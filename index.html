@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Field Shift — Smart Farm Intelligence</title>
+
+    <!-- FIX: three এবং three/addons/ এর জন্য importmap -->
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Leaflet CSS & JS (FIX: Leaflet JS script tag যোগ করা হয়েছে) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <header class="navbar">
+
+        <div class="logo">
+            <span>FS</span>
+            <strong>Field Shift</strong>
+        </div>
+
+        <nav>
+            <a href="#how">How it works</a>
+            <a href="#analysis">Analyze</a>
+            <a href="#simulation">Simulation</a>
+        </nav>
+
+        <button class="nav-btn" onclick="scrollToAnalysis()">
+            Start analysis
+        </button>
+
+    </header>
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <div class="hero-content">
+
+            <p class="eyebrow">
+                SMART FARM INTELLIGENCE
+            </p>
+
+            <h1>
+                Adapt your
+                <br>
+                farm to
+                <span>change.</span>
+            </h1>
+
+            <p class="hero-description">
+                Analyze climate, water, soil and crop conditions
+                to build smarter and more resilient farming plans.
+            </p>
+
+            <div class="hero-buttons">
+
+                <button class="primary-btn" onclick="scrollToAnalysis()">
+                    Analyze my field →
+                </button>
+
+                <button class="secondary-btn" onclick="scrollToHow()">
+                    See how it works
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- HERO VISUAL -->
+
+        <div class="hero-visual">
+
+            <div class="field-grid">
+
+                <div class="field-dot"></div>
+
+                <div class="analysis-card">
+
+                    <small>FIELD ANALYSIS</small>
+
+                    <strong>
+                        Mymensingh · Field 02
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section id="how" class="section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                HOW IT WORKS
+            </p>
+
+            <h2>
+                Turn field data into
+                <span>better decisions.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="steps">
+
+            <div class="step-card">
+                <span>01</span>
+
+                <h3>
+                    Select your field
+                </h3>
+
+                <p>
+                    Enter your location and field conditions.
+                </p>
+            </div>
+
+
+            <div class="step-card">
+                <span>02</span>
+
+                <h3>
+                    Analyze conditions
+                </h3>
+
+                <p>
+                    Combine climate, water and crop information.
+                </p>
+            </div>
+
+
+            <div class="step-card">
+                <span>03</span>
+
+                <h3>
+                    Get your plan
+                </h3>
+
+                <p>
+                    Generate an adaptive crop recommendation.
+                </p>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ANALYSIS -->
+
+    <section id="analysis" class="section analysis-section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                FIELD ANALYSIS
+            </p>
+
+            <h2>
+                Your field,
+                <span>in real time.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="dashboard">
+
+
+            <!-- FIELD MAP -->
+
+            <div class="field-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <small>NASA OBSERVATION ZONE</small>
+
+                        <h3>
+                            Mymensingh · Field 02
+                        </h3>
+
+                    </div>
+
+                    <span class="live">
+                        ● LIVE DATA
+                    </span>
+
+                </div>
+
+
+                <div class="field-map">
+
+                    <div class="map-point"></div>
+
+                </div>
+
+            </div>
+
+
+            <!-- METRICS -->
+
+            <div class="metrics">
+
+                <div class="metric-card">
+
+                    <small>RAINFALL</small>
+
+                    <strong id="rainfall">
+                        1842 mm
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <small>AVG TEMPERATURE</small>
+
+                    <strong id="temperature">
+                        27.4°C
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <small>WATER AVAILABILITY</small>
+
+                    <strong id="water">
+                        72%
+                    </strong>
+
+                </div>
+
+
+                <div class="metric-card">
+
+                    <small>VEGETATION INDEX</small>
+
+                    <strong>
+                        0.68 NDVI
+                    </strong>
+
+                </div>
+
+
+                <div class="condition-card">
+
+                    <small>FIELD CONDITION</small>
+
+                    <p id="fieldCondition">
+                        Moderate water pressure with good
+                        soil compatibility.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- SIMULATOR -->
+
+    <section id="simulation" class="section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                SCENARIO SIMULATOR
+            </p>
+
+            <h2>
+                Stress-test your
+                <span>next season.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="simulator">
+
+
+            <!-- CONTROLS -->
+
+            <div class="controls">
+
+                <h3>
+                    Climate controls
+                </h3>
+
+
+                <label>
+                    Rainfall change
+
+                    <span id="rainValue">
+                        0%
+                    </span>
+                </label>
+
+                <input type="range" id="rainSlider" min="-30" max="30" value="0">
+
+
+                <label>
+                    Temperature change
+
+                    <span id="tempValue">
+                        0°C
+                    </span>
+                </label>
+
+                <input type="range" id="tempSlider" min="-3" max="5" step="0.1" value="0">
+
+
+                <label>
+                    Water availability
+
+                    <span id="waterValue">
+                        0%
+                    </span>
+                </label>
+
+                <input type="range" id="waterSlider" min="-30" max="20" value="0">
+
+
+                <button class="secondary-btn" onclick="resetSimulation()">
+                    Reset scenario
+                </button>
+
+            </div>
+
+
+            <!-- RESULT -->
+
+            <div class="result">
+
+                <small>
+                    SIMULATED OUTCOME
+                </small>
+
+                <h3>
+                    Recommended crop
+                </h3>
+
+                <h2 id="crop">
+                    Maize
+                </h2>
+
+                <div class="score">
+
+                    <span id="score">
+                        81
+                    </span>
+
+                    /100
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div>
+                        <small>
+                            WATER PRESSURE
+                        </small>
+
+                        <strong id="waterScore">
+                            79%
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <small>
+                            CLIMATE FIT
+                        </small>
+
+                        <strong id="climateScore">
+                            79%
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <small>
+                            EXPECTED RETURN
+                        </small>
+
+                        <strong id="returnScore">
+                            ৳1.58L
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="recommendation">
+
+                    <p id="recommendationText">
+                        The scenario remains within a
+                        manageable range. Your adaptive
+                        rotation remains competitive.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CHART -->
+
+    <section class="section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                DATA VISUALIZATION
+            </p>
+
+            <h2>
+                See how conditions
+                <span>change.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="chart-container">
+
+            <canvas id="farmChart"></canvas>
+
+        </div>
+
+    </section>
+
+
+    <!-- FIELD ROTATION SECTION -->
+
+    <section id="rotation" class="section rotation-section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow">
+                FIELD ROTATION
+            </p>
+
+            <h2>
+                Plan your field
+                <span>across seasons.</span>
+            </h2>
+
+            <p class="section-description">
+                Rotate crops strategically to protect soil health,
+                manage water pressure and improve long-term productivity.
+            </p>
+
+        </div>
+
+
+        <!-- ROTATION HEADER -->
+
+        <div class="rotation-header">
+
+            <div>
+
+                <small>SELECTED FIELD</small>
+
+                <h3>
+                    Mymensingh · Field 02
+                </h3>
+
+            </div>
+
+            <div class="rotation-status">
+
+                <span class="status-dot"></span>
+
+                Rotation optimized
+
+            </div>
+
+        </div>
+
+
+        <!-- ROTATION TIMELINE -->
+
+        <div class="rotation-timeline">
+
+
+            <!-- YEAR 1 -->
+
+            <div class="rotation-card active" data-year="2026" onclick="selectRotation(2026)">
+
+                <div class="rotation-year">
+                    2026
+                </div>
+
+                <div class="crop-icon">
+                    🌽
+                </div>
+
+                <h3>
+                    Maize
+                </h3>
+
+                <p>
+                    High yield crop
+                </p>
+
+                <div class="rotation-score">
+
+                    <span>
+                        Soil impact
+                    </span>
+
+                    <strong>
+                        Medium
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 2 -->
+
+            <div class="rotation-card" data-year="2027" onclick="selectRotation(2027)">
+
+                <div class="rotation-year">
+                    2027
+                </div>
+
+                <div class="crop-icon">
+                    🌾
+                </div>
+
+                <h3>
+                    Rice
+                </h3>
+
+                <p>
+                    Water intensive
+                </p>
+
+                <div class="rotation-score">
+
+                    <span>
+                        Soil impact
+                    </span>
+
+                    <strong>
+                        High
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 3 -->
+
+            <div class="rotation-card" data-year="2028" onclick="selectRotation(2028)">
+
+                <div class="rotation-year">
+                    2028
+                </div>
+
+                <div class="crop-icon">
+                    🌱
+                </div>
+
+                <h3>
+                    Wheat
+                </h3>
+
+                <p>
+                    Moderate demand
+                </p>
+
+                <div class="rotation-score">
+
+                    <span>
+                        Soil impact
+                    </span>
+
+                    <strong>
+                        Low
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 4 -->
+
+            <div class="rotation-card" data-year="2029" onclick="selectRotation(2029)">
+
+                <div class="rotation-year">
+                    2029
+                </div>
+
+                <div class="crop-icon">
+                    🫘
+                </div>
+
+                <h3>
+                    Legume
+                </h3>
+
+                <p>
+                    Soil restoration
+                </p>
+
+                <div class="rotation-score">
+
+                    <span>
+                        Soil impact
+                    </span>
+
+                    <strong>
+                        Very Low
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROTATION ANALYSIS -->
+
+        <div class="rotation-analysis">
+
+            <div class="rotation-info">
+
+                <small>
+                    SELECTED YEAR
+                </small>
+
+                <h2 id="rotationYear">
+                    2026
+                </h2>
+
+                <h3 id="rotationCrop">
+                    🌽 Maize
+                </h3>
+
+                <p id="rotationDescription">
+                    Maize provides strong yield potential but
+                    requires careful nutrient management.
+                </p>
+
+            </div>
+
+
+            <div class="rotation-metrics">
+
+                <div>
+
+                    <span>
+                        Soil health
+                    </span>
+
+                    <strong id="soilHealth">
+                        72%
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Water demand
+                    </span>
+
+                    <strong id="rotationWater">
+                        68%
+                    </strong>
+
+                </div>
+
+
+                <div>
+
+                    <span>
+                        Yield potential
+                    </span>
+
+                    <strong id="yieldPotential">
+                        91%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- FIELD ROTATION INTERACTIVE DETAILS -->
+
+    <div class="rotation-details">
+
+        <div class="rotation-detail-main">
+
+            <span class="detail-label">
+                SELECTED YEAR
+            </span>
+
+            <h2 id="selectedYear">
+                2026
+            </h2>
+
+            <div class="selected-crop">
+
+                <span id="selectedCropIcon">🌽</span>
+
+                <span id="selectedCrop">
+                    Maize
+                </span>
+
+            </div>
+
+            <p id="cropDescription">
+                Maize provides strong yield potential
+                but requires careful nutrient management.
+            </p>
+
+        </div>
+
+
+        <div class="rotation-metrics">
+
+            <div class="metric">
+
+                <span>
+                    Soil Health
+                </span>
+
+                <strong id="detailSoilHealth">
+                    72%
+                </strong>
+
+            </div>
+
+
+            <div class="metric">
+
+                <span>
+                    Water Demand
+                </span>
+
+                <strong id="waterDemand">
+                    68%
+                </strong>
+
+            </div>
+
+
+            <div class="metric">
+
+                <span>
+                    Yield Potential
+                </span>
+
+                <strong id="detailYieldPotential">
+                    91%
+                </strong>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ROTATION ACTIONS -->
+
+    <div class="rotation-actions">
+
+        <button type="button" id="simulateRotation">
+            ▶ Simulate Rotation
+        </button>
+
+        <button type="button" id="resetRotation">
+            Reset
+        </button>
+
+    </div>
+
+
+    <!-- SIMULATION RESULT -->
+
+    <div id="rotationResult" class="rotation-result">
+
+        <span class="result-icon">
+            ✓
+        </span>
+
+        <div>
+
+            <strong>
+                Rotation analysis complete
+            </strong>
+
+            <p id="rotationResultText">
+                Your selected rotation has a
+                healthy long-term outlook.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- LAND LOCATION -->
+
+    <section id="landLocation">
+
+        <div class="section-label">
+            LAND INTELLIGENCE
+        </div>
+
+        <h2>
+            Understand your
+            <span>land.</span>
+        </h2>
+
+        <p>
+            Analyze the geographic conditions around
+            your agricultural field.
+        </p>
+
+
+        <div class="location-layout">
+
+            <!-- MAP -->
+
+            <div class="land-map">
+
+                <div id="farmMap"></div>
+
+            </div>
+
+
+            <!-- DATA -->
+
+            <div class="land-data">
+
+                <div class="land-data-header">
+
+                    <span>
+                        SELECTED LAND
+                    </span>
+
+                    <strong id="locationName">
+                        Mymensingh Field 02
+                    </strong>
+
+                </div>
+
+
+                <div class="geo-card">
+
+                    <span>
+                        📍 LOCATION
+                    </span>
+
+                    <strong id="coordinates">
+                        24.7471° N,
+                        90.4203° E
+                    </strong>
+
+                </div>
+
+
+                <div class="geo-card">
+
+                    <span>
+                        🌊 NEAREST RIVER
+                    </span>
+
+                    <strong id="riverStatus">
+                        Detecting...
+                    </strong>
+
+                    <small id="riverDistance">
+                        --
+                    </small>
+
+                </div>
+
+
+                <div class="geo-card">
+
+                    <span>
+                        💧 NEAREST POND
+                    </span>
+
+                    <strong id="pondStatus">
+                        Detecting...
+                    </strong>
+
+                    <small id="pondDistance">
+                        --
+                    </small>
+
+                </div>
+
+
+                <div class="geo-card">
+
+                    <span>
+                        📐 FIELD AREA
+                    </span>
+
+                    <strong id="fieldArea">
+                        2.4 acres
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="coordinate-inputs">
+
+            <div class="input-group">
+
+                <label>LATITUDE</label>
+
+                <input
+                    type="number"
+                    id="latitudeInput"
+                    value="24.7471"
+                    step="0.000001"
+                >
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>LONGITUDE</label>
+
+                <input
+                    type="number"
+                    id="longitudeInput"
+                    value="90.4203"
+                    step="0.000001"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="search-radius">
+
+            <label>
+                SEARCH RADIUS
+            </label>
+
+            <select id="searchRadius">
+
+                <option value="500">
+                    500 meters
+                </option>
+
+                <option
+                    value="1000"
+                    selected
+                >
+                    1 kilometer
+                </option>
+
+                <option value="2000">
+                    2 kilometers
+                </option>
+
+                <option value="5000">
+                    5 kilometers
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <button
+            id="analyzeLand"
+            class="analyze-btn"
+        >
+            Analyze this land
+        </button>
+
+    </section>
+
+
+       <section id="farmSimulation">
+
+        <!-- 3D Viewport Canvas -->
+        <div id="farm3D"></div>
+
+        <!-- Floating Glassmorphic HUD Master Overlay -->
+        <div class="hud-overlay">
+
+            <!-- Top Header -->
+            <div class="hud-top-header">
+                <h1>ময়মনসিংহ খামার সিমুলেশন</h1>
+                <p>বর্তমান অবস্থা</p>
+                <div class="hud-top-actions">
+                    <button id="hudResetView" class="hud-pill-btn" title="ড্রোন ভিউতে ফিরে যান">🚁 ড্রোন ভিউ</button>
+                    <button id="hudToggleSun" class="hud-pill-btn" title="সূর্যের আলো ও সময় পরিবর্তন">☀️ দিন</button>
+                </div>
+            </div>
+
+            <!-- Middle Body: Left and Right floating panels -->
+            <div class="hud-middle-body">
+
+                <!-- Left Panel: মাটির গুণমান -->
+                <aside class="hud-card hud-left-card">
+                    <div class="hud-card-title">
+                        <span class="hud-icon">🌱</span>
+                        <h3>মাটির গুণমান</h3>
+                    </div>
+
+                    <!-- N-P-K -->
+                    <div class="hud-npk-box">
+                        <div class="hud-npk-header">N - P - K</div>
+                        <div class="hud-npk-row">
+                            <span>নাইট্রোজেন</span>
+                            <div class="hud-bar-track">
+                                <div id="hudNitrogenBar" class="hud-bar-fill bar-nitrogen" style="width: 64%;"></div>
+                            </div>
+                            <strong id="hudNitrogenVal">৬৪%</strong>
+                        </div>
+                        <div class="hud-npk-row">
+                            <span>ফসফরাস</span>
+                            <div class="hud-bar-track">
+                                <div id="hudPhosphorusBar" class="hud-bar-fill bar-phosphorus" style="width: 52%;"></div>
+                            </div>
+                            <strong id="hudPhosphorusVal">৫২%</strong>
+                        </div>
+                        <div class="hud-npk-row">
+                            <span>পটাশিয়াম</span>
+                            <div class="hud-bar-track">
+                                <div id="hudPotassiumBar" class="hud-bar-fill bar-potassium" style="width: 48%;"></div>
+                            </div>
+                            <strong id="hudPotassiumVal">৪৮%</strong>
+                        </div>
+                    </div>
+
+                    <!-- মাটির আর্দ্রতা -->
+                    <div class="hud-moisture-box">
+                        <h4>মাটির আর্দ্রতা</h4>
+                        <div class="hud-moisture-content">
+                            <div class="soil-strata-viz">
+                                <div class="strata-scale">
+                                    <span>০ সেমি</span>
+                                    <span>৫ সেমি</span>
+                                    <span>১০ সেমি</span>
+                                </div>
+                                <div class="strata-graphic">
+                                    <div class="strata-grass"></div>
+                                    <div class="strata-topsoil"></div>
+                                    <div class="strata-subsoil"></div>
+                                </div>
+                            </div>
+                            <div class="moisture-ring-gauge">
+                                <svg viewBox="0 0 80 80">
+                                    <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
+                                    <circle class="gauge-meter" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="64"></circle>
+                                </svg>
+                                <div class="gauge-val" id="hudMoistureVal">৬৮%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- মাটির pH ও গঠন -->
+                    <div class="hud-split-row">
+                        <div class="hud-sub-box ph-box">
+                            <h4>মাটির pH</h4>
+                            <div class="ph-gauge-viz">
+                                <svg viewBox="0 0 100 55">
+                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#phGradient)" stroke-width="8" stroke-linecap="round"></path>
+                                    <defs>
+                                        <linearGradient id="phGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                            <stop offset="0%" stop-color="#e74c3c" />
+                                            <stop offset="35%" stop-color="#f1c40f" />
+                                            <stop offset="70%" stop-color="#2ecc71" />
+                                            <stop offset="100%" stop-color="#3498db" />
+                                        </linearGradient>
+                                    </defs>
+                                    <circle cx="50" cy="50" r="4" fill="#2d3748" />
+                                    <line x1="50" y1="50" x2="56" y2="18" stroke="#1a3e23" stroke-width="2.5" stroke-linecap="round" />
+                                </svg>
+                                <strong id="hudPHVal">৬.৫</strong>
+                            </div>
+                        </div>
+
+                        <div class="hud-sub-box texture-box">
+                            <h4>মাটির গঠন</h4>
+                            <p>মাটির গঠন দোআঁশ সাধারণ নার্সিং জমি হলেও পর্যাপ্ত পুষ্টি ও নিয়মিত পানি নিষ্কাশনে সর্বাধিক ফলন নিশ্চিত হয়।</p>
+                        </div>
+                    </div>
+
+                    <!-- মাটির তাপমাত্রা -->
+                    <div class="hud-footer-metric">
+                        <span>মাটির তাপমাত্রা</span>
+                        <strong id="hudTempVal">২৪°সে.</strong>
+                    </div>
+                </aside>
+
+                <!-- Right Column: ফসল পরামর্শ ও আবহাওয়া -->
+                <div class="hud-right-col">
+
+                    <!-- ফসল পরামর্শ -->
+                    <aside class="hud-card hud-crops-card">
+                        <div class="hud-card-title">
+                            <span class="hud-icon">🌱</span>
+                            <h3>ফসল পরামর্শ</h3>
+                        </div>
+                        <div class="crop-rec-header">সেরা ফসল</div>
+                        <ul class="rec-crop-list">
+                            <li>
+                                <span class="rec-icon">🌾</span>
+                                <span class="rec-name">১. আমন ধান</span>
+                                <span class="rec-badge badge-top">উপযুক্ত</span>
+                            </li>
+                            <li>
+                                <span class="rec-icon">🍆</span>
+                                <span class="rec-name">২. বেগুন</span>
+                                <span class="rec-badge">উচ্চ ফলন</span>
+                            </li>
+                            <li>
+                                <span class="rec-icon">🍈</span>
+                                <span class="rec-name">৩. পেঁপে</span>
+                                <span class="rec-badge">অনুকূল</span>
+                            </li>
+                            <li>
+                                <span class="rec-icon">🫘</span>
+                                <span class="rec-name">৪. ডাল</span>
+                                <span class="rec-badge">মাটিবান্ধব</span>
+                            </li>
+                        </ul>
+                    </aside>
+
+                    <!-- আবহাওয়া -->
+                    <aside class="hud-card hud-weather-card">
+                        <div class="hud-card-title">
+                            <h3>আবহাওয়া</h3>
+                        </div>
+                        <div class="weather-subhead">৫ দিন এ ময়মনসিংহ</div>
+                        <div class="forecast-5day">
+                            <div class="f-day-col">
+                                <span class="d-name">আজ</span>
+                                <span class="d-icon">☀️</span>
+                                <strong class="d-temp">৩১°সে.</strong>
+                            </div>
+                            <div class="f-day-col">
+                                <span class="d-name">শুক্র</span>
+                                <span class="d-icon">🌤️</span>
+                                <strong class="d-temp">২৯°সে.</strong>
+                            </div>
+                            <div class="f-day-col">
+                                <span class="d-name">শনি</span>
+                                <span class="d-icon">🌧️</span>
+                                <strong class="d-temp">২৬°সে.</strong>
+                            </div>
+                            <div class="f-day-col">
+                                <span class="d-name">রবি</span>
+                                <span class="d-icon">☀️</span>
+                                <strong class="d-temp">৩০°সে.</strong>
+                            </div>
+                            <div class="f-day-col">
+                                <span class="d-name">সোম</span>
+                                <span class="d-icon">⛅</span>
+                                <strong class="d-temp">২৮°সে.</strong>
+                            </div>
+                        </div>
+
+                        <div class="weather-meta-row">
+                            <div class="w-meta-item">
+                                <span>বাতাসের গতি</span>
+                                <strong id="hudWindSpeed">৩১ কিমি/ঘণ্টা</strong>
+                                <small id="hudHumidity">৮৮% আর্দ্রতা</small>
+                            </div>
+                            <div class="w-meta-item">
+                                <span>বৃষ্টির সম্ভাবনা</span>
+                                <strong>বৃষ্টি</strong>
+                                <small>পরশুদিন</small>
+                            </div>
+                        </div>
+                    </aside>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- CTA -->
+
+    <section class="final-cta">
+
+        <p class="eyebrow">
+            READY TO ADAPT?
+        </p>
+
+        <h2>
+            Build a smarter
+            <span>farm plan.</span>
+        </h2>
+
+        <button class="primary-btn" onclick="scrollToAnalysis()">
+            Start analysis →
+        </button>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <strong>
+            AgriVision
+        </strong>
+
+        <p>
+            Smart farming intelligence platform.
+        </p>
+
+    </footer>
+
+
+    <!-- SCRIPTS (সঠিক ক্রমানুসারে) -->
+    <script src="js/data.js"></script>
+    <script src="js/map.js"></script>
+    <script src="js/rotation.js"></script>
+    <script src="script.js"></script>
+    <script type="module" src="js/simulation.js"></script>
+
+</body>
+
+</html>
