@@ -1,10 +1,15 @@
 /*
 |--------------------------------------------------------------------------
-| AGRIVISION - ADVANCED REALISTIC 3D FARM ENGINE
+| AGRIVISION — HYPER-REALISTIC 3D SMART FARM ENGINE (Three.js)
 |--------------------------------------------------------------------------
-| Procedural PBR Textures + Atmospheric Lighting + Furrowed Plots
-| Dynamic Pond Water + Instanced Crops (Rice, Brinjal, Cabbage, Tomato)
-| Tropical Trees (Coconut Palm, Jackfruit, Mango) + Bangladeshi Farmhouse
+| Features:
+| • Procedural PBR Soil & Furrow Textures + Anisotropic Tin Roof Shader
+| • Dynamic Animated Water with Ripple Normal Distortion & Reflections
+| • Rich Bengali Farm Atmosphere: Farmhouse, Veranda, Hand Tube-Well (নলকূপ),
+|   Bamboo Fencing, Coconut Palms, Banana Trees, Rice Paddy & Vegetable Plots
+| • 3-Stage Cinematic Lighting: Day ☀️, Sunset 🌅, and Night 🌙 with Fireflies
+| • Dual Camera Presets: 🚁 Drone Overview & 🚜 Ground-Level Field Walk
+| • English Default HUD with Instant Bilingual (EN ⇄ BN) Synchronization
 |--------------------------------------------------------------------------
 */
 
@@ -12,11 +17,14 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 let scene, camera, renderer, controls;
-let farmGroup, cropGroup, treeGroup, waterGroup, animatedObjects = [];
+let farmGroup, cropGroup, treeGroup, waterGroup, cloudGroup, fireflyGroup;
+let animatedObjects = [];
 let pondMaterial, paddyWaterMaterial;
-let sunLight, hemiLight;
+let sunLight, hemiLight, ambientLight, moonLight;
 let animationTime = 0;
-let isDayMode = true;
+
+// Lighting Modes: 0 = Day, 1 = Sunset / Dusk, 2 = Night
+let currentLightingMode = 0;
 
 /*
 |--------------------------------------------------------------------------
@@ -24,33 +32,34 @@ let isDayMode = true;
 |--------------------------------------------------------------------------
 */
 
-// ১. খাঁজকাটা দোআঁশ মাটির টেক্সচার (Plowed Furrows)
+// 1. Furrowed Agricultural Soil Texture (Plowed Earth)
 function createFurrowTexture() {
     const canvas = document.createElement("canvas");
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#3a2a1a";
+    ctx.fillStyle = "#332214";
     ctx.fillRect(0, 0, 512, 512);
 
     const furrowHeight = 32;
     for (let y = 0; y < 512; y += furrowHeight) {
         const grad = ctx.createLinearGradient(0, y, 0, y + furrowHeight);
-        grad.addColorStop(0, "rgba(25, 17, 10, 0.85)");
-        grad.addColorStop(0.3, "rgba(70, 52, 33, 0.9)");
-        grad.addColorStop(0.7, "rgba(95, 72, 46, 0.95)");
-        grad.addColorStop(1, "rgba(25, 17, 10, 0.85)");
+        grad.addColorStop(0.0, "rgba(22, 14, 8, 0.95)");
+        grad.addColorStop(0.3, "rgba(65, 46, 27, 0.9)");
+        grad.addColorStop(0.7, "rgba(92, 68, 42, 0.95)");
+        grad.addColorStop(1.0, "rgba(22, 14, 8, 0.95)");
 
         ctx.fillStyle = grad;
         ctx.fillRect(0, y, 512, furrowHeight);
 
-        for (let i = 0; i < 90; i++) {
+        // Soil clumps & pebbles
+        for (let i = 0; i < 80; i++) {
             const rx = Math.random() * 512;
             const ry = y + Math.random() * furrowHeight;
-            const rSize = 1.5 + Math.random() * 3.5;
-            const dark = Math.random() > 0.5;
-            ctx.fillStyle = dark ? "rgba(20, 14, 8, 0.4)" : "rgba(110, 85, 55, 0.35)";
+            const rSize = 1.2 + Math.random() * 3.2;
+            const isDark = Math.random() > 0.5;
+            ctx.fillStyle = isDark ? "rgba(15, 10, 5, 0.5)" : "rgba(115, 88, 55, 0.4)";
             ctx.beginPath();
             ctx.arc(rx, ry, rSize, 0, Math.PI * 2);
             ctx.fill();
@@ -64,21 +73,21 @@ function createFurrowTexture() {
     return texture;
 }
 
-// ২. সবুজ ঘাসের টেক্সচার
+// 2. Natural Lush Grass Texture
 function createGrassTexture() {
     const canvas = document.createElement("canvas");
     canvas.width = 512;
     canvas.height = 512;
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#48712f";
+    ctx.fillStyle = "#3c6126";
     ctx.fillRect(0, 0, 512, 512);
 
-    for (let i = 0; i < 15000; i++) {
+    const colors = ["#4e7a2d", "#36591f", "#5c8c36", "#294617", "#466e28"];
+    for (let i = 0; i < 18000; i++) {
         const x = Math.random() * 512;
         const y = Math.random() * 512;
-        const len = 2 + Math.random() * 5;
-        const colors = ["#5c8c3a", "#3b6024", "#6fa345", "#2e4d1c", "#507a33"];
+        const len = 2.5 + Math.random() * 5.5;
         ctx.strokeStyle = colors[Math.floor(Math.random() * colors.length)];
         ctx.lineWidth = 1;
         ctx.beginPath();
@@ -90,11 +99,11 @@ function createGrassTexture() {
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(10, 10);
+    texture.repeat.set(12, 12);
     return texture;
 }
 
-// ৩. পানির ঢেউয়ের নরমাল ম্যাপ
+// 3. Dynamic Water Surface Normal Map
 function createWaterNormalTexture() {
     const canvas = document.createElement("canvas");
     canvas.width = 256;
@@ -105,12 +114,12 @@ function createWaterNormalTexture() {
     for (let y = 0; y < 256; y++) {
         for (let x = 0; x < 256; x++) {
             const idx = (y * 256 + x) * 4;
-            const wave1 = Math.sin(x * 0.12) * Math.cos(y * 0.12);
-            const wave2 = Math.sin((x + y) * 0.08) * 0.5;
-            const combined = (wave1 + wave2 + 1.5) / 3;
+            const w1 = Math.sin(x * 0.14) * Math.cos(y * 0.14);
+            const w2 = Math.sin((x + y) * 0.09) * 0.6;
+            const val = (w1 + w2 + 1.6) / 3.2;
 
-            imgData.data[idx] = Math.floor(128 + combined * 60);
-            imgData.data[idx + 1] = Math.floor(128 + combined * 60);
+            imgData.data[idx]     = Math.floor(128 + (val - 0.5) * 80);
+            imgData.data[idx + 1] = Math.floor(128 + (val - 0.5) * 80);
             imgData.data[idx + 2] = 255;
             imgData.data[idx + 3] = 255;
         }
@@ -120,25 +129,25 @@ function createWaterNormalTexture() {
     const texture = new THREE.CanvasTexture(canvas);
     texture.wrapS = THREE.RepeatWrapping;
     texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(6, 6);
+    texture.repeat.set(8, 8);
     return texture;
 }
 
-// ৪. টিনের চালের মেটালিক টেক্সচার
+// 4. Corrugated Galvanized Tin Roof Texture
 function createTinRoofTexture() {
     const canvas = document.createElement("canvas");
     canvas.width = 256;
     canvas.height = 256;
     const ctx = canvas.getContext("2d");
 
-    ctx.fillStyle = "#8a959e";
+    ctx.fillStyle = "#8a969e";
     ctx.fillRect(0, 0, 256, 256);
 
     for (let x = 0; x < 256; x += 8) {
         const grad = ctx.createLinearGradient(x, 0, x + 8, 0);
-        grad.addColorStop(0, "#5e6973");
-        grad.addColorStop(0.5, "#b5c1cb");
-        grad.addColorStop(1, "#5e6973");
+        grad.addColorStop(0.0, "#525e68");
+        grad.addColorStop(0.5, "#d2dbe2");
+        grad.addColorStop(1.0, "#525e68");
         ctx.fillStyle = grad;
         ctx.fillRect(x, 0, 8, 256);
     }
@@ -152,7 +161,7 @@ function createTinRoofTexture() {
 
 /*
 |--------------------------------------------------------------------------
-| INITIALIZE 3D SCENE
+| INITIALIZE 3D SIMULATION SCENE
 |--------------------------------------------------------------------------
 */
 
@@ -162,104 +171,161 @@ export function initializeFarmSimulation() {
 
     container.innerHTML = "";
 
+    // 1. Scene & Atmosphere Fog
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xa6d1df);
-    scene.fog = new THREE.FogExp2(0xc4dfc8, 0.015); // বায়ুমণ্ডলীয় হালকা কুয়াশা
+    scene.background = new THREE.Color(0xa5d6e7);
+    scene.fog = new THREE.FogExp2(0xcde6df, 0.012);
 
+    // 2. Camera setup
     const aspect = container.clientWidth / container.clientHeight;
-    camera = new THREE.PerspectiveCamera(42, aspect, 0.5, 300);
-    camera.position.set(0, 19, 32); // ড্রোন ভিউ
+    camera = new THREE.PerspectiveCamera(42, aspect, 0.5, 350);
+    camera.position.set(0, 20, 32); // Drone View default
 
+    // 3. Renderer with High-Fidelity Tone Mapping & Soft Shadows
     renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.12;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     container.appendChild(renderer.domElement);
 
+    // 4. Orbit Controls with Smooth Damping
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.minDistance = 10;
-    controls.maxDistance = 65;
-    controls.maxPolarAngle = Math.PI / 2.08;
-    controls.minPolarAngle = Math.PI / 8;
+    controls.minDistance = 6;
+    controls.maxDistance = 75;
+    controls.maxPolarAngle = Math.PI / 2.05; // Prevent camera sinking under ground
+    controls.minPolarAngle = Math.PI / 10;
     controls.target.set(0, 1.2, 0);
 
-    setupLighting();
-
-    farmGroup  = new THREE.Group();
-    cropGroup  = new THREE.Group();
-    treeGroup  = new THREE.Group();
-    waterGroup = new THREE.Group();
+    // 5. Hierarchy Groups
+    farmGroup    = new THREE.Group();
+    cropGroup    = new THREE.Group();
+    treeGroup    = new THREE.Group();
+    waterGroup   = new THREE.Group();
+    cloudGroup   = new THREE.Group();
+    fireflyGroup = new THREE.Group();
 
     scene.add(farmGroup);
     farmGroup.add(cropGroup);
     farmGroup.add(treeGroup);
     farmGroup.add(waterGroup);
+    scene.add(cloudGroup);
+    scene.add(fireflyGroup);
 
-    buildSkyAndBackdrop();
+    // 6. Build Scene Objects
+    setupLighting();
+    buildAtmosphereDome();
+    buildVolumetricClouds();
     buildTerrain();
-    buildPlowedVegetableFields();
     buildPaddyField();
-    buildPondsAndWaterways();
+    buildVegetableBeds();
+    buildPondAndCanals();
     buildRoadsAndAils();
-    buildFarmHousesAndSheds();
+    buildBangladeshiFarmhouse();
+    buildTubeWell();
+    buildBambooFences();
     buildVegetationAndCrops();
-    buildPerimeterTrees();
+    buildTropicalTrees();
+    buildFireflies();
 
-    updateDashboard();
-    setupInteractiveHUDControls();
+    // 7. Interactive Controls & Bilingual Synchronization
+    setupInteractiveCameraAndLights();
+    updateDashboardUI();
 
     window.addEventListener("resize", onWindowResize);
-    animateFarm();
+    window.addEventListener("languageChanged", updateDashboardUI);
+
+    animate();
 }
 
+/*
+|--------------------------------------------------------------------------
+| LIGHTING RIG (DAY, SUNSET, NIGHT)
+|--------------------------------------------------------------------------
+*/
+
 function setupLighting() {
-    hemiLight = new THREE.HemisphereLight(0xdaf2ff, 0x486932, 1.3);
+    hemiLight = new THREE.HemisphereLight(0xdcf4ff, 0x3d5a27, 1.4);
     scene.add(hemiLight);
 
-    const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-    scene.add(ambient);
+    ambientLight = new THREE.AmbientLight(0xffffff, 0.65);
+    scene.add(ambientLight);
 
-    sunLight = new THREE.DirectionalLight(0xfffae8, 2.7);
-    sunLight.position.set(28, 42, 22);
+    sunLight = new THREE.DirectionalLight(0xfffae6, 2.8);
+    sunLight.position.set(30, 45, 24);
     sunLight.castShadow = true;
 
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
     sunLight.shadow.camera.near = 5;
-    sunLight.shadow.camera.far = 120;
-    sunLight.shadow.camera.left = -30;
-    sunLight.shadow.camera.right = 30;
-    sunLight.shadow.camera.top = 30;
-    sunLight.shadow.camera.bottom = -30;
-    sunLight.shadow.bias = -0.0003;
-    sunLight.shadow.radius = 2.5;
+    sunLight.shadow.camera.far = 130;
+    sunLight.shadow.camera.left = -35;
+    sunLight.shadow.camera.right = 35;
+    sunLight.shadow.camera.top = 35;
+    sunLight.shadow.camera.bottom = -35;
+    sunLight.shadow.bias = -0.00025;
+    sunLight.shadow.radius = 2.4;
 
     scene.add(sunLight);
+
+    // Moonlight (active during night)
+    moonLight = new THREE.DirectionalLight(0x7da4d9, 0);
+    moonLight.position.set(-20, 35, -20);
+    scene.add(moonLight);
 }
 
-function buildSkyAndBackdrop() {
-    const skyGeo = new THREE.SphereGeometry(140, 32, 16);
-    const skyMat = new THREE.MeshBasicMaterial({ color: 0x9ed1e8, side: THREE.BackSide });
+/*
+|--------------------------------------------------------------------------
+| ENVIRONMENT & ATMOSPHERE
+|--------------------------------------------------------------------------
+*/
+
+function buildAtmosphereDome() {
+    const skyGeo = new THREE.SphereGeometry(150, 32, 16);
+    const skyMat = new THREE.MeshBasicMaterial({ color: 0x9ecfe6, side: THREE.BackSide });
     scene.add(new THREE.Mesh(skyGeo, skyMat));
 
-    const treeWallGeo = new THREE.CylinderGeometry(75, 75, 12, 48, 1, true);
-    const treeWallMat = new THREE.MeshBasicMaterial({ color: 0x426839, side: THREE.BackSide, fog: true });
-    const treeWall = new THREE.Mesh(treeWallGeo, treeWallMat);
-    treeWall.position.y = 5;
-    scene.add(treeWall);
+    // Distant tree horizon layer
+    const horizonGeo = new THREE.CylinderGeometry(80, 80, 14, 48, 1, true);
+    const horizonMat = new THREE.MeshBasicMaterial({ color: 0x3b5f34, side: THREE.BackSide, fog: true });
+    const horizon = new THREE.Mesh(horizonGeo, horizonMat);
+    horizon.position.y = 5.5;
+    scene.add(horizon);
+}
+
+function buildVolumetricClouds() {
+    const cloudMat = new THREE.MeshStandardMaterial({
+        color: 0xffffff,
+        roughness: 0.9,
+        transparent: true,
+        opacity: 0.85
+    });
+
+    for (let c = 0; c < 7; c++) {
+        const cloud = new THREE.Group();
+        const puffCount = 5 + Math.floor(Math.random() * 4);
+        for (let p = 0; p < puffCount; p++) {
+            const size = 2.2 + Math.random() * 2.2;
+            const puff = new THREE.Mesh(new THREE.SphereGeometry(size, 7, 7), cloudMat);
+            puff.position.set((p - puffCount / 2) * 2.2, (Math.random() - 0.5) * 0.8, (Math.random() - 0.5) * 1.5);
+            cloud.add(puff);
+        }
+        cloud.position.set(-45 + Math.random() * 90, 26 + Math.random() * 6, -35 + Math.random() * 70);
+        cloud.scale.set(1.4, 0.7, 1.2);
+        cloudGroup.add(cloud);
+    }
 }
 
 function buildTerrain() {
     const grassTex = createGrassTexture();
     const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(85, 75, 32, 32),
-        new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9, metalness: 0.05 })
+        new THREE.PlaneGeometry(90, 80, 32, 32),
+        new THREE.MeshStandardMaterial({ map: grassTex, roughness: 0.9, metalness: 0.04 })
     );
     ground.rotation.x = -Math.PI / 2;
     ground.position.y = -0.05;
@@ -267,197 +333,311 @@ function buildTerrain() {
     farmGroup.add(ground);
 }
 
-function buildPlowedVegetableFields() {
-    const furrowTex = createFurrowTexture();
-    const soilMat = new THREE.MeshStandardMaterial({ map: furrowTex, roughness: 0.95, metalness: 0.02 });
-
-    const bed1 = new THREE.Mesh(new THREE.BoxGeometry(16, 0.35, 9), soilMat);
-    bed1.position.set(0, 0.15, 3.5);
-    bed1.receiveShadow = true;
-    bed1.castShadow = true;
-    farmGroup.add(bed1);
-
-    const bed2 = new THREE.Mesh(new THREE.BoxGeometry(11, 0.35, 7.5), soilMat);
-    bed2.position.set(8.5, 0.15, -6.5);
-    bed2.receiveShadow = true;
-    bed2.castShadow = true;
-    farmGroup.add(bed2);
-
-    const bed3 = new THREE.Mesh(new THREE.BoxGeometry(8, 0.3, 5), soilMat);
-    bed3.position.set(-9.5, 0.12, 1);
-    bed3.receiveShadow = true;
-    bed3.castShadow = true;
-    farmGroup.add(bed3);
-
-    buildEarthBorder(0, 3.5, 16.3, 9.3);
-    buildEarthBorder(8.5, -6.5, 11.3, 7.8);
-}
-
-function buildEarthBorder(x, z, w, d) {
-    const borderMat = new THREE.MeshStandardMaterial({ color: 0x5a4833, roughness: 0.9 });
-    const h = 0.45;
-    const thickness = 0.35;
-
-    const nsGeo = new THREE.BoxGeometry(w, h, thickness);
-    const nMesh = new THREE.Mesh(nsGeo, borderMat);
-    nMesh.position.set(x, h / 2, z - d / 2);
-    farmGroup.add(nMesh);
-
-    const sMesh = new THREE.Mesh(nsGeo, borderMat);
-    sMesh.position.set(x, h / 2, z + d / 2);
-    farmGroup.add(sMesh);
-
-    const ewGeo = new THREE.BoxGeometry(thickness, h, d);
-    const eMesh = new THREE.Mesh(ewGeo, borderMat);
-    eMesh.position.set(x + w / 2, h / 2, z);
-    farmGroup.add(eMesh);
-
-    const wMesh = new THREE.Mesh(ewGeo, borderMat);
-    wMesh.position.set(x - w / 2, h / 2, z);
-    farmGroup.add(wMesh);
-}
+/*
+|--------------------------------------------------------------------------
+| AGRICULTURAL PLOTS & WATERWAYS
+|--------------------------------------------------------------------------
+*/
 
 function buildPaddyField() {
+    // Sunken waterlogged mud plot
     const mud = new THREE.Mesh(
-        new THREE.BoxGeometry(14, 0.15, 12),
-        new THREE.MeshStandardMaterial({ color: 0x3d3528, roughness: 0.4, metalness: 0.1 })
+        new THREE.BoxGeometry(15, 0.16, 12.5),
+        new THREE.MeshStandardMaterial({ color: 0x352c20, roughness: 0.35, metalness: 0.15 })
     );
-    mud.position.set(-13, 0.05, -7.5);
+    mud.position.set(-13.5, 0.05, -7.5);
     farmGroup.add(mud);
 
     paddyWaterMaterial = new THREE.MeshStandardMaterial({
-        color: 0x3f6b4d,
-        roughness: 0.1,
-        metalness: 0.25,
+        color: 0x3a6b4c,
+        roughness: 0.08,
+        metalness: 0.3,
         transparent: true,
-        opacity: 0.75
+        opacity: 0.78
     });
-    const water = new THREE.Mesh(new THREE.PlaneGeometry(13.8, 11.8), paddyWaterMaterial);
+    const water = new THREE.Mesh(new THREE.PlaneGeometry(14.7, 12.2), paddyWaterMaterial);
     water.rotation.x = -Math.PI / 2;
-    water.position.set(-13, 0.14, -7.5);
+    water.position.set(-13.5, 0.14, -7.5);
     farmGroup.add(water);
 
-    buildEarthBorder(-13, -7.5, 14.2, 12.2);
-    buildPaddyPlants(-13, -7.5, 13, 11);
+    buildAilBorder(-13.5, -7.5, 15.2, 12.7);
+    buildPaddySeedlings(-13.5, -7.5, 14, 11.5);
 }
 
-function buildPaddyPlants(centerX, centerZ, width, depth) {
-    const plantCount = 280;
-    const shootGeo = new THREE.ConeGeometry(0.08, 0.7, 4);
-    const shootMat = new THREE.MeshStandardMaterial({ color: 0x6bb83b, roughness: 0.6 });
+function buildAilBorder(x, z, w, d) {
+    const ailMat = new THREE.MeshStandardMaterial({ color: 0x54432d, roughness: 0.92 });
+    const h = 0.42;
+    const thickness = 0.4;
 
-    const instancedPaddy = new THREE.InstancedMesh(shootGeo, shootMat, plantCount);
-    instancedPaddy.castShadow = true;
+    const nsGeo = new THREE.BoxGeometry(w, h, thickness);
+    const n = new THREE.Mesh(nsGeo, ailMat);
+    n.position.set(x, h / 2, z - d / 2);
+    n.castShadow = true; n.receiveShadow = true;
+    farmGroup.add(n);
+
+    const s = new THREE.Mesh(nsGeo, ailMat);
+    s.position.set(x, h / 2, z + d / 2);
+    s.castShadow = true; s.receiveShadow = true;
+    farmGroup.add(s);
+
+    const ewGeo = new THREE.BoxGeometry(thickness, h, d);
+    const e = new THREE.Mesh(ewGeo, ailMat);
+    e.position.set(x + w / 2, h / 2, z);
+    e.castShadow = true; e.receiveShadow = true;
+    farmGroup.add(e);
+
+    const wMesh = new THREE.Mesh(ewGeo, ailMat);
+    wMesh.position.set(x - w / 2, h / 2, z);
+    wMesh.castShadow = true; wMesh.receiveShadow = true;
+    farmGroup.add(wMesh);
+}
+
+function buildPaddySeedlings(centerX, centerZ, width, depth) {
+    const shootGeo = new THREE.ConeGeometry(0.07, 0.72, 4);
+    const shootMat = new THREE.MeshStandardMaterial({ color: 0x6dbf39, roughness: 0.55 });
+    const count = 300;
+    const instanced = new THREE.InstancedMesh(shootGeo, shootMat, count);
+    instanced.castShadow = true;
 
     const dummy = new THREE.Object3D();
     let idx = 0;
-    const cols = 20, rows = 14;
+    const cols = 20, rows = 15;
     const xStep = width / cols, zStep = depth / rows;
 
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            const px = centerX - width / 2 + c * xStep + (Math.random() - 0.5) * 0.25;
-            const pz = centerZ - depth / 2 + r * zStep + (Math.random() - 0.5) * 0.25;
-            const scale = 0.8 + Math.random() * 0.45;
+            const px = centerX - width / 2 + c * xStep + (Math.random() - 0.5) * 0.28;
+            const pz = centerZ - depth / 2 + r * zStep + (Math.random() - 0.5) * 0.28;
+            const s = 0.8 + Math.random() * 0.4;
 
-            dummy.position.set(px, 0.45 * scale, pz);
-            dummy.scale.set(scale, scale, scale);
+            dummy.position.set(px, 0.45 * s, pz);
+            dummy.scale.set(s, s, s);
             dummy.rotation.y = Math.random() * Math.PI;
             dummy.updateMatrix();
 
-            instancedPaddy.setMatrixAt(idx++, dummy.matrix);
+            instanced.setMatrixAt(idx++, dummy.matrix);
         }
     }
-    cropGroup.add(instancedPaddy);
-    animatedObjects.push({ mesh: instancedPaddy, type: "paddy" });
+    cropGroup.add(instanced);
+    animatedObjects.push({ mesh: instanced, type: "paddy" });
 }
 
-function buildPondsAndWaterways() {
+function buildVegetableBeds() {
+    const furrowTex = createFurrowTexture();
+    const soilMat = new THREE.MeshStandardMaterial({ map: furrowTex, roughness: 0.95, metalness: 0.02 });
+
+    // Bed 1: Brinjal & Cabbage (center front)
+    const bed1 = new THREE.Mesh(new THREE.BoxGeometry(16, 0.35, 9.5), soilMat);
+    bed1.position.set(0, 0.15, 3.8);
+    bed1.receiveShadow = true;
+    bed1.castShadow = true;
+    farmGroup.add(bed1);
+    buildAilBorder(0, 3.8, 16.4, 9.8);
+
+    // Bed 2: Tomatoes & Maize (right side)
+    const bed2 = new THREE.Mesh(new THREE.BoxGeometry(12, 0.35, 8.5), soilMat);
+    bed2.position.set(9.2, 0.15, -6.5);
+    bed2.receiveShadow = true;
+    bed2.castShadow = true;
+    farmGroup.add(bed2);
+    buildAilBorder(9.2, -6.5, 12.4, 8.8);
+}
+
+function buildPondAndCanals() {
     const waterNormal = createWaterNormalTexture();
 
     pondMaterial = new THREE.MeshStandardMaterial({
-        color: 0x1f749e,
-        roughness: 0.12,
-        metalness: 0.35,
+        color: 0x1a729b,
+        roughness: 0.08,
+        metalness: 0.32,
         normalMap: waterNormal,
         transparent: true,
         opacity: 0.88
     });
 
-    const pond = new THREE.Mesh(new THREE.CylinderGeometry(5.2, 5.8, 0.4, 40), pondMaterial);
-    pond.position.set(-1.5, 0.12, -7.5);
-    pond.scale.set(1.4, 1, 0.85);
+    // Rural Farm Pond (পুকুর)
+    const pond = new THREE.Mesh(new THREE.CylinderGeometry(5.4, 6.0, 0.45, 42), pondMaterial);
+    pond.position.set(-1.8, 0.12, -7.5);
+    pond.scale.set(1.45, 1, 0.9);
     waterGroup.add(pond);
 
+    // Earthen embankment rim
     const rim = new THREE.Mesh(
-        new THREE.TorusGeometry(5.5, 0.4, 8, 36),
-        new THREE.MeshStandardMaterial({ color: 0x4a5d33, roughness: 0.95 })
+        new THREE.TorusGeometry(5.6, 0.45, 8, 36),
+        new THREE.MeshStandardMaterial({ color: 0x485a31, roughness: 0.95 })
     );
     rim.rotation.x = Math.PI / 2;
-    rim.position.set(-1.5, 0.18, -7.5);
-    rim.scale.set(1.4, 0.85, 1);
+    rim.position.set(-1.8, 0.18, -7.5);
+    rim.scale.set(1.45, 0.9, 1);
     waterGroup.add(rim);
 
-    const stream = new THREE.Mesh(new THREE.BoxGeometry(28, 0.2, 1.4), pondMaterial);
-    stream.position.set(0, 0.08, 9.8);
-    waterGroup.add(stream);
+    // Irrigation Canal
+    const canal = new THREE.Mesh(new THREE.BoxGeometry(32, 0.22, 1.6), pondMaterial);
+    canal.position.set(0, 0.08, 10.2);
+    waterGroup.add(canal);
+
+    // Lotus / Water Lily Pads (শাপলা পাতা)
+    const lilyMat = new THREE.MeshStandardMaterial({ color: 0x2e6f33, roughness: 0.6 });
+    for (let l = 0; l < 9; l++) {
+        const pad = new THREE.Mesh(new THREE.CircleGeometry(0.35 + Math.random() * 0.2, 8), lilyMat);
+        pad.rotation.x = -Math.PI / 2;
+        pad.position.set(-2.5 + (Math.random() - 0.5) * 4.5, 0.25, -7.5 + (Math.random() - 0.5) * 3);
+        waterGroup.add(pad);
+    }
 }
 
 function buildRoadsAndAils() {
-    const roadMat = new THREE.MeshStandardMaterial({ color: 0xb49a74, roughness: 0.95 });
+    const pathMat = new THREE.MeshStandardMaterial({ color: 0xb59972, roughness: 0.95 });
 
-    const mainRoad = new THREE.Mesh(new THREE.BoxGeometry(60, 0.1, 2.2), roadMat);
+    const mainRoad = new THREE.Mesh(new THREE.BoxGeometry(65, 0.1, 2.4), pathMat);
     mainRoad.position.set(0, 0.06, -1.8);
+    mainRoad.receiveShadow = true;
     farmGroup.add(mainRoad);
 
-    const sideRoad = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 40), roadMat);
-    sideRoad.position.set(-6.2, 0.06, 0);
-    farmGroup.add(sideRoad);
+    const farmPath = new THREE.Mesh(new THREE.BoxGeometry(2.0, 0.1, 42), pathMat);
+    farmPath.position.set(-6.5, 0.06, 0);
+    farmPath.receiveShadow = true;
+    farmGroup.add(farmPath);
 }
 
-function buildFarmHousesAndSheds() {
+/*
+|--------------------------------------------------------------------------
+| BANGLADESHI RURAL FARMHOUSE, TUBE-WELL & FENCING
+|--------------------------------------------------------------------------
+*/
+
+function buildBangladeshiFarmhouse() {
+    const house = new THREE.Group();
     const tinTex = createTinRoofTexture();
-    const houseGroup = new THREE.Group();
 
-    const walls = new THREE.Mesh(
-        new THREE.BoxGeometry(4.5, 2.4, 3.4),
-        new THREE.MeshStandardMaterial({ color: 0xd8caa8, roughness: 0.8 })
-    );
-    walls.position.y = 1.2;
-    walls.castShadow = true;
-    houseGroup.add(walls);
+    // Mud / Plaster Walls
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xd6cbb0, roughness: 0.85 });
+    const mainRoom = new THREE.Mesh(new THREE.BoxGeometry(5.0, 2.5, 3.6), wallMat);
+    mainRoom.position.y = 1.25;
+    mainRoom.castShadow = true;
+    house.add(mainRoom);
 
-    const roofMat = new THREE.MeshStandardMaterial({ map: tinTex, roughness: 0.45, metalness: 0.65 });
+    // Door & Windows
+    const woodMat = new THREE.MeshStandardMaterial({ color: 0x4a321d, roughness: 0.7 });
+    const door = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.8, 0.08), woodMat);
+    door.position.set(0.6, 0.9, 1.82);
+    house.add(door);
 
-    const roofA = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.1, 2.4), roofMat);
-    roofA.position.set(0, 2.9, 0.85);
-    roofA.rotation.x = Math.PI / 6;
-    houseGroup.add(roofA);
+    const windowA = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.08), woodMat);
+    windowA.position.set(-1.4, 1.4, 1.82);
+    house.add(windowA);
 
-    const roofB = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.1, 2.4), roofMat);
-    roofB.position.set(0, 2.9, -0.85);
-    roofB.rotation.x = -Math.PI / 6;
-    houseGroup.add(roofB);
+    // Roof (Corrugated Tin / টিনের চাল)
+    const roofMat = new THREE.MeshStandardMaterial({
+        map: tinTex,
+        roughness: 0.42,
+        metalness: 0.7,
+        side: THREE.DoubleSide
+    });
 
-    houseGroup.position.set(6.5, 0, -2.5);
-    farmGroup.add(houseGroup);
+    const roofFront = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.1, 2.6), roofMat);
+    roofFront.position.set(0, 3.0, 1.0);
+    roofFront.rotation.x = Math.PI / 5.5;
+    roofFront.castShadow = true;
+    house.add(roofFront);
+
+    const roofBack = new THREE.Mesh(new THREE.BoxGeometry(5.4, 0.1, 2.6), roofMat);
+    roofBack.position.set(0, 3.0, -1.0);
+    roofBack.rotation.x = -Math.PI / 5.5;
+    roofBack.castShadow = true;
+    house.add(roofBack);
+
+    // Front Veranda / বারান্দা Posts
+    for (let p = -2.2; p <= 2.2; p += 2.2) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.4, 6), woodMat);
+        post.position.set(p, 1.2, 2.1);
+        post.castShadow = true;
+        house.add(post);
+    }
+
+    house.position.set(7.5, 0, -2.6);
+    farmGroup.add(house);
 }
+
+// Traditional Bangladeshi Hand Tube-Well (টিউবওয়েল / নলকূপ)
+function buildTubeWell() {
+    const tubeWell = new THREE.Group();
+    const castIronMat = new THREE.MeshStandardMaterial({ color: 0x225533, roughness: 0.4, metalness: 0.75 });
+    const silverMat   = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.2, metalness: 0.9 });
+    const concreteMat = new THREE.MeshStandardMaterial({ color: 0x999999, roughness: 0.9 });
+
+    // Concrete platform (পাকা ঘাট)
+    const base = new THREE.Mesh(new THREE.CylinderGeometry(1.2, 1.3, 0.18, 16), concreteMat);
+    base.position.y = 0.09;
+    base.receiveShadow = true;
+    tubeWell.add(base);
+
+    // Main pump body
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.15, 1.2, 8), castIronMat);
+    body.position.y = 0.68;
+    body.castShadow = true;
+    tubeWell.add(body);
+
+    // Spout (নল)
+    const spout = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.35, 6), castIronMat);
+    spout.position.set(0.18, 0.75, 0);
+    spout.rotation.z = Math.PI / 2.8;
+    tubeWell.add(spout);
+
+    // Handle (হাতা)
+    const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.85, 6), silverMat);
+    handle.position.set(-0.35, 1.15, 0);
+    handle.rotation.z = -Math.PI / 4;
+    tubeWell.add(handle);
+
+    tubeWell.position.set(-4.5, 0, -6.8);
+    farmGroup.add(tubeWell);
+}
+
+function buildBambooFences() {
+    const fenceMat = new THREE.MeshStandardMaterial({ color: 0xb59e6c, roughness: 0.8 });
+    const fence = new THREE.Group();
+
+    // Horizontal bamboo poles
+    for (let h = 0.3; h <= 0.7; h += 0.35) {
+        const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 16.2, 6), fenceMat);
+        rail.rotation.z = Math.PI / 2;
+        rail.position.set(0, h, 8.5);
+        fence.add(rail);
+    }
+
+    // Vertical bamboo slats
+    for (let x = -8.0; x <= 8.0; x += 0.8) {
+        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.9, 6), fenceMat);
+        post.position.set(x, 0.45, 8.5);
+        post.castShadow = true;
+        fence.add(post);
+    }
+
+    farmGroup.add(fence);
+}
+
+/*
+|--------------------------------------------------------------------------
+| VEGETATION: BRINJAL, TOMATO, CABBAGE & MAIZE
+|--------------------------------------------------------------------------
+*/
 
 function buildVegetationAndCrops() {
-    buildBrinjalRows(0, 5.5, 14, 3);
-    buildCabbageRows(0, 2.0, 14, 3);
-    buildTomatoRows(8.5, -6.5, 9.5, 5);
+    buildBrinjalPlot(0, 5.8, 14, 3);
+    buildCabbagePlot(0, 2.2, 14, 3);
+    buildTomatoPlot(9.2, -7.5, 10, 4);
+    buildMaizePlot(9.2, -4.5, 10, 3);
 }
 
-function buildBrinjalRows(centerX, centerZ, width, numRows) {
+function buildBrinjalPlot(cx, cz, width, numRows) {
     const group = new THREE.Group();
-    const plantsPerRow = 14, zSpacing = 1.0;
-
+    const cols = 14, spacing = 1.0;
     for (let r = 0; r < numRows; r++) {
-        const z = centerZ - ((numRows - 1) * zSpacing) / 2 + r * zSpacing;
-        for (let c = 0; c < plantsPerRow; c++) {
-            const x = centerX - width / 2 + 0.8 + c * (width / plantsPerRow);
-            const plant = createSingleBrinjalPlant();
+        const z = cz - ((numRows - 1) * spacing) / 2 + r * spacing;
+        for (let c = 0; c < cols; c++) {
+            const x = cx - width / 2 + 0.8 + c * (width / cols);
+            const plant = createBrinjalPlant();
             plant.position.set(x, 0.35, z);
             group.add(plant);
         }
@@ -466,67 +646,80 @@ function buildBrinjalRows(centerX, centerZ, width, numRows) {
     animatedObjects.push({ mesh: group, type: "crop" });
 }
 
-function createSingleBrinjalPlant() {
+function createBrinjalPlant() {
     const p = new THREE.Group();
     const stemMat = new THREE.MeshStandardMaterial({ color: 0x3d662e });
     const leafMat = new THREE.MeshStandardMaterial({ color: 0x2e5c2b, roughness: 0.6 });
-    const fruitMat = new THREE.MeshStandardMaterial({ color: 0x3b1842, roughness: 0.25 });
+    const fruitMat = new THREE.MeshStandardMaterial({ color: 0x3c1248, roughness: 0.22 });
 
-    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.5, 5), stemMat);
-    stalk.position.y = 0.25;
+    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.06, 0.55, 6), stemMat);
+    stalk.position.y = 0.28;
     p.add(stalk);
 
     for (let a = 0; a < 4; a++) {
-        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.22, 6, 6), leafMat);
+        const leaf = new THREE.Mesh(new THREE.SphereGeometry(0.24, 6, 6), leafMat);
         leaf.scale.set(1.4, 0.2, 0.7);
         leaf.rotation.y = (a * Math.PI) / 2;
-        leaf.rotation.z = 0.25;
-        leaf.position.set(Math.cos((a * Math.PI) / 2) * 0.18, 0.35, Math.sin((a * Math.PI) / 2) * 0.18);
+        leaf.rotation.z = 0.28;
+        leaf.position.set(Math.cos((a * Math.PI) / 2) * 0.2, 0.38, Math.sin((a * Math.PI) / 2) * 0.2);
         p.add(leaf);
     }
 
-    const fruit = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.04, 0.25, 8), fruitMat);
-    fruit.position.set(0.12, 0.22, 0.1);
-    fruit.rotation.z = -0.4;
-    p.add(fruit);
+    const brinjal = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.04, 0.3, 8), fruitMat);
+    brinjal.position.set(0.14, 0.22, 0.1);
+    brinjal.rotation.z = -0.4;
+    p.add(brinjal);
 
     return p;
 }
 
-function buildCabbageRows(centerX, centerZ, width, numRows) {
+function buildCabbagePlot(cx, cz, width, numRows) {
     const group = new THREE.Group();
-    const plantsPerRow = 14, zSpacing = 0.9;
+    const cols = 14, spacing = 0.9;
+    const cabMat = new THREE.MeshStandardMaterial({ color: 0x6db359, roughness: 0.65 });
 
     for (let r = 0; r < numRows; r++) {
-        const z = centerZ - ((numRows - 1) * zSpacing) / 2 + r * zSpacing;
-        for (let c = 0; c < plantsPerRow; c++) {
-            const x = centerX - width / 2 + 0.8 + c * (width / plantsPerRow);
-            const plant = createSingleCabbage();
-            plant.position.set(x, 0.35, z);
-            group.add(plant);
+        const z = cz - ((numRows - 1) * spacing) / 2 + r * spacing;
+        for (let c = 0; c < cols; c++) {
+            const x = cx - width / 2 + 0.8 + c * (width / cols);
+            const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), cabMat);
+            head.position.set(x, 0.45, z);
+            group.add(head);
         }
     }
     cropGroup.add(group);
 }
 
-function createSingleCabbage() {
-    const cab = new THREE.Group();
-    const innerMat = new THREE.MeshStandardMaterial({ color: 0x76b364, roughness: 0.6 });
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), innerMat);
-    head.position.y = 0.15;
-    cab.add(head);
-    return cab;
-}
-
-function buildTomatoRows(centerX, centerZ, width, numRows) {
+function buildTomatoPlot(cx, cz, width, numRows) {
     const group = new THREE.Group();
-    const plantsPerRow = 8, zSpacing = 1.1;
+    const cols = 8, spacing = 1.1;
+    const poleMat = new THREE.MeshStandardMaterial({ color: 0x7a6344 });
+    const redMat  = new THREE.MeshStandardMaterial({ color: 0xd92b18, roughness: 0.3 });
+    const bushMat = new THREE.MeshStandardMaterial({ color: 0x367329, roughness: 0.6 });
 
     for (let r = 0; r < numRows; r++) {
-        const z = centerZ - ((numRows - 1) * zSpacing) / 2 + r * zSpacing;
-        for (let c = 0; c < plantsPerRow; c++) {
-            const x = centerX - width / 2 + 0.7 + c * (width / plantsPerRow);
-            const plant = createSingleTomatoPlant();
+        const z = cz - ((numRows - 1) * spacing) / 2 + r * spacing;
+        for (let c = 0; c < cols; c++) {
+            const x = cx - width / 2 + 0.8 + c * (width / cols);
+            const plant = new THREE.Group();
+
+            // Support bamboo stake
+            const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.2, 5), poleMat);
+            stake.position.y = 0.6;
+            plant.add(stake);
+
+            // Foliage
+            const bush = new THREE.Mesh(new THREE.SphereGeometry(0.28, 7, 7), bushMat);
+            bush.position.y = 0.55;
+            plant.add(bush);
+
+            // Red Tomato fruits
+            for (let f = 0; f < 3; f++) {
+                const tom = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), redMat);
+                tom.position.set((Math.random() - 0.5) * 0.3, 0.4 + f * 0.15, (Math.random() - 0.5) * 0.3);
+                plant.add(tom);
+            }
+
             plant.position.set(x, 0.35, z);
             group.add(plant);
         }
@@ -535,166 +728,320 @@ function buildTomatoRows(centerX, centerZ, width, numRows) {
     animatedObjects.push({ mesh: group, type: "crop" });
 }
 
-function createSingleTomatoPlant() {
-    const t = new THREE.Group();
-    const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 0.75, 6), new THREE.MeshStandardMaterial({ color: 0x416832 }));
-    stalk.position.y = 0.38;
-    t.add(stalk);
+function buildMaizePlot(cx, cz, width, numRows) {
+    const group = new THREE.Group();
+    const cols = 9, spacing = 1.0;
+    const stalkMat = new THREE.MeshStandardMaterial({ color: 0x47782b });
+    const leafMat  = new THREE.MeshStandardMaterial({ color: 0x5a9135, side: THREE.DoubleSide });
+    const cornMat  = new THREE.MeshStandardMaterial({ color: 0xf5b041, roughness: 0.4 });
 
-    const bush = new THREE.Mesh(new THREE.SphereGeometry(0.25, 7, 7), new THREE.MeshStandardMaterial({ color: 0x367329 }));
-    bush.position.y = 0.45;
-    t.add(bush);
+    for (let r = 0; r < numRows; r++) {
+        const z = cz - ((numRows - 1) * spacing) / 2 + r * spacing;
+        for (let c = 0; c < cols; c++) {
+            const x = cx - width / 2 + 0.8 + c * (width / cols);
+            const stalk = new THREE.Group();
 
-    const fruit = new THREE.Mesh(new THREE.SphereGeometry(0.08, 6, 6), new THREE.MeshStandardMaterial({ color: 0xc9301e }));
-    fruit.position.set(0.15, 0.35, 0.1);
-    t.add(fruit);
+            const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.05, 1.6, 6), stalkMat);
+            stem.position.y = 0.8;
+            stalk.add(stem);
 
-    return t;
+            // Drooping leaves
+            for (let l = 0; l < 4; l++) {
+                const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.7), leafMat);
+                leaf.position.set(0, 0.8 + l * 0.2, 0.3);
+                leaf.rotation.x = 0.5;
+                leaf.rotation.y = (l * Math.PI) / 2;
+                stalk.add(leaf);
+            }
+
+            // Corn cob
+            const cob = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.04, 0.3, 6), cornMat);
+            cob.position.set(0.08, 0.9, 0.05);
+            cob.rotation.z = -0.3;
+            stalk.add(cob);
+
+            stalk.position.set(x, 0.35, z);
+            group.add(stalk);
+        }
+    }
+    cropGroup.add(group);
+    animatedObjects.push({ mesh: group, type: "crop" });
 }
 
-function buildPerimeterTrees() {
-    const palmPositions = [[-5.5, -9.5], [-8.2, -10.5], [3.2, -10.0], [-14.5, 2.5], [15.5, 6.0]];
+/*
+|--------------------------------------------------------------------------
+| TROPICAL TREES (PALMS, BANANAS & JACKFRUIT)
+|--------------------------------------------------------------------------
+*/
+
+function buildTropicalTrees() {
+    // 1. Tall Coconut Palm Trees (নারিকেল গাছ)
+    const palmPositions = [[-6.0, -10.5], [-9.5, -11.5], [2.8, -10.5], [-15.5, 3.0], [16.5, 6.5]];
     palmPositions.forEach(([x, z]) => {
-        const palm = createCoconutPalmTree();
+        const palm = createCoconutPalm();
         palm.position.set(x, 0, z);
         treeGroup.add(palm);
         animatedObjects.push({ mesh: palm, type: "tree" });
     });
 
-    const fruitPositions = [[-11.5, 7.5], [-3.5, 9.0], [9.5, 8.5], [14.0, 9.5], [12.0, -11.0]];
+    // 2. Broad-Leaved Banana Trees (কলা গাছ)
+    const bananaPositions = [[-12.0, -2.5], [-4.0, -5.5], [6.0, -9.5]];
+    bananaPositions.forEach(([x, z]) => {
+        const banana = createBananaTree();
+        banana.position.set(x, 0, z);
+        treeGroup.add(banana);
+        animatedObjects.push({ mesh: banana, type: "tree" });
+    });
+
+    // 3. Dense Fruit Trees (Mango & Jackfruit - আম ও কাঁঠাল গাছ)
+    const fruitPositions = [[-12.5, 7.5], [-4.5, 9.2], [10.5, 8.5], [15.0, 9.8]];
     fruitPositions.forEach(([x, z], i) => {
-        const tree = i % 2 === 0 ? createJackfruitTree() : createMangoTree();
+        const tree = createCanopyTree(i % 2 === 0 ? 0x275e24 : 0x1f5421);
         tree.position.set(x, 0, z);
         treeGroup.add(tree);
         animatedObjects.push({ mesh: tree, type: "tree" });
     });
 }
 
-function createCoconutPalmTree() {
+function createCoconutPalm() {
     const palm = new THREE.Group();
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.32, 5.2, 7), new THREE.MeshStandardMaterial({ color: 0x6e5842 }));
-    trunk.position.y = 2.6;
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x6e5944, roughness: 0.9 });
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.34, 5.8, 7), trunkMat);
+    trunk.position.y = 2.9;
+    trunk.rotation.z = (Math.random() - 0.5) * 0.12;
     palm.add(trunk);
 
-    const frondMat = new THREE.MeshStandardMaterial({ color: 0x36782b, side: THREE.DoubleSide });
-    for (let f = 0; f < 7; f++) {
-        const frond = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.04, 2.8), frondMat);
-        frond.position.set(0, 5.2, 1.2);
-        frond.rotation.x = 0.35;
+    const frondMat = new THREE.MeshStandardMaterial({ color: 0x387d29, side: THREE.DoubleSide });
+    for (let f = 0; f < 8; f++) {
         const frondGroup = new THREE.Group();
-        frondGroup.add(frond);
-        frondGroup.rotation.y = (f * Math.PI * 2) / 7;
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.04, 3.0), frondMat);
+        blade.position.set(0, 5.8, 1.4);
+        blade.rotation.x = 0.38;
+        frondGroup.add(blade);
+        frondGroup.rotation.y = (f * Math.PI * 2) / 8;
         palm.add(frondGroup);
     }
     return palm;
 }
 
-function createJackfruitTree() {
-    const tree = new THREE.Group();
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.55, 2.6, 8), new THREE.MeshStandardMaterial({ color: 0x54402e }));
+function createBananaTree() {
+    const banana = new THREE.Group();
+    const trunkMat = new THREE.MeshStandardMaterial({ color: 0x668b3d, roughness: 0.7 });
+    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.22, 2.6, 6), trunkMat);
     trunk.position.y = 1.3;
-    tree.add(trunk);
+    banana.add(trunk);
 
-    const jfMat = new THREE.MeshStandardMaterial({ color: 0x6b822d });
-    for (let j = 0; j < 4; j++) {
-        const jf = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.25, 0.55, 7), jfMat);
-        const angle = (j * Math.PI * 2) / 4;
-        jf.position.set(Math.cos(angle) * 0.42, 0.8 + j * 0.25, Math.sin(angle) * 0.42);
-        tree.add(jf);
+    const leafMat = new THREE.MeshStandardMaterial({ color: 0x4f942d, side: THREE.DoubleSide, roughness: 0.5 });
+    for (let l = 0; l < 6; l++) {
+        const leafGroup = new THREE.Group();
+        const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.03, 2.2), leafMat);
+        leaf.position.set(0, 2.6, 0.9);
+        leaf.rotation.x = 0.45;
+        leafGroup.add(leaf);
+        leafGroup.rotation.y = (l * Math.PI * 2) / 6;
+        banana.add(leafGroup);
     }
-
-    const canopy = new THREE.Mesh(new THREE.SphereGeometry(2.2, 10, 10), new THREE.MeshStandardMaterial({ color: 0x275924 }));
-    canopy.position.y = 3.6;
-    tree.add(canopy);
-    return tree;
+    return banana;
 }
 
-function createMangoTree() {
+function createCanopyTree(leafColor) {
     const tree = new THREE.Group();
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.6, 2.8, 8), new THREE.MeshStandardMaterial({ color: 0x483a2d }));
+    const trunk = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.35, 0.55, 2.8, 8),
+        new THREE.MeshStandardMaterial({ color: 0x4e3e2c, roughness: 0.9 })
+    );
     trunk.position.y = 1.4;
     tree.add(trunk);
 
-    const canopy = new THREE.Mesh(new THREE.SphereGeometry(2.3, 8, 8), new THREE.MeshStandardMaterial({ color: 0x1f5421 }));
-    canopy.position.y = 3.6;
+    const canopy = new THREE.Mesh(
+        new THREE.SphereGeometry(2.4, 9, 9),
+        new THREE.MeshStandardMaterial({ color: leafColor, roughness: 0.65 })
+    );
+    canopy.position.y = 3.8;
     tree.add(canopy);
     return tree;
 }
 
-function animateFarm() {
-    requestAnimationFrame(animateFarm);
-    animationTime += 0.015;
+/*
+|--------------------------------------------------------------------------
+| NIGHT FIREFLIES / PARTICLES
+|--------------------------------------------------------------------------
+*/
 
-    if (pondMaterial && pondMaterial.normalMap) {
-        pondMaterial.normalMap.offset.x = Math.sin(animationTime * 0.3) * 0.05;
-        pondMaterial.normalMap.offset.y = animationTime * 0.04;
+function buildFireflies() {
+    const count = 35;
+    const geom = new THREE.BufferGeometry();
+    const positions = new Float32Array(count * 3);
+
+    for (let i = 0; i < count; i++) {
+        positions[i * 3]     = -18 + Math.random() * 36;
+        positions[i * 3 + 1] = 0.5 + Math.random() * 3.5;
+        positions[i * 3 + 2] = -12 + Math.random() * 24;
     }
 
+    geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    const mat = new THREE.PointsMaterial({
+        color: 0x99ff66,
+        size: 0.35,
+        transparent: true,
+        opacity: 0
+    });
+
+    const fireflies = new THREE.Points(geom, mat);
+    fireflyGroup.add(fireflies);
+}
+
+/*
+|--------------------------------------------------------------------------
+| ANIMATION LOOP
+|--------------------------------------------------------------------------
+*/
+
+function animate() {
+    requestAnimationFrame(animate);
+    animationTime += 0.015;
+
+    // 1. Water ripple animation
+    if (pondMaterial && pondMaterial.normalMap) {
+        pondMaterial.normalMap.offset.x = Math.sin(animationTime * 0.3) * 0.04;
+        pondMaterial.normalMap.offset.y = animationTime * 0.035;
+    }
+
+    // 2. Wind wave animation on crops and trees
     animatedObjects.forEach((obj, i) => {
         const offset = i * 0.35;
         if (obj.type === "crop" || obj.type === "paddy") {
-            obj.mesh.rotation.z = Math.sin(animationTime * 1.8 + offset) * 0.012;
+            obj.mesh.rotation.z = Math.sin(animationTime * 1.9 + offset) * 0.012;
         } else if (obj.type === "tree") {
-            obj.mesh.rotation.z = Math.sin(animationTime * 1.1 + offset) * 0.007;
+            obj.mesh.rotation.z = Math.sin(animationTime * 1.1 + offset) * 0.008;
         }
     });
+
+    // 3. Clouds drift gently
+    cloudGroup.children.forEach(c => {
+        c.position.x += 0.012;
+        if (c.position.x > 50) c.position.x = -50;
+    });
+
+    // 4. Night fireflies twinkle
+    if (currentLightingMode === 2 && fireflyGroup.children.length > 0) {
+        const pts = fireflyGroup.children[0];
+        const pos = pts.geometry.attributes.position.array;
+        for (let i = 0; i < pos.length / 3; i++) {
+            pos[i * 3 + 1] += Math.sin(animationTime * 2 + i) * 0.006;
+        }
+        pts.geometry.attributes.position.needsUpdate = true;
+    }
 
     controls.update();
     renderer.render(scene, camera);
 }
 
-function setupInteractiveHUDControls() {
-    const resetBtn = document.getElementById("hudResetView");
-    if (resetBtn) {
-        resetBtn.addEventListener("click", () => {
-            camera.position.set(0, 19, 32);
+/*
+|--------------------------------------------------------------------------
+| CAMERA & LIGHTING CONTROLS
+|--------------------------------------------------------------------------
+*/
+
+function setupInteractiveCameraAndLights() {
+    // 🚁 Drone Overview
+    const droneBtn = document.getElementById("hudResetView");
+    if (droneBtn) {
+        droneBtn.addEventListener("click", () => {
+            camera.position.set(0, 20, 32);
             controls.target.set(0, 1.2, 0);
             controls.update();
         });
     }
 
-    const lightToggle = document.getElementById("hudToggleSun");
-    if (lightToggle) {
-        lightToggle.addEventListener("click", () => {
-            isDayMode = !isDayMode;
-            if (isDayMode) {
-                scene.background.set(0xa6d1df);
-                scene.fog.color.set(0xc4dfc8);
-                sunLight.color.set(0xfffae8);
-                sunLight.intensity = 2.7;
-                hemiLight.intensity = 1.3;
-                lightToggle.textContent = "☀️ দিন";
-            } else {
-                scene.background.set(0xdf8453);
-                scene.fog.color.set(0xd87a50);
-                sunLight.color.set(0xff7733);
-                sunLight.intensity = 1.9;
-                hemiLight.intensity = 0.8;
-                lightToggle.textContent = "🌅 গোধূলি";
-            }
+    // 🚜 Ground-Level Field View
+    const fieldBtn = document.getElementById("hudFieldView");
+    if (fieldBtn) {
+        fieldBtn.addEventListener("click", () => {
+            camera.position.set(-6, 2.8, 12);
+            controls.target.set(0, 1.5, 4);
+            controls.update();
+        });
+    }
+
+    // ☀️ / 🌅 / 🌙 Lighting Cycle
+    const sunBtn = document.getElementById("hudToggleSun");
+    if (sunBtn) {
+        sunBtn.addEventListener("click", () => {
+            currentLightingMode = (currentLightingMode + 1) % 3;
+            applyLightingMode(currentLightingMode);
         });
     }
 }
 
-export function updateDashboard() {
+function applyLightingMode(mode) {
+    const sunBtn = document.getElementById("hudToggleSun");
+    const isBn = (window.currentAppLanguage === "bn");
+
+    if (mode === 0) {
+        // DAY
+        scene.background.set(0xa5d6e7);
+        scene.fog.color.set(0xcde6df);
+        sunLight.color.set(0xfffae6);
+        sunLight.intensity = 2.8;
+        hemiLight.intensity = 1.4;
+        moonLight.intensity = 0;
+        if (fireflyGroup.children[0]) fireflyGroup.children[0].material.opacity = 0;
+
+        if (sunBtn) sunBtn.textContent = isBn ? "☀️ দিন" : "☀️ Day";
+    } else if (mode === 1) {
+        // SUNSET / GOLDEN HOUR
+        scene.background.set(0xe28154);
+        scene.fog.color.set(0xd8764a);
+        sunLight.color.set(0xff7733);
+        sunLight.intensity = 1.9;
+        hemiLight.intensity = 0.85;
+        moonLight.intensity = 0;
+        if (fireflyGroup.children[0]) fireflyGroup.children[0].material.opacity = 0.3;
+
+        if (sunBtn) sunBtn.textContent = isBn ? "🌅 গোধূলি" : "🌅 Sunset";
+    } else {
+        // NIGHT
+        scene.background.set(0x0a1626);
+        scene.fog.color.set(0x0c1b2c);
+        sunLight.intensity = 0;
+        hemiLight.intensity = 0.25;
+        moonLight.intensity = 1.6;
+        if (fireflyGroup.children[0]) fireflyGroup.children[0].material.opacity = 0.9;
+
+        if (sunBtn) sunBtn.textContent = isBn ? "🌙 রাত" : "🌙 Night";
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| BILINGUAL DASHBOARD UI UPDATE
+|--------------------------------------------------------------------------
+*/
+
+export function updateDashboardUI() {
     if (typeof farmData === "undefined") return;
 
     const soil = farmData.soil || {};
     const weather = farmData.weather || {};
+    const isBn = (window.currentAppLanguage === "bn");
 
     setVal("hudNitrogenVal", `${soil.nitrogen ?? 64}%`);
     setVal("hudPhosphorusVal", `${soil.phosphorus ?? 52}%`);
     setVal("hudPotassiumVal", `${soil.potassium ?? 48}%`);
     setVal("hudMoistureVal", `${soil.moisture ?? 68}%`);
     setVal("hudPHVal", soil.ph ?? 6.5);
-    setVal("hudTempVal", `${weather.temperature ?? 29}°সে.`);
+    setVal("hudTempVal", isBn ? `${weather.temperature ?? 24}°সে.` : `${weather.temperature ?? 24}°C`);
 
     setBarWidth("hudNitrogenBar", `${soil.nitrogen ?? 64}%`);
     setBarWidth("hudPhosphorusBar", `${soil.phosphorus ?? 52}%`);
     setBarWidth("hudPotassiumBar", `${soil.potassium ?? 48}%`);
 
-    setVal("hudWindSpeed", `${weather.windSpeed ?? 31} কিমি/ঘণ্টা`);
-    setVal("hudHumidity", `${weather.humidity ?? 88}%`);
+    setVal("hudWindSpeed", isBn ? `${weather.windSpeed ?? 31} কিমি/ঘণ্টা` : `${weather.windSpeed ?? 31} km/h`);
+    setVal("hudHumidity", isBn ? `${weather.humidity ?? 88}% আর্দ্রতা` : `${weather.humidity ?? 88}% Humidity`);
+
+    // Synchronize Sun toggle button label
+    applyLightingMode(currentLightingMode);
 }
 
 function setVal(id, text) {
@@ -707,7 +1054,7 @@ function setBarWidth(id, width) {
     if (el) el.style.width = width;
 }
 
-window.updateSimulationFromFarmData = updateDashboard;
+window.updateSimulationFromFarmData = updateDashboardUI;
 
 function onWindowResize() {
     const container = document.getElementById("farm3D");

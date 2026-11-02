@@ -3,11 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 
     <title>Field Shift — Smart Farm Intelligence</title>
 
-    <!-- FIX: three এবং three/addons/ এর জন্য importmap -->
+    <!-- Importmap for Three.js and Addons -->
     <script type="importmap">
     {
       "imports": {
@@ -17,27 +17,25 @@
     }
     </script>
 
+    <!-- Google Fonts: Inter and Hind Siliguri for Bengali -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="style.css">
 
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Leaflet CSS & JS (FIX: Leaflet JS script tag যোগ করা হয়েছে) -->
+    <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 </head>
 
 <body>
 
     <!-- NAVBAR -->
-
     <header class="navbar">
 
         <div class="logo">
@@ -46,47 +44,58 @@
         </div>
 
         <nav>
-            <a href="#how">How it works</a>
-            <a href="#analysis">Analyze</a>
-            <a href="#simulation">Simulation</a>
+            <a href="#how" data-i18n="nav-how">How it works</a>
+            <a href="#analysis" data-i18n="nav-analyze">Analyze</a>
+            <a href="#simulation" data-i18n="nav-simulation">Simulation</a>
         </nav>
 
-        <button class="nav-btn" onclick="scrollToAnalysis()">
-            Start analysis
-        </button>
+        <div class="nav-right">
+            <!-- Language Toggle Switch (EN / বাংলা) -->
+            <div class="lang-switch-container">
+                <span class="lang-tag" id="tagEN">EN</span>
+                <label class="lang-switch" for="langToggle" title="Switch Language / ভাষা পরিবর্তন">
+                    <input type="checkbox" id="langToggle">
+                    <span class="slider round"></span>
+                </label>
+                <span class="lang-tag" id="tagBN">বাং</span>
+            </div>
+
+            <button class="nav-btn" onclick="scrollToAnalysis()" data-i18n="nav-btn">
+                Start analysis
+            </button>
+        </div>
 
     </header>
 
 
     <!-- HERO -->
-
     <section class="hero">
 
         <div class="hero-content">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="hero-eyebrow">
                 SMART FARM INTELLIGENCE
             </p>
 
             <h1>
-                Adapt your
+                <span data-i18n="hero-h1-1">Adapt your</span>
                 <br>
-                farm to
-                <span>change.</span>
+                <span data-i18n="hero-h1-2">farm to</span>
+                <span class="highlight" data-i18n="hero-h1-span">change.</span>
             </h1>
 
-            <p class="hero-description">
+            <p class="hero-description" data-i18n="hero-desc">
                 Analyze climate, water, soil and crop conditions
                 to build smarter and more resilient farming plans.
             </p>
 
             <div class="hero-buttons">
 
-                <button class="primary-btn" onclick="scrollToAnalysis()">
+                <button class="primary-btn" onclick="scrollToAnalysis()" data-i18n="hero-btn-primary">
                     Analyze my field →
                 </button>
 
-                <button class="secondary-btn" onclick="scrollToHow()">
+                <button class="secondary-btn" onclick="scrollToHow()" data-i18n="hero-btn-secondary">
                     See how it works
                 </button>
 
@@ -96,7 +105,6 @@
 
 
         <!-- HERO VISUAL -->
-
         <div class="hero-visual">
 
             <div class="field-grid">
@@ -105,9 +113,9 @@
 
                 <div class="analysis-card">
 
-                    <small>FIELD ANALYSIS</small>
+                    <small data-i18n="field-analysis">FIELD ANALYSIS</small>
 
-                    <strong>
+                    <strong data-i18n="field-name">
                         Mymensingh · Field 02
                     </strong>
 
@@ -121,18 +129,17 @@
 
 
     <!-- HOW IT WORKS -->
-
     <section id="how" class="section">
 
         <div class="section-heading">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="how-eyebrow">
                 HOW IT WORKS
             </p>
 
             <h2>
-                Turn field data into
-                <span>better decisions.</span>
+                <span data-i18n="how-h2-1">Turn field data into</span>
+                <span class="highlight" data-i18n="how-h2-span">better decisions.</span>
             </h2>
 
         </div>
@@ -143,11 +150,11 @@
             <div class="step-card">
                 <span>01</span>
 
-                <h3>
+                <h3 data-i18n="step1-title">
                     Select your field
                 </h3>
 
-                <p>
+                <p data-i18n="step1-desc">
                     Enter your location and field conditions.
                 </p>
             </div>
@@ -156,11 +163,11 @@
             <div class="step-card">
                 <span>02</span>
 
-                <h3>
+                <h3 data-i18n="step2-title">
                     Analyze conditions
                 </h3>
 
-                <p>
+                <p data-i18n="step2-desc">
                     Combine climate, water and crop information.
                 </p>
             </div>
@@ -169,11 +176,11 @@
             <div class="step-card">
                 <span>03</span>
 
-                <h3>
+                <h3 data-i18n="step3-title">
                     Get your plan
                 </h3>
 
-                <p>
+                <p data-i18n="step3-desc">
                     Generate an adaptive crop recommendation.
                 </p>
             </div>
@@ -184,18 +191,17 @@
 
 
     <!-- ANALYSIS -->
-
     <section id="analysis" class="section analysis-section">
 
         <div class="section-heading">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="analysis-eyebrow">
                 FIELD ANALYSIS
             </p>
 
             <h2>
-                Your field,
-                <span>in real time.</span>
+                <span data-i18n="analysis-h2-1">Your field,</span>
+                <span class="highlight" data-i18n="analysis-h2-span">in real time.</span>
             </h2>
 
         </div>
@@ -203,24 +209,22 @@
 
         <div class="dashboard">
 
-
             <!-- FIELD MAP -->
-
             <div class="field-panel">
 
                 <div class="panel-header">
 
                     <div>
 
-                        <small>NASA OBSERVATION ZONE</small>
+                        <small data-i18n="nasa-obs">NASA OBSERVATION ZONE</small>
 
-                        <h3>
+                        <h3 data-i18n="field-name">
                             Mymensingh · Field 02
                         </h3>
 
                     </div>
 
-                    <span class="live">
+                    <span class="live" data-i18n="live-data">
                         ● LIVE DATA
                     </span>
 
@@ -237,12 +241,11 @@
 
 
             <!-- METRICS -->
-
             <div class="metrics">
 
                 <div class="metric-card">
 
-                    <small>RAINFALL</small>
+                    <small data-i18n="rainfall-label">RAINFALL</small>
 
                     <strong id="rainfall">
                         1842 mm
@@ -253,7 +256,7 @@
 
                 <div class="metric-card">
 
-                    <small>AVG TEMPERATURE</small>
+                    <small data-i18n="temp-label">AVG TEMPERATURE</small>
 
                     <strong id="temperature">
                         27.4°C
@@ -264,7 +267,7 @@
 
                 <div class="metric-card">
 
-                    <small>WATER AVAILABILITY</small>
+                    <small data-i18n="water-label">WATER AVAILABILITY</small>
 
                     <strong id="water">
                         72%
@@ -275,7 +278,7 @@
 
                 <div class="metric-card">
 
-                    <small>VEGETATION INDEX</small>
+                    <small data-i18n="veg-label">VEGETATION INDEX</small>
 
                     <strong>
                         0.68 NDVI
@@ -286,11 +289,10 @@
 
                 <div class="condition-card">
 
-                    <small>FIELD CONDITION</small>
+                    <small data-i18n="field-cond-label">FIELD CONDITION</small>
 
-                    <p id="fieldCondition">
-                        Moderate water pressure with good
-                        soil compatibility.
+                    <p id="fieldCondition" data-i18n="field-cond-text">
+                        Moderate water pressure with good soil compatibility.
                     </p>
 
                 </div>
@@ -303,18 +305,17 @@
 
 
     <!-- SIMULATOR -->
-
     <section id="simulation" class="section">
 
         <div class="section-heading">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="sim-eyebrow">
                 SCENARIO SIMULATOR
             </p>
 
             <h2>
-                Stress-test your
-                <span>next season.</span>
+                <span data-i18n="sim-h2-1">Stress-test your</span>
+                <span class="highlight" data-i18n="sim-h2-span">next season.</span>
             </h2>
 
         </div>
@@ -322,50 +323,39 @@
 
         <div class="simulator">
 
-
             <!-- CONTROLS -->
-
             <div class="controls">
 
-                <h3>
+                <h3 data-i18n="climate-ctrl">
                     Climate controls
                 </h3>
 
 
                 <label>
-                    Rainfall change
-
-                    <span id="rainValue">
-                        0%
-                    </span>
+                    <span data-i18n="rain-change">Rainfall change</span>
+                    <span id="rainValue">0%</span>
                 </label>
 
                 <input type="range" id="rainSlider" min="-30" max="30" value="0">
 
 
                 <label>
-                    Temperature change
-
-                    <span id="tempValue">
-                        0°C
-                    </span>
+                    <span data-i18n="temp-change">Temperature change</span>
+                    <span id="tempValue">0°C</span>
                 </label>
 
                 <input type="range" id="tempSlider" min="-3" max="5" step="0.1" value="0">
 
 
                 <label>
-                    Water availability
-
-                    <span id="waterValue">
-                        0%
-                    </span>
+                    <span data-i18n="water-avail">Water availability</span>
+                    <span id="waterValue">0%</span>
                 </label>
 
                 <input type="range" id="waterSlider" min="-30" max="20" value="0">
 
 
-                <button class="secondary-btn" onclick="resetSimulation()">
+                <button class="secondary-btn" onclick="resetSimulation()" data-i18n="reset-scenario">
                     Reset scenario
                 </button>
 
@@ -373,14 +363,13 @@
 
 
             <!-- RESULT -->
-
             <div class="result">
 
-                <small>
+                <small data-i18n="sim-outcome">
                     SIMULATED OUTCOME
                 </small>
 
-                <h3>
+                <h3 data-i18n="rec-crop">
                     Recommended crop
                 </h3>
 
@@ -402,7 +391,7 @@
                 <div class="result-grid">
 
                     <div>
-                        <small>
+                        <small data-i18n="water-pressure">
                             WATER PRESSURE
                         </small>
 
@@ -413,7 +402,7 @@
 
 
                     <div>
-                        <small>
+                        <small data-i18n="climate-fit">
                             CLIMATE FIT
                         </small>
 
@@ -424,7 +413,7 @@
 
 
                     <div>
-                        <small>
+                        <small data-i18n="expected-return">
                             EXPECTED RETURN
                         </small>
 
@@ -439,9 +428,7 @@
                 <div class="recommendation">
 
                     <p id="recommendationText">
-                        The scenario remains within a
-                        manageable range. Your adaptive
-                        rotation remains competitive.
+                        The scenario remains within a manageable range. Your adaptive rotation remains competitive.
                     </p>
 
                 </div>
@@ -454,18 +441,17 @@
 
 
     <!-- CHART -->
-
     <section class="section">
 
         <div class="section-heading">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="chart-eyebrow">
                 DATA VISUALIZATION
             </p>
 
             <h2>
-                See how conditions
-                <span>change.</span>
+                <span data-i18n="chart-h2-1">See how conditions</span>
+                <span class="highlight" data-i18n="chart-h2-span">change.</span>
             </h2>
 
         </div>
@@ -481,21 +467,20 @@
 
 
     <!-- FIELD ROTATION SECTION -->
-
     <section id="rotation" class="section rotation-section">
 
         <div class="section-heading">
 
-            <p class="eyebrow">
+            <p class="eyebrow" data-i18n="rot-eyebrow">
                 FIELD ROTATION
             </p>
 
             <h2>
-                Plan your field
-                <span>across seasons.</span>
+                <span data-i18n="rot-h2-1">Plan your field</span>
+                <span class="highlight" data-i18n="rot-h2-span">across seasons.</span>
             </h2>
 
-            <p class="section-description">
+            <p class="section-description" data-i18n="rot-desc">
                 Rotate crops strategically to protect soil health,
                 manage water pressure and improve long-term productivity.
             </p>
@@ -504,14 +489,13 @@
 
 
         <!-- ROTATION HEADER -->
-
         <div class="rotation-header">
 
             <div>
 
-                <small>SELECTED FIELD</small>
+                <small data-i18n="selected-field">SELECTED FIELD</small>
 
-                <h3>
+                <h3 data-i18n="field-name">
                     Mymensingh · Field 02
                 </h3>
 
@@ -521,7 +505,7 @@
 
                 <span class="status-dot"></span>
 
-                Rotation optimized
+                <span data-i18n="rot-optimized">Rotation optimized</span>
 
             </div>
 
@@ -529,12 +513,9 @@
 
 
         <!-- ROTATION TIMELINE -->
-
         <div class="rotation-timeline">
 
-
             <!-- YEAR 1 -->
-
             <div class="rotation-card active" data-year="2026" onclick="selectRotation(2026)">
 
                 <div class="rotation-year">
@@ -545,21 +526,21 @@
                     🌽
                 </div>
 
-                <h3>
+                <h3 data-i18n="crop-maize">
                     Maize
                 </h3>
 
-                <p>
+                <p data-i18n="high-yield">
                     High yield crop
                 </p>
 
                 <div class="rotation-score">
 
-                    <span>
+                    <span data-i18n="soil-impact">
                         Soil impact
                     </span>
 
-                    <strong>
+                    <strong data-i18n="impact-medium">
                         Medium
                     </strong>
 
@@ -569,7 +550,6 @@
 
 
             <!-- YEAR 2 -->
-
             <div class="rotation-card" data-year="2027" onclick="selectRotation(2027)">
 
                 <div class="rotation-year">
@@ -580,21 +560,21 @@
                     🌾
                 </div>
 
-                <h3>
+                <h3 data-i18n="crop-rice">
                     Rice
                 </h3>
 
-                <p>
+                <p data-i18n="water-intensive">
                     Water intensive
                 </p>
 
                 <div class="rotation-score">
 
-                    <span>
+                    <span data-i18n="soil-impact">
                         Soil impact
                     </span>
 
-                    <strong>
+                    <strong data-i18n="impact-high">
                         High
                     </strong>
 
@@ -604,7 +584,6 @@
 
 
             <!-- YEAR 3 -->
-
             <div class="rotation-card" data-year="2028" onclick="selectRotation(2028)">
 
                 <div class="rotation-year">
@@ -615,21 +594,21 @@
                     🌱
                 </div>
 
-                <h3>
+                <h3 data-i18n="crop-wheat">
                     Wheat
                 </h3>
 
-                <p>
+                <p data-i18n="moderate-demand">
                     Moderate demand
                 </p>
 
                 <div class="rotation-score">
 
-                    <span>
+                    <span data-i18n="soil-impact">
                         Soil impact
                     </span>
 
-                    <strong>
+                    <strong data-i18n="impact-low">
                         Low
                     </strong>
 
@@ -639,7 +618,6 @@
 
 
             <!-- YEAR 4 -->
-
             <div class="rotation-card" data-year="2029" onclick="selectRotation(2029)">
 
                 <div class="rotation-year">
@@ -650,21 +628,21 @@
                     🫘
                 </div>
 
-                <h3>
+                <h3 data-i18n="crop-legume">
                     Legume
                 </h3>
 
-                <p>
+                <p data-i18n="soil-restoration">
                     Soil restoration
                 </p>
 
                 <div class="rotation-score">
 
-                    <span>
+                    <span data-i18n="soil-impact">
                         Soil impact
                     </span>
 
-                    <strong>
+                    <strong data-i18n="impact-very-low">
                         Very Low
                     </strong>
 
@@ -675,27 +653,31 @@
         </div>
 
 
-        <!-- ROTATION ANALYSIS -->
+        <!-- ROTATION INTERACTIVE DETAILS -->
+        <div class="rotation-details">
 
-        <div class="rotation-analysis">
+            <div class="rotation-detail-main">
 
-            <div class="rotation-info">
-
-                <small>
+                <span class="detail-label" data-i18n="selected-year-lbl">
                     SELECTED YEAR
-                </small>
+                </span>
 
-                <h2 id="rotationYear">
+                <h2 id="selectedYear">
                     2026
                 </h2>
 
-                <h3 id="rotationCrop">
-                    🌽 Maize
-                </h3>
+                <div class="selected-crop">
 
-                <p id="rotationDescription">
-                    Maize provides strong yield potential but
-                    requires careful nutrient management.
+                    <span id="selectedCropIcon">🌽</span>
+
+                    <span id="selectedCrop">
+                        Maize
+                    </span>
+
+                </div>
+
+                <p id="cropDescription">
+                    Maize provides strong yield potential but requires careful nutrient management.
                 </p>
 
             </div>
@@ -703,39 +685,39 @@
 
             <div class="rotation-metrics">
 
-                <div>
+                <div class="metric">
 
-                    <span>
-                        Soil health
+                    <span data-i18n="soil-health-lbl">
+                        Soil Health
                     </span>
 
-                    <strong id="soilHealth">
+                    <strong id="detailSoilHealth">
                         72%
                     </strong>
 
                 </div>
 
 
-                <div>
+                <div class="metric">
 
-                    <span>
-                        Water demand
+                    <span data-i18n="water-demand-lbl">
+                        Water Demand
                     </span>
 
-                    <strong id="rotationWater">
+                    <strong id="waterDemand">
                         68%
                     </strong>
 
                 </div>
 
 
-                <div>
+                <div class="metric">
 
-                    <span>
-                        Yield potential
+                    <span data-i18n="yield-pot-lbl">
+                        Yield Potential
                     </span>
 
-                    <strong id="yieldPotential">
+                    <strong id="detailYieldPotential">
                         91%
                     </strong>
 
@@ -745,148 +727,65 @@
 
         </div>
 
+
+        <!-- ROTATION ACTIONS -->
+        <div class="rotation-actions">
+
+            <button type="button" id="simulateRotation" data-i18n="sim-rotation-btn">
+                ▶ Simulate Rotation
+            </button>
+
+            <button type="button" id="resetRotation" data-i18n="reset-rotation-btn">
+                Reset
+            </button>
+
+        </div>
+
+
+        <!-- SIMULATION RESULT -->
+        <div id="rotationResult" class="rotation-result">
+
+            <span class="result-icon">
+                ✓
+            </span>
+
+            <div>
+
+                <strong data-i18n="rot-complete-title">
+                    Rotation analysis complete
+                </strong>
+
+                <p id="rotationResultText">
+                    The 4-year rotation shows a positive long-term trajectory. Soil health improves during the legume phase while water pressure decreases.
+                </p>
+
+            </div>
+
+        </div>
+
     </section>
 
 
-    <!-- FIELD ROTATION INTERACTIVE DETAILS -->
-
-    <div class="rotation-details">
-
-        <div class="rotation-detail-main">
-
-            <span class="detail-label">
-                SELECTED YEAR
-            </span>
-
-            <h2 id="selectedYear">
-                2026
-            </h2>
-
-            <div class="selected-crop">
-
-                <span id="selectedCropIcon">🌽</span>
-
-                <span id="selectedCrop">
-                    Maize
-                </span>
-
-            </div>
-
-            <p id="cropDescription">
-                Maize provides strong yield potential
-                but requires careful nutrient management.
-            </p>
-
-        </div>
-
-
-        <div class="rotation-metrics">
-
-            <div class="metric">
-
-                <span>
-                    Soil Health
-                </span>
-
-                <strong id="detailSoilHealth">
-                    72%
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span>
-                    Water Demand
-                </span>
-
-                <strong id="waterDemand">
-                    68%
-                </strong>
-
-            </div>
-
-
-            <div class="metric">
-
-                <span>
-                    Yield Potential
-                </span>
-
-                <strong id="detailYieldPotential">
-                    91%
-                </strong>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- ROTATION ACTIONS -->
-
-    <div class="rotation-actions">
-
-        <button type="button" id="simulateRotation">
-            ▶ Simulate Rotation
-        </button>
-
-        <button type="button" id="resetRotation">
-            Reset
-        </button>
-
-    </div>
-
-
-    <!-- SIMULATION RESULT -->
-
-    <div id="rotationResult" class="rotation-result">
-
-        <span class="result-icon">
-            ✓
-        </span>
-
-        <div>
-
-            <strong>
-                Rotation analysis complete
-            </strong>
-
-            <p id="rotationResultText">
-                Your selected rotation has a
-                healthy long-term outlook.
-            </p>
-
-        </div>
-
-    </div>
-
-
     <!-- LAND LOCATION -->
-
     <section id="landLocation">
 
-        <div class="section-label">
+        <div class="section-label" data-i18n="land-eyebrow">
             LAND INTELLIGENCE
         </div>
 
         <h2>
-            Understand your
-            <span>land.</span>
+            <span data-i18n="land-h2-1">Understand your</span>
+            <span class="highlight" data-i18n="land-h2-span">land.</span>
         </h2>
 
-        <p>
-            Analyze the geographic conditions around
-            your agricultural field.
+        <p data-i18n="land-desc">
+            Analyze the geographic conditions around your agricultural field.
         </p>
 
 
         <div class="location-layout">
 
             <!-- MAP -->
-
             <div class="land-map">
 
                 <div id="farmMap"></div>
@@ -895,12 +794,11 @@
 
 
             <!-- DATA -->
-
             <div class="land-data">
 
                 <div class="land-data-header">
 
-                    <span>
+                    <span data-i18n="selected-land">
                         SELECTED LAND
                     </span>
 
@@ -913,13 +811,12 @@
 
                 <div class="geo-card">
 
-                    <span>
+                    <span data-i18n="location-label">
                         📍 LOCATION
                     </span>
 
                     <strong id="coordinates">
-                        24.7471° N,
-                        90.4203° E
+                        24.7471° N, 90.4203° E
                     </strong>
 
                 </div>
@@ -927,7 +824,7 @@
 
                 <div class="geo-card">
 
-                    <span>
+                    <span data-i18n="river-label">
                         🌊 NEAREST RIVER
                     </span>
 
@@ -944,7 +841,7 @@
 
                 <div class="geo-card">
 
-                    <span>
+                    <span data-i18n="pond-label">
                         💧 NEAREST POND
                     </span>
 
@@ -961,7 +858,7 @@
 
                 <div class="geo-card">
 
-                    <span>
+                    <span data-i18n="area-label">
                         📐 FIELD AREA
                     </span>
 
@@ -980,7 +877,7 @@
 
             <div class="input-group">
 
-                <label>LATITUDE</label>
+                <label data-i18n="lat-label">LATITUDE</label>
 
                 <input
                     type="number"
@@ -994,7 +891,7 @@
 
             <div class="input-group">
 
-                <label>LONGITUDE</label>
+                <label data-i18n="lon-label">LONGITUDE</label>
 
                 <input
                     type="number"
@@ -1010,28 +907,25 @@
 
         <div class="search-radius">
 
-            <label>
+            <label data-i18n="search-rad-label">
                 SEARCH RADIUS
             </label>
 
             <select id="searchRadius">
 
-                <option value="500">
+                <option value="500" data-i18n="opt-500m">
                     500 meters
                 </option>
 
-                <option
-                    value="1000"
-                    selected
-                >
+                <option value="1000" selected data-i18n="opt-1km">
                     1 kilometer
                 </option>
 
-                <option value="2000">
+                <option value="2000" data-i18n="opt-2km">
                     2 kilometers
                 </option>
 
-                <option value="5000">
+                <option value="5000" data-i18n="opt-5km">
                     5 kilometers
                 </option>
 
@@ -1043,6 +937,7 @@
         <button
             id="analyzeLand"
             class="analyze-btn"
+            data-i18n="analyze-land-btn"
         >
             Analyze this land
         </button>
@@ -1050,69 +945,71 @@
     </section>
 
 
-       <section id="farmSimulation">
+    <!-- 3D FARM SIMULATION -->
+    <section id="farmSimulation">
 
         <!-- 3D Viewport Canvas -->
         <div id="farm3D"></div>
 
-        <!-- Floating Glassmorphic HUD Master Overlay -->
+        <!-- Floating Glassmorphic HUD Master Overlay (English by default, fully localized with data-i18n) -->
         <div class="hud-overlay">
 
-            <!-- Top Header -->
+            <!-- Top Header & Camera Controls -->
             <div class="hud-top-header">
-                <h1>ময়মনসিংহ খামার সিমুলেশন</h1>
-                <p>বর্তমান অবস্থা</p>
+                <h1 data-i18n="hud-title">Mymensingh Farm 3D Simulation</h1>
+                <p data-i18n="hud-status">Live Real-Time Conditions</p>
                 <div class="hud-top-actions">
-                    <button id="hudResetView" class="hud-pill-btn" title="ড্রোন ভিউতে ফিরে যান">🚁 ড্রোন ভিউ</button>
-                    <button id="hudToggleSun" class="hud-pill-btn" title="সূর্যের আলো ও সময় পরিবর্তন">☀️ দিন</button>
+                    <button id="hudResetView" class="hud-pill-btn" data-i18n="hud-drone-btn" title="Switch to Drone View">🚁 Drone View</button>
+                    <button id="hudFieldView" class="hud-pill-btn" data-i18n="hud-field-btn" title="Switch to Ground Level View">🚜 Field View</button>
+                    <button id="hudToggleSun" class="hud-pill-btn" data-i18n="hud-sun-btn" title="Cycle Day / Sunset / Night Lighting">☀️ Day</button>
                 </div>
             </div>
 
             <!-- Middle Body: Left and Right floating panels -->
             <div class="hud-middle-body">
 
-                <!-- Left Panel: মাটির গুণমান -->
+                <!-- Left Panel: Soil Quality & Stratum -->
                 <aside class="hud-card hud-left-card">
                     <div class="hud-card-title">
                         <span class="hud-icon">🌱</span>
-                        <h3>মাটির গুণমান</h3>
+                        <h3 data-i18n="hud-soil-title">Soil Quality & Health</h3>
                     </div>
 
                     <!-- N-P-K -->
                     <div class="hud-npk-box">
-                        <div class="hud-npk-header">N - P - K</div>
+                        <div class="hud-npk-header" data-i18n="hud-npk-header">N - P - K Nutrients</div>
                         <div class="hud-npk-row">
-                            <span>নাইট্রোজেন</span>
+                            <span data-i18n="hud-nitrogen">Nitrogen</span>
                             <div class="hud-bar-track">
                                 <div id="hudNitrogenBar" class="hud-bar-fill bar-nitrogen" style="width: 64%;"></div>
                             </div>
-                            <strong id="hudNitrogenVal">৬৪%</strong>
+                            <strong id="hudNitrogenVal">64%</strong>
                         </div>
                         <div class="hud-npk-row">
-                            <span>ফসফরাস</span>
+                            <span data-i18n="hud-phosphorus">Phosphorus</span>
                             <div class="hud-bar-track">
                                 <div id="hudPhosphorusBar" class="hud-bar-fill bar-phosphorus" style="width: 52%;"></div>
                             </div>
-                            <strong id="hudPhosphorusVal">৫২%</strong>
+                            <strong id="hudPhosphorusVal">52%</strong>
                         </div>
                         <div class="hud-npk-row">
-                            <span>পটাশিয়াম</span>
+                            <span data-i18n="hud-potassium">Potassium</span>
                             <div class="hud-bar-track">
                                 <div id="hudPotassiumBar" class="hud-bar-fill bar-potassium" style="width: 48%;"></div>
                             </div>
-                            <strong id="hudPotassiumVal">৪৮%</strong>
+                            <strong id="hudPotassiumVal">48%</strong>
                         </div>
                     </div>
 
-                    <!-- মাটির আর্দ্রতা -->
+                    <!-- Soil Moisture -->
                     <div class="hud-moisture-box">
-                        <h4>মাটির আর্দ্রতা</h4>
+                        <h4 data-i18n="hud-moisture-title">Soil Moisture</h4>
                         <div class="hud-moisture-content">
                             <div class="soil-strata-viz">
                                 <div class="strata-scale">
-                                    <span>০ সেমি</span>
-                                    <span>৫ সেমি</span>
-                                    <span>১০ সেমি</span>
+                                    <span data-i18n="hud-depth-0cm">0 cm</span>
+                                    <span data-i18n="hud-depth-5cm">5 cm</span>
+                                    <span data-i18n="hud-depth-10cm">10 cm</span>
                                 </div>
                                 <div class="strata-graphic">
                                     <div class="strata-grass"></div>
@@ -1125,15 +1022,15 @@
                                     <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
                                     <circle class="gauge-meter" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="64"></circle>
                                 </svg>
-                                <div class="gauge-val" id="hudMoistureVal">৬৮%</div>
+                                <div class="gauge-val" id="hudMoistureVal">68%</div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- মাটির pH ও গঠন -->
+                    <!-- Soil pH & Texture -->
                     <div class="hud-split-row">
                         <div class="hud-sub-box ph-box">
-                            <h4>মাটির pH</h4>
+                            <h4 data-i18n="hud-ph-title">Soil pH</h4>
                             <div class="ph-gauge-viz">
                                 <svg viewBox="0 0 100 55">
                                     <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#phGradient)" stroke-width="8" stroke-linecap="round"></path>
@@ -1148,101 +1045,102 @@
                                     <circle cx="50" cy="50" r="4" fill="#2d3748" />
                                     <line x1="50" y1="50" x2="56" y2="18" stroke="#1a3e23" stroke-width="2.5" stroke-linecap="round" />
                                 </svg>
-                                <strong id="hudPHVal">৬.৫</strong>
+                                <strong id="hudPHVal">6.5</strong>
                             </div>
                         </div>
 
                         <div class="hud-sub-box texture-box">
-                            <h4>মাটির গঠন</h4>
-                            <p>মাটির গঠন দোআঁশ সাধারণ নার্সিং জমি হলেও পর্যাপ্ত পুষ্টি ও নিয়মিত পানি নিষ্কাশনে সর্বাধিক ফলন নিশ্চিত হয়।</p>
+                            <h4 data-i18n="hud-texture-title">Soil Texture</h4>
+                            <p data-i18n="hud-texture-desc">Loamy soil with rich organic nutrients and adequate natural drainage for maximum crop yield.</p>
                         </div>
                     </div>
 
-                    <!-- মাটির তাপমাত্রা -->
+                    <!-- Soil Temp -->
                     <div class="hud-footer-metric">
-                        <span>মাটির তাপমাত্রা</span>
-                        <strong id="hudTempVal">২৪°সে.</strong>
+                        <span data-i18n="hud-soil-temp-lbl">Soil Temperature</span>
+                        <strong id="hudTempVal">24°C</strong>
                     </div>
                 </aside>
 
-                <!-- Right Column: ফসল পরামর্শ ও আবহাওয়া -->
+                <!-- Right Column: Crop Advisory & Weather -->
                 <div class="hud-right-col">
 
-                    <!-- ফসল পরামর্শ -->
+                    <!-- Crop Advisory -->
                     <aside class="hud-card hud-crops-card">
                         <div class="hud-card-title">
-                            <span class="hud-icon">🌱</span>
-                            <h3>ফসল পরামর্শ</h3>
+                            <span class="hud-icon">🌾</span>
+                            <h3 data-i18n="hud-crop-title">Crop Advisory</h3>
                         </div>
-                        <div class="crop-rec-header">সেরা ফসল</div>
+                        <div class="crop-rec-header" data-i18n="hud-best-crops">Optimal Seasonal Crops</div>
                         <ul class="rec-crop-list">
                             <li>
                                 <span class="rec-icon">🌾</span>
-                                <span class="rec-name">১. আমন ধান</span>
-                                <span class="rec-badge badge-top">উপযুক্ত</span>
+                                <span class="rec-name" data-i18n="hud-crop1-name">1. Aman Paddy</span>
+                                <span class="rec-badge badge-top" data-i18n="hud-crop1-badge">Optimal</span>
                             </li>
                             <li>
                                 <span class="rec-icon">🍆</span>
-                                <span class="rec-name">২. বেগুন</span>
-                                <span class="rec-badge">উচ্চ ফলন</span>
+                                <span class="rec-name" data-i18n="hud-crop2-name">2. Eggplant / Brinjal</span>
+                                <span class="rec-badge" data-i18n="hud-crop2-badge">High Yield</span>
                             </li>
                             <li>
                                 <span class="rec-icon">🍈</span>
-                                <span class="rec-name">৩. পেঁপে</span>
-                                <span class="rec-badge">অনুকূল</span>
+                                <span class="rec-name" data-i18n="hud-crop3-name">3. Papaya</span>
+                                <span class="rec-badge" data-i18n="hud-crop3-badge">Favorable</span>
                             </li>
                             <li>
                                 <span class="rec-icon">🫘</span>
-                                <span class="rec-name">৪. ডাল</span>
-                                <span class="rec-badge">মাটিবান্ধব</span>
+                                <span class="rec-name" data-i18n="hud-crop4-name">4. Lentils / Pulses</span>
+                                <span class="rec-badge" data-i18n="hud-crop4-badge">Soil Revitalizer</span>
                             </li>
                         </ul>
                     </aside>
 
-                    <!-- আবহাওয়া -->
+                    <!-- Weather Card -->
                     <aside class="hud-card hud-weather-card">
                         <div class="hud-card-title">
-                            <h3>আবহাওয়া</h3>
+                            <span class="hud-icon">⛅</span>
+                            <h3 data-i18n="hud-weather-title">Weather Forecast</h3>
                         </div>
-                        <div class="weather-subhead">৫ দিন এ ময়মনসিংহ</div>
+                        <div class="weather-subhead" data-i18n="hud-weather-sub">5-Day Outlook · Mymensingh</div>
                         <div class="forecast-5day">
                             <div class="f-day-col">
-                                <span class="d-name">আজ</span>
+                                <span class="d-name" data-i18n="hud-day-today">Today</span>
                                 <span class="d-icon">☀️</span>
-                                <strong class="d-temp">৩১°সে.</strong>
+                                <strong class="d-temp">31°C</strong>
                             </div>
                             <div class="f-day-col">
-                                <span class="d-name">শুক্র</span>
+                                <span class="d-name" data-i18n="hud-day-fri">Fri</span>
                                 <span class="d-icon">🌤️</span>
-                                <strong class="d-temp">২৯°সে.</strong>
+                                <strong class="d-temp">29°C</strong>
                             </div>
                             <div class="f-day-col">
-                                <span class="d-name">শনি</span>
+                                <span class="d-name" data-i18n="hud-day-sat">Sat</span>
                                 <span class="d-icon">🌧️</span>
-                                <strong class="d-temp">২৬°সে.</strong>
+                                <strong class="d-temp">26°C</strong>
                             </div>
                             <div class="f-day-col">
-                                <span class="d-name">রবি</span>
+                                <span class="d-name" data-i18n="hud-day-sun">Sun</span>
                                 <span class="d-icon">☀️</span>
-                                <strong class="d-temp">৩০°সে.</strong>
+                                <strong class="d-temp">30°C</strong>
                             </div>
                             <div class="f-day-col">
-                                <span class="d-name">সোম</span>
+                                <span class="d-name" data-i18n="hud-day-mon">Mon</span>
                                 <span class="d-icon">⛅</span>
-                                <strong class="d-temp">২৮°সে.</strong>
+                                <strong class="d-temp">28°C</strong>
                             </div>
                         </div>
 
                         <div class="weather-meta-row">
                             <div class="w-meta-item">
-                                <span>বাতাসের গতি</span>
-                                <strong id="hudWindSpeed">৩১ কিমি/ঘণ্টা</strong>
-                                <small id="hudHumidity">৮৮% আর্দ্রতা</small>
+                                <span data-i18n="hud-wind-lbl">Wind Speed</span>
+                                <strong id="hudWindSpeed">31 km/h</strong>
+                                <small id="hudHumidity">88% Humidity</small>
                             </div>
                             <div class="w-meta-item">
-                                <span>বৃষ্টির সম্ভাবনা</span>
-                                <strong>বৃষ্টি</strong>
-                                <small>পরশুদিন</small>
+                                <span data-i18n="hud-rain-prob-lbl">Precipitation</span>
+                                <strong data-i18n="hud-rain-status">Moderate Rain</strong>
+                                <small data-i18n="hud-rain-time">In 48 Hours</small>
                             </div>
                         </div>
                     </aside>
@@ -1256,20 +1154,19 @@
     </section>
 
 
-    <!-- CTA -->
-
+    <!-- FINAL CTA -->
     <section class="final-cta">
 
-        <p class="eyebrow">
+        <p class="eyebrow" data-i18n="cta-eyebrow">
             READY TO ADAPT?
         </p>
 
         <h2>
-            Build a smarter
-            <span>farm plan.</span>
+            <span data-i18n="cta-h2-1">Build a smarter</span>
+            <span class="highlight" data-i18n="cta-h2-span">farm plan.</span>
         </h2>
 
-        <button class="primary-btn" onclick="scrollToAnalysis()">
+        <button class="primary-btn" onclick="scrollToAnalysis()" data-i18n="cta-btn">
             Start analysis →
         </button>
 
@@ -1277,21 +1174,21 @@
 
 
     <!-- FOOTER -->
-
     <footer>
 
-        <strong>
+        <strong data-i18n="footer-brand">
             AgriVision
         </strong>
 
-        <p>
+        <p data-i18n="footer-tagline">
             Smart farming intelligence platform.
         </p>
 
     </footer>
 
 
-    <!-- SCRIPTS (সঠিক ক্রমানুসারে) -->
+    <!-- SCRIPTS -->
+    <script src="js/i18n.js"></script>
     <script src="js/data.js"></script>
     <script src="js/map.js"></script>
     <script src="js/rotation.js"></script>

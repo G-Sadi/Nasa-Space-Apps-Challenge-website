@@ -2853,3 +2853,290 @@ footer {
         max-width: 480px;
     }
 }
+
+
+/* ==========================================================================
+   LANGUAGE TOGGLE SWITCH & MULTILINGUAL (EN / BN) STYLES
+   ========================================================================== */
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.lang-switch-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    user-select: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+    transition: all 0.3s ease;
+}
+
+.lang-switch-container:hover {
+    border-color: rgba(67, 239, 140, 0.4);
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.lang-tag {
+    font-size: 13px;
+    font-weight: 700;
+    color: #94a99f;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    cursor: default;
+}
+
+.lang-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.lang-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.22);
+    transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: .35s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.lang-switch input:checked + .slider {
+    background-color: #43ef8c;
+}
+
+.lang-switch input:checked + .slider:before {
+    transform: translateX(20px);
+    background-color: #06150f;
+}
+
+body.lang-bn #tagBN {
+    color: #43ef8c;
+    text-shadow: 0 0 10px rgba(67, 239, 140, 0.7);
+}
+
+body:not(.lang-bn) #tagEN {
+    color: #43ef8c;
+    text-shadow: 0 0 10px rgba(67, 239, 140, 0.7);
+}
+
+body.lang-bn {
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', Arial, sans-serif !important;
+}
+
+body.lang-bn h1,
+body.lang-bn h2,
+body.lang-bn h3,
+body.lang-bn strong {
+    letter-spacing: 0px !important;
+}
+
+/* ==========================================================================
+   MOBILE & DESKTOP RESPONSIVE OPTIMIZATION
+   ========================================================================== */
+
+@media (max-width: 900px) {
+    .navbar {
+        height: auto;
+        padding: 14px 5%;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    nav {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        gap: 20px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-right {
+        gap: 12px;
+    }
+
+    .nav-btn {
+        padding: 10px 18px;
+        font-size: 13px;
+    }
+
+    .hero {
+        padding: 50px 5%;
+        gap: 30px;
+        min-height: auto;
+    }
+
+    .hero h1 {
+        font-size: clamp(38px, 8.5vw, 62px);
+        letter-spacing: -2px;
+    }
+
+    #farmSimulation {
+        height: auto;
+        min-height: 850px;
+        padding: 0;
+        border-radius: 20px;
+        margin: 2rem 0;
+    }
+
+    .hud-overlay {
+        padding: 1.2rem;
+    }
+
+    .hud-top-header h1 {
+        font-size: 1.7rem;
+    }
+
+    .hud-middle-body {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    .hud-left-card, 
+    .hud-right-col {
+        width: 100%;
+        max-width: 520px;
+    }
+}
+
+@media (max-width: 600px) {
+    .navbar {
+        padding: 10px 4%;
+    }
+
+    .logo strong {
+        font-size: 15px;
+    }
+
+    .logo span {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .lang-switch-container {
+        padding: 4px 10px;
+    }
+
+    .lang-tag {
+        font-size: 12px;
+    }
+
+    .lang-switch {
+        width: 38px;
+        height: 20px;
+    }
+
+    .slider:before {
+        height: 14px;
+        width: 14px;
+        bottom: 3px;
+    }
+
+    .lang-switch input:checked + .slider:before {
+        transform: translateX(18px);
+    }
+
+    .nav-btn {
+        display: none; /* Keep mobile navbar uncluttered */
+    }
+
+    nav {
+        gap: 14px;
+        font-size: 14px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .primary-btn, 
+    .secondary-btn {
+        width: 100%;
+        text-align: center;
+    }
+
+    .field-grid {
+        height: 320px;
+    }
+
+    .analysis-card {
+        bottom: 20px;
+        left: 20px;
+        right: 20px;
+        padding: 15px;
+    }
+
+    #farmSimulation {
+        min-height: 980px;
+    }
+
+    .hud-overlay {
+        padding: 0.8rem;
+    }
+
+    .hud-top-header h1 {
+        font-size: 1.35rem;
+    }
+
+    .hud-top-header p {
+        font-size: 0.95rem;
+    }
+
+    .hud-card {
+        padding: 1rem;
+        background: rgba(255, 255, 255, 0.82);
+    }
+
+    .rotation-timeline {
+        grid-template-columns: 1fr;
+    }
+
+    .result h2 {
+        font-size: 38px;
+    }
+
+    .result-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #farmMap {
+        height: 360px;
+    }
+}
