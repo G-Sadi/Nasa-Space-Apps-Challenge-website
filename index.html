@@ -208,6 +208,57 @@
         </div>
 
 
+        <!-- 7-DAY HYPER-LOCAL WEATHER FORECAST MODULE -->
+        <div class="weather-forecast-container" id="weatherForecastContainer">
+            <div class="weather-header-row">
+                <div class="weather-header-left">
+                    <div class="weather-pulse-badge">
+                        <span class="weather-pulse-dot"></span>
+                        <span class="weather-badge-text" data-i18n="weather-title">7-Day Hyper-Local Forecast</span>
+                    </div>
+                    <div class="weather-location-pill" id="weatherLocationPill">
+                        <span class="loc-icon">📍</span>
+                        <span id="weatherLocationText">Mymensingh · Field 02</span>
+                    </div>
+                </div>
+
+                <div class="weather-header-right">
+                    <span class="weather-cache-indicator" id="weatherCacheIndicator">⚡ Cached (3h)</span>
+                    <button id="refreshWeatherBtn" class="weather-refresh-btn" title="Refresh Forecast">
+                        <span class="refresh-icon">↻</span>
+                        <span data-i18n="weather-refresh-btn">Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL WEATHER CARDS STRIP -->
+            <div class="weather-cards-scroll">
+                <div class="weather-cards-strip" id="weatherCardsStrip">
+                    <div class="weather-loading-skeleton">
+                        <span class="loading-spinner">↻</span>
+                        <span>Connecting to Open-Meteo satellite feed...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUTOMATED KRISHI ALERT BANNER -->
+            <div class="krishi-alert-banner alert-favorable" id="krishiAlertBanner">
+                <div class="krishi-alert-icon-box">
+                    <span class="krishi-alert-icon" id="krishiAlertIcon">🌱</span>
+                </div>
+                <div class="krishi-alert-content">
+                    <div class="krishi-alert-header">
+                        <strong class="krishi-alert-title" data-i18n="krishi-alert-title">KRISHI WEATHER ADVISORY</strong>
+                        <span class="krishi-alert-tag" id="krishiAlertTag">Next 48 Hours</span>
+                    </div>
+                    <p class="krishi-alert-message" id="krishiAlertMessage">
+                        আগামী ৪৮ ঘণ্টায় আবহাওয়া অনুকূলে রয়েছে—পরিকল্পিত সেচ ও মাঠ পরিচর্যা পরিচালনা করতে পারেন।
+                    </p>
+                </div>
+            </div>
+        </div>
+
+
         <div class="dashboard">
 
             <!-- FIELD MAP -->
@@ -1322,6 +1373,7 @@
     <script src="js/i18n.js"></script>
     <script src="js/data.js"></script>
     <script src="js/crops_db.js"></script>
+    <script src="js/weather.js"></script>
     <script src="js/map.js"></script>
     <script src="js/rotation.js"></script>
     <script src="script.js"></script>
