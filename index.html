@@ -1128,60 +1128,105 @@
 
 
     <!-- 3D FARM SIMULATION -->
-    <section id="farmSimulation">
+    <section id="farmSimulation" class="cinema-mode">
 
         <!-- 3D Viewport Canvas -->
-        <div id="farm3D" class="canvas-container">
-            <!-- Interactive 3D HTML Marker Pins Layer -->
-            <div id="crop3DHotspots" class="crop-3d-hotspots-layer"></div>
-        </div>
+        <div id="farm3D" class="canvas-container"></div>
 
-        <!-- Floating Glassmorphic HUD Master Overlay (English by default, fully localized with data-i18n) -->
-        <div class="hud-overlay">
-
-            <!-- Top Header & Camera Controls -->
-            <div class="hud-top-header">
-                <div>
-                    <h1 data-i18n="hud-title">Mymensingh Farm 3D Simulation</h1>
-                    <p data-i18n="hud-status">Live Real-Time Conditions</p>
-                </div>
-
-                <div class="hud-crop-picker">
-                    <label for="cropSelect" class="hud-crop-label">🌾 <span data-i18n="hud-crop-label">ফসল সিমুলেশন:</span></label>
-                    <select id="cropSelect" class="hud-crop-select" aria-label="3D Crop Selector">
-                        <option value="rice" selected>🌾 ধান (Rice)</option>
-                        <option value="wheat">🌾 গম (Wheat)</option>
-                        <option value="maize">🌽 ভুট্টা (Maize)</option>
-                        <option value="jute">🌿 পাট (Jute)</option>
-                        <option value="potato">🥔 আলু (Potato)</option>
-                        <option value="mustard">🌼 সরিষা (Mustard)</option>
-                        <option value="tomato">🍅 টমেটো (Tomato)</option>
-                        <option value="eggplant">🍆 বেগুন (Eggplant)</option>
-                        <option value="chili">🌶️ মরিচ (Chili)</option>
-                        <option value="lentil">🌱 মসুর ডাল (Lentil)</option>
-                        <option value="cucumber">🥒 শসা (Cucumber)</option>
-                        <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
-                        <option value="onion">🧅 পেঁয়াজ (Onion)</option>
-                        <option value="carrot">🥕 গাজর (Carrot)</option>
-                        <option value="papaya">🍈 পেঁপে (Papaya)</option>
-                    </select>
-                </div>
-
-                <div class="hud-top-actions">
-                    <button id="hudResetView" class="hud-pill-btn" data-i18n="hud-drone-btn" title="Switch to Drone View">🚁 Drone View</button>
-                    <button id="hudFieldView" class="hud-pill-btn" data-i18n="hud-field-btn" title="Switch to Ground Level View">🚜 Field View</button>
-                    <button id="hudToggleSun" class="hud-pill-btn" data-i18n="hud-sun-btn" title="Cycle Day / Sunset / Night Lighting">☀️ Day</button>
-                </div>
+        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Data Mode) -->
+        <div class="field-view-controls-bar">
+            <!-- Crop Selector Pill -->
+            <div class="fctrl-pill fctrl-crop-pill">
+                <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
+                <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
+                    <option value="rice" selected>🌾 ধান (Rice Field)</option>
+                    <option value="wheat">🌾 গম (Wheat Field)</option>
+                    <option value="maize">🌽 ভুট্টা (Maize Field)</option>
+                    <option value="jute">🌿 পাট (Jute Field)</option>
+                    <option value="potato">🥔 আলু (Potato Plot)</option>
+                    <option value="mustard">🌼 সরিষা (Mustard Field)</option>
+                    <option value="tomato">🍅 টমেটো (Tomato Field)</option>
+                    <option value="eggplant">🍆 বেগুন (Eggplant Field)</option>
+                    <option value="chili">🌶️ মরিচ (Chili Plot)</option>
+                    <option value="lentil">🌱 মসুর ডাল (Lentil Field)</option>
+                    <option value="cucumber">🥒 শসা (Cucumber Plot)</option>
+                    <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
+                    <option value="onion">🧅 পেঁয়াজ (Onion Ridge)</option>
+                    <option value="carrot">🥕 গাজর (Carrot Field)</option>
+                    <option value="papaya">🍈 পেঁপে (Papaya Orchard)</option>
+                </select>
             </div>
 
-            <!-- Middle Body: Left and Right floating panels -->
-            <div class="hud-middle-body">
+            <!-- View Mode Toggle Pill: Cinema (Clean) vs Data View -->
+            <div class="fctrl-pill fctrl-mode-pill">
+                <button id="btnCleanView" class="fctrl-toggle-btn active" title="নির্মল দৃশ্য (Cinema Mode)">
+                    <span class="btn-icon">👁️</span>
+                    <span class="btn-text" data-i18n="sim-clean-view">নির্মল দৃশ্য</span>
+                </button>
+                <button id="btnDataView" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
+                    <span class="btn-icon">📊</span>
+                    <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
+                </button>
+            </div>
 
-                <!-- Left Panel: Soil Quality & Stratum -->
-                <aside class="hud-card hud-left-card">
-                    <div class="hud-card-title">
+            <!-- Atmosphere & Camera Actions -->
+            <div class="fctrl-pill fctrl-actions-pill">
+                <button id="hudToggleSun" class="fctrl-action-btn" title="Cycle Day / Sunset / Night Lighting">
+                    <span>☀️</span> <span id="sunBtnText">দিন</span>
+                </button>
+                <button id="hudResetView" class="fctrl-action-btn" title="Switch to Drone View">
+                    <span>🚁</span>
+                </button>
+                <button id="hudFieldView" class="fctrl-action-btn" title="Switch to Ground Level View">
+                    <span>🚜</span>
+                </button>
+                <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
+                    <span>⛶</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Slide-in Glassmorphic Data Drawer (Hidden by default in Cinema Mode) -->
+        <aside id="farmDataDrawer" class="farm-data-drawer" aria-hidden="true">
+            <div class="drawer-header">
+                <div class="drawer-header-title">
+                    <span class="drawer-icon">📊</span>
+                    <h3 data-i18n="drawer-title">মাটি ও ফসলের লাইভ তথ্য</h3>
+                </div>
+                <button id="btnCloseDrawer" class="drawer-close-btn" title="তথ্য বন্ধ করুন (Close Data)">✕</button>
+            </div>
+
+            <div class="drawer-scroll-body">
+                <!-- Active Crop Dynamic Info Badge -->
+                <div class="drawer-crop-card">
+                    <div class="drawer-crop-header">
+                        <span id="drawerCropIcon" class="drawer-crop-icon">🌾</span>
+                        <div>
+                            <h4 id="drawerCropName">আমন ধান (Aman Rice Field)</h4>
+                            <p id="drawerCropSubtitle">হাই-ইয়েল্ডিং স্থানীয় জাত · দানা গঠনের পর্যায়</p>
+                        </div>
+                    </div>
+                    <div class="drawer-crop-metrics">
+                        <div class="d-metric">
+                            <span>অনুকূল NPK অনুপাত:</span>
+                            <strong id="drawerCropNPK">১০০ - ২০ - ৪০ কেজি/হেক্টর</strong>
+                        </div>
+                        <div class="d-metric">
+                            <span>মাটির আদর্শ আর্দ্রতা:</span>
+                            <strong id="drawerCropMoist">৬৫% – ৭৫% (পরিমিত পানি)</strong>
+                        </div>
+                        <div class="d-metric">
+                            <span>জীবনকাল:</span>
+                            <strong id="drawerCropDays">১১০ – ১২৫ দিন</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Soil Nutrients & N-P-K -->
+                <div class="drawer-section-card">
+                    <div class="drawer-card-title">
                         <span class="hud-icon">🌱</span>
-                        <h3 data-i18n="hud-soil-title">Soil Quality & Health</h3>
+                        <h4 data-i18n="hud-soil-title">Soil Quality & Health</h4>
                     </div>
 
                     <!-- N-P-K -->
@@ -1269,96 +1314,47 @@
                         <span data-i18n="hud-soil-temp-lbl">Soil Temperature</span>
                         <strong id="hudTempVal">24°C</strong>
                     </div>
-                </aside>
-
-                <!-- Right Column: Crop Advisory & Weather -->
-                <div class="hud-right-col">
-
-                    <!-- Crop Advisory -->
-                    <aside class="hud-card hud-crops-card">
-                        <div class="hud-card-title">
-                            <span class="hud-icon">🌾</span>
-                            <h3 data-i18n="hud-crop-title">Crop Advisory</h3>
-                        </div>
-                        <div class="crop-rec-header" data-i18n="hud-best-crops">Optimal Seasonal Crops</div>
-                        <ul class="rec-crop-list">
-                            <li>
-                                <span class="rec-icon">🌾</span>
-                                <span class="rec-name" data-i18n="hud-crop1-name">1. Aman Paddy</span>
-                                <span class="rec-badge badge-top" data-i18n="hud-crop1-badge">Optimal</span>
-                            </li>
-                            <li>
-                                <span class="rec-icon">🍆</span>
-                                <span class="rec-name" data-i18n="hud-crop2-name">2. Eggplant / Brinjal</span>
-                                <span class="rec-badge" data-i18n="hud-crop2-badge">High Yield</span>
-                            </li>
-                            <li>
-                                <span class="rec-icon">🍈</span>
-                                <span class="rec-name" data-i18n="hud-crop3-name">3. Papaya</span>
-                                <span class="rec-badge" data-i18n="hud-crop3-badge">Favorable</span>
-                            </li>
-                            <li>
-                                <span class="rec-icon">🫘</span>
-                                <span class="rec-name" data-i18n="hud-crop4-name">4. Lentils / Pulses</span>
-                                <span class="rec-badge" data-i18n="hud-crop4-badge">Soil Revitalizer</span>
-                            </li>
-                        </ul>
-                    </aside>
-
-                    <!-- Weather Card -->
-                    <aside class="hud-card hud-weather-card">
-                        <div class="hud-card-title">
-                            <span class="hud-icon">⛅</span>
-                            <h3 data-i18n="hud-weather-title">Weather Forecast</h3>
-                        </div>
-                        <div class="weather-subhead" data-i18n="hud-weather-sub">5-Day Outlook · Mymensingh</div>
-                        <div class="forecast-5day">
-                            <div class="f-day-col">
-                                <span class="d-name" data-i18n="hud-day-today">Today</span>
-                                <span class="d-icon">☀️</span>
-                                <strong class="d-temp">31°C</strong>
-                            </div>
-                            <div class="f-day-col">
-                                <span class="d-name" data-i18n="hud-day-fri">Fri</span>
-                                <span class="d-icon">🌤️</span>
-                                <strong class="d-temp">29°C</strong>
-                            </div>
-                            <div class="f-day-col">
-                                <span class="d-name" data-i18n="hud-day-sat">Sat</span>
-                                <span class="d-icon">🌧️</span>
-                                <strong class="d-temp">26°C</strong>
-                            </div>
-                            <div class="f-day-col">
-                                <span class="d-name" data-i18n="hud-day-sun">Sun</span>
-                                <span class="d-icon">☀️</span>
-                                <strong class="d-temp">30°C</strong>
-                            </div>
-                            <div class="f-day-col">
-                                <span class="d-name" data-i18n="hud-day-mon">Mon</span>
-                                <span class="d-icon">⛅</span>
-                                <strong class="d-temp">28°C</strong>
-                            </div>
-                        </div>
-
-                        <div class="weather-meta-row">
-                            <div class="w-meta-item">
-                                <span data-i18n="hud-wind-lbl">Wind Speed</span>
-                                <strong id="hudWindSpeed">31 km/h</strong>
-                                <small id="hudHumidity">88% Humidity</small>
-                            </div>
-                            <div class="w-meta-item">
-                                <span data-i18n="hud-rain-prob-lbl">Precipitation</span>
-                                <strong data-i18n="hud-rain-status">Moderate Rain</strong>
-                                <small data-i18n="hud-rain-time">In 48 Hours</small>
-                            </div>
-                        </div>
-                    </aside>
-
                 </div>
 
-            </div>
+                <!-- Crop Advisory & Weather Snapshot -->
+                <div class="drawer-section-card">
+                    <div class="drawer-card-title">
+                        <span class="hud-icon">🌾</span>
+                        <h4 data-i18n="hud-crop-title">Crop Advisory & Field Outlook</h4>
+                    </div>
+                    <ul class="rec-crop-list">
+                        <li>
+                            <span class="rec-icon">🌾</span>
+                            <span class="rec-name" data-i18n="hud-crop1-name">1. Aman Paddy</span>
+                            <span class="rec-badge badge-top" data-i18n="hud-crop1-badge">Optimal</span>
+                        </li>
+                        <li>
+                            <span class="rec-icon">🍆</span>
+                            <span class="rec-name" data-i18n="hud-crop2-name">2. Eggplant / Brinjal</span>
+                            <span class="rec-badge" data-i18n="hud-crop2-badge">High Yield</span>
+                        </li>
+                        <li>
+                            <span class="rec-icon">🍈</span>
+                            <span class="rec-name" data-i18n="hud-crop3-name">3. Papaya</span>
+                            <span class="rec-badge" data-i18n="hud-crop3-badge">Favorable</span>
+                        </li>
+                    </ul>
 
-        </div>
+                    <div class="weather-meta-row" style="margin-top: 14px;">
+                        <div class="w-meta-item">
+                            <span data-i18n="hud-wind-lbl">Wind Speed</span>
+                            <strong id="hudWindSpeed">31 km/h</strong>
+                            <small id="hudHumidity">88% Humidity</small>
+                        </div>
+                        <div class="w-meta-item">
+                            <span data-i18n="hud-rain-prob-lbl">Precipitation</span>
+                            <strong data-i18n="hud-rain-status">Moderate Rain</strong>
+                            <small data-i18n="hud-rain-time">In 48 Hours</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
     </section>
 

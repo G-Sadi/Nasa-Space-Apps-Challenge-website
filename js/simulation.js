@@ -1,934 +1,1001 @@
 /*
 |--------------------------------------------------------------------------
-| AGRIVISION / FIELD SHIFT — ADVANCED 3D CROP SIMULATION ENGINE
+| AGRIVISION / FIELD SHIFT — PHASE 3: ULTRA-REALISTIC 3D LIVING FIELD ENGINE
 |--------------------------------------------------------------------------
-| - Three.js WebGLRenderer with ACESFilmicToneMapping & sRGB output
-| - Warm natural sunlight, hemisphere sky-ground lighting, 3D soil mound
-| - 15 Procedural Anatomical 3D Crops + GLTF/DRACO Loader Fallback
-| - Dynamic smooth crop switching (fade-scale transition) & auto-framing
-| - 3 Farmer-Centric Interactive 3D HTML Hotspots (Leaf, Soil, Fruit)
-| - Procedural wind swaying animation & Touch controls with angle limits
+| - 4K High-DPI PBR Three.js WebGLRenderer (ACESFilmic, sRGB, PCFSoftShadow)
+| - Dense Agricultural Plot (81 Instances via InstancedMesh)
+| - Textured Plowed Furrowed Soil Terrain (আল ও মাটির ভাঁজ)
+| - Living Wind Shader / Wave Physics across the crop canopy
+| - 15 Distinct Anatomical 3D Botanical Crops with smooth camera transitions
+| - 100% Clutter-Free Cinema Mode by default vs Slide-in Data Drawer
+| - Fullscreen & Touch Controls
 |--------------------------------------------------------------------------
 */
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
-// Core Three.js State
+// Core Scene Globals
 let scene, camera, renderer, controls;
-let containerEl, hotspotsOverlayEl;
-let sunLight, hemiLight, fillLight;
-let moundGroup, currentCropGroup, surroundingFarmGroup;
-let isDayMode = true;
-let animationTime = 0;
+let containerEl, canvasEl;
+let sunLight, hemiLight, rimLight;
+let terrainMesh = null;
+let currentCropGroup = null;
 
-// Switching & Camera Animation State
+// Field Instances Globals
+const ROWS = 9;
+const COLS = 9;
+const TOTAL_PLANTS = ROWS * COLS; // 81 plants
+const ROW_SPACING = 1.2;          // Distance between furrow rows
+const PLANT_SPACING = 1.2;        // Distance along row
+
+let instanceData = [];            // Base positions, scale, rotation
+let stemInstancedMesh = null;
+let leafInstancedMesh = null;
+let fruitInstancedMesh = null;
+
+// Wind Physics State
+let animationTime = 0;
+let isDayMode = true;
+
+// Active Crop & Transition State
 let activeCropId = "rice";
 let isTransitioningCrop = false;
-let transitionProgress = 0;
-let oldCropMesh = null;
-let newCropMesh = null;
+let transitionProgress = 1.0;
+let transitionScale = 1.0;
 
-let targetCameraPos = new THREE.Vector3(0, 5, 8.5);
-let targetLookAt = new THREE.Vector3(0, 1.6, 0);
+// Camera Framing State
+let targetCameraPos = new THREE.Vector3(0, 3.4, 8.0);
+let targetLookAt = new THREE.Vector3(0, 0.9, 0);
 let isTransitioningCamera = false;
 
-// Hotspots State & World Anchors
-const hotspotAnchors = {
-    leaf:  new THREE.Vector3(0.5, 2.2, 0.2),
-    soil:  new THREE.Vector3(-0.6, 0.45, 0.8),
-    fruit: new THREE.Vector3(0.2, 1.4, 0.4)
-};
+// Reusable Matrix & Math Objects
+const dummy = new THREE.Object3D();
+const tempBox = new THREE.Box3();
+const tempVec = new THREE.Vector3();
 
-// 15 Crop Metadata for Hotspots (Bilingual)
-const CROP_HOTSPOT_INFO = {
+// 15 Crop Metadata for Live Data Drawer (Bilingual & Agricultural)
+const CROP_METRICS = {
     rice: {
-        leaf: { badge: "স্বাভাবিক / Normal", status: "good", desc: "ধানের পাতায় ক্লোরোফিল ঘনত্ব চমৎকার। কোনো ব্লাস্ট বা খোলপোড়া রোগের লক্ষণ নেই।" },
-        soil: { badge: "আর্দ্র / 68% Moisture", status: "good", desc: "দোআঁশ মাটিতে ২-৩ সেমি পানির পরিমিত রস বজায় আছে। শিকড় সতেজ।" },
-        fruit: { badge: "শীষ বৃদ্ধি / Panicle Set", status: "good", desc: "সুষম ধান শীষ গজানো পর্যায়; দানার দুধ পূর্ণতা পাচ্ছে।" }
+        nameBn: "আমন ধান",
+        nameEn: "Aman Rice Field",
+        subtitle: "হাই-ইয়েল্ডিং স্থানীয় জাত · দানা গঠনের পর্যায়",
+        npk: "১০০ - ২০ - ৪০ কেজি/হেক্টর",
+        moisture: "৬৫% – ৭৫% (পরিমিত পানি)",
+        ph: "৬.০ – ৬.৮",
+        temp: "২৫°C – ৩২°C",
+        duration: "১১০ – ১২৫ দিন",
+        heightCategory: "medium",
+        advisory: "শীষে দানা ভরার সময় জমিতে ২-৩ ইঞ্চি পানি রাখুন। পাতা ব্লাইট দমনে প্রয়োজনে কার্বেনডাজিম স্প্রে করুন।"
     },
     wheat: {
-        leaf: { badge: "সতেজ / Healthy", status: "good", desc: "গমের পাতায় কোনো মরিচা বা ব্লাইট নেই। রোদে সালোকসংশ্লেষণ সক্রিয়।" },
-        soil: { badge: "পরিমিত / 55% Moisture", status: "good", desc: "মুকুট শিকড় অঞ্চলে পর্যাপ্ত রস রয়েছে; জলাবদ্ধতামুক্ত।" },
-        fruit: { badge: "দানা গঠন / Grain Filling", status: "good", desc: "গমের শীষে পুষ্ট দানা তৈরি হচ্ছে। গরম বাতাস থেকে সুরক্ষিত রাখুন।" }
+        nameBn: "উফশী গম",
+        nameEn: "Wheat Field (Golden Triticum)",
+        subtitle: "রবি শস্য · দানার বৃদ্ধি ও পুষ্টিকালীন পর্যায়",
+        npk: "১২০ - ৬০ - ৬০ কেজি/হেক্টর",
+        moisture: "৫৫% – ৬৫% (পর্যাপ্ত আর্দ্রতা)",
+        ph: "৬.২ – ৭.০",
+        temp: "১৮°C – ২৫°C",
+        duration: "১০৫ – ১১৫ দিন",
+        heightCategory: "medium",
+        advisory: "শীষ আসার সময় হালকা সেচ দিন। ব্লাস্ট বা মরিচা রোগের লক্ষণ দেখা দিলে দ্রুত ছত্রাকনাশক ব্যবহার করুন।"
     },
     maize: {
-        leaf: { badge: "চমৎকার / Vigorous", status: "good", desc: "প্রশস্ত সবুজ পাতা। ফল আর্মিওয়ার্মের কোনো উপস্থিতি পাওয়া যায়নি।" },
-        soil: { badge: "অনুকূল / 65% Moisture", status: "good", desc: "আইলে গোড়ায় মাটি উঁচু করে শক্তভাবে নোঙর করা রয়েছে।" },
-        fruit: { badge: "মোচা ধারণ / Tassel & Silk", status: "good", desc: "মোচায় রেশম বের হয়েছে; পরাগায়নের জন্য আবহাওয়া উপযুক্ত।" }
+        nameBn: "হাইব্রিড ভুট্টা",
+        nameEn: "Hybrid Maize Field",
+        subtitle: "উচ্চফলনশীল খাদ্যশস্য · মোচা ও সিল্কিং পর্যায়",
+        npk: "২৫০ - ১২০ - ১২০ কেজি/হেক্টর",
+        moisture: "৬০% – ৭০% (উচ্চ পুষ্টি চাহিদা)",
+        ph: "৫.৮ – ৭.২",
+        temp: "২১°C – ৩০°C",
+        duration: "১৩০ – ১৪৫ দিন",
+        heightCategory: "tall",
+        advisory: "গাছের গোড়ায় মাটি তুলে দিন। ফল আর্মিওয়ার্ম পোকার আক্রমণ প্রতিহত করতে নিয়মিত পর্যবেক্ষণ করুন।"
     },
     jute: {
-        leaf: { badge: "স্বাভাবিক / Normal", status: "good", desc: "কচি পাতায় কোনো বিছা পোকা বা হলুদ মাকড়ের আক্রমণ নেই।" },
-        soil: { badge: "উর্বর / High Moisture", status: "good", desc: "পলি মাটিতে দ্রুত কান্ড লম্বা হওয়ার জন্য নাইট্রোজেন সক্রিয়।" },
-        fruit: { badge: "কান্ড বৃদ্ধি / Bast Fibers", status: "good", desc: "পাটের আঁশের গুণগত শক্তি দ্রুত বৃদ্ধি পাচ্ছে।" }
+        nameBn: "তোষা পাট",
+        nameEn: "Golden Jute Field",
+        subtitle: "অর্থকরী আঁশ ফসল · পূর্ণাঙ্গ উদ্ভিদ বৃদ্ধি",
+        npk: "৬০ - ৩০ - ৩০ কেজি/হেক্টর",
+        moisture: "৭০% – ৮০% (উচ্চ আর্দ্রতা প্রিয়)",
+        ph: "৬.০ – ৭.২",
+        temp: "২৮°C – ৩৫°C",
+        duration: "১০০ – ১২০ দিন",
+        heightCategory: "tall",
+        advisory: "আগাছা পরিষ্কার রাখুন এবং ঘোড়া পোকার আক্রমণ দেখা দিলে বায়োপেস্টিসাইড স্প্রে করুন।"
     },
     potato: {
-        leaf: { badge: "সতর্কতা / Monitored", status: "warn", desc: "কুয়াশাচ্ছন্ন রাতে নাবি ধসা (Late Blight) প্রতিরোধে আগাম ছত্রাকনাশক স্প্রে করুন।" },
-        soil: { badge: "ঝুরঝুরে / Loamy Ridge", status: "good", desc: "গোড়ায় মাটি তুলে আলু সম্পূর্ণ ঢেকে রাখা হয়েছে; আলু সবুজ হবে না।" },
-        fruit: { badge: "আলু স্ফীতি / Tuber Bulking", status: "good", desc: "মাটির নিচে আলুর সাইজ বাড়ছে; পরিমিত আর্দ্রতা বজায় রাখুন।" }
+        nameBn: "ডায়মন্ড আলু",
+        nameEn: "Diamond Potato Ridge Plot",
+        subtitle: "কন্দ জাতীয় কন্দশস্য · টিউবার গঠন পর্যায়",
+        npk: "৩০০ - ১৫০ - ২৫০ কেজি/হেক্টর",
+        moisture: "৬৫% – ৭২% (সুনিষ্কাশিত মাটির ভাঁজ)",
+        ph: "৫.৫ – ৬.৫",
+        temp: "১৬°C – ২২°C",
+        duration: "৮৫ – ৯৫ দিন",
+        heightCategory: "low",
+        advisory: "নাবিম ধসা (Late Blight) প্রতিরোধে ঘন কুয়াশার সময় উপযুক্ত ছত্রাকনাশক স্প্রে করুন ও গোড়া বেঁধে দিন।"
     },
     mustard: {
-        leaf: { badge: "উত্তম / Good", status: "good", desc: "পাতার নিচে জাবপোকা নেই; লেডিবার্ড বিটল পোকা প্রাকৃতিকভাবে রক্ষা করছে।" },
-        soil: { badge: "শুকনো-মাঝারি / 45%", status: "good", desc: "হালকা দোআঁশ মাটিতে শিকড় দৃঢ়ভাবে প্রতিষ্ঠিত।" },
-        fruit: { badge: "হলুদ ফুল / Full Bloom", status: "good", desc: "মৌমাছির দ্বারা ব্যাপক পরাগায়ন হচ্ছে; ফলন বৃদ্ধির লক্ষণ।" }
+        nameBn: "টরি-৭ সরিষা",
+        nameEn: "Mustard Flower Field",
+        subtitle: "তৈলবীজ ফসল · হলুদ ফুল প্রস্ফুটন পর্যায়",
+        npk: "৮০ - ৪০ - ৪০ কেজি/হেক্টর",
+        moisture: "৫০% – ৬০% (সহনশীল আর্দ্রতা)",
+        ph: "৬.০ – ৭.৫",
+        temp: "১৫°C – ২২°C",
+        duration: "৭৫ – ৮৫ দিন",
+        heightCategory: "medium",
+        advisory: "ফুল আসার পূর্বে একটি হালকা সেচ দিন। জাব পোকার উপদ্রব দেখা দিলে নিম তেলের মিশ্রণ স্প্রে করুন।"
     },
     tomato: {
-        leaf: { badge: "সংরক্ষিত / Staked", status: "good", desc: "বাঁশের খুঁটিতে বাঁধা রয়েছে; ভেজা মাটি থেকে পাতা সম্পূর্ণ ওপরে।" },
-        soil: { badge: "সুনিষ্কাশিত / 60%", status: "good", desc: "ক্যালসিয়াম ও বোরনের সুষম সরবরাহ রয়েছে; তলা পচা রোধ হয়েছে।" },
-        fruit: { badge: "ফল ধরা / Fruiting", status: "good", desc: "পুষ্ট টমেটোর থোকায় রঙ ধরছে (ব্রেকার স্টেজ); উজ্জ্বল ত্বক।" }
+        nameBn: "বারি টমেটো",
+        nameEn: "Tomato Bush Field",
+        subtitle: "উচ্চমূল্যের সবজি · পাকা ফল ও পুষ্পায়ন পর্যায়",
+        npk: "১৫০ - ১০০ - ১২০ কেজি/হেক্টর",
+        moisture: "৬০% – ৭০% (নিয়মিত হালকা সেচ)",
+        ph: "৬.০ – ৬.৮",
+        temp: "২০°C – ২৮°C",
+        duration: "৯০ – ১১০ দিন",
+        heightCategory: "medium",
+        advisory: "গাছের ডালপালায় সাপোর্ট দিন। ঢলে পড়া রোগ ও ফল ছিদ্রকারী পোকা দমনে ফেরোমোন ফাঁদ ব্যবহার করুন।"
     },
     eggplant: {
-        leaf: { badge: "ঝোপালো / Bushy", status: "good", desc: "ডগা ছিদ্রকারী পোকার কোনো সংক্রমণ নেই; ডগা সোজা ও তাজা।" },
-        soil: { badge: "সমৃদ্ধ / Rich Humus", status: "good", desc: "গোড়ায় পচা গোবর ও পটাশের সুষম বলয় রয়েছে।" },
-        fruit: { badge: "চকচকে বেগুন / Glossy", status: "good", desc: "নরম বীজসহ আকর্ষণীয় বেগুন সংগ্রহের উপযোগী হচ্ছে।" }
+        nameBn: "উত্তরা বেগুন",
+        nameEn: "Eggplant / Brinjal Field",
+        subtitle: "বারোমাসি সবজি · ফলন ও ফুল আসার পর্যায়",
+        npk: "১৩০ - ৯০ - ১০০ কেজি/হেক্টর",
+        moisture: "৬৫% – ৭২% (ভারী ও সুনিষ্কাশিত মাটি)",
+        ph: "৫.৮ – ৬.৮",
+        temp: "২২°C – ৩০°C",
+        duration: "১১০ – ১৩০ দিন",
+        heightCategory: "medium",
+        advisory: "ডগা ও ফল ছিদ্রকারী পোকা দমনে নিয়মিত আক্রান্ত ডগা কেটে ধ্বংস করুন।"
     },
     chili: {
-        leaf: { badge: "কোঁকড়ামুক্ত / Clean", status: "good", desc: "থ্রিপস ও হলুদ মাকড়মুক্ত সমতল সবুজ পাতা।" },
-        soil: { badge: "উঁচু বেড / Raised Bed", status: "good", desc: "পানি জমে থাকার কোনো সুযোগ নেই; শিকড় শ্বাস নিচ্ছে।" },
-        fruit: { badge: "ঝাল মরিচ / Pod Setting", status: "good", desc: "গাঢ় সবুজ ও লাল টুকটুকে মরিচে ভরা ডালপালা।" }
+        nameBn: "বিন্দু মরিচ",
+        nameEn: "Hot Chili Plantation",
+        subtitle: "মসলা জাতীয় শস্য · ফল পরিপক্বতা পর্যায়",
+        npk: "১০০ - ৬০ - ৮০ কেজি/হেক্টর",
+        moisture: "৫৫% – ৬৫% (পানি নিষ্কাশন আবশ্যক)",
+        ph: "৬.০ – ৭.০",
+        temp: "২২°C – ৩২°C",
+        duration: "৯০ – ১২০ দিন",
+        heightCategory: "low",
+        advisory: "গাছের পাতা কোকড়ানো রোগ (Leaf Curl Virus) রোধে সাদা মাছি দমন করুন।"
     },
     lentil: {
-        leaf: { badge: "সূক্ষ্ম / Feathery", status: "good", desc: "স্টেমফাইলিয়াম ব্লাইটমুক্ত মসুরের চিকন পাতা।" },
-        soil: { badge: "নাইট্রোজেন গুটি / Nodules", status: "good", desc: "শিকড়ে প্রচুর সক্রিয় গোলাপী রাইজোবিয়াম গুটি বিদ্যমান।" },
-        fruit: { badge: "শুঁটি গঠন / Podding", status: "good", desc: "প্রতিটি ডালে প্রচুর মসুরের ছোট শুঁটি আসছে।" }
+        nameBn: "বারি মসুর ডাল",
+        nameEn: "Lentil Pulse Field",
+        subtitle: "নাইট্রোজেন সংবন্ধনকারী ডাল ফসল · শুঁটি পুষ্টিকাল",
+        npk: "২০ - ৪০ - ২০ কেজি/হেক্টর",
+        moisture: "৪৫% – ৫৫% (কম পানি প্রয়োজন)",
+        ph: "৬.২ – ৭.৫",
+        temp: "১৮°C – ২৪°C",
+        duration: "৯৫ – ১০৫ দিন",
+        heightCategory: "low",
+        advisory: "গাছের শিকড়ে রাইজোবিয়াম ব্যাকটেরিয়া বৃদ্ধি পায়। অতিরিক্ত সেচ পরিহার করুন।"
     },
     cucumber: {
-        leaf: { badge: "মাচায় বিস্তৃত / Trellis", status: "good", desc: "বাঁশের মাচায় লতা সুষমভাবে প্রসারিত; ডাউনি মিলডিউ নেই।" },
-        soil: { badge: "রসালো মাদা / Moist Pit", status: "good", desc: "মাদায় খড়ের মালচিং থাকায় মাটির রস শুকিয়ে যাচ্ছে না।" },
-        fruit: { badge: "খাস্তা শসা / Crisp Fruit", status: "good", desc: "সোজা ও মসৃণ সবুজ শসা ঝুলছে; কোনো মাছি পোকা নেই।" }
+        nameBn: "গ্রিন শসা",
+        nameEn: "Cucumber Creeper Plot",
+        subtitle: "লতানো সবজি ফসল · তরতাজা ফলন পর্যায়",
+        npk: "৮০ - ৫০ - ৮০ কেজি/হেক্টর",
+        moisture: "৭০% – ৮০% (উচ্চ পানি প্রিয়)",
+        ph: "৬.০ – ৭.০",
+        temp: "২৪°C – ৩২°C",
+        duration: "৫৫ – ৭০ দিন",
+        heightCategory: "low",
+        advisory: "মাটির উপরে সমানভাবে ছড়িয়ে লতা বৃদ্ধি পায়; পাউডারি মিলডিউ প্রতিরোধে নজর রাখুন।"
     },
     cauliflower: {
-        leaf: { badge: "ব্লাঞ্চিং ঢাকা / Blanched", status: "good", desc: "ভেতরের জ্যাকেট পাতা দিয়ে সাদা কপিটিকে আলতো করে ঢেকে রাখা হয়েছে।" },
-        soil: { badge: "বোরন সমৃদ্ধ / 65%", status: "good", desc: "বোরনের পর্যাপ্ততায় ফাঁপা কান্ড ও বাদামি দাগ পুরোপুরি মুক্ত।" },
-        fruit: { badge: "ধবধবে কার্ড / Snow Curd", status: "good", desc: "নিবিড় নিরেট দুধ-সাদা ফুলকপির আকার বাড়ছে।" }
+        nameBn: "স্নোবল ফুলকপি",
+        nameEn: "Cauliflower Field",
+        subtitle: "শীতকালীন সবজি · সাদা কার্ড পুষ্টিকালীন পর্যায়",
+        npk: "১০০ - ৮০ - ১০০ কেজি/হেক্টর",
+        moisture: "৬৫% – ৭৫% (পর্যাপ্ত জৈবসার সমৃদ্ধ)",
+        ph: "৬.৫ – ৭.২",
+        temp: "১৫°C – ২২°C",
+        duration: "৭৫ – ৯০ দিন",
+        heightCategory: "low",
+        advisory: "কার্ড যেন সূর্যের তীব্র আলোয় হলুদ না হয় সেজন্য পাতা দিয়ে ঢেকে (ব্লাঞ্চিং) রাখুন।"
     },
     onion: {
-        leaf: { badge: "নলাকার সবুজ / Tubular", status: "good", desc: "প্রতিটি পাতা কন্দের এক একটি খোসা তৈরি করছে।" },
-        soil: { badge: "সালফার মিশ্রিত / Friable", status: "good", desc: "ঝুরঝুরে মাটিতে পেঁয়াজের ঝাঁঝ ও খোসার শক্তি বাড়ছে।" },
-        fruit: { badge: "কন্দ স্ফীতি / Bulb Swelling", status: "good", desc: "মাটির উপরিভাগে বড় গোল পেঁয়াজের কন্দ দৃশ্যমান হচ্ছে।" }
+        nameBn: "তাহেরপুরী পেঁয়াজ",
+        nameEn: "Onion Bulb Ridge",
+        subtitle: "মসলা জাতীয় কন্দশস্য · কন্দ বৃদ্ধি পর্যায়",
+        npk: "১০০ - ৮০ - ১০০ কেজি/হেক্টর",
+        moisture: "৫০% – ৬০% (মাটির ভাজে উন্নত নিষ্কাশন)",
+        ph: "৬.০ – ৬.৮",
+        temp: "১৮°C – ২৬°C",
+        duration: "৯০ – ১১০ দিন",
+        heightCategory: "low",
+        advisory: "কন্দ উঠানোর ১৫ দিন পূর্বে সেচ দেওয়া বন্ধ রাখুন যাতে পেঁয়াজের সংরক্ষণ ক্ষমতা বৃদ্ধি পায়।"
     },
     carrot: {
-        leaf: { badge: "ঘন ফার্ন পাতা / Lacy", status: "good", desc: "সবুজ পাতার ছাউনি মাটির রস ধরে রাখছে।" },
-        soil: { badge: "পাথরহীন বেলে / Deep Tilth", status: "good", desc: "৩০ সেমি গভীর ঝুরঝুরে মাটি; গাজর বাঁকা বা ফাটলমুক্ত।" },
-        fruit: { badge: "কমলা মূল / Orange Taproot", status: "good", desc: "মিষ্টতা ও বিটা-ক্যারোটিন সমৃদ্ধ মোটা রসালো গাজর তৈরি হচ্ছে।" }
+        nameBn: "কুঁজো গাজর",
+        nameEn: "Carrot Fronds Field",
+        subtitle: "মূল জাতীয় পুষ্টিকর সবজি · মূল স্ফীতি পর্যায়",
+        npk: "৮০ - ৬০ - ৮০ কেজি/হেক্টর",
+        moisture: "৬০% – ৭০% (ঝুরঝুরে বেলে দোআঁশ)",
+        ph: "৬.০ – ৬.৮",
+        temp: "১৬°C – ২৪°C",
+        duration: "৮০ – ৯৫ দিন",
+        heightCategory: "low",
+        advisory: "মাটি নরম ও ঝুরঝুরে রাখুন যাতে গাজর সোজা ও মসৃণভাবে নিচের দিকে বৃদ্ধি পেতে পারে।"
     },
     papaya: {
-        leaf: { badge: "ছাতার মতো ছাউনি / Canopy", status: "good", desc: "রিং স্পট ভাইরাসমুক্ত সুস্থ বড় পেঁপে পাতা।" },
-        soil: { badge: "উঁচু ঢিবি / Mounded Soil", status: "good", desc: "গোড়া থেকে পানি দ্রুত নেমে যাওয়ার জন্য ঢিবি করা।" },
-        fruit: { badge: "থোকায় ফল / Heavy Clusters", status: "good", desc: "কান্ডের উপরিভাগে ঘন থোকায় সুষম পেঁপে বড় হচ্ছে।" }
+        nameBn: "রেড লেডি পেঁপে",
+        nameEn: "Papaya Orchard Field",
+        subtitle: "উচ্চ ফলনশীল ফল ফসল · ফল ধারণ পর্যায়",
+        npk: "১৫০ - ১৫০ - ২০০ গ্রাম/গাছ",
+        moisture: "৬৫% – ৭৫% (গোড়ায় পানি জমা নিষেধ)",
+        ph: "৬.০ – ৭.০",
+        temp: "২৫°C – ৩৫°C",
+        duration: "৮ – ১০ মাস",
+        heightCategory: "tall",
+        advisory: "গাছের গোড়ায় যাতে কখনোই পানি জমে না থাকে সেদিকে খেয়াল রাখুন। রিং পদ্ধতিতে সার প্রয়োগ করুন।"
     }
 };
-
-// DRACO & GLTF Loaders Setup
-let gltfLoader = null;
-function setupLoaders() {
-    try {
-        const dracoLoader = new DRACOLoader();
-        dracoLoader.setDecoderPath("https://unpkg.com/three@0.160.0/examples/jsm/libs/draco/");
-        gltfLoader = new GLTFLoader();
-        gltfLoader.setDRACOLoader(dracoLoader);
-    } catch (e) {
-        console.warn("[3D Engine] DRACOLoader initialize fallback:", e);
-    }
-}
 
 /*
 |--------------------------------------------------------------------------
-| INITIALIZE 3D REALISTIC SCENE
+| INITIALIZE 3D ENGINE
 |--------------------------------------------------------------------------
 */
-export function initializeFarmSimulation() {
+export function init3DFieldSimulation() {
     containerEl = document.getElementById("farm3D");
     if (!containerEl) return;
 
-    // Ensure container has canvas-container class for styling hooks
     containerEl.classList.add("canvas-container");
     containerEl.innerHTML = "";
 
     const width = containerEl.clientWidth || window.innerWidth;
-    const height = containerEl.clientHeight || 650;
+    const height = containerEl.clientHeight || 560;
 
-    // 1. Scene & Atmosphere
+    // 1. Scene Setup & Atmospheric Fog
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x06150f); // Matching authentic Field Shift theme
-    scene.fog = new THREE.FogExp2(0x0c251a, 0.025);
+    scene.background = new THREE.Color(0x06150f);
+    scene.fog = new THREE.FogExp2(0x0a1e14, 0.022); // Lifelike horizon atmospheric blending
 
-    // 2. Camera setup
-    camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 200);
-    camera.position.set(0, 5, 8.5);
+    // 2. Camera Setup
+    camera = new THREE.PerspectiveCamera(45, width / height, 0.2, 80);
+    camera.position.set(0, 3.4, 8.0);
 
-    // 3. WebGLRenderer with Hyper-Realistic ToneMapping & ColorSpace
+    // 3. 4K High-DPI WebGLRenderer with PBR & Color Science
     renderer = new THREE.WebGLRenderer({
         antialias: true,
-        powerPreference: "high-performance",
-        alpha: false
+        alpha: false,
+        powerPreference: "high-performance"
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    
-    // Lifelike vibrancy per specification
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // 4K Crisp DPI
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Ultra-smooth realistic shadows
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
+    renderer.toneMappingExposure = 1.18;
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
-    // Soft Shadow mapping
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    canvasEl = renderer.domElement;
+    containerEl.appendChild(canvasEl);
 
-    containerEl.appendChild(renderer.domElement);
-
-    // 4. Subtle Touch OrbitControls with Rotation Limits
-    controls = new OrbitControls(camera, renderer.domElement);
+    // 4. OrbitControls with Farmer-Safe Angle Limits
+    controls = new OrbitControls(camera, canvasEl);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.minDistance = 3.2;
-    controls.maxDistance = 22;
-    controls.maxPolarAngle = Math.PI / 2.05; // Prevent flipping under ground!
-    controls.minPolarAngle = Math.PI / 12;
-    controls.target.set(0, 1.4, 0);
-    controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
+    controls.dampingFactor = 0.06;
+    controls.maxPolarAngle = Math.PI / 2.05; // Prevent flipping ground upside down
+    controls.minDistance = 1.8;              // Prevent clipping into soil
+    controls.maxDistance = 18.0;             // Limit maximum zoom out
+    controls.target.set(0, 0.9, 0);
 
-    // 5. Farm Lighting Environment
-    setupAtmosphericLighting();
+    // 5. Realistic Golden-Hour Environment & Lighting
+    setupFieldLighting();
 
-    // 6. Base Soil Mound & Groups
-    moundGroup = createMoundBase();
-    scene.add(moundGroup);
+    // 6. Textured Plowed Furrowed Soil Terrain (আল ও মাটির ভাঁজ)
+    buildFurrowedSoilTerrain();
 
-    surroundingFarmGroup = createAmbientFarmSurroundings();
-    scene.add(surroundingFarmGroup);
+    // 7. Calculate Grid Instance Positions (81 Plant Plots)
+    computeGridPositions();
 
-    currentCropGroup = new THREE.Group();
-    scene.add(currentCropGroup);
+    // 8. Build Initial Crop Field
+    createCropField(activeCropId);
 
-    // 7. Setup Loaders & HTML Hotspot Overlay
-    setupLoaders();
-    createHotspotOverlay();
+    // 9. Bind UI Controls (Clean View vs Data Drawer, Fullscreen, Dropdown)
+    bindViewControls();
 
-    // 8. Connect Dropdown Selectors
-    bindCropDropdowns();
-
-    // 9. Load Initial Crop Model (Rice by default)
-    loadCropModel(activeCropId);
-
-    // 10. Start Animation Loop
-    animate();
-
-    // Window Resize Handler
+    // 10. Handle Resize
     window.addEventListener("resize", onWindowResize);
+
+    // 11. Start 60FPS Animation Loop
+    animate();
 }
 
 /*
 |--------------------------------------------------------------------------
-| REALISTIC LIGHTING SETUP
+| ENVIRONMENT & GOLDEN-HOUR LIGHTING SETUP
 |--------------------------------------------------------------------------
 */
-function setupAtmosphericLighting() {
-    // Warm natural sunlight with soft shadows
-    sunLight = new THREE.DirectionalLight(0xfff6df, 2.5);
-    sunLight.position.set(12, 22, 14);
+function setupFieldLighting() {
+    // Warm natural sunlight (Golden-hour angle with soft shadows)
+    sunLight = new THREE.DirectionalLight(0xffecd0, 2.8);
+    sunLight.position.set(-9, 14, 11);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = 2048;
     sunLight.shadow.mapSize.height = 2048;
-    sunLight.shadow.camera.near = 0.5;
-    sunLight.shadow.camera.far = 60;
-    sunLight.shadow.camera.left = -12;
-    sunLight.shadow.camera.right = 12;
-    sunLight.shadow.camera.top = 12;
-    sunLight.shadow.camera.bottom = -12;
+    sunLight.shadow.camera.near = 1.0;
+    sunLight.shadow.camera.far = 40.0;
+    sunLight.shadow.camera.left = -9.0;
+    sunLight.shadow.camera.right = 9.0;
+    sunLight.shadow.camera.top = 9.0;
+    sunLight.shadow.camera.bottom = -9.0;
     sunLight.shadow.bias = -0.0003;
     scene.add(sunLight);
 
-    // Gentle sky ambient light (Sky cyan-blue blending to earthy ground green)
-    hemiLight = new THREE.HemisphereLight(0x7ec8e3, 0x1f3818, 1.25);
+    // Sky & ground natural ambient bounce
+    hemiLight = new THREE.HemisphereLight(0x8ad1f0, 0x25351a, 1.15);
+    hemiLight.position.set(0, 20, 0);
     scene.add(hemiLight);
 
-    // Soft bounce fill light for dark foliage underside
-    fillLight = new THREE.DirectionalLight(0x43ef8c, 0.45);
-    fillLight.position.set(-14, 8, -10);
-    scene.add(fillLight);
+    // Subtle horizon rim light for plant foliage translucency
+    rimLight = new THREE.DirectionalLight(0x52ff9a, 0.45);
+    rimLight.position.set(10, 6, -10);
+    scene.add(rimLight);
 }
 
 /*
 |--------------------------------------------------------------------------
-| SUBTLE CIRCULAR 3D SOIL BASE & FARM BED
+| REALISTIC FURROWED SOIL TERRAIN (আল ও মাটির ভাঁজ)
 |--------------------------------------------------------------------------
 */
-function createMoundBase() {
-    const group = new THREE.Group();
+function buildFurrowedSoilTerrain() {
+    const size = 15;
+    const segments = 100;
+    const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
+    geometry.rotateX(-Math.PI / 2); // Make horizontal
 
-    // Raised circular furrowed soil mound
-    const moundGeo = new THREE.CylinderGeometry(2.6, 3.1, 0.5, 36);
-    const moundMat = new THREE.MeshStandardMaterial({
-        color: 0x22160d,
-        roughness: 0.92,
-        metalness: 0.05
-    });
-    const mound = new THREE.Mesh(moundGeo, moundMat);
-    mound.position.y = 0.25;
-    mound.receiveShadow = true;
-    group.add(mound);
+    const posAttr = geometry.attributes.position;
+    const count = posAttr.count;
+    const colors = new Float32Array(count * 3);
 
-    // Top moist furrow bed with circular ridges
-    const topBedGeo = new THREE.CylinderGeometry(2.55, 2.55, 0.08, 36);
-    const topBedMat = new THREE.MeshStandardMaterial({
-        color: 0x181008,
-        roughness: 0.8
-    });
-    const topBed = new THREE.Mesh(topBedGeo, topBedMat);
-    topBed.position.y = 0.52;
-    topBed.receiveShadow = true;
-    group.add(topBed);
+    const furrowFreq = (Math.PI * 2) / ROW_SPACING;
 
-    // Terracotta / Earthy perimeter collar
-    const collarGeo = new THREE.TorusGeometry(2.65, 0.08, 12, 40);
-    collarGeo.rotateX(Math.PI / 2);
-    const collarMat = new THREE.MeshStandardMaterial({
-        color: 0x3d2b1f,
-        roughness: 0.75
-    });
-    const collar = new THREE.Mesh(collarGeo, collarMat);
-    collar.position.y = 0.5;
-    group.add(collar);
+    // Soil Color Palette (Plowed earth, moist trenches, border bunds)
+    const colRidge = new THREE.Color(0x3e2c1d); // Aerated dry-top soil
+    const colTrench = new THREE.Color(0x1e130a); // Moist rich humus furrow
+    const colBund = new THREE.Color(0x2f3c22); // Grassy perimeter boundary (আইল)
 
-    // Gentle ground terrain surrounding mound
-    const groundGeo = new THREE.CircleGeometry(26, 48);
-    groundGeo.rotateX(-Math.PI / 2);
-    const groundMat = new THREE.MeshStandardMaterial({
-        color: 0x091c13,
-        roughness: 0.95
-    });
-    const ground = new THREE.Mesh(groundGeo, groundMat);
-    ground.position.y = 0;
-    ground.receiveShadow = true;
-    group.add(ground);
+    for (let i = 0; i < count; i++) {
+        const x = posAttr.getX(i);
+        const z = posAttr.getZ(i);
 
-    return group;
-}
+        // Sinusoidal furrow ridges running along Z axis
+        let y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.18;
 
-function createAmbientFarmSurroundings() {
-    const group = new THREE.Group();
-    // Distant soft green hedge / perimeter rows
-    for (let i = 0; i < 28; i++) {
-        const angle = (i / 28) * Math.PI * 2;
-        const dist = 14 + Math.sin(i * 3) * 2;
-        const hedgeGeo = new THREE.SphereGeometry(0.7 + (i % 3) * 0.25, 7, 7);
-        const hedgeMat = new THREE.MeshStandardMaterial({
-            color: (i % 2 === 0) ? 0x1b4324 : 0x15351c,
-            roughness: 0.9
-        });
-        const hedge = new THREE.Mesh(hedgeGeo, hedgeMat);
-        hedge.position.set(Math.cos(angle) * dist, 0.4, Math.sin(angle) * dist);
-        group.add(hedge);
+        // Micro-roughness clods and crumbs
+        y += Math.sin(x * 12.0) * Math.cos(z * 9.0) * 0.02;
+
+        // Raised Farm Perimeter Bunds (জমির আল)
+        const distFromCenter = Math.max(Math.abs(x), Math.abs(z));
+        if (distFromCenter > 5.4) {
+            const bundFactor = Math.min((distFromCenter - 5.4) / 1.5, 1.0);
+            y += Math.sin(bundFactor * Math.PI * 0.5) * 0.28;
+        }
+
+        posAttr.setY(i, y);
+
+        // Vertex color interpolation based on height & furrow slope
+        const tempCol = new THREE.Color();
+        if (distFromCenter > 5.4) {
+            tempCol.lerpColors(colRidge, colBund, 0.7);
+        } else {
+            const ridgeFactor = (y + 0.02) / 0.20;
+            tempCol.lerpColors(colTrench, colRidge, Math.max(0, Math.min(1, ridgeFactor)));
+        }
+
+        colors[i * 3]     = tempCol.r;
+        colors[i * 3 + 1] = tempCol.g;
+        colors[i * 3 + 2] = tempCol.b;
     }
-    return group;
+
+    geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    geometry.computeVertexNormals();
+
+    const soilMaterial = new THREE.MeshStandardMaterial({
+        vertexColors: true,
+        roughness: 0.90,
+        metalness: 0.04
+    });
+
+    terrainMesh = new THREE.Mesh(geometry, soilMaterial);
+    terrainMesh.receiveShadow = true;
+    scene.add(terrainMesh);
 }
 
 /*
 |--------------------------------------------------------------------------
-| PROCEDURAL ANATOMICAL 3D CROP GENERATORS (15 CROPS)
+| GRID POSITION GENERATOR (81 PLANT INSTANCES)
 |--------------------------------------------------------------------------
 */
-function createProceduralCrop(cropId) {
-    const root = new THREE.Group();
-    root.name = `crop_${cropId}`;
+function computeGridPositions() {
+    instanceData = [];
+    const xStart = -((COLS - 1) / 2) * ROW_SPACING;
+    const zStart = -((ROWS - 1) / 2) * PLANT_SPACING;
+
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            // Position on top of furrow ridge
+            const baseX = xStart + c * ROW_SPACING + (Math.random() - 0.5) * 0.10;
+            const baseZ = zStart + r * PLANT_SPACING + (Math.random() - 0.5) * 0.10;
+
+            // Height matching ridge elevation
+            const baseY = 0.16 + (Math.random() - 0.5) * 0.02;
+
+            // Organic natural variation
+            const scale = 0.88 + Math.random() * 0.26;
+            const baseRotY = Math.random() * Math.PI * 2;
+
+            instanceData.push({ baseX, baseY, baseZ, scale, baseRotY });
+        }
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| 15 CROPS BOTANICAL GEOMETRIES (STALKS, LEAVES, FRUITS)
+|--------------------------------------------------------------------------
+*/
+function generateCropBotanicalAssets(cropId) {
+    let stemGeom, leafGeom, fruitGeom;
+    let stemMat, leafMat, fruitMat;
 
     switch (cropId) {
-        case "rice":
-            // Rice (ধান): Curved green stalks & golden drooping panicles
-            const stalkMat = new THREE.MeshStandardMaterial({ color: 0x48a832, roughness: 0.6 });
-            const grainMat = new THREE.MeshStandardMaterial({ color: 0xd9b33a, roughness: 0.5 });
-            for (let i = 0; i < 18; i++) {
-                const angle = (i / 18) * Math.PI * 2;
-                const r = 0.15 + (i % 3) * 0.1;
-                const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.035, 1.8, 6), stalkMat);
-                stalk.position.set(Math.cos(angle) * r, 1.4, Math.sin(angle) * r);
-                stalk.rotation.z = (Math.cos(angle) * 0.25);
-                stalk.rotation.x = (Math.sin(angle) * 0.25);
-                stalk.castShadow = true;
-                root.add(stalk);
+        case "rice": {
+            // Rice: Arching golden-green stems + curved heavy drooping grain panicles
+            stemGeom = new THREE.CylinderGeometry(0.014, 0.025, 0.95, 6);
+            stemGeom.translate(0, 0.47, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x4d7c2b, roughness: 0.65 });
 
-                // Grain Panicle drooping
-                const panicle = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.6, 6), grainMat);
-                panicle.position.set(Math.cos(angle) * (r + 0.35), 2.2, Math.sin(angle) * (r + 0.35));
-                panicle.rotation.z = Math.cos(angle) * 0.7;
-                panicle.castShadow = true;
-                root.add(panicle);
-            }
+            leafGeom = new THREE.ConeGeometry(0.05, 0.85, 4);
+            leafGeom.rotateZ(0.28);
+            leafGeom.translate(0.12, 0.42, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x569632, roughness: 0.55, side: THREE.DoubleSide });
+
+            // Curved heavy grain panicle (ধানের শীষ)
+            fruitGeom = new THREE.TorusGeometry(0.22, 0.035, 6, 12, Math.PI * 0.65);
+            fruitGeom.rotateZ(-Math.PI * 0.45);
+            fruitGeom.translate(0.14, 0.82, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xd4af37, roughness: 0.45 });
             break;
+        }
 
-        case "wheat":
-            // Wheat (গম): Upright golden-amber stalks with awned spikelets
-            const wheatStalk = new THREE.MeshStandardMaterial({ color: 0x8fb84b, roughness: 0.7 });
-            const earMat = new THREE.MeshStandardMaterial({ color: 0xe0b448, roughness: 0.45 });
-            for (let i = 0; i < 22; i++) {
-                const angle = (i / 22) * Math.PI * 2;
-                const r = 0.2 + (i % 4) * 0.12;
-                const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.03, 1.9, 6), wheatStalk);
-                stalk.position.set(Math.cos(angle) * r, 1.45, Math.sin(angle) * r);
-                stalk.castShadow = true;
-                root.add(stalk);
+        case "wheat": {
+            // Wheat: Upright amber hollow culms + compact bearded spike with bristly awns
+            stemGeom = new THREE.CylinderGeometry(0.016, 0.024, 0.90, 6);
+            stemGeom.translate(0, 0.45, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0xb5994b, roughness: 0.7 });
 
-                // Awned Wheat Head
-                const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.05, 0.55, 6), earMat);
-                ear.position.set(Math.cos(angle) * (r + 0.05), 2.45, Math.sin(angle) * (r + 0.05));
-                ear.castShadow = true;
-                root.add(ear);
-            }
+            leafGeom = new THREE.ConeGeometry(0.035, 0.70, 4);
+            leafGeom.rotateZ(0.18);
+            leafGeom.translate(0.08, 0.35, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x9e8942, roughness: 0.6 });
+
+            // Erect bearded spike with awns (গমের শিষ)
+            fruitGeom = new THREE.CylinderGeometry(0.038, 0.045, 0.32, 7);
+            fruitGeom.translate(0, 0.95, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xe6c875, roughness: 0.4 });
             break;
+        }
 
-        case "maize":
-            // Maize (ভুট্টা): Tall jointed stalk, broad leaves, cobs with silk & tassel
-            const maizeStem = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 2.8, 8), new THREE.MeshStandardMaterial({ color: 0x4d8a2d }));
-            maizeStem.position.y = 1.9;
-            maizeStem.castShadow = true;
-            root.add(maizeStem);
+        case "maize": {
+            // Maize: Tall thick cane + broad arching ribbon leaves + corn cobs with silk
+            stemGeom = new THREE.CylinderGeometry(0.045, 0.065, 2.2, 8);
+            stemGeom.translate(0, 1.1, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3d7e2e, roughness: 0.65 });
 
-            // Broad arching leaves
-            const leafMat = new THREE.MeshStandardMaterial({ color: 0x3d7e22, side: THREE.DoubleSide });
-            for (let l = 0; l < 8; l++) {
-                const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.03, 1.4), leafMat);
-                leaf.position.set(0, 1.2 + l * 0.22, 0.55);
-                leaf.rotation.x = 0.45;
-                const lg = new THREE.Group();
-                lg.add(leaf);
-                lg.rotation.y = l * 1.6;
-                root.add(lg);
-            }
+            leafGeom = new THREE.PlaneGeometry(0.22, 1.1, 4, 4);
+            leafGeom.rotateX(Math.PI * 0.3);
+            leafGeom.translate(0, 1.2, 0.45);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x35872d, roughness: 0.5, side: THREE.DoubleSide });
 
-            // Corn cobs
-            const cobMat = new THREE.MeshStandardMaterial({ color: 0xf5b82e });
-            for (let c = 0; c < 2; c++) {
-                const cob = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.6, 8), cobMat);
-                cob.position.set(0.18, 1.5 + c * 0.4, 0.1);
-                cob.rotation.z = -0.4;
-                cob.castShadow = true;
-                root.add(cob);
-            }
-
-            // Top tassel
-            const tassel = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.6, 6), new THREE.MeshStandardMaterial({ color: 0xd4a037 }));
-            tassel.position.y = 3.5;
-            root.add(tassel);
+            // Plump ear of corn in husk with golden silk
+            fruitGeom = new THREE.CapsuleGeometry(0.08, 0.30, 4, 8);
+            fruitGeom.rotateZ(0.35);
+            fruitGeom.translate(0.14, 1.1, 0.08);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.4 });
             break;
+        }
 
-        case "jute":
-            // Jute (পাট): Tall slender reddish-green bast stems & serrated foliage
-            const juteMat = new THREE.MeshStandardMaterial({ color: 0x5e913a });
-            for (let j = 0; j < 12; j++) {
-                const a = (j / 12) * Math.PI * 2;
-                const dist = 0.2 + (j % 2) * 0.15;
-                const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 3.1, 6), juteMat);
-                stem.position.set(Math.cos(a) * dist, 2.0, Math.sin(a) * dist);
-                stem.castShadow = true;
-                root.add(stem);
+        case "jute": {
+            // Jute: Exceptionally tall slender fibrous cane + apex leaf canopy
+            stemGeom = new THREE.CylinderGeometry(0.028, 0.042, 2.8, 7);
+            stemGeom.translate(0, 1.4, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x398048, roughness: 0.7 });
 
-                const topLeaf = new THREE.Mesh(new THREE.SphereGeometry(0.3, 6, 6), new THREE.MeshStandardMaterial({ color: 0x4a822b }));
-                topLeaf.position.set(Math.cos(a) * dist, 3.4, Math.sin(a) * dist);
-                root.add(topLeaf);
-            }
+            // Clustered canopy of ovate serrated leaves
+            leafGeom = new THREE.SphereGeometry(0.42, 8, 6);
+            leafGeom.scale(1.2, 0.45, 1.2);
+            leafGeom.translate(0, 2.75, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.5 });
+
+            fruitGeom = new THREE.CylinderGeometry(0.02, 0.02, 0.15, 5);
+            fruitGeom.translate(0.08, 2.4, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.6 });
             break;
+        }
 
-        case "potato":
-            // Potato (আলু): Bushy canopy + half-visible potato tubers in soil!
-            const potBush = new THREE.Mesh(new THREE.SphereGeometry(0.9, 10, 10), new THREE.MeshStandardMaterial({ color: 0x3d702a, roughness: 0.8 }));
-            potBush.position.y = 1.35;
-            potBush.castShadow = true;
-            root.add(potBush);
+        case "potato": {
+            // Potato: Low spreading lush bush + visible earthy brown tubers on furrow ridge
+            stemGeom = new THREE.CylinderGeometry(0.02, 0.03, 0.55, 6);
+            stemGeom.translate(0, 0.28, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x29642e, roughness: 0.7 });
 
-            // Tubers nestled on soil mound
-            const tuberMat = new THREE.MeshStandardMaterial({ color: 0xa87e4f, roughness: 0.85 });
-            for (let tb = 0; tb < 6; tb++) {
-                const a = (tb / 6) * Math.PI * 2;
-                const tuber = new THREE.Mesh(new THREE.SphereGeometry(0.22, 8, 8), tuberMat);
-                tuber.scale.set(1.4, 0.9, 1.1);
-                tuber.position.set(Math.cos(a) * 0.9, 0.58, Math.sin(a) * 0.9);
-                tuber.castShadow = true;
-                root.add(tuber);
-            }
+            leafGeom = new THREE.DodecahedronGeometry(0.38, 1);
+            leafGeom.scale(1.3, 0.6, 1.3);
+            leafGeom.translate(0, 0.35, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.55 });
+
+            // Plump potato tubers nestled at soil surface
+            fruitGeom = new THREE.SphereGeometry(0.09, 7, 6);
+            fruitGeom.scale(1.3, 0.85, 1.0);
+            fruitGeom.translate(0.14, 0.05, 0.12);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x92663b, roughness: 0.85 });
             break;
+        }
 
-        case "mustard":
-            // Mustard (সরিষা): Bright vibrant yellow flower head clusters
-            const mStem = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.07, 1.8, 6), new THREE.MeshStandardMaterial({ color: 0x528236 }));
-            mStem.position.y = 1.4;
-            root.add(mStem);
+        case "mustard": {
+            // Mustard: Slender branching stems + radiant canary-yellow flowering canopy
+            stemGeom = new THREE.CylinderGeometry(0.016, 0.026, 1.05, 6);
+            stemGeom.translate(0, 0.52, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x48792c, roughness: 0.65 });
 
-            const yellowFlowerMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.4 });
-            for (let f = 0; f < 14; f++) {
-                const a = (f / 14) * Math.PI * 2;
-                const fl = new THREE.Mesh(new THREE.SphereGeometry(0.18, 6, 6), yellowFlowerMat);
-                fl.position.set(Math.cos(a) * 0.45, 2.0 + (f % 4) * 0.15, Math.sin(a) * 0.45);
-                root.add(fl);
-            }
+            leafGeom = new THREE.ConeGeometry(0.12, 0.55, 5);
+            leafGeom.translate(0, 0.45, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x3d7023, roughness: 0.6 });
+
+            // Brilliant yellow inflorescence
+            fruitGeom = new THREE.DodecahedronGeometry(0.28, 1);
+            fruitGeom.scale(1.1, 0.8, 1.1);
+            fruitGeom.translate(0, 1.02, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, emissive: 0x332600 });
             break;
+        }
 
-        case "tomato":
-            // Tomato (টমেটো): Stake prop, leafy bush & bright red tomato clusters
-            const stake = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 2.2, 5), new THREE.MeshStandardMaterial({ color: 0x755938 }));
-            stake.position.set(0.08, 1.5, 0);
-            root.add(stake);
+        case "tomato": {
+            // Tomato: Multi-branched bush + glossy vibrant red tomatoes
+            stemGeom = new THREE.CylinderGeometry(0.025, 0.038, 0.85, 6);
+            stemGeom.translate(0, 0.42, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x326d30, roughness: 0.7 });
 
-            const tomBush = new THREE.Mesh(new THREE.SphereGeometry(0.75, 8, 8), new THREE.MeshStandardMaterial({ color: 0x2e6b21 }));
-            tomBush.position.y = 1.5;
-            tomBush.castShadow = true;
-            root.add(tomBush);
+            leafGeom = new THREE.SphereGeometry(0.38, 7, 6);
+            leafGeom.scale(1.1, 0.7, 1.1);
+            leafGeom.translate(0, 0.55, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 0.55 });
 
-            const redTomMat = new THREE.MeshStandardMaterial({ color: 0xdd2c1c, roughness: 0.25 });
-            for (let t = 0; t < 5; t++) {
-                const ta = (t / 5) * Math.PI * 2;
-                const redTom = new THREE.Mesh(new THREE.SphereGeometry(0.15, 8, 8), redTomMat);
-                redTom.position.set(Math.cos(ta) * 0.5, 1.25 + (t % 2) * 0.3, Math.sin(ta) * 0.5);
-                redTom.castShadow = true;
-                root.add(redTom);
-            }
+            // Glossy red spherical tomatoes
+            fruitGeom = new THREE.SphereGeometry(0.085, 10, 8);
+            fruitGeom.translate(0.16, 0.45, 0.14);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xdc2626, roughness: 0.22, metalness: 0.1 });
             break;
+        }
 
-        case "eggplant":
-            // Eggplant (বেগুন): Velvety leaves & deep glossy purple fruits
-            const brinjalBush = new THREE.Mesh(new THREE.SphereGeometry(0.85, 8, 8), new THREE.MeshStandardMaterial({ color: 0x326127 }));
-            brinjalBush.position.y = 1.45;
-            brinjalBush.castShadow = true;
-            root.add(brinjalBush);
+        case "eggplant": {
+            // Eggplant: Broad velvety leaves + deep glossy purple teardrop brinjals
+            stemGeom = new THREE.CylinderGeometry(0.03, 0.045, 0.80, 6);
+            stemGeom.translate(0, 0.40, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e5938, roughness: 0.75 });
 
-            const eggMat = new THREE.MeshStandardMaterial({ color: 0x2a0845, roughness: 0.18 });
-            for (let e = 0; e < 3; e++) {
-                const ea = (e / 3) * Math.PI * 2;
-                const egg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.22, 0.65, 8), eggMat);
-                egg.position.set(Math.cos(ea) * 0.55, 1.1, Math.sin(ea) * 0.55);
-                egg.rotation.z = Math.cos(ea) * 0.3;
-                egg.castShadow = true;
-                root.add(egg);
-            }
+            leafGeom = new THREE.DodecahedronGeometry(0.40, 1);
+            leafGeom.scale(1.2, 0.6, 1.2);
+            leafGeom.translate(0, 0.52, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x1e5631, roughness: 0.6 });
+
+            // Deep violet-purple glossy brinjal
+            fruitGeom = new THREE.ConeGeometry(0.08, 0.24, 8);
+            fruitGeom.rotateX(Math.PI);
+            fruitGeom.translate(0.15, 0.38, 0.10);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x3b0764, roughness: 0.2, metalness: 0.15 });
             break;
+        }
 
-        case "chili":
-            // Chili (মরিচ): Dark bush with glossy red & green peppers
-            const chiliBush = new THREE.Mesh(new THREE.SphereGeometry(0.65, 8, 8), new THREE.MeshStandardMaterial({ color: 0x25571c }));
-            chiliBush.position.y = 1.35;
-            root.add(chiliBush);
+        case "chili": {
+            // Chili: Compact branching bush + upright/drooping bright red & green peppers
+            stemGeom = new THREE.CylinderGeometry(0.02, 0.032, 0.70, 6);
+            stemGeom.translate(0, 0.35, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x346b33, roughness: 0.7 });
 
-            const redPepper = new THREE.MeshStandardMaterial({ color: 0xd61818, roughness: 0.2 });
-            const greenPepper = new THREE.MeshStandardMaterial({ color: 0x2bb01c, roughness: 0.2 });
-            for (let ch = 0; ch < 8; ch++) {
-                const ca = (ch / 8) * Math.PI * 2;
-                const mat = (ch % 2 === 0) ? redPepper : greenPepper;
-                const pod = new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.38, 6), mat);
-                pod.position.set(Math.cos(ca) * 0.45, 1.2 + (ch % 3) * 0.15, Math.sin(ca) * 0.45);
-                pod.rotation.x = Math.PI; // pointing down
-                root.add(pod);
-            }
+            leafGeom = new THREE.SphereGeometry(0.32, 7, 6);
+            leafGeom.scale(1.1, 0.7, 1.1);
+            leafGeom.translate(0, 0.48, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5 });
+
+            // Conical pointed red chili
+            fruitGeom = new THREE.ConeGeometry(0.028, 0.16, 6);
+            fruitGeom.rotateZ(Math.PI * 0.2);
+            fruitGeom.translate(0.12, 0.46, 0.08);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xef4444, roughness: 0.25 });
             break;
+        }
 
-        case "lentil":
-            // Lentil (মসুর ডাল): Delicate pinnate leaflets and pods
-            const lentilMat = new THREE.MeshStandardMaterial({ color: 0x4f8737 });
-            for (let lt = 0; lt < 16; lt++) {
-                const la = (lt / 16) * Math.PI * 2;
-                const lr = 0.2 + (lt % 3) * 0.12;
-                const lstem = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.025, 1.2, 5), lentilMat);
-                lstem.position.set(Math.cos(la) * lr, 1.05, Math.sin(la) * lr);
-                root.add(lstem);
-            }
+        case "lentil": {
+            // Lentil: Fine feathery pinnate foliage + miniature flat seed pods
+            stemGeom = new THREE.CylinderGeometry(0.012, 0.02, 0.52, 5);
+            stemGeom.translate(0, 0.26, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x4a7e3d, roughness: 0.7 });
+
+            leafGeom = new THREE.DodecahedronGeometry(0.26, 1);
+            leafGeom.scale(1.2, 0.55, 1.2);
+            leafGeom.translate(0, 0.34, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x3f8a42, roughness: 0.6 });
+
+            fruitGeom = new THREE.BoxGeometry(0.03, 0.08, 0.015);
+            fruitGeom.translate(0.08, 0.32, 0.05);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.5 });
             break;
+        }
 
-        case "cucumber":
-            // Cucumber (শসা): Mini A-frame trellis with hanging cucumbers
-            const cVine = new THREE.Mesh(new THREE.ConeGeometry(0.9, 1.6, 7), new THREE.MeshStandardMaterial({ color: 0x367a26, wireframe: false }));
-            cVine.position.y = 1.3;
-            root.add(cVine);
+        case "cucumber": {
+            // Cucumber: Low sprawling ground creeper vine + elongated dark green cucumbers
+            stemGeom = new THREE.TorusGeometry(0.40, 0.022, 5, 10, Math.PI * 1.2);
+            stemGeom.rotateX(Math.PI * 0.5);
+            stemGeom.translate(0, 0.08, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6b36, roughness: 0.7 });
 
-            const cucMat = new THREE.MeshStandardMaterial({ color: 0x236924, roughness: 0.35 });
-            for (let cc = 0; cc < 4; cc++) {
-                const cca = (cc / 4) * Math.PI * 2;
-                const cuc = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.65, 8), cucMat);
-                cuc.position.set(Math.cos(cca) * 0.6, 1.1, Math.sin(cca) * 0.6);
-                cuc.rotation.z = Math.cos(cca) * 0.2;
-                root.add(cuc);
-            }
+            leafGeom = new THREE.CircleGeometry(0.16, 6);
+            leafGeom.rotateX(-Math.PI * 0.45);
+            leafGeom.translate(0.2, 0.12, 0.15);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x16a34a, roughness: 0.55, side: THREE.DoubleSide });
+
+            // Elongated cucumber fruit on soil
+            fruitGeom = new THREE.CylinderGeometry(0.045, 0.048, 0.32, 8);
+            fruitGeom.rotateZ(Math.PI * 0.48);
+            fruitGeom.translate(0.16, 0.07, -0.12);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x14532d, roughness: 0.35 });
             break;
+        }
 
-        case "cauliflower":
-            // Cauliflower (ফুলকপি): Spreading jacket leaves & compact snow-white curd
-            const curd = new THREE.Mesh(new THREE.SphereGeometry(0.48, 10, 10), new THREE.MeshStandardMaterial({ color: 0xf5f8f5, roughness: 0.8 }));
-            curd.position.y = 0.85;
-            curd.scale.set(1.1, 0.75, 1.1);
-            root.add(curd);
+        case "cauliflower": {
+            // Cauliflower: Large waxy wrapper leaves + dense domed creamy-white central curd
+            stemGeom = new THREE.CylinderGeometry(0.04, 0.055, 0.38, 7);
+            stemGeom.translate(0, 0.19, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x486b45, roughness: 0.8 });
 
-            const jacketMat = new THREE.MeshStandardMaterial({ color: 0x336b28, side: THREE.DoubleSide });
-            for (let j = 0; j < 8; j++) {
-                const jf = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.03, 0.75), jacketMat);
-                jf.position.set(0, 0.75, 0.45);
-                jf.rotation.x = -0.35;
-                const jg = new THREE.Group();
-                jg.add(jf);
-                jg.rotation.y = (j / 8) * Math.PI * 2;
-                root.add(jg);
-            }
+            // Wrapper waxy blue-green leaves
+            leafGeom = new THREE.ConeGeometry(0.44, 0.40, 7, 1, true);
+            leafGeom.rotateX(Math.PI);
+            leafGeom.translate(0, 0.32, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x2d6a54, roughness: 0.6, side: THREE.DoubleSide });
+
+            // Creamy-white bumpy curd
+            fruitGeom = new THREE.SphereGeometry(0.18, 10, 8);
+            fruitGeom.scale(1.15, 0.75, 1.15);
+            fruitGeom.translate(0, 0.28, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xfaf5e4, roughness: 0.55 });
             break;
+        }
 
-        case "onion":
-            // Onion (পেঁয়াজ): Bulb half-exposed in soil with hollow tubular scapes
-            const onionBulb = new THREE.Mesh(new THREE.SphereGeometry(0.35, 10, 10), new THREE.MeshStandardMaterial({ color: 0x822d3d, roughness: 0.4 }));
-            onionBulb.position.y = 0.68;
-            onionBulb.scale.set(1.2, 0.9, 1.2);
-            root.add(onionBulb);
+        case "onion": {
+            // Onion: Hollow upright tubular blue-green leaves + swollen bulb on furrow crest
+            stemGeom = new THREE.CylinderGeometry(0.012, 0.024, 0.60, 6);
+            stemGeom.translate(0, 0.32, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x237050, roughness: 0.6 });
 
-            const scapeMat = new THREE.MeshStandardMaterial({ color: 0x347d2b });
-            for (let sc = 0; sc < 6; sc++) {
-                const scape = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.035, 1.4, 5), scapeMat);
-                scape.position.set((sc - 2.5) * 0.06, 1.45, 0);
-                scape.rotation.z = (sc - 2.5) * 0.08;
-                root.add(scape);
-            }
+            leafGeom = new THREE.ConeGeometry(0.02, 0.55, 5);
+            leafGeom.rotateZ(0.12);
+            leafGeom.translate(0.04, 0.35, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x1f7a55, roughness: 0.55 });
+
+            // Swollen onion bulb breaking topsoil
+            fruitGeom = new THREE.SphereGeometry(0.09, 8, 8);
+            fruitGeom.scale(1.1, 0.85, 1.1);
+            fruitGeom.translate(0, 0.08, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x831843, roughness: 0.4 });
             break;
+        }
 
-        case "carrot":
-            // Carrot (গাজর): Feathery fern canopy & conical orange crown in soil
-            const carrotRoot = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0xed6e1a, roughness: 0.4 }));
-            carrotRoot.position.y = 0.55;
-            carrotRoot.rotation.x = Math.PI; // taproot in soil
-            root.add(carrotRoot);
+        case "carrot": {
+            // Carrot: Delicate feathery fern fronds + conical orange root shoulder at surface
+            stemGeom = new THREE.CylinderGeometry(0.015, 0.025, 0.50, 6);
+            stemGeom.translate(0, 0.25, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x367e39, roughness: 0.7 });
 
-            const fernMat = new THREE.MeshStandardMaterial({ color: 0x2e8020 });
-            const fernTop = new THREE.Mesh(new THREE.ConeGeometry(0.65, 1.1, 7), fernMat);
-            fernTop.position.y = 1.35;
-            root.add(fernTop);
+            leafGeom = new THREE.DodecahedronGeometry(0.28, 1);
+            leafGeom.scale(1.1, 0.6, 1.1);
+            leafGeom.translate(0, 0.38, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x22c55e, roughness: 0.55 });
+
+            // Vibrant conical orange taproot shoulder
+            fruitGeom = new THREE.ConeGeometry(0.065, 0.22, 8);
+            fruitGeom.rotateX(Math.PI);
+            fruitGeom.translate(0, 0.06, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.45 });
             break;
+        }
 
-        case "papaya":
-            // Papaya (পেঁপে): Straight textured trunk, umbrella canopy & fruit cluster
-            const papTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 2.5, 8), new THREE.MeshStandardMaterial({ color: 0x6e6353, roughness: 0.85 }));
-            papTrunk.position.y = 1.75;
-            root.add(papTrunk);
+        case "papaya": {
+            // Papaya: Tall erect single trunk + crown of palmately lobed leaves + clustered fruits
+            stemGeom = new THREE.CylinderGeometry(0.065, 0.095, 2.5, 8);
+            stemGeom.translate(0, 1.25, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x635745, roughness: 0.8 });
 
-            // Large palm-like umbrella leaves
-            const papLeafMat = new THREE.MeshStandardMaterial({ color: 0x2b6e1f, side: THREE.DoubleSide });
-            for (let pl = 0; pl < 6; pl++) {
-                const pleaf = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.03, 1.1), papLeafMat);
-                pleaf.position.set(0, 3.0, 0.6);
-                pleaf.rotation.x = 0.25;
-                const plg = new THREE.Group();
-                plg.add(pleaf);
-                plg.rotation.y = (pl / 6) * Math.PI * 2;
-                root.add(plg);
-            }
+            // Umbrella crown of palmately lobed leaves
+            leafGeom = new THREE.ConeGeometry(0.75, 0.35, 8, 1, true);
+            leafGeom.translate(0, 2.65, 0);
+            leafMat = new THREE.MeshStandardMaterial({ color: 0x15803d, roughness: 0.5, side: THREE.DoubleSide });
 
-            // Papaya fruits clustered below canopy
-            const papFruitMat = new THREE.MeshStandardMaterial({ color: 0x949e28, roughness: 0.35 });
-            for (let pf = 0; pf < 5; pf++) {
-                const pfa = (pf / 5) * Math.PI * 2;
-                const pfruit = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.45, 7), papFruitMat);
-                pfruit.position.set(Math.cos(pfa) * 0.25, 2.35, Math.sin(pfa) * 0.25);
-                root.add(pfruit);
-            }
+            // Cluster of oblong papaya fruits
+            fruitGeom = new THREE.SphereGeometry(0.12, 8, 8);
+            fruitGeom.scale(0.8, 1.4, 0.8);
+            fruitGeom.translate(0.12, 2.15, 0.08);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xca8a04, roughness: 0.35 });
             break;
+        }
 
         default:
-            // Generic lush plant fallback
-            const genBush = new THREE.Mesh(new THREE.SphereGeometry(0.8, 8, 8), new THREE.MeshStandardMaterial({ color: 0x3d7e22 }));
-            genBush.position.y = 1.4;
-            root.add(genBush);
+            return generateCropBotanicalAssets("rice");
     }
 
-    return root;
+    return { stemGeom, stemMat, leafGeom, leafMat, fruitGeom, fruitMat };
 }
 
 /*
 |--------------------------------------------------------------------------
-| LOAD CROP MODEL (GLTF WITH PROCEDURAL FALLBACK)
+| CREATE FULL CROP FIELD (81 INSTANCED PLANTS)
 |--------------------------------------------------------------------------
 */
-function loadCropModel(cropId) {
-    if (gltfLoader) {
-        const modelPath = `models/${cropId}.glb`;
-        gltfLoader.load(
-            modelPath,
-            (gltf) => {
-                const mesh = gltf.scene;
-                mesh.traverse((node) => {
-                    if (node.isMesh) {
-                        node.castShadow = true;
-                        node.receiveShadow = true;
-                    }
-                });
-                swapCropModel(mesh, cropId);
-            },
-            undefined,
-            (error) => {
-                // Seamless Procedural Fallback — never shows a broken canvas!
-                const proceduralMesh = createProceduralCrop(cropId);
-                swapCropModel(proceduralMesh, cropId);
-            }
-        );
+function createCropField(cropId) {
+    // 1. Remove previous instanced meshes
+    if (currentCropGroup) {
+        scene.remove(currentCropGroup);
+        if (stemInstancedMesh) stemInstancedMesh.dispose();
+        if (leafInstancedMesh) leafInstancedMesh.dispose();
+        if (fruitInstancedMesh) fruitInstancedMesh.dispose();
+    }
+
+    currentCropGroup = new THREE.Group();
+
+    // 2. Build Botanical Geometries
+    const assets = generateCropBotanicalAssets(cropId);
+
+    // 3. Create Instanced Meshes
+    stemInstancedMesh = new THREE.InstancedMesh(assets.stemGeom, assets.stemMat, TOTAL_PLANTS);
+    stemInstancedMesh.castShadow = true;
+    stemInstancedMesh.receiveShadow = true;
+    currentCropGroup.add(stemInstancedMesh);
+
+    leafInstancedMesh = new THREE.InstancedMesh(assets.leafGeom, assets.leafMat, TOTAL_PLANTS);
+    leafInstancedMesh.castShadow = true;
+    leafInstancedMesh.receiveShadow = true;
+    currentCropGroup.add(leafInstancedMesh);
+
+    if (assets.fruitGeom && assets.fruitMat) {
+        fruitInstancedMesh = new THREE.InstancedMesh(assets.fruitGeom, assets.fruitMat, TOTAL_PLANTS);
+        fruitInstancedMesh.castShadow = true;
+        fruitInstancedMesh.receiveShadow = true;
+        currentCropGroup.add(fruitInstancedMesh);
     } else {
-        const proceduralMesh = createProceduralCrop(cropId);
-        swapCropModel(proceduralMesh, cropId);
+        fruitInstancedMesh = null;
     }
+
+    // 4. Initial Matrix Population
+    for (let i = 0; i < TOTAL_PLANTS; i++) {
+        const d = instanceData[i];
+        dummy.position.set(d.baseX, d.baseY, d.baseZ);
+        dummy.rotation.set(0, d.baseRotY, 0);
+        dummy.scale.set(d.scale, d.scale, d.scale);
+        dummy.updateMatrix();
+
+        stemInstancedMesh.setMatrixAt(i, dummy.matrix);
+        leafInstancedMesh.setMatrixAt(i, dummy.matrix);
+        if (fruitInstancedMesh) fruitInstancedMesh.setMatrixAt(i, dummy.matrix);
+    }
+
+    stemInstancedMesh.instanceMatrix.needsUpdate = true;
+    leafInstancedMesh.instanceMatrix.needsUpdate = true;
+    if (fruitInstancedMesh) fruitInstancedMesh.instanceMatrix.needsUpdate = true;
+
+    scene.add(currentCropGroup);
+
+    // 5. Trigger Transition Scale Animation
+    transitionProgress = 0.0;
+    isTransitioningCrop = true;
+
+    // 6. Smooth Camera Height Adjustment based on Crop Anatomy
+    adjustCameraForCrop(cropId);
+
+    // 7. Update Live Data in Slide-in Drawer
+    updateDrawerData(cropId);
 }
 
 /*
 |--------------------------------------------------------------------------
-| SEAMLESS TRANSITION & AUTO-FRAMING CAMERA
+| CAMERA FRAMING ADAPTATION (SMOOTH TWEEN)
 |--------------------------------------------------------------------------
 */
-function swapCropModel(incomingMesh, cropId) {
-    if (newCropMesh) {
-        oldCropMesh = newCropMesh;
+function adjustCameraForCrop(cropId) {
+    const meta = CROP_METRICS[cropId] || CROP_METRICS.rice;
+
+    if (meta.heightCategory === "tall") {
+        // Papaya, Maize, Jute
+        targetCameraPos.set(0, 4.4, 9.2);
+        targetLookAt.set(0, 1.6, 0);
+    } else if (meta.heightCategory === "low") {
+        // Potato, Onion, Carrot, Cucumber, Cauliflower, Lentil
+        targetCameraPos.set(0, 2.2, 5.8);
+        targetLookAt.set(0, 0.45, 0);
+    } else {
+        // Rice, Wheat, Tomato, Eggplant, Chili, Mustard
+        targetCameraPos.set(0, 3.2, 7.6);
+        targetLookAt.set(0, 0.85, 0);
     }
 
-    newCropMesh = incomingMesh;
-    newCropMesh.scale.set(0.001, 0.001, 0.001); // start at scale 0
-    currentCropGroup.add(newCropMesh);
-
-    isTransitioningCrop = true;
-    transitionProgress = 0;
-
-    // Auto-frame camera based on THREE.Box3 bounding box
-    autoFramePlant(newCropMesh);
-
-    // Update hotspots info for new crop
-    updateHotspotsData(cropId);
-}
-
-function autoFramePlant(mesh) {
-    const box = new THREE.Box3().setFromObject(mesh);
-    const size = box.getSize(new THREE.Vector3());
-    const center = box.getCenter(new THREE.Vector3());
-
-    const maxDim = Math.max(size.x, size.y, size.z, 1.4);
-    const fov = camera.fov * (Math.PI / 180);
-    let cameraDistance = Math.abs(maxDim / Math.sin(fov / 2)) * 0.72;
-    cameraDistance = Math.max(cameraDistance, 4.2);
-
-    targetCameraPos.set(center.x + cameraDistance * 0.45, center.y + cameraDistance * 0.35, center.z + cameraDistance * 0.85);
-    targetLookAt.set(center.x, Math.max(center.y, 1.2), center.z);
     isTransitioningCamera = true;
 }
 
 /*
 |--------------------------------------------------------------------------
-| DYNAMIC & SMOOTH CROP SWITCHING EXPORT
+| PUBLIC METHOD: UPDATE CROP SIMULATION
 |--------------------------------------------------------------------------
 */
 export function updateCropSimulation(cropId) {
-    if (!cropId || cropId === activeCropId && newCropMesh) return;
+    if (!cropId || (cropId === activeCropId && currentCropGroup)) return;
     activeCropId = cropId;
 
-    // Sync #cropSelect in 3D HUD
-    const hudSelect = document.getElementById("cropSelect");
-    if (hudSelect && hudSelect.value !== cropId) {
-        hudSelect.value = cropId;
+    // Synchronize UI dropdown in top bar
+    const cropSelect = document.getElementById("cropSelect");
+    if (cropSelect && cropSelect.value !== cropId) {
+        cropSelect.value = cropId;
     }
 
-    // Sync #cropLifecycleSelect in Tracker
+    // Synchronize Lifecycle Tracker dropdown if present
     const lifecycleSelect = document.getElementById("cropLifecycleSelect");
     if (lifecycleSelect && lifecycleSelect.value !== cropId && window.selectLifecycleCrop) {
         window.selectLifecycleCrop(cropId);
     }
 
-    loadCropModel(cropId);
+    createCropField(cropId);
 }
 window.updateCropSimulation = updateCropSimulation;
 
 /*
 |--------------------------------------------------------------------------
-| FARMER-CENTRIC 3D HTML HOTSPOTS & TOOLTIPS
+| UPDATE SLIDE-IN DATA DRAWER METRICS
 |--------------------------------------------------------------------------
 */
-function createHotspotOverlay() {
-    hotspotsOverlayEl = document.getElementById("crop3DHotspots");
-    if (!hotspotsOverlayEl) {
-        hotspotsOverlayEl = document.createElement("div");
-        hotspotsOverlayEl.id = "crop3DHotspots";
-        hotspotsOverlayEl.className = "crop-3d-hotspots-layer";
-        containerEl.appendChild(hotspotsOverlayEl);
+function updateDrawerData(cropId) {
+    const meta = CROP_METRICS[cropId] || CROP_METRICS.rice;
+
+    const nameEl = document.getElementById("drawerCropName");
+    if (nameEl) nameEl.textContent = `${meta.nameBn} (${meta.nameEn})`;
+
+    const subEl = document.getElementById("drawerCropSubtitle");
+    if (subEl) subEl.textContent = meta.subtitle;
+
+    const npkEl = document.getElementById("drawerCropNPK");
+    if (npkEl) npkEl.textContent = meta.npk;
+
+    const moistEl = document.getElementById("drawerCropMoist");
+    if (moistEl) moistEl.textContent = meta.moisture;
+
+    const daysEl = document.getElementById("drawerCropDays");
+    if (daysEl) daysEl.textContent = meta.duration;
+
+    const iconEl = document.getElementById("drawerCropIcon");
+    if (iconEl) {
+        const iconMap = {
+            rice: "🌾", wheat: "🌾", maize: "🌽", jute: "🌿", potato: "🥔",
+            mustard: "🌼", tomato: "🍅", eggplant: "🍆", chili: "🌶️", lentil: "🌱",
+            cucumber: "🥒", cauliflower: "🥦", onion: "🧅", carrot: "🥕", papaya: "🍈"
+        };
+        iconEl.textContent = iconMap[cropId] || "🌱";
     }
-
-    hotspotsOverlayEl.innerHTML = `
-        <!-- Hotspot 1: Leaf Health -->
-        <div class="crop-hotspot" id="hotspotLeaf" data-type="leaf">
-            <button class="hotspot-pin" aria-label="Leaf Health">
-                <span class="pin-pulse"></span>
-                <span class="pin-icon">🌱</span>
-            </button>
-            <div class="hotspot-tooltip">
-                <div class="tooltip-header">
-                    <strong class="tooltip-title">পাতার স্বাস্থ্য (Leaf Health)</strong>
-                    <span class="tooltip-badge badge-good" id="badgeLeaf">স্বাভাবিক</span>
-                </div>
-                <p class="tooltip-desc" id="descLeaf">পাতায় ক্লোরোফিল ঘনত্ব স্বাভাবিক। কোনো ছত্রাক বা রোগের লক্ষণ নেই।</p>
-            </div>
-        </div>
-
-        <!-- Hotspot 2: Soil Moisture Zone -->
-        <div class="crop-hotspot" id="hotspotSoil" data-type="soil">
-            <button class="hotspot-pin" aria-label="Soil Moisture">
-                <span class="pin-pulse"></span>
-                <span class="pin-icon">💧</span>
-            </button>
-            <div class="hotspot-tooltip">
-                <div class="tooltip-header">
-                    <strong class="tooltip-title">মাটির আর্দ্রতা (Soil Moisture)</strong>
-                    <span class="tooltip-badge badge-good" id="badgeSoil">অনুকূল ৬৮%</span>
-                </div>
-                <p class="tooltip-desc" id="descSoil">শিকড়ের আশেপাশে আদর্শ আর্দ্রতা বজায় রয়েছে। জলাবদ্ধতামুক্ত।</p>
-            </div>
-        </div>
-
-        <!-- Hotspot 3: Grain/Fruit Growth -->
-        <div class="crop-hotspot" id="hotspotFruit" data-type="fruit">
-            <button class="hotspot-pin" aria-label="Fruit Growth">
-                <span class="pin-pulse"></span>
-                <span class="pin-icon">🌾</span>
-            </button>
-            <div class="hotspot-tooltip">
-                <div class="tooltip-header">
-                    <strong class="tooltip-title">ফলন ও বৃদ্ধি (Yield Stage)</strong>
-                    <span class="tooltip-badge badge-good" id="badgeFruit">সক্রিয় বৃদ্ধি</span>
-                </div>
-                <p class="tooltip-desc" id="descFruit">সুষম বৃদ্ধি ও দানা গঠন সন্তোষজনক গতিতে এগোচ্ছে।</p>
-            </div>
-        </div>
-    `;
-
-    // Interactive Click/Tap on Hotspot Pin
-    hotspotsOverlayEl.querySelectorAll(".crop-hotspot").forEach((hs) => {
-        const pin = hs.querySelector(".hotspot-pin");
-        pin.addEventListener("click", (e) => {
-            e.stopPropagation();
-            const isOpen = hs.classList.contains("active");
-            hotspotsOverlayEl.querySelectorAll(".crop-hotspot").forEach(h => h.classList.remove("active"));
-            if (!isOpen) hs.classList.add("active");
-        });
-    });
-
-    // Close on outside click
-    document.addEventListener("click", () => {
-        if (hotspotsOverlayEl) {
-            hotspotsOverlayEl.querySelectorAll(".crop-hotspot").forEach(h => h.classList.remove("active"));
-        }
-    });
-
-    updateHotspotsData(activeCropId);
-}
-
-function updateHotspotsData(cropId) {
-    const info = CROP_HOTSPOT_INFO[cropId] || CROP_HOTSPOT_INFO.rice;
-
-    const bLeaf = document.getElementById("badgeLeaf");
-    const dLeaf = document.getElementById("descLeaf");
-    if (bLeaf) {
-        bLeaf.textContent = info.leaf.badge;
-        bLeaf.className = `tooltip-badge ${info.leaf.status === 'warn' ? 'badge-warn' : 'badge-good'}`;
-    }
-    if (dLeaf) dLeaf.textContent = info.leaf.desc;
-
-    const bSoil = document.getElementById("badgeSoil");
-    const dSoil = document.getElementById("descSoil");
-    if (bSoil) {
-        bSoil.textContent = info.soil.badge;
-        bSoil.className = `tooltip-badge ${info.soil.status === 'warn' ? 'badge-warn' : 'badge-good'}`;
-    }
-    if (dSoil) dSoil.textContent = info.soil.desc;
-
-    const bFruit = document.getElementById("badgeFruit");
-    const dFruit = document.getElementById("descFruit");
-    if (bFruit) {
-        bFruit.textContent = info.fruit.badge;
-        bFruit.className = `tooltip-badge ${info.fruit.status === 'warn' ? 'badge-warn' : 'badge-good'}`;
-    }
-    if (dFruit) dFruit.textContent = info.fruit.desc;
-}
-
-function updateHotspotsScreenPositions() {
-    if (!hotspotsOverlayEl || !containerEl) return;
-
-    const width = containerEl.clientWidth;
-    const height = containerEl.clientHeight;
-
-    const projectPoint = (vec3, elementId) => {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-
-        const p = vec3.clone();
-        p.project(camera);
-
-        // Behind camera?
-        if (p.z > 1) {
-            el.style.display = "none";
-            return;
-        }
-
-        el.style.display = "block";
-        const screenX = (p.x * 0.5 + 0.5) * width;
-        const screenY = (-(p.y * 0.5) + 0.5) * height;
-
-        el.style.transform = `translate(-50%, -50%) translate(${screenX}px, ${screenY}px)`;
-    };
-
-    projectPoint(hotspotAnchors.leaf, "hotspotLeaf");
-    projectPoint(hotspotAnchors.soil, "hotspotSoil");
-    projectPoint(hotspotAnchors.fruit, "hotspotFruit");
 }
 
 /*
 |--------------------------------------------------------------------------
-| BIND CROP DROPDOWNS & HUD CONTROLS
+| BIND VIEW CONTROLS (CINEMA MODE VS DATA DRAWER, FULLSCREEN, LIGHTING)
 |--------------------------------------------------------------------------
 */
-function bindCropDropdowns() {
-    const hudSelect = document.getElementById("cropSelect");
-    if (hudSelect) {
-        hudSelect.addEventListener("change", (e) => {
+function bindViewControls() {
+    const simSection = document.getElementById("farmSimulation");
+    const dataDrawer = document.getElementById("farmDataDrawer");
+    const btnClean = document.getElementById("btnCleanView");
+    const btnData = document.getElementById("btnDataView");
+    const btnCloseDrawer = document.getElementById("btnCloseDrawer");
+    const btnFullscreen = document.getElementById("btnFullscreen");
+    const cropSelect = document.getElementById("cropSelect");
+
+    // 1. Clean View (Cinema Mode - Default)
+    function activateCleanView() {
+        if (simSection) simSection.classList.add("cinema-mode");
+        if (dataDrawer) {
+            dataDrawer.classList.remove("active");
+            dataDrawer.setAttribute("aria-hidden", "true");
+        }
+        if (btnClean) btnClean.classList.add("active");
+        if (btnData) btnData.classList.remove("active");
+    }
+
+    // 2. Data Mode (Slide in Glassmorphic Drawer)
+    function activateDataView() {
+        if (simSection) simSection.classList.remove("cinema-mode");
+        if (dataDrawer) {
+            dataDrawer.classList.add("active");
+            dataDrawer.setAttribute("aria-hidden", "false");
+        }
+        if (btnData) btnData.classList.add("active");
+        if (btnClean) btnClean.classList.remove("active");
+    }
+
+    if (btnClean) btnClean.addEventListener("click", activateCleanView);
+    if (btnData) {
+        btnData.addEventListener("click", () => {
+            const isOpen = dataDrawer && dataDrawer.classList.contains("active");
+            if (isOpen) {
+                activateCleanView();
+            } else {
+                activateDataView();
+            }
+        });
+    }
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener("click", activateCleanView);
+
+    // 3. Dropdown selection
+    if (cropSelect) {
+        cropSelect.addEventListener("change", (e) => {
             updateCropSimulation(e.target.value);
         });
     }
 
-    const lifecycleSelect = document.getElementById("cropLifecycleSelect");
-    if (lifecycleSelect) {
-        lifecycleSelect.addEventListener("change", (e) => {
-            updateCropSimulation(e.target.value);
+    // 4. Fullscreen Toggle
+    if (btnFullscreen && simSection) {
+        btnFullscreen.addEventListener("click", () => {
+            if (!document.fullscreenElement) {
+                simSection.requestFullscreen?.() || simSection.webkitRequestFullscreen?.();
+            } else {
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+            }
         });
     }
 
-    // Auto-frame button in HUD
-    const autoFrameBtn = document.getElementById("hudResetView");
-    if (autoFrameBtn) {
-        autoFrameBtn.addEventListener("click", () => {
-            if (newCropMesh) autoFramePlant(newCropMesh);
-        });
-    }
-
-    // Field View button
-    const fieldBtn = document.getElementById("hudFieldView");
-    if (fieldBtn) {
-        fieldBtn.addEventListener("click", () => {
-            targetCameraPos.set(0, 1.8, 5.2);
-            targetLookAt.set(0, 1.2, 0);
+    // 5. Drone & Eye Level Camera Presets
+    const btnDrone = document.getElementById("hudResetView");
+    if (btnDrone) {
+        btnDrone.addEventListener("click", () => {
+            targetCameraPos.set(0, 7.5, 9.5);
+            targetLookAt.set(0, 0.4, 0);
             isTransitioningCamera = true;
         });
     }
 
-    // Day / Night Sun toggle
+    const btnEye = document.getElementById("hudFieldView");
+    if (btnEye) {
+        btnEye.addEventListener("click", () => {
+            targetCameraPos.set(0, 1.2, 4.6);
+            targetLookAt.set(0, 0.8, 0);
+            isTransitioningCamera = true;
+        });
+    }
+
+    // 6. Day / Sunset / Night Lighting
     const sunBtn = document.getElementById("hudToggleSun");
+    const sunBtnText = document.getElementById("sunBtnText");
     if (sunBtn) {
         sunBtn.addEventListener("click", () => {
             isDayMode = !isDayMode;
             if (isDayMode) {
                 scene.background.set(0x06150f);
-                sunLight.color.set(0xfff6df);
-                sunLight.intensity = 2.5;
-                hemiLight.intensity = 1.25;
-                sunBtn.textContent = "☀️ দিন";
+                scene.fog.color.set(0x0a1e14);
+                sunLight.color.set(0xffecd0);
+                sunLight.intensity = 2.8;
+                hemiLight.intensity = 1.15;
+                if (sunBtnText) sunBtnText.textContent = "দিন";
             } else {
                 scene.background.set(0x040b08);
-                sunLight.color.set(0xff7a33);
-                sunLight.intensity = 1.3;
-                hemiLight.intensity = 0.6;
-                sunBtn.textContent = "🌅 গোধূলি";
+                scene.fog.color.set(0x06110b);
+                sunLight.color.set(0xff7733);
+                sunLight.intensity = 1.4;
+                hemiLight.intensity = 0.55;
+                if (sunBtnText) sunBtnText.textContent = "গোধূলি";
             }
         });
     }
@@ -936,73 +1003,89 @@ function bindCropDropdowns() {
 
 /*
 |--------------------------------------------------------------------------
-| ANIMATION LOOP & PROCEDURAL WIND SWAYING
+| ANIMATION LOOP & LIVING WIND WAVE PHYSICS
 |--------------------------------------------------------------------------
 */
 function animate() {
     requestAnimationFrame(animate);
     animationTime += 0.016;
 
-    // 1. Procedural Wind Swaying Animation on Crop
-    if (newCropMesh) {
-        newCropMesh.rotation.z = Math.sin(animationTime * 1.8) * 0.022;
-        newCropMesh.rotation.x = Math.cos(animationTime * 1.4) * 0.015;
-    }
-
-    // 2. Smooth Model Fade/Scale Transition
+    // 1. Crop Model Fade/Scale Transition
     if (isTransitioningCrop) {
-        transitionProgress += 0.055;
-        const t = Math.min(transitionProgress, 1);
-        const easeScale = 1 - Math.pow(1 - t, 3); // ease-out cubic
-
-        if (newCropMesh) {
-            newCropMesh.scale.set(easeScale, easeScale, easeScale);
-        }
-
-        if (oldCropMesh) {
-            const shrink = Math.max(1 - t * 1.5, 0);
-            oldCropMesh.scale.set(shrink, shrink, shrink);
-            if (t >= 1) {
-                currentCropGroup.remove(oldCropMesh);
-                oldCropMesh = null;
-                isTransitioningCrop = false;
-            }
-        } else if (t >= 1) {
+        transitionProgress += 0.065;
+        const t = Math.min(transitionProgress, 1.0);
+        transitionScale = 1.0 - Math.pow(1.0 - t, 3); // Ease-out cubic
+        if (t >= 1.0) {
             isTransitioningCrop = false;
+            transitionScale = 1.0;
         }
     }
 
-    // 3. Smooth Camera Auto-Framing Interpolation
-    if (isTransitioningCamera) {
-        camera.position.lerp(targetCameraPos, 0.06);
-        controls.target.lerp(targetLookAt, 0.06);
+    // 2. Living Wind Wave Physics Across 81 Plants
+    if (stemInstancedMesh && instanceData.length > 0) {
+        const t = animationTime * 2.3;
 
-        if (camera.position.distanceTo(targetCameraPos) < 0.08) {
+        for (let i = 0; i < TOTAL_PLANTS; i++) {
+            const d = instanceData[i];
+
+            // Diagonal traveling wind wave (real breeze blowing across paddy field)
+            const wavePhase = t + d.baseX * 0.45 + d.baseZ * 0.65;
+            const gust = Math.sin(t * 0.45 + d.baseX * 0.22) * 0.35 + 0.85;
+            const tilt = (Math.sin(wavePhase) * 0.085 + Math.cos(wavePhase * 1.5) * 0.035) * gust;
+
+            dummy.position.set(d.baseX, d.baseY, d.baseZ);
+            dummy.rotation.set(tilt * 0.4, d.baseRotY + tilt * 0.15, tilt);
+
+            const currentScale = d.scale * transitionScale;
+            dummy.scale.set(currentScale, currentScale, currentScale);
+            dummy.updateMatrix();
+
+            stemInstancedMesh.setMatrixAt(i, dummy.matrix);
+            leafInstancedMesh.setMatrixAt(i, dummy.matrix);
+            if (fruitInstancedMesh) fruitInstancedMesh.setMatrixAt(i, dummy.matrix);
+        }
+
+        stemInstancedMesh.instanceMatrix.needsUpdate = true;
+        leafInstancedMesh.instanceMatrix.needsUpdate = true;
+        if (fruitInstancedMesh) fruitInstancedMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    // 3. Smooth Camera Tweening
+    if (isTransitioningCamera) {
+        camera.position.lerp(targetCameraPos, 0.065);
+        controls.target.lerp(targetLookAt, 0.065);
+
+        if (camera.position.distanceTo(targetCameraPos) < 0.04 && controls.target.distanceTo(targetLookAt) < 0.04) {
+            camera.position.copy(targetCameraPos);
+            controls.target.copy(targetLookAt);
             isTransitioningCamera = false;
         }
     }
 
     controls.update();
-
-    // 4. Update 3D HTML Hotspots Screen Projections
-    updateHotspotsScreenPositions();
-
     renderer.render(scene, camera);
 }
 
+/*
+|--------------------------------------------------------------------------
+| RESIZE HANDLER
+|--------------------------------------------------------------------------
+*/
 function onWindowResize() {
     if (!containerEl || !renderer || !camera) return;
     const width = containerEl.clientWidth || window.innerWidth;
-    const height = containerEl.clientHeight || 650;
+    const height = containerEl.clientHeight || 560;
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+
     renderer.setSize(width, height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
-// Auto Initialize when DOM is ready
+// Auto-run when DOM is loaded
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initializeFarmSimulation);
+    document.addEventListener("DOMContentLoaded", init3DFieldSimulation);
 } else {
-    initializeFarmSimulation();
+    init3DFieldSimulation();
 }
