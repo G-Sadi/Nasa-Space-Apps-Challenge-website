@@ -1135,54 +1135,63 @@
 
         <!-- Sleek Floating View Controls Bar (Cinema Mode vs Data Mode) -->
         <div class="field-view-controls-bar">
-            <!-- Crop Selector Pill -->
-            <div class="fctrl-pill fctrl-crop-pill">
-                <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
-                <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
-                    <option value="rice" selected>🌾 ধান (Rice Field)</option>
-                    <option value="wheat">🌾 গম (Wheat Field)</option>
-                    <option value="maize">🌽 ভুট্টা (Maize Field)</option>
-                    <option value="jute">🌿 পাট (Jute Field)</option>
-                    <option value="potato">🥔 আলু (Potato Plot)</option>
-                    <option value="mustard">🌼 সরিষা (Mustard Field)</option>
-                    <option value="tomato">🍅 টমেটো (Tomato Field)</option>
-                    <option value="eggplant">🍆 বেগুন (Eggplant Field)</option>
-                    <option value="chili">🌶️ মরিচ (Chili Plot)</option>
-                    <option value="lentil">🌱 মসুর ডাল (Lentil Field)</option>
-                    <option value="cucumber">🥒 শসা (Cucumber Plot)</option>
-                    <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
-                    <option value="onion">🧅 পেঁয়াজ (Onion Ridge)</option>
-                    <option value="carrot">🥕 গাজর (Carrot Field)</option>
-                    <option value="papaya">🍈 পেঁপে (Papaya Orchard)</option>
-                </select>
+            <!-- Top Left: Dual Camera Modes -->
+            <div class="fctrl-group fctrl-left">
+                <div class="fctrl-pill fctrl-cam-pill">
+                    <button id="btnDroneView" class="fctrl-cam-btn" title="ড্রোন ভিউ (Drone Aerial View)">
+                        <span class="btn-icon">🚁</span>
+                        <span class="btn-text">ড্রোন ভিউ</span>
+                    </button>
+                    <button id="btnFieldView" class="fctrl-cam-btn active" title="মাঠের দৃশ্য (Ground Field View)">
+                        <span class="btn-icon">🌾</span>
+                        <span class="btn-text">মাঠের দৃশ্য</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- View Mode Toggle Pill: Cinema (Clean) vs Data View -->
-            <div class="fctrl-pill fctrl-mode-pill">
-                <button id="btnCleanView" class="fctrl-toggle-btn active" title="নির্মল দৃশ্য (Cinema Mode)">
-                    <span class="btn-icon">👁️</span>
-                    <span class="btn-text" data-i18n="sim-clean-view">নির্মল দৃশ্য</span>
-                </button>
-                <button id="btnDataView" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
-                    <span class="btn-icon">📊</span>
-                    <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
-                </button>
+            <!-- Top Center: Crop Selector & Time of Day Slider -->
+            <div class="fctrl-group fctrl-center">
+                <!-- Crop Selector Pill -->
+                <div class="fctrl-pill fctrl-crop-pill">
+                    <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
+                    <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
+                        <option value="rice" selected>🌾 ধান (Rice Field)</option>
+                        <option value="wheat">🌾 গম (Wheat Field)</option>
+                        <option value="maize">🌽 ভুট্টা (Maize Field)</option>
+                        <option value="jute">🌿 পাট (Jute Field)</option>
+                        <option value="potato">🥔 আলু (Potato Plot)</option>
+                        <option value="mustard">🌼 সরিষা (Mustard Field)</option>
+                        <option value="tomato">🍅 টমেটো (Tomato Field)</option>
+                        <option value="eggplant">🍆 বেগুন (Eggplant Field)</option>
+                        <option value="chili">🌶️ মরিচ (Chili Plot)</option>
+                        <option value="lentil">🌱 মসুর ডাল (Lentil Field)</option>
+                        <option value="cucumber">🥒 শসা (Cucumber Plot)</option>
+                        <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
+                        <option value="onion">🧅 পেঁয়াজ (Onion Ridge)</option>
+                        <option value="carrot">🥕 গাজর (Carrot Field)</option>
+                        <option value="papaya">🍈 পেঁপে (Papaya Orchard)</option>
+                    </select>
+                </div>
+
+                <!-- ☀️ Time of Day Slider -->
+                <div class="fctrl-pill fctrl-tod-pill" title="সূর্যের অবস্থান ও আলো পরিবর্তন (Time of Day)">
+                    <span class="tod-label">☀️</span>
+                    <input type="range" id="timeOfDaySlider" class="tod-slider" min="0" max="100" value="45" step="1" aria-label="Time of Day">
+                    <span id="timeOfDayLabel" class="tod-val-text">দুপুর (Noon)</span>
+                </div>
             </div>
 
-            <!-- Atmosphere & Camera Actions -->
-            <div class="fctrl-pill fctrl-actions-pill">
-                <button id="hudToggleSun" class="fctrl-action-btn" title="Cycle Day / Sunset / Night Lighting">
-                    <span>☀️</span> <span id="sunBtnText">দিন</span>
-                </button>
-                <button id="hudResetView" class="fctrl-action-btn" title="Switch to Drone View">
-                    <span>🚁</span>
-                </button>
-                <button id="hudFieldView" class="fctrl-action-btn" title="Switch to Ground Level View">
-                    <span>🚜</span>
-                </button>
-                <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
-                    <span>⛶</span>
-                </button>
+            <!-- Top Right: Data Drawer Toggle & Fullscreen -->
+            <div class="fctrl-group fctrl-right">
+                <div class="fctrl-pill fctrl-action-pill">
+                    <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
+                        <span class="btn-icon">📊</span>
+                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
+                    </button>
+                    <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
+                        <span>⛶</span>
+                    </button>
+                </div>
             </div>
         </div>
 
