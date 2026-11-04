@@ -1,0 +1,2372 @@
+[
+  {
+    "id": "rice",
+    "name": "Rice",
+    "bangla_name": "ধান",
+    "icon": "🌾",
+    "scientific_name": "Oryza sativa",
+    "category": "Cereal",
+    "category_bn": "দানাশস্য",
+    "ideal_season": "Aman / Boro / Aus",
+    "ideal_season_bn": "আমন / বোরো / আউশ",
+    "total_duration_days": 125,
+    "optimal_temp": "22°C - 34°C",
+    "water_requirement": "High (1100-1350 mm)",
+    "soil_type": "Clay loam to silty clay",
+    "soil_type_bn": "দোআঁশ থেকে এঁটেল মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Germination",
+        "stage_name_bn": "বপন ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 15",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Basal: N: 40, P: 60, K: 40 kg/ha",
+          "description": "Apply full dose of TSP/DAP and MOP, plus 1/3 of Urea as basal application during final puddle preparation.",
+          "description_bn": "জমি তৈরির শেষ চাষে সম্পূর্ণ টিএসপি/ডিএপি এবং এমওপি, সাথে ১/৩ অংশ ইউরিয়া প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Seedling Blight, Brown Spot, Snails",
+          "threats_bn": "চারা পোড়া রোগ, বাদামি দাগ রোগ, শামুক",
+          "management": "Treat seeds with Carbendazim (2g/kg) before sowing. Maintain shallow water layer (2-3 cm) in nursery bed.",
+          "management_bn": "বপনের আগে কার্বেনডাজিম (২ গ্রাম/কেজি) দিয়ে বীজ শোধন করুন। বীজতলায় ২-৩ সেমি পানি বজায় রাখুন।"
+        },
+        "actionable_tips": [
+          "Select certified disease-free seeds with >85% germination rate.",
+          "Soak seeds for 24 hours and incubate for 48 hours for uniform sprouting.",
+          "Prepare raised nursery beds with fine tilth and clear drainage channels."
+        ],
+        "actionable_tips_bn": [
+          "৮৫% এর বেশি অঙ্কুরোদগম ক্ষমতাসম্পন্ন প্রত্যয়িত বীজ নির্বাচন করুন।",
+          "২৪ ঘণ্টা ভিজিয়ে রেখে ৪৮ ঘণ্টা জাগ দিয়ে সুষমভাবে অঙ্কুরিত করুন।",
+          "উঁচু বীজতলায় মসৃণ মাটি এবং নিকাশ নালা তৈরি করুন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative (Tillering)",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি (কুশি পর্যায়)",
+        "days_range": "Day 16 - 50",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 40 kg/ha (Split 1)",
+          "description": "Apply 1st top dressing of Urea at active tillering stage (20-25 days after transplanting). Add Zinc Sulphate (10 kg/ha) if deficiency occurs.",
+          "description_bn": "চারা রোপণের ২০-২৫ দিন পর ১ম কিস্তি ইউরিয়া উপরিপ্রয়োগ করুন। জিংকের ঘাটতি থাকলে জিংক সালফেট (১০ কেজি/হেক্টর) দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Yellow Stem Borer, Gall Midge, Leaf Folder, Blast",
+          "threats_bn": "হলুদ মাজরা পোড়া, গল মাছি, পাতা মোড়ানো পোকা, ব্লাস্ট",
+          "management": "Install light traps and pheromone traps for stem borer. Spray Tricyclazole (0.6 g/L) if blast lesions appear.",
+          "management_bn": "মাজরা পোকার জন্য আলোক ফাঁদ ও ফেরোমোন ট্র্যাপ ব্যবহার করুন। ব্লাস্টের দাগ দেখা দিলে ট্রাইসাইক্লাজল স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Transplant 2-3 seedlings per hill at 20x15 cm spacing.",
+          "Adopt Alternate Wetting and Drying (AWD) to save 25% irrigation water.",
+          "Perform weeding using a mechanical rotary weeder at 20 and 40 DAT."
+        ],
+        "actionable_tips_bn": [
+          "প্রতি গুছিতে ২-৩টি চারা ২০x১৫ সেমি দূরত্বে রোপণ করুন।",
+          "২৫% সেচের পানি সাশ্রয়ে এডব্লিউডি (পর্যায়ক্রমিক ভেজানো ও শুকানো) পদ্ধতি গ্রহণ করুন।",
+          "রোপণের ২০ এবং ৪০ দিনে উইডার মেশিন দিয়ে আগাছা পরিষ্কার করুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Panicle Initiation",
+        "stage_name_bn": "ফুল ও শিষ ধারণ পর্যায়",
+        "days_range": "Day 51 - 85",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 35 kg/ha, K: 15 kg/ha",
+          "description": "Apply remaining Urea and MOP at panicle initiation (PI) stage. Avoid excess Nitrogen which induces lodging and blast.",
+          "description_bn": "শীষ গজানোর প্রাক্কালে অবশিষ্ট ইউরিয়া ও পটাশ উপরিপ্রয়োগ করুন। অতিরিক্ত নাইট্রোজেন ধান হেলে পড়া ও ব্লাস্ট বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Brown Planthopper (BPH), Neck Blast, Sheath Blight",
+          "threats_bn": "বাদামি গাছফড়িং (কারেন্ট পোকা), শিষ ব্লাস্ট, খোলপোড়া রোগ",
+          "management": "Inspect stem base for BPH; drain standing water temporarily. Spray Azoxystrobin for sheath blight.",
+          "management_bn": "ধানের গোড়ায় বাদামি গাছফড়িং পর্যবেক্ষণ করুন; তীব্র আক্রমণে ক্ষেতের পানি নিষ্কাশন করুন।"
+        },
+        "actionable_tips": [
+          "Maintain continuous 3-5 cm standing water during panicle formation and flowering.",
+          "Avoid spraying any insecticides between 9 AM and 12 PM when pollination is actively occurring.",
+          "Open alleys (every 10 rows) for aeration to deter planthoppers."
+        ],
+        "actionable_tips_bn": [
+          "শীষ বের হওয়া ও ফুল ফোটার সময় জমিতে সার্বক্ষণিক ৩-৫ সেমি পানি ধরে রাখুন।",
+          "পরাগায়নের প্রধান সময় (সকাল ৯টা-১২টা) কোনো কীটনাশক স্প্রে করবেন না।",
+          "বাতাস চলাচলের জন্য প্রতি ১০ সারি পর পর ১টি ফাঁকা লাইন বা 'আলি' রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity (Grain Filling & Ripening)",
+        "stage_name_bn": "পরিপক্কতা ও দানা গঠন",
+        "days_range": "Day 86 - 110",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Foliar K: 0-0-10 (No Nitrogen)",
+          "description": "Do not apply nitrogen fertilizer. A foliar spray of Potassium Nitrate (1%) helps enhance grain weight and shine.",
+          "description_bn": "এ সময়ে কোনো নাইট্রোজেন সার দেবেন না। দানার পুষ্টতা ও উজ্জ্বলতা বাড়াতে পটাশিয়ামের হালকা ফলিয়ার স্প্রে করা যায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Rice Bug (Gandhi bug), False Smut, Bacterial Blight",
+          "threats_bn": "গান্ধী পোকা, ধান ফোস্কা রোগ (ফলস স্মাট), ব্যাকটেরিয়া পাতা পোড়া",
+          "management": "Spray Malathion or neem seed kernel extract early morning for stink/rice bugs.",
+          "management_bn": "গান্ধী পোকার আক্রমণে সকালের দিকে ম্যালাথিয়ন বা নিম বীজের নির্যাস স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Drain all standing water out of the field 10 to 14 days before harvest.",
+          "Protect the crop from rats using zinc phosphide bait traps along bunds.",
+          "Monitor grain firmness; grains should resist fingernail indentation."
+        ],
+        "actionable_tips_bn": [
+          "ফসল কাটার ১০-১৪ দিন পূর্বে ক্ষেতের সমস্ত পানি পুরোপুরি নিষ্কাশন করে দিন।",
+          "আইলে জিংক ফসফাইড বিষটোপ বা ফাঁদ ব্যবহার করে ইঁদুর দমন করুন।",
+          "দানা শক্ত হয়েছে কি না নখ দিয়ে চাপ দিয়ে পরীক্ষা করুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Post-Harvest",
+        "stage_name_bn": "ফসল কর্তন ও সংগ্রহ",
+        "days_range": "Day 111 - 125",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "No Fertilizer Needed",
+          "description": "No chemical fertilizers required. Incorporate stubble and residue back into the soil for organic carbon enrichment.",
+          "description_bn": "কোনো সারের প্রয়োজন নেই। ফসলের নাড়া বা খড় জমিতে মিশিয়ে মাটির জৈব কার্বন বৃদ্ধি করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Storage Weevil, Grain Mold, Rodents",
+          "threats_bn": "গুদামের ঘুণ পোকা, ছত্রাক আক্রমণ, ইঁদুর",
+          "management": "Clean storage bins thoroughly and treat with dry neem leaves before storing paddy.",
+          "management_bn": "সংরক্ষণের পূর্বে গোলা বা ড্রাম ভালো করে পরিষ্কার করে শুকনো নিম পাতা দিন।"
+        },
+        "actionable_tips": [
+          "Harvest when 80-85% of grains in the panicle turn golden straw-yellow.",
+          "Thresh promptly to avoid field shattering losses.",
+          "Sun-dry paddy grains over 2-3 sunny days until moisture drops below 12-14%."
+        ],
+        "actionable_tips_bn": [
+          "শীষের ৮০-৮৫% দানা সোনালী হলুদ বর্ণ ধারণ করলে ফসল কর্তন করুন।",
+          "ঝরে যাওয়া রোধে দ্রুত মাড়াই সম্পন্ন করুন।",
+          "রোদে শুকিয়ে দানার আর্দ্রতা ১২-১৪% এর নিচে নামিয়ে সংরক্ষণ করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "wheat",
+    "name": "Wheat",
+    "bangla_name": "গম",
+    "icon": "🌾",
+    "scientific_name": "Triticum aestivum",
+    "category": "Cereal",
+    "category_bn": "দানাশস্য",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 115,
+    "optimal_temp": "15°C - 25°C",
+    "water_requirement": "Moderate (400-500 mm)",
+    "soil_type": "Well-drained fertile loam",
+    "soil_type_bn": "সুনিষ্কাশিত উর্বর দোআঁশ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Crown Root Initiation (CRI)",
+        "stage_name_bn": "বপন ও মুকুট শিকড় পর্যায়",
+        "days_range": "Day 1 - 20",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Basal: N: 50, P: 60, K: 40 kg/ha + Boron: 1 kg/ha",
+          "description": "Apply 2/3 Urea and full TSP/DAP, MOP, and Gypsum during final land prep. Boron is vital to prevent sterility.",
+          "description_bn": "জমি তৈরিতে ২/৩ অংশ ইউরিয়া এবং সম্পূর্ণ টিএসপি, এমওপি ও জিপসাম দিন। বোরন দানা বন্ধ্যাত্ব রোধ করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Termites, Foot Rot, Seedling Damping-off",
+          "threats_bn": "উইপোকা, গোড়া পচা রোগ, চারা ধ্বসা",
+          "management": "Treat seeds with Vitavax-200 (2.5 g/kg) or Provax. Use Chlorpyrifos for termite-prone sandy loams.",
+          "management_bn": "ভিটাভ্যাক্স-২০০ বা প্রোভ্যাক্স দিয়ে বীজ শোধন করুন। উইপোকার জন্য ক্লোরপাইরিফস ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Sow during November 15-30 for optimal Bangladesh and sub-tropical winter chill.",
+          "Maintain seeding depth strictly at 4-5 cm in rows 20 cm apart.",
+          "First irrigation at 18-21 days (CRI stage) is the single most critical yield determinant."
+        ],
+        "actionable_tips_bn": [
+          "১৫-৩০ নভেম্বরের মধ্যে বীজ বপন সম্পন্ন করুন।",
+          "২০ সেমি দূরত্বে সারিতে ৪-৫ সেমি গভীরে বীজ বপন করুন।",
+          "১৮-২১ দিনে মুকুট শিকড় (CRI) পর্যায়ে প্রথম সেচ দেওয়া ফলনের জন্য সবচেয়ে জরুরি।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative (Tillering & Jointing)",
+        "stage_name_bn": "কুশি ও গিঁট গঠন পর্যায়",
+        "days_range": "Day 21 - 50",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha",
+          "description": "Broadcast remaining 1/3 Urea immediately following the first crown root irrigation.",
+          "description_bn": "প্রথম মুকুট শিকড় সেচের পরপরই অবশিষ্ট ১/৩ অংশ ইউরিয়া উপরিপ্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Aphids, Shoot Fly, Yellow Rust, Leaf Blight",
+          "threats_bn": "জাবপোকা, কান্ড মাছি, হলুদ মরিচা রোগ, পাতা ঝলসানো",
+          "management": "Spray Mancozeb (2 g/L) for leaf blight. Apply Azadirachtin or Dimethoate if aphid colonies exceed 5/tiller.",
+          "management_bn": "পাতা ঝলসানো রোধে ম্যানকোজেব স্প্রে করুন। জাবপোকা দমনে নিম তেল বা ডাইমিথোয়েট স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Perform weeding at 25-30 days before tillers close the canopy.",
+          "Ensure light soil aeration around plant crowns after first irrigation.",
+          "Avoid water stagnation which causes rapid yellowing of wheat leaves."
+        ],
+        "actionable_tips_bn": [
+          "২৫-৩০ দিনের মধ্যে প্রথম নিড়ানি দিয়ে আগাছামুক্ত করুন।",
+          "সেচের পর মাটির 'জো' আসলে হালকা নিড়ানি দিয়ে বাতাস চলাচলের ব্যবস্থা করুন।",
+          "পানি জমে থাকতে দেবেন না, কারণ জলাবদ্ধতায় গমের পাতা দ্রুত হলুদ হয়ে যায়।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Heading (Anthesis)",
+        "stage_name_bn": "শীষ বের হওয়া ও ফুল ফোটা",
+        "days_range": "Day 51 - 80",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Foliar Spray: Boron (0.2%) + Potassium Sulphate (1%)",
+          "description": "Apply foliar Boron spray during boot leaf stage to ensure complete pollination and plump grain set.",
+          "description_bn": "বুট লিফ বা থোর অবস্থায় বোরন ও পটাশিয়ামের হালকা স্প্রে সুষম পরাগায়ন ও দানা গঠনে সাহায্য করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Wheat Blast (Magnaporthe oryzae), Loose Smut, Aphids",
+          "threats_bn": "গম ব্লাস্ট রোগ, আলগা অঙ্গার রোগ, জাবপোকা",
+          "management": "Spray Nativo (Tebuconazole + Trifloxystrobin) at 0.75 g/L preventively at heading to guard against Blast.",
+          "management_bn": "গম ব্লাস্টের বিরুদ্ধে প্রতিরোধক হিসেবে শীষ বের হওয়ার সময় নাটিভো স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Provide second critical irrigation at booting/heading stage (50-55 DAS).",
+          "Avoid sprinkler or overhead irrigation during flowering to safeguard pollen.",
+          "Inspect edges of field for early blast white-head symptoms."
+        ],
+        "actionable_tips_bn": [
+          "৫০-৫৫ দিনে দ্বিতীয় জীবন রক্ষাকারী সেচ নিশ্চিত করুন।",
+          "ফুল ফোটার সময় ওপর থেকে পানি ছিটাবেন না যাতে পরাগরেণু ধুয়ে না যায়।",
+          "সাদা শীষ বা ব্লাস্টের আগাম লক্ষণের জন্য নিয়মিত ক্ষেত পরিদর্শন করুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity (Milking & Dough Stage)",
+        "stage_name_bn": "দুধ ও শক্ত দানা গঠন পর্যায়",
+        "days_range": "Day 81 - 102",
+        "duration_days": 22,
+        "npk_advice": {
+          "ratio": "No Nitrogen Application",
+          "description": "Zero fertilizer application. Excess nitrogen causes lodging and delays maturity under terminal heat.",
+          "description_bn": "কোনো সার প্রয়োগ করবেন না। অতিরিক্ত নাইট্রোজেন ফসল হেলে দেয় এবং পরিপক্কতায় ব্যাঘাত ঘটায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Armyworm, Grain Mite, Bird Damage",
+          "threats_bn": "লেদা পোকা, দানার মাইট, পাখির আক্রমণ",
+          "management": "Set up reflective ribbons or auditory bird scarers during grain hardening.",
+          "management_bn": "দানা শক্ত হওয়ার সময় পাখ তাড়ানোর জন্য চকচকে ফিতা বা শব্দযন্ত্র ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Apply light third irrigation at grain filling (75-80 DAS) on calm non-windy days.",
+          "Stop all irrigation once grains reach hard-dough stage to enable rapid drying.",
+          "Monitor for premature desiccation caused by hot westerly winds."
+        ],
+        "actionable_tips_bn": [
+          "শান্ত বাতাসে দানা ভরাট পর্যায়ে তৃতীয় হালকা সেচ দিন।",
+          "দানা শক্ত হলে সেচ সম্পূর্ণ বন্ধ করুন যাতে শিষ দ্রুত পরিপক্ক হয়।",
+          "বসন্তের শুষ্ক গরম বাতাসে দানা কুঁচকে যাওয়া প্রতিরোধে মাটি আর্দ্র রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Threshing",
+        "stage_name_bn": "ফসল কর্তন ও মাড়াই",
+        "days_range": "Day 103 - 115",
+        "duration_days": 13,
+        "npk_advice": {
+          "ratio": "No Fertilizer Needed",
+          "description": "Harvest complete. Incorporate root residues into soil.",
+          "description_bn": "কোনো সারের প্রয়োজন নেই। গমের গোড়া মাটিতে চাষ দিয়ে মিশিয়ে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Lesser Grain Borer, Khapra Beetle in Storage",
+          "threats_bn": "গুদামের ঘুণ পোকা, খাপরা বিটল",
+          "management": "Sun-dry grains to <12% moisture. Store in airtight metal bins or hermetic Purdue bags.",
+          "management_bn": "১২% এর কম আর্দ্রতায় শুকিয়ে এয়ারটাইট ড্রাম বা হারমেটিক ব্যাগে সংরক্ষণ করুন।"
+        },
+        "actionable_tips": [
+          "Harvest when straw turns completely golden yellow and grains snap cleanly under teeth.",
+          "Harvest early in the morning before daytime heat causes shatter losses.",
+          "Thresh using pedal or mechanical threshers immediately after drying."
+        ],
+        "actionable_tips_bn": [
+          "গাছের নাড়া সোনালী হলুদ হলে এবং দাঁতে কাটলে 'কট' শব্দ হলে কর্তন করুন।",
+          "ঝরে পড়া রোধে সকালের দিকে ফসল কাটুন।",
+          "শুকানোর পরপরই মাড়াই যন্ত্রের সাহায্যে দ্রুত মাড়াই সম্পন্ন করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "maize",
+    "name": "Maize",
+    "bangla_name": "ভুট্টা",
+    "icon": "🌽",
+    "scientific_name": "Zea mays",
+    "category": "Cereal",
+    "category_bn": "দানাশস্য",
+    "ideal_season": "Rabi (Winter) / Kharif",
+    "ideal_season_bn": "রবি / খরিফ মৌসুম",
+    "total_duration_days": 135,
+    "optimal_temp": "20°C - 32°C",
+    "water_requirement": "Moderate-High (500-750 mm)",
+    "soil_type": "Deep sandy loam to silty loam",
+    "soil_type_bn": "গভীর বেলে দোআঁশ থেকে পলি দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Germination",
+        "stage_name_bn": "বপন ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 15",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Basal: N: 60, P: 60, K: 40 kg/ha + ZnSO4: 15 kg/ha",
+          "description": "Maize is a heavy feeder. Apply 1/3 Nitrogen, full Phosphorus, half Potash, and Zinc during final land preparation.",
+          "description_bn": "ভুট্টায় প্রচুর পুষ্টি লাগে। ১/৩ অংশ ইউরিয়া, সম্পূর্ণ ফসফরাস, অর্ধেক পটাশ এবং জিংক জমি তৈরিতে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Cutworms, Seedling Blight, Termites",
+          "threats_bn": "কাটুই পোকা, চারা পোড়া রোগ, উইপোকা",
+          "management": "Treat hybrid seeds with Imidacloprid (4 g/kg) and Thiram (2.5 g/kg) to deter subterranean pests.",
+          "management_bn": "ইমিডাক্লোপ্রিড ও থাইরাম দিয়ে বীজ শোধন করে কাটুই পোকা ও রোগ থেকে রক্ষা করুন।"
+        },
+        "actionable_tips": [
+          "Plant on raised ridges at 60 cm row spacing and 20 cm plant spacing.",
+          "Place 1 seed per hill at 3-4 cm depth with sufficient soil moisture.",
+          "Ensure excellent drainage as water stagnation causes seedling rot."
+        ],
+        "actionable_tips_bn": [
+          "উঁচু আইল বা বেডে ৬০ সেমি সারি এবং ২০ সেমি চারা দূরত্বে রোপণ করুন।",
+          "পর্যাপ্ত রসে প্রতি গর্তে ৩-৪ সেমি গভীরে ১টি করে বীজ দিন।",
+          "পানি যাতে জমে না থাকে সেদিকে খেয়াল রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative (Knee-High to V8)",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি (হাঁটু সমান পর্যায়)",
+        "days_range": "Day 16 - 50",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 60 kg/ha (Split 2)",
+          "description": "Side-dress 1/3 Urea along rows at knee-high stage (30-35 DAS) followed by ridge earthing-up.",
+          "description_bn": "গাছ হাঁটু সমান হলে (৩০-৩৫ দিনে) ১/৩ অংশ ইউরিয়া সারিতে দিয়ে গোড়ায় মাটি তুলে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Fall Armyworm (Spodoptera frugiperda), Stem Borer",
+          "threats_bn": "ফল আর্মিওয়ার্ম, মাজরা পোকা",
+          "management": "Scout central whorls for FAW pinholes. Apply Emamectin Benzoate (0.5 g/L) or Spinetoram directly into whorls.",
+          "management_bn": "গাছের ডগায় ফল আর্মিওয়ার্মের আক্রমণ তদারকি করুন। ডগায় ইমাদেকটিন বেনজোয়েট স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Earth up soil around base to anchor plants against heavy winds.",
+          "Weed thoroughly before applying fertilizer.",
+          "Irrigate immediately after side-dressing nitrogen."
+        ],
+        "actionable_tips_bn": [
+          "ঝড়ে হেলে পড়া ঠেকাতে গাছের গোড়ায় শক্ত করে মাটি তুলে দিন।",
+          "সার দেওয়ার পূর্বে ক্ষেত সম্পূর্ণ আগাছামুক্ত করুন।",
+          "ইউরিয়া প্রয়োগের পর হালকা সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering (Tasseling & Silking)",
+        "stage_name_bn": "পুরুষ ফুল (ট্যাসেল) ও রেশম (সিল্ক) পর্যায়",
+        "days_range": "Day 51 - 85",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 40 kg/ha, K: 30 kg/ha",
+          "description": "Apply final dose of Urea and remaining MOP prior to tassel emergence.",
+          "description_bn": "ট্যাসেল বের হওয়ার পূর্বে শেষ কিস্তি ইউরিয়া এবং বাকি পটাশ প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Corn Earworm, Turcicum Leaf Blight, Banded Leaf Disease",
+          "threats_bn": "ভুট্টার মোচা ছিদ্রকারী পোকা, পাতা ঝলসানো রোগ",
+          "management": "Install FAW and earworm pheromone traps (10 traps/ha). Spray Azoxystrobin for Turcicum blight.",
+          "management_bn": "মোচা ছিদ্রকারী পোকার জন্য ফেরোমোন ফাঁদ পাতুন। পাতা ঝলসানো রোগে এজোক্সিস্ট্রবিন দিন।"
+        },
+        "actionable_tips": [
+          "Tasseling and silking is the peak water consumption period; water stress now reduces yield by 50%.",
+          "Maintain continuous soil moisture without ponding water.",
+          "Ensure adequate pollinator activity; do not spray harsh insecticides."
+        ],
+        "actionable_tips_bn": [
+          "ট্যাসেল ও সিল্ক বের হওয়ার সময় পানির তীব্র প্রয়োজন হয়; এ সময় সেচের ঘাটতি মারাত্মক ফলন কমায়।",
+          "জমিতে নিয়মিত রস বজায় রাখুন তবে জলাবদ্ধতা সৃষ্টি হতে দেবেন না।",
+          "পরাগায়নের অনুকূল পরিবেশ রক্ষায় ক্ষতিকর কীটনাশক স্প্রে পরিহার করুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity (Grain Filling to Black Layer)",
+        "stage_name_bn": "দানা ভরাট ও মোচা পরিপক্কতা",
+        "days_range": "Day 86 - 118",
+        "duration_days": 33,
+        "npk_advice": {
+          "ratio": "Foliar Micronutrients (B + Zn)",
+          "description": "Spray 0.2% Boric acid on cobs to ensure kernels fill to the cob tip.",
+          "description_bn": "মোচায় সম্পূর্ণ দানা ভরাটের জন্য বোরিক এসিডের হালকা স্প্রে উপকারী।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Cob Rot (Fusarium), Rodents, Birds",
+          "threats_bn": "মোচা পচা রোগ, ইঁদুর, পাখির আক্রমণ",
+          "management": "Keep husks tightly bound; set up visual scarecrows and sonic rodent repellers.",
+          "management_bn": "মোচায় যাতে পানি না ঢোকে খেয়াল রাখুন এবং পাখি ও ইঁদুর তাড়ানোর ব্যবস্থা নিন।"
+        },
+        "actionable_tips": [
+          "Discontinue irrigation 15 days before harvest when husks turn straw-brown.",
+          "Check for the 'black layer' formation at the base of the kernel, indicating physiological maturity.",
+          "Remove lower dried leaves to improve air circulation."
+        ],
+        "actionable_tips_bn": [
+          "মোচার খোসা বাদামি হলে ফসল তোলার ১৫ দিন পূর্বে সেচ বন্ধ করুন।",
+          "দানার গোড়ায় 'কালো দাগ' (Black layer) দেখা দিলে বুঝবেন ফসল পেকে গেছে।",
+          "বাতাস চলাচলের জন্য নিচের শুকনা পাতা ছিঁড়ে দিন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Shelling",
+        "stage_name_bn": "ফসল সংগ্রহ ও দানা মাড়াই",
+        "days_range": "Day 119 - 135",
+        "duration_days": 17,
+        "npk_advice": {
+          "ratio": "Post-Harvest Management",
+          "description": "Chop maize stalks for livestock silage or mulch.",
+          "description_bn": "ভুট্টার গাছ গবাদি পশুর পুষ্টিকর সাইলেজ তৈরিতে ব্যবহার করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Aflatoxin (Aspergillus flavus), Maize Weevil",
+          "threats_bn": "অ্যাফ্লাটক্সিন ছত্রাক, ভুট্টার ঘুণ পোকা",
+          "management": "Sun dry shelled grains on tarpaulins to <13% moisture to avoid aflatoxin contamination.",
+          "management_bn": "অ্যাফ্লাটক্সিন বিষক্রিয়া রোধে দানা দ্রুত রোদে শুকিয়ে ১৩% আর্দ্রতায় আনুন।"
+        },
+        "actionable_tips": [
+          "Harvest cobs on a dry sunny morning when husk covers are crispy-dry.",
+          "De-husk cobs and sun-cure for 3 days before mechanical shelling.",
+          "Store in dry hermetic drums away from damp floors."
+        ],
+        "actionable_tips_bn": [
+          "খোসা সম্পূর্ণ শুকিয়ে গেলে শুষ্ক রৌদ্রোজ্জ্বল সকালে মোচা সংগ্রহ করুন।",
+          "খোসা ছাড়িয়ে ৩ দিন রোদে শুকিয়ে মাড়াই যন্ত্রে দানা আলাদা করুন।",
+          "আর্দ্রতামুক্ত স্থানে ড্রামে সংরক্ষণ করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "jute",
+    "name": "Jute",
+    "bangla_name": "পাট",
+    "icon": "🌿",
+    "scientific_name": "Corchorus olitorius",
+    "category": "Cash Crop",
+    "category_bn": "অর্থকরী ফসল",
+    "ideal_season": "Kharif-1 (Summer/Monsoon)",
+    "ideal_season_bn": "খরিফ-১ (গ্রীষ্মকালীন)",
+    "total_duration_days": 120,
+    "optimal_temp": "24°C - 37°C",
+    "water_requirement": "High (1000-1500 mm)",
+    "soil_type": "Rich alluvial silt loam",
+    "soil_type_bn": "উর্বর পলি দোআঁশ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Seedling Emergence",
+        "stage_name_bn": "বপন ও চারা গজানো",
+        "days_range": "Day 1 - 15",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Basal: N: 20, P: 30, K: 30 kg/ha",
+          "description": "Apply low initial nitrogen and full phosphate/potash during final land preparation to establish deep taproots.",
+          "description_bn": "শিকড় মজবুত করতে জমি তৈরিতে সম্পূর্ণ ফসফেট, পটাশ এবং সামান্য ইউরিয়া দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Stem Rot (Macrophomina), Seedling Damping-off, Crickets",
+          "threats_bn": "কান্ড পচা রোগ, চারা ধসা, ঝিঁঝিঁ পোকা",
+          "management": "Treat seeds with Carbendazim (2 g/kg). Ensure good surface drainage to avoid standing water on tiny seedlings.",
+          "management_bn": "কার্বেনডাজিম দিয়ে বীজ শোধন করুন। কচি চারার গোড়ায় যেন পানি না জমে খেয়াল রাখুন।"
+        },
+        "actionable_tips": [
+          "Sow during March-April after first pre-monsoon shower.",
+          "Line sow at 25-30 cm row spacing or broadcast evenly mixed with dry sand.",
+          "Keep seeding depth within 2-3 cm for fast emergence."
+        ],
+        "actionable_tips_bn": [
+          "মার্চ-এপ্রিলে কালবৈশাখীর প্রথম বৃষ্টির পর বীজ বপন করুন।",
+          "সারিতে ২৫-৩০ সেমি দূরত্বে অথবা বালির সাথে মিশিয়ে সমভাবে ছিটিয়ে দিন।",
+          "বীজ ২-৩ সেমি গভীরে রাখুন যাতে দ্রুত গজাতে পারে।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative (Rapid Stem Elongation)",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি (দ্রুত কাণ্ড বৃদ্ধি)",
+        "days_range": "Day 16 - 60",
+        "duration_days": 45,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 40 kg/ha (Two splits at 25 & 45 DAS)",
+          "description": "Apply Urea in two equal splits to fuel rapid bast fiber cell multiplication in the bark.",
+          "description_bn": "পাট কাণ্ডের দ্রুত বৃদ্ধির জন্য ২৫ ও ৪৫ দিনে দুই কিস্তিতে ইউরিয়া উপরিপ্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Jute Hairy Caterpillar (Spilosoma), Jute Semilooper, Yellow Mite",
+          "threats_bn": "বিছা পোকা, ঘোড়া পোকা (সেমিলুপার), হলুদ মাকড়",
+          "management": "Collect egg masses and gregarious young hairy caterpillars by hand. Spray Diafenthiuron for yellow mite.",
+          "management_bn": "বিছা পোকার ডিমের গাদা ও দলবদ্ধ পোকা হাত দিয়ে তুলে ধ্বংস করুন। মাকড়ের জন্য ডায়াফেন্থিউরন স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Perform first thinning at 15-20 days; maintain 8-10 cm between healthy seedlings.",
+          "Second weeding and thinning at 35 days ensures robust unbranched stalks.",
+          "Keep field weed-free during first 45 days of competition."
+        ],
+        "actionable_tips_bn": [
+          "১৫-২০ দিনে প্রথম বাছায় ও নিড়ানি দিয়ে গাছ থেকে গাছের দূরত্ব ৮-১০ সেমি রাখুন।",
+          "৩৫ দিনে দ্বিতীয় নিড়ানি সম্পন্ন করে সোজা শাখা-বিহীন কান্ড নিশ্চিত করুন।",
+          "প্রথম ৪৫ দিন পাট ক্ষেত পুরোপুরি আগাছামুক্ত রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering (Budding to Early Bloom)",
+        "stage_name_bn": "কুঁড়ি ও ফুল ধারণ পর্যায়",
+        "days_range": "Day 61 - 95",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: K: 20 kg/ha",
+          "description": "Light top dressing of MOP improves bast fiber tensile strength and lustre.",
+          "description_bn": "হালকা পটাশ সার পাটের আঁশের উজ্জ্বলতা ও শক্তি বৃদ্ধি করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Anthracnose, Apion Weevil (Stem gall), Root Rot",
+          "threats_bn": "ক্ষত রোগ (অ্যানথ্রাকনোজ), পাটের গুঁড়ি বা চেলে পোকা",
+          "management": "Spray Mancozeb (2.5 g/L) for anthracnose; spray Chlorpyrifos if Apion stem galls exceed threshold.",
+          "management_bn": "অ্যানথ্রাকনোজের দাগে ম্যানকোজেব স্প্রে করুন। চেলে পোকা দমনে অনুমোদিত কীটনাশক দিন।"
+        },
+        "actionable_tips": [
+          "Jute easily tolerates moderate standing water after reaching 1.5 m height.",
+          "Ensure adequate field drainage after heavy monsoon downpours.",
+          "Rogue out diseased or deformed plants."
+        ],
+        "actionable_tips_bn": [
+          "গাছ দেড় মিটার উঁচু হওয়ার পর মাঠে মাঝারি পানি জমলেও ক্ষতি হয় না।",
+          "ভারী বৃষ্টির পর অতিরিক্ত পানি দ্রুত নিষ্কাশনের পথ রাখুন।",
+          "রোগাক্রান্ত গাছ তুলে ফেলে দিন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity (Small Pod Stage)",
+        "stage_name_bn": "পরিপক্কতা (ছোট শুঁটি পর্যায়)",
+        "days_range": "Day 96 - 115",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "No Fertilizer Application",
+          "description": "Cease all fertilizing. The crop has synthesized optimal cellulose for highest fiber grade.",
+          "description_bn": "সার দেওয়া বন্ধ রাখুন। এ সময়ে পাটের আঁশের গ্রেড সর্বোচ্চ মানের থাকে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Black Band Disease, Termites",
+          "threats_bn": "কালো বন্ধনী রোগ, উইপোকা",
+          "management": "Inspect stalks; harvest early if waterlogging or black band rot threatens stems.",
+          "management_bn": "কান্ডের গোড়ায় কালো পচন দেখা দিলে দ্রুত ফসল কাটার ব্যবস্থা নিন।"
+        },
+        "actionable_tips": [
+          "The small pod formation stage (50% flowering) provides the premier balance between fiber yield and fine quality.",
+          "Late harvest yields coarser brittle fiber; premature harvest gives thin weak fiber.",
+          "Prepare nearby retting canals with clean slow-moving water."
+        ],
+        "actionable_tips_bn": [
+          "৫০% ফুল ফোটা বা ছোট শুঁটি আসার সময় পাট কাটার সর্বোত্তম সময় (আঁশ নরম ও চকচকে হয়)।",
+          "দেরিতে কাটলে আঁশ খসখসে ও ভঙ্গুর হয়, আগে কাটলে ফলন কমে।",
+          "জাগ দেওয়ার জন্য পরিষ্কার পানির জলাশয় ঠিক করুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting, Retting & Fiber Extraction",
+        "stage_name_bn": "কর্তন, জাগ ও আঁশ নিষ্কাশন",
+        "days_range": "Day 116 - 120",
+        "duration_days": 5,
+        "npk_advice": {
+          "ratio": "Biological Retting Management",
+          "description": "Utilize fungal retting inoculant (e.g. BJRI 'CFL-1') to accelerate retting by 5-7 days.",
+          "description_bn": "দ্রুত ও উন্নত জাগের জন্য বিজিআরআই উদ্ভাবিত পাটের জাগ অণুজীব প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Shyamla Color Defect (Iron staining from soil sinkers)",
+          "threats_bn": "শ্যামলা বর্ণ ত্রুটি (কাদামাটি দিয়ে জাগ দিলে আঁশ কালচে হয়)",
+          "management": "Never weigh down jute bundles with mud or soil! Use water hyacinth, concrete slabs or bamboo pins.",
+          "management_bn": "জাগ ডুবানোর জন্য কখনো মাটি বা কাদা ব্যবহার করবেন না! কচুরিপানা বা বাঁশ ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Cut stalks flush to the ground; leave bundles in field for 2-3 days for leaf shedding.",
+          "Submerge bundles 10-20 cm below water surface in slow clean water for 12-15 days.",
+          "Extract fiber, wash thoroughly in clean water, and sun-dry on bamboo poles."
+        ],
+        "actionable_tips_bn": [
+          "মাটির কাছাকাছি কান্ড কেটে ২-৩ দিন ক্ষেতে রেখে পাতা ঝরিয়ে নিন।",
+          "পরিষ্কার পানিতে আঁটির ওপর কচুরিপানা দিয়ে ১২-১৫ দিন জাগ দিন।",
+          "আঁশ ছাড়িয়ে পরিষ্কার পানিতে ধুয়ে বাঁশের আড়ে রোদে শুকান।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "potato",
+    "name": "Potato",
+    "bangla_name": "আলু",
+    "icon": "🥔",
+    "scientific_name": "Solanum tuberosum",
+    "category": "Tuber / Vegetable",
+    "category_bn": "কন্দ / সবজি",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 95,
+    "optimal_temp": "15°C - 22°C",
+    "water_requirement": "Moderate (450-550 mm)",
+    "soil_type": "Loose, friable sandy loam rich in organic matter",
+    "soil_type_bn": "হালকা বেলে দোআঁশ ও জৈব সমৃদ্ধ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Sprouting (Planting to Emergence)",
+        "stage_name_bn": "রোপণ ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 20",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Basal: N: 60, P: 80, K: 60 kg/ha + Cowdung: 10 t/ha",
+          "description": "Apply half Nitrogen, full Phosphorus, half Potassium, and well-decomposed manure in furrow beds at planting.",
+          "description_bn": "রোপণের সময় অর্ধেক ইউরিয়া, সম্পূর্ণ টিএসপি, অর্ধেক এমওপি এবং পচা গোবর নালায় দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Black Scurf (Rhizoctonia), Cutworms, Seed Tuber Rot",
+          "threats_bn": "কালো খোসা রোগ, কাটুই পোকা, বীজ আলু পচা",
+          "management": "Dip sprouted seed tubers in Boric Acid (3%) or Mancozeb (2 g/L) before planting. Apply Chlorpyrifos granules in furrows.",
+          "management_bn": "বীজ আলু বোরিক এসিড (৩%) বা ম্যানকোজেবে ডুবিয়ে শোধন করুন। নালায় কাটুই পোকার কীটনাশক দিন।"
+        },
+        "actionable_tips": [
+          "Plant well-sprouted, certified disease-free whole seed tubers (30-45g size).",
+          "Space tubers at 60 cm row-to-row and 25 cm plant-to-plant.",
+          "Plant at 5-7 cm depth in moist soil; avoid over-watering during emergence."
+        ],
+        "actionable_tips_bn": [
+          "সুস্থ চোখবিশিষ্ট প্রত্যয়িত বীজ আলু (৩০-৪৫ গ্রাম) নির্বাচন করুন।",
+          "সারি থেকে সারি ৬০ সেমি এবং আলু থেকে আলু ২৫ সেমি দূরত্বে লাগান।",
+          "মাটিতে ৫-৭ সেমি গভীরে রোপণ করুন; চারা বের না হওয়া পর্যন্ত অতিরিক্ত পানি দেবেন না।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Stolon Formation",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও ধাবক গঠন",
+        "days_range": "Day 21 - 45",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 50 kg/ha + Ridge Earthing-Up",
+          "description": "Apply remaining Urea at first earthing up (30-35 DAP). Avoid excess N which causes lush vines with small tubers.",
+          "description_bn": "৩০-৩৫ দিনে প্রথম মাটি তোলার সময় বাকি ইউরিয়া দিয়ে গোড়ায় উঁচু আইল তৈরি করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Aphids (Myzus persicae - Virus Vector), Early Blight",
+          "threats_bn": "জাবপোকা (ভাইরাস ছড়ায়), আগাম ধসা রোগ",
+          "management": "Install yellow sticky traps for aphids. Spray Mancozeb (2 g/L) preventively against Alternaria early blight.",
+          "management_bn": "জাবপোকা দমনে হলুদ আঠালো ফাঁদ ব্যবহার করুন। আগাম ধসা রোগের জন্য ম্যানকোজেব স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "First earthing-up (hilling) is critical to prevent tubers from greening under sunlight (solanine poison).",
+          "Provide first light furrow irrigation at 25 DAP.",
+          "Keep beds free from broadleaf weeds."
+        ],
+        "actionable_tips_bn": [
+          "সূর্যালোক লেগে আলু যাতে সবুজ ও বিষাক্ত (সোলা নাইন) না হয় তাই গোড়ায় ভালোভাবে মাটি তুলুন।",
+          "২৫ দিনে প্রথম হালকা নালা সেচ প্রয়োগ করুন।",
+          "ক্ষেত সম্পূর্ণ আগাছামুক্ত রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Tuber Bulking & Flowering",
+        "stage_name_bn": "আলু স্ফীতি ও ফুল ধারণ পর্যায়",
+        "days_range": "Day 46 - 70",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Top Dressing: K: 40 kg/ha",
+          "description": "Apply second split of MOP. Potassium is pivotal for starch synthesis, tuber size, and skin thickness.",
+          "description_bn": "দ্বিতীয় কিস্তির পটাশ দিন; পটাশিয়াম আলুর আকার, শর্করা ও খোসার স্থায়িত্ব বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Late Blight (Phytophthora infestans), Potato Tuber Moth (PTM)",
+          "threats_bn": "নাবি ধসা রোগ (লেট ব্লাইট), আলুর সুতা পোকা (পিটিএম)",
+          "management": "In cold foggy weather, spray preventively with Cymoxanil + Mancozeb or Acrobat MZ every 5-7 days.",
+          "management_bn": "কুয়াশাচ্ছন্ন আবহাওয়ায় নাবি ধসা রোধে এক্রোব্যাট এমজেড বা সাইমোক্সানিল স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "This is the most moisture-sensitive stage: maintain 70-80% field capacity with frequent light irrigations.",
+          "Earth up a second time to ensure no cracks expose growing tubers.",
+          "Avoid over-flooding furrow ridges."
+        ],
+        "actionable_tips_bn": [
+          "আলু বড় হওয়ার প্রধান সময়ে নিয়মিত হালকা সেচ দিন যাতে মাটিতে পর্যাপ্ত আর্দ্রতা থাকে।",
+          "দ্বিতীয়বার মাটি তুলে আলুকে পুরোপুরি ঢেকে রাখুন।",
+          "আইল ডুবে যেন পানি উপচে না পড়ে।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity & Dehaulming (Skin Curing)",
+        "stage_name_bn": "পরিপক্কতা ও গাছ কাটা (ডিহমিং)",
+        "days_range": "Day 71 - 85",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Zero Fertilizer",
+          "description": "Stop all chemical fertilizers and stop irrigation 10-12 days before dehaulming.",
+          "description_bn": "সব সার ও সেচ বন্ধ রাখুন; গাছ কাটার ১০-১২ দিন আগে পানি দেওয়া বন্ধ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Late Blight Tuber Rot, Common Scab",
+          "threats_bn": "আলু পচন রোগ, আলুর দাদ রোগ",
+          "management": "Cut and remove aboveground green foliage (dehaulm) 10 days before digging to prevent fungal spore migration to tubers.",
+          "management_bn": "আলু তোলার ১০ দিন পূর্বে মাটির ১ ইঞ্চি ওপর থেকে গাছ কেটে সরিয়ে ফেলুন যাতে খোসা শক্ত হয়।"
+        },
+        "actionable_tips": [
+          "Dehaulming hardens the potato skin, preventing bruising, skinning, and rot during storage.",
+          "Leave tubers undisturbed in dry soil for 8-10 days after dehaulming.",
+          "Inspect soil moisture; avoid waterlogging."
+        ],
+        "actionable_tips_bn": [
+          "গাছ কেটে দিলে আলুর খোসা শক্ত ও মজবুত হয়, যা সংরক্ষণে পচন রোধ করে।",
+          "গাছ কাটার পর ৮-১০ দিন মাটির নিচে আলু রেখে দিন।",
+          "মাটি সম্পূর্ণ শুকিয়ে গেলে তবেই আলু তুলুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting, Curing & Sorting",
+        "stage_name_bn": "ফসল সংগ্রহ, শুকানো ও সংরক্ষণ",
+        "days_range": "Day 86 - 95",
+        "duration_days": 10,
+        "npk_advice": {
+          "ratio": "Post-Harvest Handling",
+          "description": "Grade harvested tubers by size (seed, table, small).",
+          "description_bn": "আকার অনুযায়ী বীজ আলু, খাওয়ার আলু এবং ছোট আলু আলাদা করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Dry Rot (Fusarium), Soft Rot (Erwinia), Tuber Moth in Storage",
+          "threats_bn": "শুষ্ক পচন, নরম পচা রোগ, গুদামের আলুর পোকা",
+          "management": "Cover potato heaps with dry sand or Lantana leaves against tuber moths.",
+          "management_bn": "গুদামে আলুর সুতা পোকা প্রতিরোধে বালুর স্তর বা নিম পাতা দিয়ে ঢেকে রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest carefully on a bright sunny day using potato diggers or spades without cutting tubers.",
+          "Cure tubers in a shaded, well-ventilated room at 15-20°C for 7-10 days for wound healing.",
+          "Discard bruised, diseased, or green tubers before bagging."
+        ],
+        "actionable_tips_bn": [
+          "রৌদ্রোজ্জ্বল দিনে যত্ন সহকারে আলু তুলুন যাতে কোনো ক্ষত সৃষ্টি না হয়।",
+          "ছায়াযুক্ত ঠান্ডা ঘরে ৭-১০ দিন বিছিয়ে রেখে খোসা নিরাময় করুন।",
+          "কাটা, ফাটা বা সবুজ আলু আলাদা করে ভালো আলু বস্তায় ভরুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "mustard",
+    "name": "Mustard",
+    "bangla_name": "সরিষা",
+    "icon": "🌼",
+    "scientific_name": "Brassica campestris",
+    "category": "Oilseed",
+    "category_bn": "তৈলবীজ",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 85,
+    "optimal_temp": "12°C - 24°C",
+    "water_requirement": "Low (200-300 mm)",
+    "soil_type": "Light loam to sandy loam",
+    "soil_type_bn": "হালকা দোআঁশ থেকে বেলে দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Germination",
+        "stage_name_bn": "বপন ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 12",
+        "duration_days": 12,
+        "npk_advice": {
+          "ratio": "Basal: N: 30, P: 40, K: 30 kg/ha + Sulphur: 20 kg/ha + Boron: 1.5 kg/ha",
+          "description": "Sulphur is mandatory for mustard; it increases oil percentage by 15-20%. Apply half N and full P, K, S, B at sowing.",
+          "description_bn": "সরিষায় সালফার অত্যাবশ্যক যা তেলের পরিমাণ ১৫-২০% বাড়ায়। জমি তৈরিতে অর্ধেক ইউরিয়া ও সম্পূর্ণ সালফার দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Mustard Sawfly, Damping-off, Cutworm",
+          "threats_bn": "সরিষার করাত মাছি, চারা ধসা, কাটুই পোকা",
+          "management": "Treat seeds with Vitavax or Carbendazim (2 g/kg). Hand-pick sawfly black grubs early morning.",
+          "management_bn": "কার্বেনডাজিম দিয়ে বীজ শোধন করুন। সকালে করাত মাছির পোকা হাত দিয়ে সংগ্রহ করে ধ্বংস করুন।"
+        },
+        "actionable_tips": [
+          "Sow between mid-October and mid-November to catch residual moisture after Aman rice.",
+          "Sow in rows 25 cm apart at 2-3 cm depth.",
+          "Ensure light fine seedbed for tiny mustard seeds."
+        ],
+        "actionable_tips_bn": [
+          "আমন ধান কাটার পর মধ্য অক্টোবর থেকে মধ্য নভেম্বরের মধ্যে সরিষা বপন করুন।",
+          "সারিতে ২৫ সেমি দূরত্বে এবং ২-৩ সেমি গভীরে বীজ দিন।",
+          "ছোট বীজের জন্য মাটি ঝুরঝুরে ও মসৃণ করুন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative (Rosette & Branching)",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও শাখা প্রশাখা বিস্তার",
+        "days_range": "Day 13 - 35",
+        "duration_days": 23,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha",
+          "description": "Apply remaining Urea at first irrigation (20-25 DAS) to spur productive primary branching.",
+          "description_bn": "২০-২৫ দিনে প্রথম সেচের সময় বাকি ইউরিয়া উপরিপ্রয়োগ করে শাখা-প্রশাখা বৃদ্ধি করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Mustard Aphid (Lipaphis erysimi), Leaf Miner",
+          "threats_bn": "সরিষার জাবপোকা, পাতা সুড়ঙ্গকারী পোকা",
+          "management": "Monitor under surface of leaves. Spray Neem seed kernel extract (5%) at initial sighting.",
+          "management_bn": "পাতার নিচে জাবপোকা লক্ষ্য করুন; শুরুতে নিম তেলের স্প্রে দিন।"
+        },
+        "actionable_tips": [
+          "Thin seedlings to 10-12 cm apart at 15 DAS to prevent spindly weak stems.",
+          "Provide 1st light irrigation at 20-22 days.",
+          "One hoeing operation controls winter weeds."
+        ],
+        "actionable_tips_bn": [
+          "১৫ দিনে পাতলা করে চারা থেকে চারার দূরত্ব ১০-১২ সেমি রাখুন।",
+          "২০-২২ দিনে প্রথম হালকা সেচ প্রদান করুন।",
+          "একটি নিড়ানি দিয়ে শীতকালীন আগাছা দমন করুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Pod Formation (Siliqua)",
+        "stage_name_bn": "ফুল ফোটা ও শুঁটি (পড) গঠন",
+        "days_range": "Day 36 - 60",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Foliar Spray: Boron (0.2%)",
+          "description": "Spray Solubor Boron at early flower bloom to prevent pod sterility and maximize seed count per siliqua.",
+          "description_bn": "ফুল ফোটার শুরুতে বোরন স্প্রে শুঁটিতে বীজ না হওয়া রোধ করে এবং দানার সংখ্যা বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Aphid Swarms, Alternaria Blight, White Rust",
+          "threats_bn": "জাবপোকার ঝাঁক, অল্টারনারিয়া পাতা ঝলসানো, সাদা মরিচা",
+          "management": "If aphids exceed 10/twig, spray Imidacloprid (0.5 ml/L) late in the afternoon (after 4 PM) to protect honeybees.",
+          "management_bn": "জাবপোকা বেশি হলে মৌমাছির ক্ষতি এড়াতে বিকেল ৪টার পর ইমিডাক্লোপ্রিড স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Set up bee hives nearby; honeybees boost mustard yield by up to 25% through cross-pollination.",
+          "Provide second irrigation at 40-45 DAS (flowering/pod setting).",
+          "Avoid water logging in flat land."
+        ],
+        "actionable_tips_bn": [
+          "সরিষা ক্ষেতের পাশে মৌমাছির বাক্স রাখলে পরাগায়নের মাধ্যমে ফলন ২৫% পর্যন্ত বাড়ে।",
+          "৪০-৪৫ দিনে শুঁটি গঠনের সময় দ্বিতীয় হালকা সেচ দিন।",
+          "জমিতে পানি জমে থাকতে দেবেন না।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity (Seed Filling & Yellowing)",
+        "stage_name_bn": "পরিপক্কতা ও বীজ ভরাট",
+        "days_range": "Day 61 - 75",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "No Fertilizer Needed",
+          "description": "Cease all inputs. Seeds mobilize stored lipids into oil reserves.",
+          "description_bn": "কোনো সারের প্রয়োজন নেই। দানায় তেল তৈরি সম্পন্ন হয়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Downy Mildew, Pod Shattering",
+          "threats_bn": "ডাউনি মিলডিউ, শুঁটি ফেটে বীজ ঝরে যাওয়া",
+          "management": "Rogue out mildewed branches; harvest before severe pod brittleness sets in.",
+          "management_bn": "অতিরিক্ত পেকে শুঁটি ফেটে যাওয়ার আগেই ফসল তোলার প্রস্তুতি নিন।"
+        },
+        "actionable_tips": [
+          "Inspect field colour: crops transform from vibrant yellow flowers into bronze-yellow pods.",
+          "Stop all irrigations to allow even ripening.",
+          "Monitor for birds feeding on ripening siliquae."
+        ],
+        "actionable_tips_bn": [
+          "গাছের ফুল ঝরে শুঁটি তামাটে-হলুদ বর্ণ ধারণ করলে পরিপক্কতা নিশ্চিত হয়।",
+          "শুঁটি সমভাবে পাকার জন্য সেচ দেওয়া পুরোপুরি বন্ধ রাখুন।",
+          "পাখির উপদ্রব রোধে পাহারা দিন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Threshing",
+        "stage_name_bn": "ফসল কর্তন ও তেল নিষ্কাশন",
+        "days_range": "Day 76 - 85",
+        "duration_days": 10,
+        "npk_advice": {
+          "ratio": "Post-Harvest Storage",
+          "description": "Store dried seeds for cold press or oil mill extraction.",
+          "description_bn": "শুকনো বীজ ঘানিতে তেল ভাঙানোর জন্য উপযোগী।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Storage Mold, Rust Mites in seed bins",
+          "threats_bn": "গুদামের ছত্রাক, বীজের মাইট",
+          "management": "Dry seeds in sun until moisture is below 8-9% before bagging.",
+          "management_bn": "রোদে ভালো করে শুকিয়ে দানার আর্দ্রতা ৮-৯% এর নিচে নামিয়ে বায়ুরোধী পাত্রে রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest early in the morning when morning dew softens pods and stops shattering loss.",
+          "Harvest when 75-80% pods turn yellowish-brown.",
+          "Thresh on clean cloth; winnow and dry under full sunlight for 3-4 days."
+        ],
+        "actionable_tips_bn": [
+          "সকালের শিশির ভেজা অবস্থায় ফসল কাটলে শুঁটি ফেটে বীজ নষ্ট হয় না।",
+          "৭৫-৮০% শুঁটি হলুদ বা বাদামি হলে ফসল কেটে আঁটি বাঁধুন।",
+          "পরিষ্কার জায়গায় মাড়াই করে রোদে ৩-৪ দিন শুকিয়ে নিন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tomato",
+    "name": "Tomato",
+    "bangla_name": "টমেটো",
+    "icon": "🍅",
+    "scientific_name": "Solanum lycopersicum",
+    "category": "Vegetable",
+    "category_bn": "সবজি",
+    "ideal_season": "Winter / Summer (Hybrid)",
+    "ideal_season_bn": "শীতকালীন / গ্রীষ্মকালীন হাইব্রিড",
+    "total_duration_days": 120,
+    "optimal_temp": "18°C - 28°C",
+    "water_requirement": "Moderate (400-600 mm)",
+    "soil_type": "Deep well-drained loam to sandy loam",
+    "soil_type_bn": "সুনিষ্কাশিত দোআঁশ থেকে বেলে দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Nursery & Transplanting",
+        "stage_name_bn": "বীজতলা ও চারা রোপণ",
+        "days_range": "Day 1 - 25",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Basal: N: 50, P: 70, K: 50 kg/ha + Vermicompost: 3 t/ha",
+          "description": "Mix generous organic compost, full Phosphate, 1/3 Nitrogen and 1/3 Potash into raised planting beds.",
+          "description_bn": "উঁচু বেডে পচা গোবর/ভার্মিকম্পোস্ট, সম্পূর্ণ ফসফেট এবং ১/৩ অংশ ইউরিয়া ও পটাশ প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Cutworm, Whitefly",
+          "threats_bn": "চারা ধসা, কাটুই পোকা, সাদা মাছি",
+          "management": "Drench nursery beds with Trichoderma viride or Carbendazim. Dip seedling roots in Imidacloprid solution before planting.",
+          "management_bn": "বীজতলায় ট্রাইকোডার্মা বা কার্বেনডাজিম প্রয়োগ করুন। রোপণের আগে চারার শিকড় শোধন করুন।"
+        },
+        "actionable_tips": [
+          "Transplant 25-30 day sturdy seedlings in late afternoon.",
+          "Space plants at 60 cm row spacing and 45 cm plant spacing on raised beds.",
+          "Irrigate immediately around root zone after planting."
+        ],
+        "actionable_tips_bn": [
+          "২৫-৩০ দিন বয়সের সুস্থ চারা বিকেলে রোপণ করুন।",
+          "বেডে সারি ৬০ সেমি এবং চারা ৪৫ সেমি দূরত্বে লাগান।",
+          "রোপণের পরপরই গাছের গোড়ায় হালকা পানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Trellising",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও মাচা/খুঁটি বাঁধা",
+        "days_range": "Day 26 - 50",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 35 kg/ha + Micronutrients",
+          "description": "Apply second split of Urea at 25-30 DAP. Spray Zinc Sulphate (0.2%) if younger foliage shows interveinal chlorosis.",
+          "description_bn": "২৫-৩০ দিনে দ্বিতীয় কিস্তি ইউরিয়া দিন। পাতায় হলদেটে ভাব থাকলে জিংক সালফেট স্প্রে করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Tomato Leaf Curl Virus (TYLCV by Whitefly), Leaf Miner",
+          "threats_bn": "টমেটোর পাতা কোঁকড়ানো ভাইরাস, পাতা সুড়ঙ্গকারী পোকা",
+          "management": "Install yellow sticky sheets (20/acre) to control whitefly vector. Pull out and burn virus-infected stunted plants.",
+          "management_bn": "সাদা মাছি দমনে হলুদ আঠালো ফাঁদ পাতুন। ভাইরাসাক্রান্ত কোঁকড়ানো গাছ তুলে ধ্বংস করুন।"
+        },
+        "actionable_tips": [
+          "Stake indeterminate tomato plants with strong bamboo sticks to keep fruit off wet soil.",
+          "Prune bottom suckers (side shoots) to encourage single/double strong leader stems.",
+          "Mulch bed surface with dry straw to preserve moisture and suppress weeds."
+        ],
+        "actionable_tips_bn": [
+          "ফল মাটিতে লেগে পচে যাওয়া ঠেকাতে বাঁশের খুঁটি দিয়ে গাছ বেঁধে দিন।",
+          "নিচের দিকের অপ্রয়োজনীয় ডালপালা (সাকার) ছেঁটে মূল কাণ্ড শক্তিশালী করুন।",
+          "আর্দ্রতা ধরে রাখতে ও আগাছা রোধে খড় দিয়ে মালচিং করুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Fruit Setting",
+        "stage_name_bn": "ফুল ফোটা ও ফল ধারণ",
+        "days_range": "Day 51 - 75",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha, K: 35 kg/ha + Calcium Nitrate",
+          "description": "Apply Nitrogen and Potassium split. Spray Calcium Nitrate (0.5%) + Boron (0.2%) to prevent Blossom End Rot.",
+          "description_bn": "ইউরিয়া ও পটাশ প্রয়োগ করুন। টমেটোর তলা পচা রোগ রোধে ক্যালসিয়াম নাইট্রেট ও বোরন স্প্রে করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Fruit Borer (Helicoverpa armigera), Early Blight, Blossom End Rot",
+          "threats_bn": "টমেটোর ফল ছিদ্রকারী পোকা, আগাম ধসা, ফুল-পচা রোগ",
+          "management": "Set up Helilure pheromone traps (15 traps/ha). Spray Spinosad (0.4 ml/L) or Emamectin Benzoate for fruit borer larvae.",
+          "management_bn": "ফল ছিদ্রকারী পোকা দমনে ফেরোমোন ফাঁদ পাতুন এবং জৈব বালাইনাশক স্পিনোসাড স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Maintain uniform soil moisture; wide swings between parched soil and heavy soaking trigger fruit cracking.",
+          "Gently vibrate supporting wires during morning hours to improve self-pollination.",
+          "Ensure adequate air flow across rows."
+        ],
+        "actionable_tips_bn": [
+          "নিয়মিত সুষম সেচ দিন; খরা ও হঠাৎ অতিরিক্ত পানিতে টমেটো ফেটে যায়।",
+          "সকালে খুঁটি বা তারে হালকা ঝাঁকুনি দিলে পরাগায়ন চমৎকার হয়।",
+          "বাতাস চলাচলের জন্য ঘন ডালপালা পরিষ্কার রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Fruit Development & Color Break",
+        "stage_name_bn": "ফল বৃদ্ধি ও লাল রঙ ধরা",
+        "days_range": "Day 76 - 100",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Foliar Potassium: 0-0-50 (SOP at 1%)",
+          "description": "Foliar Potassium spray maximizes lycopene synthesis, sugar accumulation, and firm fruit walls.",
+          "description_bn": "পটাশিয়াম স্প্রে টমেটোর লাইকোপিন, মিষ্টতা ও শক্ত ত্বক গঠনে সহায়তা করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Late Blight, Buckeye Rot, Sunscald",
+          "threats_bn": "নাবি ধসা রোগ, বাকাই রট, ফল পোড়া",
+          "management": "Spray Mancozeb or Acrobat MZ if damp foggy nights occur. Keep fruits shaded by healthy foliage to avoid sunscald.",
+          "management_bn": "ঘন কুয়াশায় নাবি ধসা রোধে ছত্রাকনাশক স্প্রে করুন। অতিরিক্ত রোদে ফল পোড়া এড়াতে পাতা দিয়ে ঢেকে রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest at 'Breaker stage' (first blush of pink at bottom) for long-distance transport.",
+          "Harvest at deep red-ripe stage for immediate local kitchen consumption.",
+          "Avoid overhead hose watering which splashes fungal spores onto ripening tomatoes."
+        ],
+        "actionable_tips_bn": [
+          "দূরে পরিবহনের জন্য তলায় হালকা গোলাপি রঙ (ব্রেকার স্টেজ) আসলে সংগ্রহ করুন।",
+          "স্থানীয় বাজারের জন্য পুরোপুরি লাল ও পাকা অবস্থায় তুলুন।",
+          "ওপর থেকে পানি ছিটাবেন না, গোড়ায় সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Sorting",
+        "stage_name_bn": "ফসল সংগ্রহ ও গ্রেডিং",
+        "days_range": "Day 101 - 120",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Maintenance Dressing",
+          "description": "For indeterminate varieties, light weekly liquid feeding sustains secondary harvests.",
+          "description_bn": "অনির্দিষ্ট বাড়ন্ত জাতের জন্য হালকা তরল সার পরবর্তী ফলন বাড়াতে সাহায্য করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Post-Harvest Soft Rot, Fruit Flies",
+          "threats_bn": "ফল পচন ছত্রাক, মাছি পোকা",
+          "management": "Wipe crates clean; never pack damp tomatoes in airtight polythene bags.",
+          "management_bn": "ক্রেট পরিষ্কার রাখুন; ভেজা টমেটো কখনো পলিথিনে রাখবেন না।"
+        },
+        "actionable_tips": [
+          "Pick tomatoes with their green pedicel (calyx) attached to lengthen shelf life.",
+          "Harvest in cool early morning or late afternoon.",
+          "Pack in rigid plastic crates (maximum 2-3 layers deep) to prevent crushing."
+        ],
+        "actionable_tips_bn": [
+          "বোঁটাসহ টমেটো সংগ্রহ করলে অনেক দিন সতেজ থাকে।",
+          "সকাল বা বিকেলে ঠান্ডা আবহাওয়ায় ফসল সংগ্রহ করুন।",
+          "প্লাস্টিকের ছিদ্রযুক্ত ক্রেটে ২-৩ স্তরে সাজিয়ে পরিবহন করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "eggplant",
+    "name": "Eggplant",
+    "bangla_name": "বেগুন",
+    "icon": "🍆",
+    "scientific_name": "Solanum melongena",
+    "category": "Vegetable",
+    "category_bn": "সবজি",
+    "ideal_season": "Year-round (Winter / Summer)",
+    "ideal_season_bn": "সারা বছর (রবি ও খরিফ)",
+    "total_duration_days": 140,
+    "optimal_temp": "22°C - 32°C",
+    "water_requirement": "Moderate-High (500-700 mm)",
+    "soil_type": "Deep silt loam to clay loam rich in humus",
+    "soil_type_bn": "গভীর পলি দোআঁশ ও জৈবসমৃদ্ধ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Nursery & Transplanting",
+        "stage_name_bn": "বীজতলা ও চারা রোপণ",
+        "days_range": "Day 1 - 30",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Basal: N: 50, P: 60, K: 50 kg/ha + Cow Dung: 10 t/ha",
+          "description": "Apply full Organic Manure, full Phosphate, 1/3 Nitrogen, and 1/3 Potash in planting pits or furrows.",
+          "description_bn": "জমি তৈরিতে সম্পূর্ণ গোবর সার, টিএসপি এবং ১/৩ অংশ ইউরিয়া ও পটাশ প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Flea Beetle, Root-knot Nematode",
+          "threats_bn": "চারা ধসা, মাছি পোকা, শিকড় গিঁট নেমাটোড",
+          "management": "Incorporate Neem cake or Trichoderma into seedbed. Dip seedling roots in Carbendazim solution before planting.",
+          "management_bn": "বীজতলায় নিমের খৈল বা ট্রাইকোডার্মা দিন। চারার শিকড় শোধন করে রোপণ করুন।"
+        },
+        "actionable_tips": [
+          "Transplant 30-35 day sturdy seedlings with 4-5 true leaves on raised beds.",
+          "Space at 75 cm row-to-row and 60 cm plant-to-plant.",
+          "Apply light basin irrigation immediately."
+        ],
+        "actionable_tips_bn": [
+          "৪-৫টি পাতাবিশিষ্ট ৩০-৩৫ দিনের চারা উঁচু বেডে রোপণ করুন।",
+          "সারি থেকে সারি ৭৫ সেমি এবং চারা ৬০ সেমি দূরত্বে লাগান।",
+          "রোপণের সাথে সাথে গোড়ায় হালকা পানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Branching",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও শাখা বিস্তার",
+        "days_range": "Day 31 - 60",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 35 kg/ha",
+          "description": "Top-dress 1/3 Urea around root perimeter at 30 DAP followed by earthing up.",
+          "description_bn": "৩০ দিনে দ্বিতীয় কিস্তি ইউরিয়া গাছের গোড়ার চারদিকে দিয়ে মাটি তুলে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Brinjal Shoot & Fruit Borer (BSFB - Leucinodes orbonalis), Jassids",
+          "threats_bn": "বেগুনের ডগা ও ফল ছিদ্রকারী পোকা, শোষক পোকা",
+          "management": "Mechanically clip off and destroy wilting drooping shoot tips daily. Install BSFB sex pheromone traps (15 traps/ha).",
+          "management_bn": "পোকা আক্রান্ত ঢলে পড়া ডগা কেটে মাটিতে পুঁতে ফেলুন। ফেরোমোন ফাঁদ ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Perform regular weeding and gentle root zone aeration.",
+          "Earth up soil firmly to support bushy branching and heavy fruit loads.",
+          "Maintain light furrow irrigation every 7-10 days."
+        ],
+        "actionable_tips_bn": [
+          "নিয়মিত আগাছা নিড়ানি দিন এবং মাটি ঝুরঝুরে রাখুন।",
+          "গাছের গোড়ায় উঁচু করে মাটি তুলুন যাতে গাছ ভার সহ্য করতে পারে।",
+          "৭-১০ দিন পর পর নালা সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Continuous Fruit Set",
+        "stage_name_bn": "ফুল ফোটা ও ফল ধরা",
+        "days_range": "Day 61 - 95",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha, K: 35 kg/ha",
+          "description": "Apply remaining Urea and Potash in two split doses during prime flush of flowers.",
+          "description_bn": "ফুল আসার সময় বাকি ইউরিয়া ও পটাশ দুই দফায় উপরিপ্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Fruit Borer Larvae, Phomopsis Blight, Epilachna Beetle",
+          "threats_bn": "ফল ছিদ্রকারী পোকা, ফোমোপসিস ব্লাইট, কাঁটাওয়ালা বিটল",
+          "management": "Spray Spinosad (0.4 ml/L) or Neem oil (5 ml/L) alternately. Spray Mancozeb for Phomopsis leaf and fruit spots.",
+          "management_bn": "স্পিনোসাড বা নিম তেল স্প্রে করুন। ফোমোপসিস দাগের জন্য ম্যানকোজেব ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Eggplant is a heavy continuous feeder; maintain regular soil moisture to avoid bitter tough skin.",
+          "Stake heavy bearing branches with bamboo props.",
+          "Remove old bottom yellowing leaves to deter red spider mites."
+        ],
+        "actionable_tips_bn": [
+          "নিয়মিত পরিমিত সেচ দিন যাতে বেগুন নরম ও চকচকে থাকে।",
+          "অতিরিক্ত ফলের ভারে ডাল ভেঙে যাওয়া রোধে খুঁটি দিন।",
+          "নিচের বুড়ো হলুদ পাতা কেটে ফেলুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Peak Fruiting & Size Expansion",
+        "stage_name_bn": "প্রধান ফলন ও ফল বৃদ্ধি",
+        "days_range": "Day 96 - 120",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Foliar Nutrition: 19-19-19 (0.5%) + Boron",
+          "description": "Spray balanced water-soluble NPK + Boron every 15 days to sustain continuous flowering and glossy fruit.",
+          "description_bn": "প্রতি ১৫ দিন পর পর সুষম এনপিকে ও বোরনের স্প্রে ফলন বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Bacterial Wilt (Ralstonia), Little Leaf Disease",
+          "threats_bn": "ব্যাকটেরিয়াজনিত ঢলে পড়া রোগ, ক্ষুদ্র পাতা রোগ",
+          "management": "Rogue out suddenly wilted plants with root system immediately; never flood-irrigate through infected patches.",
+          "management_bn": "ঢলে পড়া রোগাক্রান্ত গাছ শিকড়সহ উপড়ে ফেলুন; আক্রান্ত জমি দিয়ে পানি প্রবাহিত করবেন না।"
+        },
+        "actionable_tips": [
+          "Harvest glossy fruits every 3-4 days to trigger new blossom buds.",
+          "Avoid letting fruits over-ripen on the vine as seeds turn brown, bitter, and hard.",
+          "Mulch rows to preserve moisture during warmer spring days."
+        ],
+        "actionable_tips_bn": [
+          "প্রতি ৩-৪ দিন পর পর চকচকে বেগুন তুলুন যাতে নতুন ফুল ফুটতে পারে।",
+          "বেশি দিন গাছে রাখলে বীজ শক্ত ও বেগুন তিতা হয়ে যায়।",
+          "গরমের দিনে মাটিতে আর্দ্রতা ধরে রাখতে মালচিং করুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Marketing",
+        "stage_name_bn": "ফসল সংগ্রহ ও বাজারজাতকরণ",
+        "days_range": "Day 121 - 140",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Post-Harvest Care",
+          "description": "Prune old unproductive branches if ratooning for secondary crop.",
+          "description_bn": "পরবর্তী ফলনের জন্য বুড়ো ডালপালা ছেঁটে হালকা সার প্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Post-Harvest Decay, Calyx Browning",
+          "threats_bn": "সংগ্রহোত্তর পচন, বোঁটা কালচে হওয়া",
+          "management": "Harvest with sharp shears retaining green fleshy calyx intact.",
+          "management_bn": "ধারালো কাঁচি দিয়ে সবুজ বোঁটাসহ বেগুন সংগ্রহ করুন।"
+        },
+        "actionable_tips": [
+          "Harvest when fruit is plump, tender, and the skin possesses a bright glossy sheen.",
+          "Pick during early morning hours to keep produce crisp.",
+          "Pack in cushioned wooden or plastic crates away from direct sun."
+        ],
+        "actionable_tips_bn": [
+          "ত্বক চকচকে ও নরম থাকা অবস্থায় কাঁচি দিয়ে কেটে তুলুন।",
+          "সকালের দিকে সংগ্রহ করলে বেগুন তাজা ও সতেজ থাকে।",
+          "রোদ থেকে বাঁচিয়ে ছায়ায় ক্র্যাটিং করে বাজারে পাঠান।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "chili",
+    "name": "Chili",
+    "bangla_name": "মরিচ",
+    "icon": "🌶️",
+    "scientific_name": "Capsicum annuum",
+    "category": "Spice / Vegetable",
+    "category_bn": "মসলা / সবজি",
+    "ideal_season": "Winter / Summer",
+    "ideal_season_bn": "রবি / খরিফ মৌসুম",
+    "total_duration_days": 130,
+    "optimal_temp": "20°C - 30°C",
+    "water_requirement": "Moderate (400-550 mm)",
+    "soil_type": "Well-drained sandy loam rich in organic matter",
+    "soil_type_bn": "সুনিষ্কাশিত বেলে দোআঁশ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Nursery & Transplanting",
+        "stage_name_bn": "বীজতলা ও চারা রোপণ",
+        "days_range": "Day 1 - 25",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Basal: N: 40, P: 50, K: 40 kg/ha + Compost: 5 t/ha",
+          "description": "Incorporate well-rotted compost, full Phosphorus, and 1/3 Nitrogen and Potassium in raised planting beds.",
+          "description_bn": "জমি তৈরিতে সম্পূর্ণ গোবর সার, টিএসপি এবং ১/৩ অংশ ইউরিয়া ও পটাশ দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Cutworm, Seedling Thrips",
+          "threats_bn": "চারা ধসা, কাটুই পোকা, কচি পাতার থ্রিপস",
+          "management": "Treat seeds with Trichoderma (5 g/kg) or Carbendazim. Maintain excellent drainage to avoid collar rot.",
+          "management_bn": "ট্রাইকোডার্মা দিয়ে বীজ শোধন করুন। চারার গোড়ায় যাতে পানি না জমে তা নিশ্চিত করুন।"
+        },
+        "actionable_tips": [
+          "Transplant 30-day hardy seedlings at 50 cm row spacing and 40 cm plant spacing.",
+          "Always plant on raised ridges or raised beds to prevent water logging.",
+          "Irrigate lightly immediately after transplanting."
+        ],
+        "actionable_tips_bn": [
+          "৩০ দিন বয়সের সুস্থ চারা ৫০ সেমি সারি ও ৪০ সেমি চারা দূরত্বে রোপণ করুন।",
+          "পানি নিষ্কাশনের জন্য সর্বদা উঁচু আইল বা বেডে লাগান।",
+          "রোপণের পরপরই গোড়ায় হালকা পানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Bushing",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও ঝোপালো শাখা বিস্তার",
+        "days_range": "Day 26 - 55",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha",
+          "description": "Apply 1/3 Nitrogen at 30 DAP followed by weeding and ridge earthing.",
+          "description_bn": "৩০ দিনে দ্বিতীয় কিস্তি ইউরিয়া দিয়ে আগাছা পরিষ্কার ও গোড়ায় মাটি তুলুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Chili Thrips (Scirtothrips dorsalis), Yellow Mites (Polyphagotarsonemus)",
+          "threats_bn": "মরিচের থ্রিপস (চুসি পোকা), হলুদ মাকড় (পাতা কোঁকড়ানো)",
+          "management": "Thrips curl leaves upwards; mites curl leaves downwards (boat-shaped). Spray Fipronil or Wettable Sulphur (2 g/L).",
+          "management_bn": "থ্রিপসে পাতা ওপরে এবং মাকড়ে নিচে কোঁকড়ায়। সালফার বা ফিপ্রোনিল স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Pinch terminal growing tip at 35 DAP to induce multiple lateral fruiting branches.",
+          "Install blue sticky traps for thrips and yellow traps for aphids.",
+          "Maintain light, frequent furrow irrigations."
+        ],
+        "actionable_tips_bn": [
+          "৩৫ দিনে গাছের প্রধান ডগার মাথা কেটে দিলে প্রচুর পার্শ্ব-শাখা বের হয় ও ফলন বাড়ে।",
+          "থ্রিপস ও মাছি পোকা দমনে নীল ও হলুদ আঠালো ফাঁদ ব্যবহার করুন।",
+          "নিয়মিত হালকা নালা সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Fruit Initiation",
+        "stage_name_bn": "ফুল ফোটা ও মরিচ ধরা",
+        "days_range": "Day 56 - 85",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 25 kg/ha, K: 30 kg/ha + Micronutrients",
+          "description": "Apply remaining N and K. Spray NAA hormone (Planofix at 0.25 ml/L) or Boron (0.2%) to arrest excessive flower drop.",
+          "description_bn": "বাকি ইউরিয়া ও পটাশ দিন। ফুল ঝরে পড়া রোধে প্ল্যানোফিক্স বা বোরন স্প্রে করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Anthracnose / Die-back (Colletotrichum), Blossom Drop",
+          "threats_bn": "অ্যানথ্রাকনোজ (ডাই-ব্যাক/ফল পচা), ফুল ঝরা রোগ",
+          "management": "Spray Azoxystrobin + Difenoconazole (Amistar Top at 1 ml/L) at first sign of circular sunken lesions on pods.",
+          "management_bn": "মরিচের গায়ে বাদামি গোল দাগ দেখা দিলে এমিস্টার টপ স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Avoid severe moisture stress during flowering which triggers mass blossom abortion.",
+          "Keep beds free from weeds which harbor virus vectors.",
+          "Support branching plants with strings or stakes if heavy winds occur."
+        ],
+        "actionable_tips_bn": [
+          "ফুল ফোটার সময় মাটিকে একদম শুষ্ক হতে দেবেন না, অন্যথায় ফুল ঝরে যাবে।",
+          "ক্ষেত সম্পূর্ণ আগাছামুক্ত রাখুন।",
+          "বাতাসে গাছ হেলে পড়লে কাঠি দিয়ে ঠেকনা দিন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Fruiting & Ripening (Green to Red)",
+        "stage_name_bn": "মরিচ পুষ্ট হওয়া ও পাকা",
+        "days_range": "Day 86 - 110",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Foliar Potassium: 0-0-50 (1%)",
+          "description": "Foliar potassium enhances capsaicin pungency, deep red colouration, and thick skin.",
+          "description_bn": "পটাশিয়াম স্প্রে মরিচের ঝাল, গাঢ় লাল বর্ণ ও চামড়ার পুরুত্ব বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Fruit Rot, Bacterial Leaf Spot, Sunscald",
+          "threats_bn": "ফল পচা রোগ, ব্যাকটেরিয়াজনিত দাগ, রোদে পোড়া",
+          "management": "Spray Copper Hydroxide (2 g/L) for bacterial leaf spot. Keep uniform canopy cover to shade developing chilies.",
+          "management_bn": "ব্যাকটেরিয়ার দাগে কপার অক্সিক্লোরাইড স্প্রে করুন। অতিরিক্ত রোদে মরিচ রক্ষা করতে পাতা সুরক্ষিত রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest plump green chilies every 5-7 days for fresh vegetable market.",
+          "For dry chili production, leave pods on plant until fully scarlet red and slightly shriveled.",
+          "Regulate irrigation carefully to avoid splitting."
+        ],
+        "actionable_tips_bn": [
+          "কাঁচা মরিচের জন্য প্রতি ৫-৭ দিন পর পর পুষ্ট সবুজ মরিচ তুলুন।",
+          "শুকনা মরিচের জন্য গাছে সম্পূর্ণ লাল টুকটুকে হওয়া পর্যন্ত রাখুন।",
+          "মরিচ ফাটা রোধে পরিমিত সেচ বজায় রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Sun-Drying",
+        "stage_name_bn": "ফসল সংগ্রহ ও শুকানো",
+        "days_range": "Day 111 - 130",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Post-Harvest Handling",
+          "description": "Sun dry harvested ripe red chilies on raised clean tarpaulins.",
+          "description_bn": "পাকা লাল মরিচ পরিষ্কার পলিথিন বা ত্রিপলের ওপর রোদে শুকান।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Anthracnose in drying yard, Storage Beetle",
+          "threats_bn": "শুকানোর চাতালে পচন, গুদামের পোকা",
+          "management": "Discard discolored or spotty pods before spreading. Protect from evening dew.",
+          "management_bn": "দাগযুক্ত মরিচ আগেই ফেলে দিন। সন্ধ্যার শিশির থেকে বাঁচাতে ঢেকে রাখুন।"
+        },
+        "actionable_tips": [
+          "Pick pods gently with stalks intact to prevent fungal entry through the calyx wound.",
+          "Sun-dry for 5-7 sunny days until moisture drops to 10% (pods rattle when shaken).",
+          "Store in dry air-tight plastic containers or polythene lined bags."
+        ],
+        "actionable_tips_bn": [
+          "বোঁটাসহ মরিচ সংগ্রহ করুন যাতে বোঁটার ক্ষতে ছত্রাক আক্রমণ না করে।",
+          "৫-৭ দিন রোদে শুকিয়ে ১০% আর্দ্রতায় আনুন (নাড়ালে ঝনঝন শব্দ হবে)।",
+          "বায়ুরোধী পাত্রে সংরক্ষণ করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "lentil",
+    "name": "Lentil",
+    "bangla_name": "মসুর ডাল",
+    "icon": "🫘",
+    "scientific_name": "Lens culinaris",
+    "category": "Pulse / Legume",
+    "category_bn": "ডাল ফসল",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 105,
+    "optimal_temp": "15°C - 25°C",
+    "water_requirement": "Low (200-300 mm)",
+    "soil_type": "Well-drained loam to clay loam",
+    "soil_type_bn": "সুনিষ্কাশিত দোআঁশ থেকে এঁটেল দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Germination",
+        "stage_name_bn": "বপন ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 15",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Basal: N: 15, P: 40, K: 20 kg/ha + Rhizobium Inoculant",
+          "description": "Starter nitrogen only! Full Phosphorus promotes rapid root nodulation. Inoculate seeds with bio-fertilizer Rhizobium.",
+          "description_bn": "সামান্য প্রারম্ভিক ইউরিয়া ও সম্পূর্ণ টিএসপি দিন। শিকড়ে নাইট্রোজেন গুটি তৈরি করতে রাইজোবিয়াম জীবাণু সার দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Collar Rot, Seedling Blight, Cutworm",
+          "threats_bn": "গোড়া পচা রোগ, চারা ধসা, কাটুই পোকা",
+          "management": "Treat seeds with Provax-200 (2.5 g/kg) or Trichoderma. Avoid waterlogged sticky soils.",
+          "management_bn": "প্রোভ্যাক্স বা ট্রাইকোডার্মা দিয়ে বীজ শোধন করুন। জলাবদ্ধতা পরিহার করুন।"
+        },
+        "actionable_tips": [
+          "Sow during November 1-20 as a relay crop in standing Aman rice or after land tilling.",
+          "Sow in rows 25 cm apart at 3-4 cm depth with good residual soil moisture.",
+          "Broadcast rate 30-35 kg/ha."
+        ],
+        "actionable_tips_bn": [
+          "১-২০ নভেম্বরের মধ্যে আমন ধানের রিলের ফসল হিসেবে বা একক ফসল রূপে বপন করুন।",
+          "সারিতে ২৫ সেমি দূরত্বে এবং ৩-৪ সেমি গভীরে বীজ দিন।",
+          "হেক্টর প্রতি ৩০-৩৫ কেজি প্রত্যয়িত বীজ ব্যবহার করুন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Root Nodulation",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও গুটি গঠন",
+        "days_range": "Day 16 - 40",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Zero Nitrogen Application",
+          "description": "No top dressing of nitrogen! Root nodules naturally fix 50-70 kg of atmospheric nitrogen per hectare.",
+          "description_bn": "কোনো ইউরিয়া দেবেন না! শিকড়ের গুটি প্রাকৃতিকভাবেই বাতাস থেকে নাইট্রোজেন শোষণ করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Stemphylium Blight (Stemphylium botryosum), Foot Rot",
+          "threats_bn": "স্টেমফাইলিয়াম ব্লাইট (পাতা ঝলসানো), গোড়া পচা",
+          "management": "Inspect for tiny pinhead ash-colored spots on leaflets. Spray Rovral 50 WP (Iprodione at 2 g/L).",
+          "management_bn": "পাতায় ছাই রঙের ছোট দাগ দেখলে সাথে সাথে রোভরাল স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "One hand weeding at 25-30 DAS keeps the canopy clean.",
+          "Lentil is drought tolerant; avoid unnecessary irrigation which induces root diseases.",
+          "Check roots: pinkish nodules indicate active healthy nitrogen fixation."
+        ],
+        "actionable_tips_bn": [
+          "২৫-৩০ দিনে একবার নিড়ানি দিয়ে আগাছা তুলে ফেলুন।",
+          "মসুর খরা সহ্য করতে পারে; অহেতুক সেচ গোড়া পচা রোগ ডেকে আনে।",
+          "শিকড়ের গুটি ভেঙে দেখুন: ভেতরটা গোলাপি হলে বুঝবেন নাইট্রোজেন তৈরি হচ্ছে।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Pod Setting",
+        "stage_name_bn": "ফুল ফোটা ও শুঁটি গঠন",
+        "days_range": "Day 41 - 70",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Foliar Spray: Boron (0.15%) + DAP (2%)",
+          "description": "Spray 2% DAP solution (20 g/L water) plus Boron during 50% flowering to boost pod numbers.",
+          "description_bn": "ফুল ফোটার সময় ২% ডিএপি দ্রবণ ও বোরন স্প্রে প্রচুর শুঁটি ধারণে সহায়তা করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Lentil Aphid (Aphis craccivora), Rust (Uromyces fabae)",
+          "threats_bn": "মসুরের জাবপোকা, মরিচা রোগ",
+          "management": "Aphids cluster on flower twigs. Spray Dimethoate or Malathion (1.5 ml/L) in late afternoon.",
+          "management_bn": "ফুলের ডালে জাবপোকার আক্রমণে বিকেলে ডাইমিথোয়েট বা ম্যালাথিয়ন স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "If prolonged winter drought threatens podding, provide a single light life-saving irrigation at 45-50 DAS.",
+          "Never allow standing water to linger for more than 4 hours.",
+          "Inspect under canopy for rust pustules."
+        ],
+        "actionable_tips_bn": [
+          "তীব্র খরা থাকলে ৪৫-৫০ দিনে একটিমাত্র হালকা জীবনরক্ষাকারী সেচ দিন।",
+          "কোনো অবস্থাতেই জমিতে ৪ ঘণ্টার বেশি পানি জমে থাকতে দেবেন না।",
+          "মরিচা রোগের লক্ষণের জন্য পাতার নিচ পর্যবেক্ষণ করুন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Pod Desiccation & Maturity",
+        "stage_name_bn": "শুঁটি শুকানো ও পরিপক্কতা",
+        "days_range": "Day 71 - 92",
+        "duration_days": 22,
+        "npk_advice": {
+          "ratio": "No Inputs Required",
+          "description": "All biological feeding complete. Foliage drops, leaving golden dry pods on wiry stems.",
+          "description_bn": "কোনো সারের প্রয়োজন নেই। পাতা ঝরে শুঁটি সোনালী বাদামি রঙ ধারণ করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Pod Borer Larvae, Rodents",
+          "threats_bn": "শুঁটি ছিদ্রকারী পোকা, ইঁদুর",
+          "management": "Install bird perches (T-stands, 40/ha) across field for predatory birds to eat pod borers.",
+          "management_bn": "পোকাখেকো পাখির বসার জন্য প্রতি হেক্টরে ৪০টি 'টি' আকৃতির ডালপালা পুঁতে দিন।"
+        },
+        "actionable_tips": [
+          "Watch for crop change to straw-yellowish brown colour.",
+          "Shake pods to hear dried seeds rattle inside.",
+          "Prepare clean threshing yard."
+        ],
+        "actionable_tips_bn": [
+          "সমগ্র গাছ ও শুঁটি খড়ের মতো হলদে-বাদামি হলে ফসল কাটার প্রস্তুতি নিন।",
+          "শুঁটি নাড়ালে ভেতরে মসুরের দানার শব্দ শোনা যাবে।",
+          "মাড়াইয়ের জন্য পরিষ্কার চাতাল প্রস্তুত করুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Safe Storage",
+        "stage_name_bn": "ফসল কর্তন ও সংরক্ষণ",
+        "days_range": "Day 93 - 105",
+        "duration_days": 13,
+        "npk_advice": {
+          "ratio": "Nitrogen Fixation Benefit",
+          "description": "Lentil root residue enriches soil with 30 kg residual N for succeeding Boro or Aus crops.",
+          "description_bn": "মসুর চাষের ফলে জমিতে প্রায় ৩০ কেজি প্রাকৃতিক নাইট্রোজেন জমা থাকে যা পরবর্তী ফসলের জন্য উপকারী।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Pulse Beetle / Bruchid (Callosobruchus chinensis)",
+          "threats_bn": "ডালের ঘুণ পোকা (ব্রুচিড বিটল)",
+          "management": "Sun dry seeds to <10% moisture. Mix with dried neem leaves or mustard oil (5 ml/kg) in sealed containers.",
+          "management_bn": "১০% এর কম আর্দ্রতায় শুকিয়ে শুকনো নিম পাতা বা সামান্য সরিষার তেল মাখিয়ে বায়ুরোধী পাত্রে রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest early in the morning with sickles while pods retain slight morning moisture to prevent shattering.",
+          "Thresh under tractor or cattle feet or beat gently with sticks on tarpaulin.",
+          "Winnow cleanly and sun-dry for 3-4 days."
+        ],
+        "actionable_tips_bn": [
+          "শুঁটি ফেটে দানা ঝরে পড়া ঠেকাতে সকালবেলা শিশির থাকা অবস্থায় কাটুন।",
+          "ত্রিপলের ওপর লাঠি দিয়ে আলতো পিটিয়ে দানা আলাদা করুন।",
+          "কুলা দিয়ে পরিষ্কার করে রোদে ৩-৪ দিন শুকিয়ে নিন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cucumber",
+    "name": "Cucumber",
+    "bangla_name": "শসা",
+    "icon": "🥒",
+    "scientific_name": "Cucumis sativus",
+    "category": "Cucurbit / Vegetable",
+    "category_bn": "লতানো সবজি",
+    "ideal_season": "Summer / Rainy / Early Winter",
+    "ideal_season_bn": "গ্রীষ্ম ও বর্ষাকাল",
+    "total_duration_days": 90,
+    "optimal_temp": "22°C - 32°C",
+    "water_requirement": "Moderate (400-500 mm)",
+    "soil_type": "Rich sandy loam high in organic humus",
+    "soil_type_bn": "উর্বর বেলে দোআঁশ মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Sprouting (Pit Preparation)",
+        "stage_name_bn": "মাদা তৈরি ও বীজ বপন",
+        "days_range": "Day 1 - 12",
+        "duration_days": 12,
+        "npk_advice": {
+          "ratio": "Basal per pit: Compost: 5 kg, TSP: 50 g, MOP: 40 g, Urea: 25 g",
+          "description": "Mix manure and fertilizers into raised circular pits (madahs) 7 days before seed sowing.",
+          "description_bn": "বীজ বপনের ৭ দিন পূর্বে মাদায় পচা গোবর, টিএসপি, পটাশ এবং সামান্য ইউরিয়া মিশিয়ে রাখুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Red Pumpkin Beetle, Cutworms, Damping-off",
+          "threats_bn": "লাল কুমড়া বিটল, কাটুই পোকা, চারা ধসা",
+          "management": "Dust wood ash over young cotyledons early morning. Hand-pick sluggish pumpkin beetles at dawn.",
+          "management_bn": "সকালে কচি চারায় ছাই ছিটিয়ে দিন। ভোরে কুমড়া পোকা হাত দিয়ে ধরে মেরে ফেলুন।"
+        },
+        "actionable_tips": [
+          "Space circular pits 1.5 m apart with 2 m between rows.",
+          "Sow 4-5 seeds per pit at 2 cm depth; thin to 2 vigorous vines after emergence.",
+          "Provide immediate gentle watering."
+        ],
+        "actionable_tips_bn": [
+          "দেড় মিটার দূরে দূরে মাদা তৈরি করুন এবং সারি ২ মিটার রাখুন।",
+          "প্রতি মাদায় ৪-৫টি বীজ লাগান; চারা গজালে ২টি শক্তিশালী চারা রেখে বাকিগুলো তুলে ফেলুন।",
+          "বীজ লাগানোর পর হালকা পানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Trellising",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও মাচা তৈরি",
+        "days_range": "Day 13 - 35",
+        "duration_days": 23,
+        "npk_advice": {
+          "ratio": "Top Dressing per pit: Urea: 30 g",
+          "description": "Apply ring top-dressing of Urea 15 cm away from vine base at 20 DAP.",
+          "description_bn": "২০ দিনে গাছের গোড়া থেকে ১৫ সেমি দূরে বলয় আকারে ইউরিয়া উপরিপ্রয়োগ করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Downy Mildew (Pseudoperonospora), Epilachna Beetle",
+          "threats_bn": "ডাউনি মিলডিউ (হলুদ কৌণিক দাগ), বিটল পোকা",
+          "management": "Spray Mancozeb (2 g/L) or Ridomil Gold (2 g/L) on undersides of leaves if yellow angular patches emerge.",
+          "management_bn": "পাতায় কৌণিক হলুদ দাগ দেখা দিলে রিডোমিল গোল্ড স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Construct horizontal bamboo net trellises (macha) at 1.5 m height.",
+          "Direct climbing tendrils onto trellis netting to keep fruit suspended off wet soil.",
+          "Maintain soil moisture without waterlogging vine roots."
+        ],
+        "actionable_tips_bn": [
+          "মাটির ওপর দেড় মিটার উঁচু বাঁশ ও জালের মাচা তৈরি করুন।",
+          "লতাকে মাচায় তুলে দিন যাতে ফল মাটিতে না ঠেকে সোজা ও দাগমুক্ত থাকে।",
+          "নিয়মিত গোড়ায় হালকা রস বজায় রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Pollination",
+        "stage_name_bn": "ফুল ফোটা ও পরাগায়ন",
+        "days_range": "Day 36 - 55",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Top Dressing per pit: Urea: 25 g, MOP: 35 g",
+          "description": "Potassium drives continuous flowering, ovary enlargement, and crisp juicy cucumber flesh.",
+          "description_bn": "ফুল আসার সময় পটাশ ও ইউরিয়া প্রয়োগ শসার বৃদ্ধি ও খাস্তা ভাব বজায় রাখে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Bactrocera Fruit Fly (Bactrocera cucurbitae), Powdery Mildew",
+          "threats_bn": "ফলের মাছি পোকা (ফল বাঁকা ও পচা), পাউডারি মিলডিউ",
+          "management": "Install Cue-lure pheromone traps with poison bait (10 traps/ha). Trap prevents fruit maggots.",
+          "management_bn": "মাছি পোকা দমনে কিউ-লিউর ফেরোমোন ফাঁদ ও বিষটোপ ব্যবহার করুন।"
+        },
+        "actionable_tips": [
+          "Cucumbers rely on bees for pollination of female flowers (small cucumber behind petals).",
+          "Never spray chemical insecticides during morning hours (7-11 AM).",
+          "Irrigate every 3-4 days in warm weather."
+        ],
+        "actionable_tips_bn": [
+          "শসার স্ত্রী ফুলে পরাগায়নের জন্য মৌমাছি আবশ্যক।",
+          "সকাল ৭টা থেকে ১১টা পর্যন্ত কোনো কীটনাশক স্প্রে করবেন না।",
+          "গরমের সময় প্রতি ৩-৪ দিন পর পর সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Fruiting & Daily Sizing",
+        "stage_name_bn": "ফল বৃদ্ধি ও পরিপুষ্টতা",
+        "days_range": "Day 56 - 75",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Foliar Spray: Calcium Nitrate (0.5%) + Boron (0.15%)",
+          "description": "Foliar Calcium and Boron prevents crooked, yellow-tipped, or bitter stunted cucumbers.",
+          "description_bn": "ক্যালসিয়াম ও বোরন স্প্রে শসা বাঁকা হওয়া, ডগা হলুদ হওয়া ও তিতা ভাব রোধ করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Cucumber Mosaic Virus (Aphid vector), Fruit Rot",
+          "threats_bn": "শসার মোজাইক ভাইরাস, ফল পচন রোগ",
+          "management": "Spray systemic Imidacloprid for aphid vectors. Bag individual prize fruits if market warrants.",
+          "management_bn": "মোজাইক ভাইরাস প্রতিরোধে জাবপোকা দমন করুন।"
+        },
+        "actionable_tips": [
+          "Cucumbers grow remarkably fast (ready in 6-8 days after flower opening).",
+          "Maintain continuous, steady soil moisture; erratic dry spells produce bitter cucumbers (cucurbitacin).",
+          "Harvest tender green cucumbers regularly."
+        ],
+        "actionable_tips_bn": [
+          "ফুল ফোটার মাত্র ৬-৮ দিনের মধ্যে শসা সংগ্রহের উপযোগী হয়।",
+          "নিয়মিত পরিমিত পানি দিন; খরা লাগলে শসা তিতা হয়ে যায়।",
+          "নিয়মিত কচি শসা তুলে নিলে গাছে নতুন ফল আসে।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Continuous Harvest & Marketing",
+        "stage_name_bn": "ধারাবাহিক ফসল সংগ্রহ",
+        "days_range": "Day 76 - 90",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Post-Harvest Crop Maintenance",
+          "description": "Light liquid cow dung drenching prolongs vine longevity for extra flushes.",
+          "description_bn": "হালকা তরল গোবর সার গাছের আয়ু বৃদ্ধি করে দীর্ঘমেয়াদী ফলন দেয়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Post-Harvest Yellowing, Shriveling",
+          "threats_bn": "সংগ্রহের পর শসা হলুদ ও নরম হয়ে যাওয়া",
+          "management": "Keep picked cucumbers in cool shade; avoid direct sun exposure.",
+          "management_bn": "তোলার পর শসা রোদ থেকে বাঁচিয়ে ঠান্ডা ছায়ায় রাখুন।"
+        },
+        "actionable_tips": [
+          "Harvest every alternate day using a sharp knife leaving a small stem piece.",
+          "Pick when fruits are medium-sized, deep green, and crisp with soft seeds.",
+          "Pack in ventilated plastic crates for transport."
+        ],
+        "actionable_tips_bn": [
+          "একদিন পর পর ধারালো ছুরি দিয়ে বোঁটাসহ শসা কাটুন।",
+          "গাঢ় সবুজ, খাস্তা ও কচি বীজ থাকা অবস্থায় সংগ্রহ করুন।",
+          "ছিদ্রযুক্ত প্লাস্টিকের ক্রেটে সাজিয়ে বাজারে পাঠান।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cauliflower",
+    "name": "Cauliflower",
+    "bangla_name": "ফুলকপি",
+    "icon": "🥦",
+    "scientific_name": "Brassica oleracea var. botrytis",
+    "category": "Cole Crop / Vegetable",
+    "category_bn": "কপিজাতীয় সবজি",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 95,
+    "optimal_temp": "15°C - 20°C",
+    "water_requirement": "Moderate (350-450 mm)",
+    "soil_type": "Rich sandy loam to clay loam high in humus",
+    "soil_type_bn": "উর্বর বেলে দোআঁশ ও পলি মাটি",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Nursery & Field Transplanting",
+        "stage_name_bn": "বীজতলা ও চারা রোপণ",
+        "days_range": "Day 1 - 25",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Basal: N: 50, P: 60, K: 50 kg/ha + Boron: 2 kg/ha + Mo: 1 kg/ha",
+          "description": "Boron and Molybdenum are non-negotiable for cauliflower! Apply half N, all P, K, Boron, and Molybdenum in base rows.",
+          "description_bn": "ফুলকপির জন্য বোরন ও মলিবডেনাম অতি জরুরি! অর্ধেক ইউরিয়া এবং সম্পূর্ণ টিএসপি, পটাশ, বোরন ও মলিবডেনাম দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Wireworms, Seedling Blight",
+          "threats_bn": "চারা ধসা, তারপোকা, শিকড় পোড়া",
+          "management": "Drench nursery with Carbendazim (1.5 g/L). Dip roots in Chlorpyrifos solution at planting.",
+          "management_bn": "বীজতলায় কার্বেনডাজিম স্প্রে করুন। রোপণের আগে শিকড় শোধন করুন।"
+        },
+        "actionable_tips": [
+          "Transplant 25-30 day sturdy stocky seedlings in afternoon.",
+          "Space plants at 60 cm row spacing and 45 cm plant spacing on raised beds.",
+          "Press soil firmly around roots and irrigate immediately."
+        ],
+        "actionable_tips_bn": [
+          "২৫-৩০ দিনের খাটো ও মোটা চারা বিকেলে রোপণ করুন।",
+          "বেডে সারি ৬০ সেমি এবং চারা ৪৫ সেমি দূরত্বে লাগান।",
+          "গোড়ায় মাটি চেপে দিয়ে সাথে সাথে সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Frame Development",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও পাতার ছাউনি গঠন",
+        "days_range": "Day 26 - 55",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 40 kg/ha",
+          "description": "Apply 1/4 Nitrogen at 25 DAP followed by earthing up to anchor large spreading leaves.",
+          "description_bn": "২৫ দিনে এক কিস্তি ইউরিয়া দিয়ে গোড়ায় শক্ত করে মাটি তুলে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Diamondback Moth (DBM - Plutella xylostella), Tobacco Caterpillar",
+          "threats_bn": "ডায়মন্ডব্যাক মথ (ডিবিএম), লেদা পোকা",
+          "management": "DBM larvae chew windows in leaves. Spray Bacillus thuringiensis (Bt at 1.5 g/L) or Spinosad (0.4 ml/L).",
+          "management_bn": "ডিবিএম পোকার জন্য বিটি (Bt) পাউডার বা স্পিনোসাড স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "The larger the vegetative leaf frame, the larger the final curd will be.",
+          "Keep soil consistently moist with furrow irrigation every 7-10 days.",
+          "Weed and hoe twice before the leaf canopy closes."
+        ],
+        "actionable_tips_bn": [
+          "গাছের পাতা যত বড় ও স্বাস্থ্যবান হবে, ফুলকপির সাইজ তত বড় হবে।",
+          "৭-১০ দিন পর পর নিয়মিত সেচ দিয়ে মাটি রসালো রাখুন।",
+          "পাতা জোড়া লাগার আগেই দুইবার আগাছা নিড়ানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Curd Initiation & Blanching",
+        "stage_name_bn": "কপি বা কার্ড গঠন ও ব্লাঞ্চিং",
+        "days_range": "Day 56 - 75",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha, K: 30 kg/ha + Solubor (0.2%)",
+          "description": "Final top-dress of Urea and Potash. Foliar spray Solubor to prevent hollow stem and curd browning.",
+          "description_bn": "শেষ কিস্তি ইউরিয়া ও পটাশ দিন। কপির কান্ড ফাঁপা ও বাদামি দাগ রোধে বোরন স্প্রে করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Curd Browning (Boron deficiency), Whiptail (Mo deficiency), Black Rot",
+          "threats_bn": "বাদামি দাগ (বোরনের অভাব), চাবুক পাতা রোগ, কালো পচা",
+          "management": "Spray Copper Hydroxide (2 g/L) if black veins or V-shaped lesions occur. Spray Boron preventively.",
+          "management_bn": "কালো পচা রোগে কপার হাইড্রোক্সাইড স্প্রে করুন। বোরনের ঘাটতি মেটাতে ফলিয়ার স্প্রে দিন।"
+        },
+        "actionable_tips": [
+          "Perform 'Blanching': tie or fold inner wrapper leaves over developing white curds.",
+          "Blanching protects curd from sunlight which causes yellowing and bitterness.",
+          "Maintain continuous soil moisture; water stress makes curds 'ricey' and loose."
+        ],
+        "actionable_tips_bn": [
+          "ব্লাঞ্চিং পদ্ধতি: ভেতরের পাতাগুলো দিয়ে সাদা ফুলকপিটিকে আলতো করে ঢেকে বেঁধে দিন।",
+          "ব্লাঞ্চিং করলে কপির রঙ দুধের মতো ধবধবে সাদা থাকে ও হলুদ হওয়া রোধ হয়।",
+          "মাটিতে পর্যাপ্ত রস রাখুন; পানির ঘাটতি হলে কপি আলগা বা ঝাঁঝরা হয়ে যায়।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Curd Sizing & Hardening",
+        "stage_name_bn": "কপি পরিপুষ্ট ও নিরেট হওয়া",
+        "days_range": "Day 76 - 88",
+        "duration_days": 13,
+        "npk_advice": {
+          "ratio": "No Nitrogen Application",
+          "description": "Discontinue nitrogen completely. Nitrogen now causes loose curds and rotting.",
+          "description_bn": "কোনো ইউরিয়া দেবেন না। এ সময়ে ইউরিয়া দিলে ফুলকপি ফেটে যায় ও পচে যায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Curd Rot (Erwinia carotovora), Downy Mildew",
+          "threats_bn": "কপি পচা রোগ, ডাউনি মিলডিউ",
+          "management": "Avoid splashing irrigation water directly over curds. Spray Streptocycline (0.1 g/L) for soft rot.",
+          "management_bn": "কপির ওপর সরাসরি পানি ছিটাবেন না। নরম পচা রোগে স্ট্রেপ্টোসাইক্লিন স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Inspect under wrapped leaves every 2-3 days for curd compactness and size.",
+          "Provide a light furrow irrigation to keep curd turgid.",
+          "Harvest promptly before curd segments begin to separate."
+        ],
+        "actionable_tips_bn": [
+          "প্রতি ২-৩ দিন পর পর মোড়ানো পাতা সরিয়ে কপির আকার ও নিরেট ভাব পরীক্ষা করুন।",
+          "হালকা নালা সেচ দিন যাতে কপি সতেজ থাকে।",
+          "কপি আলগা হওয়ার আগেই সঠিক সময়ে কাটার প্রস্তুতি নিন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting & Marketing",
+        "stage_name_bn": "ফসল কর্তন ও বাজারজাতকরণ",
+        "days_range": "Day 89 - 95",
+        "duration_days": 7,
+        "npk_advice": {
+          "ratio": "Post-Harvest Handling",
+          "description": "Trim outer foliage; compost crop stalks.",
+          "description_bn": "বাড়তি পাতা ছেঁটে নিন; গাছের গোড়া জমিতে পচিয়ে কম্পোস্ট করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Mechanical Bruising, Sun Yellowing",
+          "threats_bn": "ঘর্ষণজনিত দাগ, রোদে হলুদ হওয়া",
+          "management": "Keep 4-5 jacket leaves around curd during packing as natural cushion.",
+          "management_bn": "পরিবহনে ঘর্ষণ ঠেকাতে কপির চারপাশে ৪-৫টি সবুজ পাতা রেখে দিন।"
+        },
+        "actionable_tips": [
+          "Cut curds in early morning using a sharp harvest knife.",
+          "Select compact, solid, snow-white curds.",
+          "Pack upright in crates; keep away from hot sunny surfaces."
+        ],
+        "actionable_tips_bn": [
+          "সকালের দিকে ধারালো ছুরি দিয়ে গাছ থেকে কপি কেটে নিন।",
+          "নিরেট, শক্ত ও ধবধবে সাদা ফুলকপি সংগ্রহ করুন।",
+          "জ্যাকেট পাতাসহ খাঁচায় সাজিয়ে বাজারে পাঠান।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "onion",
+    "name": "Onion",
+    "bangla_name": "পেঁয়াজ",
+    "icon": "🧅",
+    "scientific_name": "Allium cepa",
+    "category": "Bulb / Spice",
+    "category_bn": "কন্দ / মসলা",
+    "ideal_season": "Rabi (Winter) / Kharif-2 (Summer)",
+    "ideal_season_bn": "রবি (শীতকালীন) ও খরিফ",
+    "total_duration_days": 125,
+    "optimal_temp": "15°C - 25°C",
+    "water_requirement": "Moderate (350-500 mm)",
+    "soil_type": "Friable sandy loam to silty loam rich in humus",
+    "soil_type_bn": "ঝুরঝুরে বেলে দোআঁশ থেকে পলি দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Nursery & Transplanting",
+        "stage_name_bn": "বীজতলা ও চারা রোপণ",
+        "days_range": "Day 1 - 25",
+        "duration_days": 25,
+        "npk_advice": {
+          "ratio": "Basal: N: 40, P: 60, K: 50 kg/ha + Sulphur: 25 kg/ha",
+          "description": "Sulphur is crucial for onion pungency (allyl propyl disulphide) and storage life. Apply 1/3 N and full P, K, S basal.",
+          "description_bn": "পেঁয়াজের ঝাঁঝ ও গুদামজাত স্থায়িত্বের জন্য সালফার অপরিহার্য। ১/৩ অংশ ইউরিয়া ও সম্পূর্ণ সালফার জমি তৈরিতে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Seedling Thrips, Smudge",
+          "threats_bn": "চারা ধসা, কচি পাতার থ্রিপস, কালো ছাতা",
+          "management": "Treat seedlings with Carbendazim (2 g/L). Clip top 1/3 of seedling foliage before transplanting to reduce shock.",
+          "management_bn": "কার্বেনডাজিম দিয়ে শিকড় শোধন করুন। রোপণের আগে চারার পাতার ওপরের ১/৩ অংশ কেটে দিন।"
+        },
+        "actionable_tips": [
+          "Transplant 40-45 day pencil-thick seedlings.",
+          "Plant on flat or raised beds at 15 cm row spacing and 10 cm plant spacing.",
+          "Plant shallow (2-3 cm deep); deep planting produces elongated bottle-necked bulbs."
+        ],
+        "actionable_tips_bn": [
+          "৪০-৪৫ দিনের পেনসিলের মতো মোটা চারা নির্বাচন করুন।",
+          "বেডে সারি ১৫ সেমি এবং চারা ১০ সেমি দূরত্বে লাগান।",
+          "অগভীরভাবে (২-৩ সেমি) রোপণ করুন; বেশি গভীরে লাগালে কন্দ লম্বাটে ও চিকন হয়।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Foliage Growth",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও পাতা বিস্তার",
+        "days_range": "Day 26 - 60",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 35 kg/ha",
+          "description": "Apply second split of Urea at 30 DAP followed by light shallow hoeing.",
+          "description_bn": "৩০ দিনে দ্বিতীয় কিস্তি ইউরিয়া দিয়ে হালকা নিড়ানি দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Onion Thrips (Thrips tabaci), Purple Blotch (Alternaria porri)",
+          "threats_bn": "পেঁয়াজের থ্রিপস (পাতায় রুপালী দাগ), পার্পল ব্লচ (বেগুনি দাগ)",
+          "management": "Spray Fipronil or Imidacloprid for thrips. Spray Mancozeb + sticker (2.5 g/L) for purple blotch.",
+          "management_bn": "থ্রিপসের জন্য ফিপ্রোনিল এবং বেগুনি দাগ রোগের জন্য আঠাসহ ম্যানকোজেব স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Each onion leaf forms a single bulb ring; healthier foliage yields larger bulbs.",
+          "Onion has shallow root systems; keep upper 15 cm of soil moist with light frequent watering.",
+          "Weed diligently; onions cannot compete with weeds."
+        ],
+        "actionable_tips_bn": [
+          "গাছের প্রতিটি সুস্থ পাতা কন্দের একটি করে খোসা তৈরি করে।",
+          "পেঁয়াজের শিকড় অগভীর হওয়ায় ঘন ঘন হালকা সেচ প্রয়োজন।",
+          "ক্ষেত শতভাগ আগাছামুক্ত রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Bulb Initiation & Swelling",
+        "stage_name_bn": "কন্দ বা বাল্ব গঠন ও বৃদ্ধি",
+        "days_range": "Day 61 - 95",
+        "duration_days": 35,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha, K: 40 kg/ha",
+          "description": "Final split of Urea and MOP at 60 DAP. Potassium stimulates translocation of sugars into the expanding bulb.",
+          "description_bn": "৬০ দিনে শেষ কিস্তি ইউরিয়া ও পটাশ দিন; পটাশ পাতা থেকে কন্দে শর্করা সঞ্চালন বাড়ায়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Basal Rot (Fusarium oxysporum), Stemphylium Leaf Blight",
+          "threats_bn": "গোড়া পচা রোগ, স্টেমফাইলিয়াম ব্লাইট",
+          "management": "Avoid waterlogging which causes rapid basal rot. Spray Nativo (0.75 g/L) for leaf blight.",
+          "management_bn": "পানি জমতে দেবেন না; গোড়া পচা রোধে ড্রেনেজ নিশ্চিত করুন। নাটিভো স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "This is the maximum water-demand stage; irrigate every 5-7 days.",
+          "Ensure bulbs remain half-exposed to air as they swell on top of soil.",
+          "Remove any bolters (premature flowering stalks) immediately."
+        ],
+        "actionable_tips_bn": [
+          "কন্দ বড় হওয়ার এ পর্যায়ে প্রতি ৫-৭ দিন পর পর পরিমিত সেচ দিন।",
+          "পেঁয়াজ মাটির ওপরে আংশিক উন্মুক্ত থেকে বড় হতে দিন।",
+          "অকালে ফুল (কদম/ফুলকুঁড়ি) বের হলে সাথে সাথে ভেঙে দিন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity & Neck Fall",
+        "stage_name_bn": "পরিপক্কতা ও গলা ভেঙে পড়া (নেক ফল)",
+        "days_range": "Day 96 - 115",
+        "duration_days": 20,
+        "npk_advice": {
+          "ratio": "Zero Fertilizer",
+          "description": "Stop all fertilizer applications. Bulbs cure outer wrapper skins.",
+          "description_bn": "সব ধরনের সার প্রয়োগ বন্ধ রাখুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Neck Rot (Botrytis), Black Mold (Aspergillus)",
+          "threats_bn": "গলা পচা রোগ, কালো ছত্রাক আক্রমণ",
+          "management": "Withhold all irrigation 15 days before harvest to seal bulb necks.",
+          "management_bn": "ফসল তোলার ১৫ দিন আগে সেচ পুরোপুরি বন্ধ করে পেঁয়াজের গলা শুকিয়ে শক্ত করুন।"
+        },
+        "actionable_tips": [
+          "Natural 'Neck-fall' (tops toppling over) signals true physiological maturity.",
+          "Harvest when 60-70% of crop tops have naturally bent and fallen over.",
+          "If tops do not fall, roll an empty light plastic drum gently across rows."
+        ],
+        "actionable_tips_bn": [
+          "গাছের পাতা বা 'গলা' স্বাভাবিকভাবে ভেঙে নিচে পড়ে যাওয়া পেঁয়াজ পাকার লক্ষণ।",
+          "ক্ষেতের ৬০-৭০% গাছের গলা ভেঙে পড়লে তবেই ফসল তুলুন।",
+          "দেরি হলে হালকা ড্রাম বা বাঁশ টেনে গাছের মাথা শুইয়ে দিন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting, Curing & Storage",
+        "stage_name_bn": "তোলা, শুকানো (কিউরিং) ও গুদামজাতকরণ",
+        "days_range": "Day 116 - 125",
+        "duration_days": 10,
+        "npk_advice": {
+          "ratio": "Post-Harvest Handling",
+          "description": "Grade bulbs by diameter (small, medium, large).",
+          "description_bn": "আকার অনুযায়ী ছোট, মাঝারি ও বড় পেঁয়াজ আলাদা করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Storage Sprouting, Bacterial Soft Rot",
+          "threats_bn": "গুদামে পেঁয়াজের গজানো, নরম পচা রোগ",
+          "management": "Thorough field curing develops papery protective skins that prevent rot.",
+          "management_bn": "ছায়ায় ভালো করে শুকিয়ে কাগজের মতো শক্ত খোসা তৈরি করুন।"
+        },
+        "actionable_tips": [
+          "Gently pull bulbs out of dry soil on a sunny morning.",
+          "Field-cure in windrows with leaves covering bulbs for 3-5 days.",
+          "Clip foliage leaving 2.5 cm neck; store in well-ventilated bamboo racks or mesh nets."
+        ],
+        "actionable_tips_bn": [
+          "রৌদ্রোজ্জ্বল দিনে আলতোভাবে মাটি থেকে পেঁয়াজ তুলুন।",
+          "পাতা দিয়ে কন্দ ঢেকে ছায়াযুক্ত স্থানে ৩-৫ দিন শুকিয়ে নিন।",
+          "বোঁটা ২.৫ সেমি রেখে পাতা কেটে বাঁশের মাচায় বা জালের ব্যাগে ঝুলিয়ে সংরক্ষণ করুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "carrot",
+    "name": "Carrot",
+    "bangla_name": "গাজর",
+    "icon": "🥕",
+    "scientific_name": "Daucus carota",
+    "category": "Root / Vegetable",
+    "category_bn": "মূলজাতীয় সবজি",
+    "ideal_season": "Rabi (Winter)",
+    "ideal_season_bn": "রবি (শীতকালীন)",
+    "total_duration_days": 100,
+    "optimal_temp": "15°C - 22°C",
+    "water_requirement": "Moderate (300-400 mm)",
+    "soil_type": "Deep, stone-free loose sandy loam",
+    "soil_type_bn": "গভীর, পাথরহীন ঝুরঝুরে বেলে দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Sowing & Germination",
+        "stage_name_bn": "বপন ও অঙ্কুরোদগম",
+        "days_range": "Day 1 - 15",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Basal: N: 30, P: 50, K: 40 kg/ha",
+          "description": "Never apply fresh raw manure! It causes forking and hairy root deformation. Use well-rotted compost and basal NPK.",
+          "description_bn": "কখনো কাঁচা গোবর দেবেন না! এতে গাজর ফেটে বাঁকা ও লোমশ হয়। সম্পূর্ণ ঝুরঝুরে মাটি ও সুষম সার দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Wireworms, Damping-off, Cutworm",
+          "threats_bn": "তারপোকা, চারা ধসা, কাটুই পোকা",
+          "management": "Plough deeply (30 cm) and incorporate Chlorpyrifos granules. Treat seeds with Thiram (2.5 g/kg).",
+          "management_bn": "জমি ৩০ সেমি গভীর করে চাষ দিন এবং বীজ শোধন করে বপন করুন।"
+        },
+        "actionable_tips": [
+          "Sow during October to November for sweet, crisp roots.",
+          "Sow on raised beds in shallow furrows 20 cm apart and 1.5 cm deep.",
+          "Keep soil surface moist with fine sprinkler water until emergence."
+        ],
+        "actionable_tips_bn": [
+          "মিষ্টি ও রসালো গাজরের জন্য অক্টোবর থেকে নভেম্বরে বীজ বপন করুন।",
+          "উঁচু বেডে ২০ সেমি সারিতে মাত্র ১.৫ সেমি গভীরে বীজ দিন।",
+          "চারা না গজানো পর্যন্ত মাটির উপরিভাগ ঝাঝরি দিয়ে ভিজিয়ে রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Taproot Elongation",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও প্রধান মূল বৃদ্ধি",
+        "days_range": "Day 16 - 45",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: N: 30 kg/ha",
+          "description": "Apply Urea after thinning at 25-30 DAS followed by light ridge earthing.",
+          "description_bn": "২৫-৩০ দিনে চারা পাতলা করার পর ইউরিয়া দিয়ে গোড়ায় মাটি তুলে দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Carrot Rust Fly (Psila rosae), Alternaria Leaf Blight",
+          "threats_bn": "গাজরের মাছি পোকা, পাতা ঝলসানো রোগ",
+          "management": "Spray Mancozeb (2 g/L) if brown spots develop on feathery foliage.",
+          "management_bn": "পাতায় বাদামি দাগ দেখা দিলে ম্যানকোজেব স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Crucial step: Thin seedlings strictly to 6-8 cm apart at 20 DAS; crowding produces twisted unmarketable roots.",
+          "Earth up soil around root crowns to prevent green shoulders from sun exposure.",
+          "Weed gently between narrow rows."
+        ],
+        "actionable_tips_bn": [
+          "চারা পাতলাকরণ: ২০ দিনে চারা থেকে চারার দূরত্ব ৬-৮ সেমি রাখুন, অন্যথায় গাজর চিকন ও পেঁচিয়ে যাবে।",
+          "গাজরের উপরিভাগ যাতে সূর্যের আলোয় সবুজ না হয় সেজন্য গোড়ায় মাটি দিন।",
+          "সাবধানে আগাছা নিড়ানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Root Thickening & Carotene Synthesis",
+        "stage_name_bn": "মূল স্ফীতি ও ক্যারোটিন গঠন",
+        "days_range": "Day 46 - 75",
+        "duration_days": 30,
+        "npk_advice": {
+          "ratio": "Top Dressing: K: 35 kg/ha + Boron (0.15%)",
+          "description": "Potassium drives core thickening, sweet sugar accumulation, and vivid orange beta-carotene synthesis.",
+          "description_bn": "পটাশিয়াম গাজর মোটা করা, মিষ্টতা বাড়ানো এবং গাঢ় কমলা রঙ (বিটা-ক্যারোটিন) তৈরিতে সহায়তা করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Root-knot Nematode, Powdery Mildew",
+          "threats_bn": "শিকড় গিঁট কৃমি, পাউডারি মিলডিউ",
+          "management": "Spray Wettable Sulphur (2 g/L) for powdery mildew on leaves.",
+          "management_bn": "পাতায় সাদা পাউডারের মতো দাগে সালফার ছত্রাকনাশক স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Irrigate consistently every 6-8 days; alternate drying and heavy flood soaking leads to longitudinal root splitting.",
+          "Cover exposed orange shoulders with loose soil.",
+          "Ensure good soil permeability."
+        ],
+        "actionable_tips_bn": [
+          "৬-৮ দিন পর পর সুষম সেচ দিন; খরা ও হঠাৎ অতিরিক্ত সেচে গাজর লম্বালম্বি ফেটে যায়।",
+          "মাটির বাইরে বেরিয়ে থাকা গাজরের মাথা মাটি দিয়ে ঢেকে দিন।",
+          "মাটি যেন শক্ত না হয়ে যায়।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Maturity & Sugar Accumulation",
+        "stage_name_bn": "পরিপক্কতা ও মিষ্টতা বৃদ্ধি",
+        "days_range": "Day 76 - 90",
+        "duration_days": 15,
+        "npk_advice": {
+          "ratio": "Zero Fertilizer",
+          "description": "Stop all chemical fertilizers. Allow natural chilling to convert root starches into sugars.",
+          "description_bn": "সার প্রয়োগ বন্ধ রাখুন। শীতের ঠান্ডায় গাজরে প্রাকৃতিক চিনি তৈরি হয়।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Cavity Spot, Sclerotinia White Mold",
+          "threats_bn": "গাজরের গর্ত রোগ, সাদা ছত্রাক পচন",
+          "management": "Withhold heavy irrigations; maintain cool dry soil conditions.",
+          "management_bn": "অতিরিক্ত পানি দেওয়া বন্ধ রাখুন যাতে মূল পচে না যায়।"
+        },
+        "actionable_tips": [
+          "Pull sample roots to check cylindrical taper and deep orange internal core.",
+          "Cool night temperatures (10-15°C) boost crispness and vitamin A content.",
+          "Stop irrigation 7-10 days before harvest."
+        ],
+        "actionable_tips_bn": [
+          "নমুনা হিসেবে কয়েকটি গাজর তুলে আকার ও ভেতরটা পরীক্ষা করুন।",
+          "রাতের ঠান্ডা আবহাওয়া গাজরকে খাস্তা ও ভিটামিন সমৃদ্ধ করে।",
+          "তোলার ৭-১০ দিন আগে সেচ বন্ধ করুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Harvesting, Washing & Packing",
+        "stage_name_bn": "উত্তোলন, ধোয়া ও প্যাকিং",
+        "days_range": "Day 91 - 100",
+        "duration_days": 10,
+        "npk_advice": {
+          "ratio": "Post-Harvest Handling",
+          "description": "Wash in clean cold water to remove soil; clip feathery tops.",
+          "description_bn": "পরিষ্কার ঠান্ডা পানিতে ধুয়ে মাটি পরিষ্কার করুন এবং পাতা ছেঁটে নিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Bacterial Soft Rot during transit",
+          "threats_bn": "পরিবহনে ব্যাকটেরিয়াজনিত নরম পচন",
+          "management": "Dry surface moisture before packing in gunny or net bags.",
+          "management_bn": "ধোয়ার পর গায়ের পানি শুকিয়ে তবেই বস্তায় ভরুন।"
+        },
+        "actionable_tips": [
+          "Moisten soil slightly 1 day before harvest for effortless pulling without snapping roots.",
+          "Pull carrots by holding the base of foliage firmly.",
+          "Grade by uniform size and pack in ventilated crates or mesh bags."
+        ],
+        "actionable_tips_bn": [
+          "গাজর ভাঙা রোধে তোলার ১ দিন আগে হালকা পানি দিয়ে মাটি নরম করে নিন।",
+          "পাতার গোড়া ধরে সোজা টেনে তুলুন।",
+          "সমান আকারের গাজর বাছাই করে জালের ব্যাগে ভরুন।"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "papaya",
+    "name": "Papaya",
+    "bangla_name": "পেঁপে",
+    "icon": "🍈",
+    "scientific_name": "Carica papaya",
+    "category": "Fruit / Horticultural",
+    "category_bn": "ফল / উদ্যানতাত্ত্বিক",
+    "ideal_season": "Year-round (Planting in Spring/Autumn)",
+    "ideal_season_bn": "সারা বছর (বসন্ত ও শরৎ রোপণ)",
+    "total_duration_days": 270,
+    "optimal_temp": "24°C - 35°C",
+    "water_requirement": "Moderate-High (1000-1400 mm)",
+    "soil_type": "Deep, well-drained fertile loam rich in organic matter",
+    "soil_type_bn": "সুনিষ্কাশিত গভীর দোআঁশ ও বেলে দোআঁশ",
+    "stages": [
+      {
+        "stage_id": 1,
+        "stage_name": "Polybag Nursery & Field Planting",
+        "stage_name_bn": "পলিব্যাগ নার্সারি ও চারা রোপণ",
+        "days_range": "Day 1 - 45",
+        "duration_days": 45,
+        "npk_advice": {
+          "ratio": "Basal per pit: Compost: 10 kg, TSP: 150 g, MOP: 150 g, Gypsum: 100 g, Boron: 20 g",
+          "description": "Mix manure and fertilizers thoroughly in 50x50x50 cm pits and mound soil 15 cm above ground level.",
+          "description_bn": "৫০x৫০x৫০ সেমি গর্তে গোবর, টিএসপি, পটাশ, জিপসাম ও বোরন মিশিয়ে ১৫ সেমি উঁচু ঢিবি বানান।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Damping-off, Stem Rot (Pythium), Nematodes",
+          "threats_bn": "চারা ধসা, কাণ্ড পচা রোগ, নেমাটোড",
+          "management": "Drench polybags with Carbendazim (2 g/L). Papaya absolutely abhors waterlogging; plant on raised mounds only.",
+          "management_bn": "কার্বেনডাজিম স্প্রে করুন। পেঁপে কখনো জলাবদ্ধতা সহ্য করতে পারে না, তাই উঁচু ঢিবিতে লাগান।"
+        },
+        "actionable_tips": [
+          "Transplant 40-50 day polybag seedlings (15-20 cm tall) during late afternoon.",
+          "Space at 2 m x 2 m spacing in square pattern.",
+          "Provide immediate basin watering without wetting stem trunk."
+        ],
+        "actionable_tips_bn": [
+          "৪০-৫০ দিনের পলিব্যাগের চারা বিকেলে রোপণ করুন।",
+          "সারি ও চারা ২ মিটার x ২ মিটার দূরত্বে রাখুন।",
+          "গাছের গোড়ায় পানি জমতে না দিয়ে চারপাশের নালায় পানি দিন।"
+        ]
+      },
+      {
+        "stage_id": 2,
+        "stage_name": "Vegetative & Canopy Expansion",
+        "stage_name_bn": "অঙ্গজ বৃদ্ধি ও কাণ্ড সম্প্রসারণ",
+        "days_range": "Day 46 - 110",
+        "duration_days": 65,
+        "npk_advice": {
+          "ratio": "Monthly Ring Feed per plant: Urea: 50 g, MOP: 50 g",
+          "description": "Apply in a shallow circular ring 30-40 cm away from trunk every 30 days followed by light watering.",
+          "description_bn": "প্রতি মাসে কাণ্ড থেকে ৩০-৪০ সেমি দূরে বলয় আকারে ৫০ গ্রাম ইউরিয়া ও ৫০ গ্রাম পটাশ দিন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Papaya Mealybug (Paracoccus marginatus), Red Spider Mites",
+          "threats_bn": "পেঁপের মিলিবাগ (সাদা তুলো পোকা), লাল মাকড়",
+          "management": "Spray Neem oil (5 ml/L) + soap or Profenofos (2 ml/L) for cottony mealybug clusters.",
+          "management_bn": "মিলিবাগের সাদা তুলোর মতো আক্রমণে নিম তেল ও সাবান পানি বা প্রফেনোফস স্প্রে করুন।"
+        },
+        "actionable_tips": [
+          "Keep ring basin clean and free of weeds.",
+          "Avoid deep hoeing near trunk as papaya roots are succulent and shallow.",
+          "Irrigate every 7-10 days in winter and 4-5 days in dry summer."
+        ],
+        "actionable_tips_bn": [
+          "গাছের চারপাশের রিং আগাছামুক্ত রাখুন।",
+          "গোড়ায় গভীর নিড়ানি দেবেন না কারণ পেঁপের শিকড় অগভীর।",
+          "শীতকালে ৭-১০ দিন এবং গরমে ৪-৫ দিন পর পর সেচ দিন।"
+        ]
+      },
+      {
+        "stage_id": 3,
+        "stage_name": "Flowering & Sex Determination",
+        "stage_name_bn": "ফুল ফোটা ও লিঙ্গ নির্ধারণ",
+        "days_range": "Day 111 - 170",
+        "duration_days": 60,
+        "npk_advice": {
+          "ratio": "Monthly Ring Feed per plant: Urea: 50 g, TSP: 50 g, MOP: 75 g + Boron (0.15%)",
+          "description": "Increase potash and spray Boron to prevent 'bumpy fruit' deformities.",
+          "description_bn": "পটাশ বাড়ান এবং পেঁপে বিকৃত ও খসখসে হওয়া ঠেকাতে বোরন স্প্রে করুন।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Papaya Ring Spot Virus (PRSV - Aphid transmitted), Anthracnose",
+          "threats_bn": "পেঁপের রিং স্পট ভাইরাস (পাতা কোঁকড়ানো ও হলদে দাগ), ক্ষত রোগ",
+          "management": "PRSV is incurable; rogue out and burn yellow-mosaic infected trees immediately to protect orchard. Control aphids.",
+          "management_bn": "রিং স্পট ভাইরাস হলে আক্রান্ত গাছ উপড়ে পুড়িয়ে ফেলুন এবং জাবপোকা দমন করুন।"
+        },
+        "actionable_tips": [
+          "Crucial: Identify plant sex (keep hermaphrodite and female trees; eliminate redundant male trees, keeping only 1 male per 20 females for cross pollination).",
+          "Thin out crowded fruit clusters; maintain 1 robust fruit per leaf node to allow full sizing.",
+          "Stake heavy leaning trees."
+        ],
+        "actionable_tips_bn": [
+          "লিঙ্গ নির্ধারণ: স্ত্রী ও উভলিঙ্গ গাছ রাখুন; পুরুষ গাছ প্রতি ২০টি স্ত্রী গাছের জন্য মাত্র ১টি রেখে বাকি কেটে ফেলুন।",
+          "প্রতি পাতার কোণে গাদাগাদি ফল থাকলে ১টি রেখে বাকিগুলো ছাঁটাই (থিনিং) করুন।",
+          "ফলের ভারে হেলে পড়া গাছে বাঁশের ঠেকনা দিন।"
+        ]
+      },
+      {
+        "stage_id": 4,
+        "stage_name": "Fruit Development & Sizing",
+        "stage_name_bn": "ফল বৃদ্ধি ও পরিপুষ্টতা",
+        "days_range": "Day 171 - 230",
+        "duration_days": 60,
+        "npk_advice": {
+          "ratio": "Monthly Ring Feed: MOP: 100 g, Urea: 40 g",
+          "description": "Heavy Potash application ensures high sugar brix, rich salmon-orange flesh, and thick peel.",
+          "description_bn": "বেশি পটাশ প্রয়োগ পেঁপের মিষ্টি স্বাদ, লালচে-কমলা শাঁস ও পুরু খোসা নিশ্চিত করে।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Fruit Fly (Bactrocera), Anthracnose Fruit Spots",
+          "threats_bn": "ফলের মাছি পোকা, অ্যানথ্রাকনোজের গোল দাগ",
+          "management": "Wrap developing fruits with breathable paper bags. Spray Mancozeb (2 g/L) for anthracnose.",
+          "management_bn": "মাছি পোকা থেকে বাঁচাতে ফল কাগজ দিয়ে ব্যাগিং করুন। দাগে ম্যানকোজেব দিন।"
+        },
+        "actionable_tips": [
+          "Green papayas can be thinned and harvested as fresh nutritious cooking vegetables.",
+          "Maintain steady soil moisture; sudden severe drought followed by flood causes fruit drop.",
+          "Inspect field drainage ditch after monsoon rains."
+        ],
+        "actionable_tips_bn": [
+          "বাড়তি পেঁপে কাঁচা সবজি হিসেবে তুলে রান্না করে খাওয়া বা বিক্রি করা যায়।",
+          "নিয়মিত পরিমিত রস রাখুন; হঠাৎ খরায় পেঁপে ঝরে পড়ে।",
+          "বর্ষার পানি যাতে গাছের গোড়ায় জমে না থাকে নালা পরিষ্কার রাখুন।"
+        ]
+      },
+      {
+        "stage_id": 5,
+        "stage_name": "Maturity & Harvesting",
+        "stage_name_bn": "পরিপক্কতা ও ফল সংগ্রহ",
+        "days_range": "Day 231 - 270",
+        "duration_days": 40,
+        "npk_advice": {
+          "ratio": "Continuous Production Feeding",
+          "description": "Continue bi-monthly top dressing to sustain continuous yields for up to 2-3 years.",
+          "description_bn": "পরবর্তী ফলন অব্যাহত রাখতে দুই মাস অন্তর গোড়ায় সার প্রয়োগ চালিয়ে যান।"
+        },
+        "pest_disease_alerts": {
+          "threats": "Post-Harvest Anthracnose, Latex Staining",
+          "threats_bn": "সংগ্রহোত্তর পচন, কষ লেগে কালো দাগ",
+          "management": "Dip harvested fruits in hot water (48°C) for 10 minutes to eradicate latent anthracnose spores.",
+          "management_bn": "তোলার পর হালকা কুসুম গরম পানিতে ধুয়ে কষ পরিষ্কার করুন।"
+        },
+        "actionable_tips": [
+          "For ripe fruit, harvest when 1-2 yellow/orange streaks appear at the blossom end (color-break stage).",
+          "Twist fruit gently or cut stalk with sharp knife; never drop fruits on the ground.",
+          "Pack in single layers padded with shredded paper or straw in ventilated boxes."
+        ],
+        "actionable_tips_bn": [
+          "পাকা পেঁপের জন্য ফলের নিচে ১-২টি হলদে বা কমলা রেখা দেখা দিলে সংগ্রহ করুন।",
+          "হাত দিয়ে ঘুরিয়ে বা কাঁচি দিয়ে কাটুন; মাটিতে পড়তে দেবেন না।",
+          "খড় বা কাগজ বিছিয়ে ক্রেটে সাবধানে সাজিয়ে পরিবহন করুন।"
+        ]
+      }
+    ]
+  }
+]

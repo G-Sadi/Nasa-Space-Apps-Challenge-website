@@ -47,6 +47,7 @@
             <a href="#how" data-i18n="nav-how">How it works</a>
             <a href="#analysis" data-i18n="nav-analyze">Analyze</a>
             <a href="#simulation" data-i18n="nav-simulation">Simulation</a>
+            <a href="#lifecycle" data-i18n="nav-lifecycle">Crop Lifecycle</a>
         </nav>
 
         <div class="nav-right">
@@ -766,6 +767,136 @@
     </section>
 
 
+    <!-- CROP LIFECYCLE TRACKER -->
+    <section id="lifecycle" class="section lifecycle-section">
+
+        <div class="section-heading">
+            <p class="eyebrow" data-i18n="lifecycle-eyebrow">
+                PRECISION CROP INTELLIGENCE
+            </p>
+            <h2>
+                <span data-i18n="lifecycle-h2-1">Interactive</span>
+                <span class="highlight" data-i18n="lifecycle-h2-span">Crop Lifecycle Tracker.</span>
+            </h2>
+            <p class="section-subtitle" data-i18n="lifecycle-desc">
+                Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K fertilizer schedules, critical pest/disease alerts, and actionable management tips.
+            </p>
+        </div>
+
+        <div class="lifecycle-container">
+
+            <!-- CROP SELECTOR CARD -->
+            <div class="crop-selector-card">
+                <div class="crop-selector-header">
+                    <label for="cropLifecycleSelect" class="selector-label">
+                        <span class="label-icon">🌱</span>
+                        <span data-i18n="lifecycle-crop-label">Select Target Crop:</span>
+                    </label>
+
+                    <div class="category-filters" id="categoryFilters" role="tablist">
+                        <button class="cat-pill active" data-category="all" data-i18n="lifecycle-category-all">All Crops</button>
+                        <button class="cat-pill" data-category="cereal" data-i18n="lifecycle-category-cereal">Cereals</button>
+                        <button class="cat-pill" data-category="vegetable" data-i18n="lifecycle-category-veg">Vegetables</button>
+                        <button class="cat-pill" data-category="cash" data-i18n="lifecycle-category-cash">Cash Crops</button>
+                        <button class="cat-pill" data-category="pulse" data-i18n="lifecycle-category-pulse">Pulses</button>
+                        <button class="cat-pill" data-category="oil-spice" data-i18n="lifecycle-category-oil">Oilseeds & Spices</button>
+                        <button class="cat-pill" data-category="fruit" data-i18n="lifecycle-category-fruit">Fruits</button>
+                    </div>
+                </div>
+
+                <div class="selector-row">
+                    <div class="custom-select-wrapper">
+                        <select id="cropLifecycleSelect" class="styled-crop-select" aria-label="Select Crop">
+                            <!-- Populated dynamically by app.js -->
+                        </select>
+                        <span class="select-chevron">▼</span>
+                    </div>
+
+                    <div class="tour-controls">
+                        <button id="lifecycleTourBtn" class="tour-btn" title="Automated Stage Walkthrough">
+                            <span class="tour-icon">▶</span>
+                            <span id="tourBtnText" data-i18n="lifecycle-btn-play">Auto Tour</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CROP PROFILE QUICK METRICS STRIP -->
+                <div class="crop-profile-strip" id="cropProfileStrip">
+                    <div class="profile-item">
+                        <span class="profile-icon">⏳</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-duration">Total Duration</span>
+                            <strong id="profileDuration">125 Days</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🌡️</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-temp">Optimal Temp</span>
+                            <strong id="profileTemp">22°C - 34°C</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">💧</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-water">Water Demand</span>
+                            <strong id="profileWater">High (1100-1350 mm)</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🌍</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-soil">Soil Suitability</span>
+                            <strong id="profileSoil">Clay loam to silty clay</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🗓️</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-season">Ideal Season</span>
+                            <strong id="profileSeason">Aman / Boro / Aus</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC 5-STEP VISUAL PROGRESS BAR -->
+            <div class="stepper-wrapper">
+                <div class="stepper-header">
+                    <div class="stepper-status">
+                        <span class="status-indicator"></span>
+                        <span class="stage-counter-text" id="stageCounterText">Stage 1 of 5</span>
+                    </div>
+                    <div class="stepper-actions">
+                        <button id="prevStageBtn" class="step-nav-btn" disabled>
+                            <span data-i18n="lifecycle-btn-prev">← Previous</span>
+                        </button>
+                        <button id="nextStageBtn" class="step-nav-btn">
+                            <span data-i18n="lifecycle-btn-next">Next →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="progress-track-container">
+                    <div class="progress-line-bg"></div>
+                    <div class="progress-line-fill" id="progressLineFill" style="width: 0%;"></div>
+
+                    <div class="stepper-nodes" id="stepperNodes" role="tablist">
+                        <!-- 5 Dynamic Step Nodes -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVE STAGE DETAILS SHOWCASE -->
+            <div class="stage-detail-panel" id="stageDetailPanel">
+                <!-- Rendered dynamically by app.js -->
+            </div>
+
+        </div>
+
+    </section>
+
+
     <!-- LAND LOCATION -->
     <section id="landLocation">
 
@@ -1190,9 +1321,11 @@
     <!-- SCRIPTS -->
     <script src="js/i18n.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/crops_db.js"></script>
     <script src="js/map.js"></script>
     <script src="js/rotation.js"></script>
     <script src="script.js"></script>
+    <script src="app.js"></script>
     <script type="module" src="js/simulation.js"></script>
 
 </body>

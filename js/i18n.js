@@ -12,6 +12,7 @@ const i18nData = {
     "nav-how":          { en: "How it works",      bn: "কিভাবে কাজ করে" },
     "nav-analyze":      { en: "Analyze",            bn: "বিশ্লেষণ" },
     "nav-simulation":   { en: "Simulation",         bn: "সিমুলেশন" },
+    "nav-lifecycle":    { en: "Crop Lifecycle",     bn: "ফসল জীবনচক্র" },
     "nav-btn":          { en: "Start analysis",     bn: "বিশ্লেষণ শুরু করুন" },
 
     // ===== HERO =====
@@ -179,6 +180,33 @@ const i18nData = {
     "hud-rain-prob-lbl":{ en: "Precipitation",                 bn: "বৃষ্টির সম্ভাবনা" },
     "hud-rain-status":  { en: "Moderate Rain",                 bn: "মাঝারি বৃষ্টি" },
     "hud-rain-time":    { en: "In 48 Hours",                   bn: "পরশুদিন" },
+
+    // ===== CROP LIFECYCLE TRACKER =====
+    "lifecycle-eyebrow":    { en: "PRECISION CROP INTELLIGENCE",   bn: "নির্ভুল ফসল চাষাবাদ বুদ্ধিমত্তা" },
+    "lifecycle-h2-1":       { en: "Interactive",                   bn: "ইন্টারেক্টিভ" },
+    "lifecycle-h2-span":    { en: "Crop Lifecycle Tracker.",       bn: "ফসল জীবনচক্র ট্র্যাকার।" },
+    "lifecycle-desc":       { en: "Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K fertilizer schedules, critical pest/disease alerts, and actionable management tips.",
+                              bn: "১৫টি প্রধান ফসলের ৫-ধাপবিশিষ্ট পূর্ণাঙ্গ চাষাবাদ গাইডলাইন: সময়কাল, সুষম এন-পি-কে সার সুপারিশ, বালাই ও রোগ সতর্কতা এবং কার্যকর পরিচর্যা পরামর্শ।" },
+    "lifecycle-crop-label": { en: "Select Target Crop:",           bn: "উদ্দিষ্ট ফসল নির্বাচন করুন:" },
+    "lifecycle-stat-duration": { en: "Total Duration",             bn: "মোট জীবনকাল" },
+    "lifecycle-stat-temp":     { en: "Optimal Temp",               bn: "অনুকূল তাপমাত্রা" },
+    "lifecycle-stat-water":    { en: "Water Demand",               bn: "পানির চাহিদা" },
+    "lifecycle-stat-soil":     { en: "Soil Suitability",           bn: "মাটির উপযোগিতা" },
+    "lifecycle-stat-season":   { en: "Ideal Season",               bn: "উপযুক্ত মৌসুম" },
+    "lifecycle-card-npk":      { en: "Recommended N-P-K Advice",   bn: "সুপারিশকৃত এন-পি-কে সার পরামর্শ" },
+    "lifecycle-card-pest":     { en: "Pest & Disease Threat Alerts", bn: "রোগবালাই ও কীটশত্রু সতর্কতা" },
+    "lifecycle-card-tips":     { en: "Actionable Stage Guidelines", bn: "কার্যকর পরিচর্যা ও ব্যবস্থাপনা" },
+    "lifecycle-btn-prev":      { en: "← Previous Stage",           bn: "← পূর্ববর্তী ধাপ" },
+    "lifecycle-btn-next":      { en: "Next Stage →",               bn: "পরবর্তী ধাপ →" },
+    "lifecycle-btn-play":      { en: "▶ Auto Tour",                bn: "▶ অটো ট্যুর" },
+    "lifecycle-btn-pause":     { en: "❚❚ Pause",                   bn: "❚❚ থামান" },
+    "lifecycle-category-all":  { en: "All Crops",                  bn: "সকল ফসল" },
+    "lifecycle-category-cereal": { en: "Cereals",                  bn: "দানাশস্য" },
+    "lifecycle-category-veg":    { en: "Vegetables",               bn: "সবজি" },
+    "lifecycle-category-cash":   { en: "Cash Crops",               bn: "অর্থকরী" },
+    "lifecycle-category-pulse":  { en: "Pulses",                   bn: "ডাল ফসল" },
+    "lifecycle-category-oil":    { en: "Oilseeds & Spices",        bn: "তৈল ও মসলা" },
+    "lifecycle-category-fruit":  { en: "Fruits",                   bn: "ফলমূল" },
 
     // ===== CTA & FOOTER =====
     "cta-eyebrow":      { en: "READY TO ADAPT?",               bn: "অভিযোজনে প্রস্তুত?" },
