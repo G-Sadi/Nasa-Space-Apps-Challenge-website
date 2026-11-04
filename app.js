@@ -135,6 +135,9 @@
                 currentStageIndex = 0;
                 stopTour();
                 renderCropLifecycle();
+                if (typeof window.updateCropSimulation === 'function') {
+                    window.updateCropSimulation(selectedCropId);
+                }
             });
         }
 

@@ -1131,15 +1131,42 @@
     <section id="farmSimulation">
 
         <!-- 3D Viewport Canvas -->
-        <div id="farm3D"></div>
+        <div id="farm3D" class="canvas-container">
+            <!-- Interactive 3D HTML Marker Pins Layer -->
+            <div id="crop3DHotspots" class="crop-3d-hotspots-layer"></div>
+        </div>
 
         <!-- Floating Glassmorphic HUD Master Overlay (English by default, fully localized with data-i18n) -->
         <div class="hud-overlay">
 
             <!-- Top Header & Camera Controls -->
             <div class="hud-top-header">
-                <h1 data-i18n="hud-title">Mymensingh Farm 3D Simulation</h1>
-                <p data-i18n="hud-status">Live Real-Time Conditions</p>
+                <div>
+                    <h1 data-i18n="hud-title">Mymensingh Farm 3D Simulation</h1>
+                    <p data-i18n="hud-status">Live Real-Time Conditions</p>
+                </div>
+
+                <div class="hud-crop-picker">
+                    <label for="cropSelect" class="hud-crop-label">🌾 <span data-i18n="hud-crop-label">ফসল সিমুলেশন:</span></label>
+                    <select id="cropSelect" class="hud-crop-select" aria-label="3D Crop Selector">
+                        <option value="rice" selected>🌾 ধান (Rice)</option>
+                        <option value="wheat">🌾 গম (Wheat)</option>
+                        <option value="maize">🌽 ভুট্টা (Maize)</option>
+                        <option value="jute">🌿 পাট (Jute)</option>
+                        <option value="potato">🥔 আলু (Potato)</option>
+                        <option value="mustard">🌼 সরিষা (Mustard)</option>
+                        <option value="tomato">🍅 টমেটো (Tomato)</option>
+                        <option value="eggplant">🍆 বেগুন (Eggplant)</option>
+                        <option value="chili">🌶️ মরিচ (Chili)</option>
+                        <option value="lentil">🌱 মসুর ডাল (Lentil)</option>
+                        <option value="cucumber">🥒 শসা (Cucumber)</option>
+                        <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
+                        <option value="onion">🧅 পেঁয়াজ (Onion)</option>
+                        <option value="carrot">🥕 গাজর (Carrot)</option>
+                        <option value="papaya">🍈 পেঁপে (Papaya)</option>
+                    </select>
+                </div>
+
                 <div class="hud-top-actions">
                     <button id="hudResetView" class="hud-pill-btn" data-i18n="hud-drone-btn" title="Switch to Drone View">🚁 Drone View</button>
                     <button id="hudFieldView" class="hud-pill-btn" data-i18n="hud-field-btn" title="Switch to Ground Level View">🚜 Field View</button>

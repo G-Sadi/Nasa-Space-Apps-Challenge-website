@@ -4447,3 +4447,238 @@ body.lang-bn strong {
     }
 }
 
+
+
+/* ==========================================================================
+   HYPER-REALISTIC 3D CROP SIMULATION & INTERACTIVE HOTSPOTS
+   ========================================================================== */
+.canvas-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 520px;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.canvas-container canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
+    outline: none;
+}
+
+/* 3D Hotspot Layer */
+.crop-3d-hotspots-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+    overflow: hidden;
+}
+
+.crop-hotspot {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.crop-hotspot:hover {
+    transform: translate(-50%, -50%) scale(1.12);
+    z-index: 25;
+}
+
+.hotspot-pin {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 6px 14px;
+    background: rgba(6, 21, 15, 0.88);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1.5px solid rgba(67, 239, 140, 0.45);
+    border-radius: 999px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45), 0 0 16px rgba(67, 239, 140, 0.25);
+    color: #e2fbe8;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    position: relative;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.crop-hotspot:hover .hotspot-pin {
+    border-color: #43ef8c;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55), 0 0 22px rgba(67, 239, 140, 0.5);
+    color: #ffffff;
+}
+
+.pin-icon {
+    font-size: 14px;
+    line-height: 1;
+}
+
+.pin-label {
+    letter-spacing: 0.2px;
+}
+
+.pin-pulse {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #43ef8c;
+    box-shadow: 0 0 8px #43ef8c;
+    animation: pinPulseAnim 2s infinite ease-in-out;
+}
+
+@keyframes pinPulseAnim {
+    0%, 100% { transform: translateY(-50%) scale(1); opacity: 0.8; }
+    50% { transform: translateY(-50%) scale(1.6); opacity: 0.3; }
+}
+
+/* Tooltip Card */
+.hotspot-tooltip {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    width: 250px;
+    background: rgba(10, 33, 23, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(67, 239, 140, 0.35);
+    border-radius: 12px;
+    padding: 12px 14px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6), 0 0 20px rgba(67, 239, 140, 0.15);
+    color: #e5e7eb;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 30;
+}
+
+.hotspot-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px;
+    border-style: solid;
+    border-color: rgba(10, 33, 23, 0.96) transparent transparent transparent;
+}
+
+.crop-hotspot:hover .hotspot-tooltip,
+.crop-hotspot.active .hotspot-tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    pointer-events: auto;
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(67, 239, 140, 0.15);
+}
+
+.tooltip-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #43ef8c;
+}
+
+.tooltip-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+}
+
+.badge-good {
+    background: rgba(67, 239, 140, 0.2);
+    color: #43ef8c;
+    border: 1px solid rgba(67, 239, 140, 0.4);
+}
+
+.badge-warn {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+    border: 1px solid rgba(251, 191, 36, 0.4);
+}
+
+.tooltip-desc {
+    font-size: 12px;
+    line-height: 1.45;
+    color: #cbd5e1;
+    margin: 0;
+}
+
+/* 3D HUD Crop Picker */
+.hud-crop-picker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(6, 21, 15, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(67, 239, 140, 0.35);
+    border-radius: 12px;
+    padding: 6px 14px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.hud-crop-label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #43ef8c;
+    white-space: nowrap;
+    margin: 0;
+}
+
+.hud-crop-select {
+    background: rgba(10, 33, 23, 0.9);
+    color: #e2fbe8;
+    border: 1px solid rgba(67, 239, 140, 0.4);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.hud-crop-select:hover,
+.hud-crop-select:focus {
+    border-color: #43ef8c;
+    box-shadow: 0 0 12px rgba(67, 239, 140, 0.3);
+}
+
+.hud-crop-select option {
+    background: #0a2117;
+    color: #e2fbe8;
+}
+
+@media (max-width: 900px) {
+    .hud-crop-picker {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hotspot-tooltip {
+        width: 210px;
+    }
+}
