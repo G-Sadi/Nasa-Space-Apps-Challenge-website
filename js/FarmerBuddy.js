@@ -11,7 +11,7 @@
 
 class FarmerBuddy {
     constructor() {
-        this.apiUrl = "http://127.0.0.1:8000/api/chat/stream";
+        this.apiUrl = "http://localhost:5000/api/ask";
         this.storageKeyPrefix = "agrivision_farmer_buddy_chat_v2_";
         this.currentLang = (typeof window !== "undefined" && window.currentAppLanguage === "bn") ? "bn" : "en";
         this.messages = [];
@@ -432,7 +432,8 @@ class FarmerBuddy {
         const buddyBubble = this.appendMessageDOM(buddyMsg);
         const textTarget = buddyBubble.querySelector(".msg-text");
 
-        textTarget.innerHTML = `<span class="fb-typing-dots"><span></span><span></span><span></span></span>`;
+        const isBn = (this.currentLang === "bn");
+        textTarget.innerHTML = `<span class="fb-typing-indicator"><span class="fb-typing-dots"><span></span><span></span><span></span></span> <span class="fb-thinking-text">${isBn ? "ভাবছি..." : "Thinking..."}</span></span>`;
 
         this.isStreaming = true;
         this.setInputsDisabled(true);
@@ -442,9 +443,16 @@ class FarmerBuddy {
                 throw new Error("OFFLINE_NETWORK");
             }
 
-            await this.streamFromBackend(text, textTarget, buddyMsg);
+            await this.askGeminiBackend(text, textTarget, buddyMsg);
         } catch (err) {
-            console.warn(`[FarmerBuddy] Backend stream unavailable. Using offline fallback for [${this.currentLang}].`);
+            console.warn(`[FarmerBuddy] Gemini backend unreachable or error: ${err.message}. Showing status & using offline advisor.`);
+            const isBn = (this.currentLang === "bn");
+            const notice = isBn
+                ? `⚠️ *ব্যাকএন্ড সার্ভারে সংযোগ পাওয়া যায়নি (http://localhost:5000/api/ask)। Gemini API সক্রিয় করতে টার্মিনালে \`npm start\` রান করুন।*\n\n`
+                : `⚠️ *Unable to reach Gemini backend proxy (http://localhost:5000/api/ask). Please ensure your Node server is running with \`npm start\`.*\n\n`;
+
+            buddyMsg.text = notice;
+            textTarget.innerHTML = this.formatMarkdown(notice);
             await this.streamFromOfflineFallback(text, textTarget, buddyMsg);
         } finally {
             this.isStreaming = false;
@@ -454,79 +462,39 @@ class FarmerBuddy {
         }
     }
 
-    async streamFromBackend(message, textTarget, buddyMsg) {
-        const trimmedHistory = this.messages.slice(-5, -1).map(m => ({
-            sender: m.sender,
-            text: m.text
-        }));
-
-        const payload = {
-            message: message,
-            history: trimmedHistory,
-            lang: this.currentLang
-        };
-
+    async askGeminiBackend(message, textTarget, buddyMsg) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000);
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
 
         const response = await fetch(this.apiUrl, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "text/event-stream"
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({ message: message }),
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
-        if (!response.ok || !response.body) {
-            throw new Error(`HTTP_${response.status}`);
+        if (!response.ok) {
+            let errorText = `HTTP_${response.status}`;
+            try {
+                const errData = await response.json();
+                if (errData?.error) errorText = errData.error;
+            } catch (_) {}
+            throw new Error(errorText);
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let accumulatedText = "";
-        let buffer = "";
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith("data:")) continue;
-
-                const dataContent = trimmed.replace("data:", "").trim();
-                if (dataContent === "[DONE]") {
-                    break;
-                }
-
-                try {
-                    const parsed = JSON.parse(dataContent);
-                    if (parsed.text) {
-                        accumulatedText += parsed.text;
-                        buddyMsg.text = accumulatedText;
-                        textTarget.innerHTML = this.formatMarkdown(accumulatedText);
-                        this.scrollToBottom();
-                    }
-                } catch (e) {
-                    accumulatedText += dataContent;
-                    buddyMsg.text = accumulatedText;
-                    textTarget.innerHTML = this.formatMarkdown(accumulatedText);
-                    this.scrollToBottom();
-                }
-            }
+        const data = await response.json();
+        if (!data || typeof data.reply !== "string") {
+            throw new Error("EMPTY_REPLY");
         }
 
-        if (!accumulatedText.trim()) {
-            throw new Error("EMPTY_STREAM_RESPONSE");
-        }
+        const replyText = data.reply.trim();
+        buddyMsg.text = replyText;
+        textTarget.innerHTML = this.formatMarkdown(replyText);
+        this.scrollToBottom();
     }
 
     async streamFromOfflineFallback(userQuery, textTarget, buddyMsg) {
@@ -635,4 +603,41 @@ if (typeof window !== "undefined") {
     } else {
         initBuddy();
     }
+}
+
+/**
+ * Standalone asynchronous helper function to query the Gemini API via the Node.js Express proxy.
+ * Can be called programmatically from anywhere: const reply = await askGemini("What fertilizer for corn?");
+ * @param {string} userInput - The user's query or agronomic question
+ * @returns {Promise<string>} The AI response from Gemini
+ */
+export async function askGemini(userInput) {
+    if (!userInput || typeof userInput !== "string" || !userInput.trim()) {
+        throw new Error("Message parameter is required and cannot be empty.");
+    }
+
+    try {
+        const response = await fetch("http://localhost:5000/api/ask", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ message: userInput.trim() })
+        });
+
+        if (!response.ok) {
+            const errBody = await response.json().catch(() => ({}));
+            throw new Error(errBody.error || `Server responded with HTTP status ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.reply;
+    } catch (err) {
+        console.error("[askGemini Error]:", err);
+        throw err;
+    }
+}
+
+if (typeof window !== "undefined") {
+    window.askGemini = askGemini;
 }
