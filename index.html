@@ -1127,24 +1127,65 @@
     </section>
 
 
-    <!-- 3D FARM SIMULATION -->
+    <!-- 3D FARM SIMULATION & SKETCHFAB 3D SPECIMEN STUDIO -->
     <section id="farmSimulation" class="cinema-mode">
 
         <!-- 3D Viewport Canvas -->
         <div id="farm3D" class="canvas-container"></div>
 
-        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Data Mode) -->
+        <!-- 3D Hotspot Annotation Screen Overlay (Sketchfab Pins) -->
+        <div id="studioHotspotsOverlay" class="studio-hotspots-overlay" aria-hidden="true"></div>
+
+        <!-- Hotspot Inspection Card (Floating interactive callout modal) -->
+        <div id="hotspotDetailCard" class="hotspot-detail-card" aria-hidden="true">
+            <div class="hcard-header">
+                <span id="hcardBadge" class="hcard-badge">3D ANATOMY</span>
+                <button id="btnCloseHcard" class="hcard-close" title="Close callout">✕</button>
+            </div>
+            <h4 id="hcardTitle">ধানের শিষ (Golden Grain Panicle)</h4>
+            <p id="hcardDesc">দানা গঠনের পর্যায়: শিষের প্রতিটি দানায় শ্বেতসার জমা হয়ে পুষ্ট হয়। সুষম পটাসিয়াম পুষ্টি নিশ্চিত করুন।</p>
+            <div class="hcard-footer">
+                <span id="hcardAction">🔬 3D Specimen Hotspot Active</span>
+            </div>
+        </div>
+
+        <!-- Cyber-Agri Telemetry HUD (Bottom-Left Floating Overlay) -->
+        <div class="sim-telemetry-hud" id="simTelemetryHud">
+            <div class="hud-stat-pill">
+                <span class="pulse-indicator"></span>
+                <span class="hud-stat-label">🛰️ SENTINEL-2 NDVI</span>
+                <strong class="hud-stat-val" id="telemetryNdvi">0.82</strong>
+                <span class="hud-stat-sub">High Health</span>
+            </div>
+            <div class="hud-stat-pill">
+                <span class="hud-stat-icon">💨</span>
+                <span class="hud-stat-label">WIND VECTOR</span>
+                <strong class="hud-stat-val" id="telemetryWind">14 km/h S-SW</strong>
+            </div>
+            <div class="hud-stat-pill">
+                <span class="hud-stat-icon">💧</span>
+                <span class="hud-stat-label">ROOT MOISTURE</span>
+                <strong class="hud-stat-val" id="telemetryMoist">68%</strong>
+            </div>
+        </div>
+
+        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Studio Mode vs Data Mode) -->
         <div class="field-view-controls-bar">
-            <!-- Top Left: Dual Camera Modes -->
+            <!-- Top Left: Triple Camera Modes (Drone vs Field vs 3D Studio) -->
             <div class="fctrl-group fctrl-left">
                 <div class="fctrl-pill fctrl-cam-pill">
                     <button id="btnDroneView" class="fctrl-cam-btn" title="ড্রোন ভিউ (Drone Aerial View)">
                         <span class="btn-icon">🚁</span>
-                        <span class="btn-text">ড্রোন ভিউ</span>
+                        <span class="btn-text" data-i18n="sim-cam-drone">ড্রোন ভিউ</span>
                     </button>
                     <button id="btnFieldView" class="fctrl-cam-btn active" title="মাঠের দৃশ্য (Ground Field View)">
                         <span class="btn-icon">🌾</span>
-                        <span class="btn-text">মাঠের দৃশ্য</span>
+                        <span class="btn-text" data-i18n="sim-cam-field">মাঠের দৃশ্য</span>
+                    </button>
+                    <button id="btnStudioView" class="fctrl-cam-btn fctrl-studio-btn" title="৩ডি স্টুডিও - স্কেচফ্যাব ইন্সপেক্টর (Sketchfab 3D Studio)">
+                        <span class="btn-icon">🔬</span>
+                        <span class="btn-text" data-i18n="sim-cam-studio">৩ডি স্টুডিও</span>
+                        <span class="btn-sub-badge">3D</span>
                     </button>
                 </div>
             </div>
@@ -1175,23 +1216,63 @@
 
                 <!-- ☀️ Time of Day Slider -->
                 <div class="fctrl-pill fctrl-tod-pill" title="সূর্যের অবস্থান ও আলো পরিবর্তন (Time of Day)">
-                    <span class="tod-label">☀️</span>
+                    <span id="todIcon" class="tod-label">☀️</span>
                     <input type="range" id="timeOfDaySlider" class="tod-slider" min="0" max="100" value="45" step="1" aria-label="Time of Day">
                     <span id="timeOfDayLabel" class="tod-val-text">দুপুর (Noon)</span>
                 </div>
             </div>
 
-            <!-- Top Right: Data Drawer Toggle & Fullscreen -->
+            <!-- Top Right: Shading, Turntable, Catalog & Drawer Toggles -->
             <div class="fctrl-group fctrl-right">
+                <!-- Shading Mode Pill (Sketchfab Inspector) -->
+                <div class="fctrl-pill fctrl-shading-pill" id="shadingControlPill" title="৩ডি শেডিং মোড (PBR Lit / Wireframe / X-Ray / Clay)">
+                    <span class="fctrl-icon-small">🎨</span>
+                    <select id="shadingSelect" class="fctrl-select-compact" aria-label="3D Shading Mode">
+                        <option value="pbr" selected>🌟 PBR Lit</option>
+                        <option value="wireframe">🕸️ Wireframe</option>
+                        <option value="vein">🌿 Vein X-Ray</option>
+                        <option value="clay">🏺 Clay Studio</option>
+                    </select>
+                </div>
+
+                <!-- Turntable Auto-Rotate Button -->
+                <button id="btnTurntable" class="fctrl-action-btn" title="৩৬০° স্বয়ংক্রিয় ঘূর্ণন (360° Auto-Rotate Turntable)">
+                    <span class="btn-icon">🔄</span>
+                    <span class="btn-text">360°</span>
+                </button>
+
+                <!-- 3D Crop Catalog Gallery Toggle Button -->
+                <button id="btnGalleryToggle" class="fctrl-action-btn fctrl-gallery-btn" title="১৫টি ফসলের ৩ডি গ্যালারি দেখুন (Sketchfab 3D Crop Catalog)">
+                    <span class="btn-icon">🖼️</span>
+                    <span class="btn-text" data-i18n="sim-gallery-btn">৩ডি শস্য</span>
+                </button>
+
+                <!-- Data Drawer Toggle & Fullscreen -->
                 <div class="fctrl-pill fctrl-action-pill">
                     <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
                         <span class="btn-icon">📊</span>
-                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
+                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও তথ্য</span>
                     </button>
                     <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
                         <span>⛶</span>
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Sketchfab 3D Crop Specimen Catalog (Collapsible Horizontal Gallery Drawer) -->
+        <div id="farmCropCatalog" class="farm-crop-catalog" aria-hidden="true">
+            <div class="catalog-header">
+                <div class="catalog-title">
+                    <span class="catalog-badge">SKETCHFAB 3D COLLECTION</span>
+                    <h3 data-i18n="sim-catalog-heading">১৫টি ফসলের হাই-ডেফিনিশন ৩ডি মডেল ও সংগ্রহশালা</h3>
+                </div>
+                <div class="catalog-actions">
+                    <button id="btnCloseCatalog" class="catalog-close-btn" title="গ্যালারি বন্ধ করুন">✕</button>
+                </div>
+            </div>
+            <div class="catalog-scroll-tray" id="catalogScrollTray">
+                <!-- Populated dynamically with Sketchfab 3D crop cards -->
             </div>
         </div>
 
@@ -1206,13 +1287,24 @@
             </div>
 
             <div class="drawer-scroll-body">
-                <!-- Active Crop Dynamic Info Badge -->
+                <!-- Active Crop Dynamic Info Badge with 3D Thumbnail -->
                 <div class="drawer-crop-card">
                     <div class="drawer-crop-header">
-                        <span id="drawerCropIcon" class="drawer-crop-icon">🌾</span>
-                        <div>
+                        <div class="drawer-crop-thumb-wrap">
+                            <img id="drawerCropThumb" src="assets/crops_3d/rice.svg" alt="3D Crop Specimen" class="drawer-crop-3d-img" />
+                            <span class="drawer-3d-tag">3D PBR</span>
+                        </div>
+                        <div class="drawer-crop-text">
+                            <div class="drawer-crop-badge-row">
+                                <span id="drawerCropIcon" class="drawer-crop-icon">🌾</span>
+                                <span id="drawerCropCategory" class="drawer-crop-cat">দানাশস্য</span>
+                            </div>
                             <h4 id="drawerCropName">আমন ধান (Aman Rice Field)</h4>
                             <p id="drawerCropSubtitle">হাই-ইয়েল্ডিং স্থানীয় জাত · দানা গঠনের পর্যায়</p>
+                            <a id="drawerSketchfabLink" href="https://sketchfab.com/search?q=rice+plant&type=models" target="_blank" rel="noopener noreferrer" class="drawer-sketchfab-btn" title="View 3D Model on Sketchfab">
+                                <span class="sk-icon">🌐</span>
+                                <span>Sketchfab 3D Model</span>
+                            </a>
                         </div>
                     </div>
                     <div class="drawer-crop-metrics">

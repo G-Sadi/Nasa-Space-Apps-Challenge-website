@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" width="100%" height="100%">
+    <defs>
+        <!-- Dark Radial Studio Environment -->
+        <radialGradient id="studioBg" cx="50%" cy="50%" r="70%">
+            <stop offset="0%" stop-color="#0e2318" />
+            <stop offset="60%" stop-color="#08150f" />
+            <stop offset="100%" stop-color="#030805" />
+        </radialGradient>
+
+        <!-- Turntable Metallic Gradient -->
+        <linearGradient id="pedestalRim" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#14261d" />
+            <stop offset="50%" stop-color="#2a4d3a" />
+            <stop offset="100%" stop-color="#14261d" />
+        </linearGradient>
+
+        <!-- Turntable Surface -->
+        <radialGradient id="pedestalSurface" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1b3829" />
+            <stop offset="70%" stop-color="#0e1f16" />
+            <stop offset="100%" stop-color="#06120b" />
+        </radialGradient>
+
+        <!-- Contact Ground Shadow -->
+        <radialGradient id="groundShadow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="rgba(0,0,0,0.85)" />
+            <stop offset="60%" stop-color="rgba(0,0,0,0.4)" />
+            <stop offset="100%" stop-color="rgba(0,0,0,0)" />
+        </radialGradient>
+
+        <!-- Crop Specific Gradients -->
+        <linearGradient id="leafGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#2e7d32" />
+            <stop offset="60%" stop-color="#43a047" />
+            <stop offset="100%" stop-color="#81c784" />
+        </linearGradient>
+
+        <linearGradient id="stemGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#2e7d32" />
+            <stop offset="50%" stop-color="#66bb6a" />
+            <stop offset="100%" stop-color="#1b5e20" />
+        </linearGradient>
+
+        <radialGradient id="tomatoRedGrad" cx="35%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ff7961" />
+            <stop offset="50%" stop-color="#f44336" />
+            <stop offset="100%" stop-color="#b71c1c" />
+        </radialGradient>
+
+        <radialGradient id="eggplantGrad" cx="30%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ba68c8" />
+            <stop offset="40%" stop-color="#6a1b9a" />
+            <stop offset="100%" stop-color="#1a0033" />
+        </radialGradient>
+
+        <linearGradient id="cucumberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#81c784" />
+            <stop offset="50%" stop-color="#388e3c" />
+            <stop offset="100%" stop-color="#1b5e20" />
+        </linearGradient>
+
+        <radialGradient id="onionGrad" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#f06292" />
+            <stop offset="50%" stop-color="#ad1457" />
+            <stop offset="100%" stop-color="#4a148c" />
+        </radialGradient>
+
+        <linearGradient id="carrotGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff9800" />
+            <stop offset="45%" stop-color="#ffb74d" />
+            <stop offset="80%" stop-color="#f57c00" />
+            <stop offset="100%" stop-color="#e65100" />
+        </linearGradient>
+
+        <linearGradient id="papayaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#cddc39" />
+            <stop offset="60%" stop-color="#fbc02d" />
+            <stop offset="100%" stop-color="#f57f17" />
+        </linearGradient>
+
+        <!-- Studio Glow Filter -->
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+    </defs>
+
+    <!-- Studio Dark Backdrop -->
+    <rect width="400" height="300" fill="url(#studioBg)" />
+
+    <!-- Isometric Turntable Pedestal Base (Sketchfab Style) -->
+    <!-- Ground Shadow below Pedestal -->
+    <ellipse cx="200" cy="246" rx="140" ry="36" fill="url(#groundShadow)" />
+
+    <!-- Pedestal Extrusion/Cylinder Rim -->
+    <path d="M 70 236 C 70 252 128 266 200 266 C 272 266 330 252 330 236 L 330 242 C 330 258 272 272 200 272 C 128 272 70 258 70 242 Z" fill="url(#pedestalRim)" />
+
+    <!-- Top Turntable Disk -->
+    <ellipse cx="200" cy="236" rx="130" ry="30" fill="url(#pedestalSurface)" stroke="rgba(67, 239, 140, 0.45)" stroke-width="1.5" />
+
+    <!-- Glowing Cyan/Emerald Pedestal Ring Edge -->
+    <ellipse cx="200" cy="236" rx="112" ry="24" fill="none" stroke="rgba(67, 239, 140, 0.28)" stroke-width="1" stroke-dasharray="4, 4" />
+
+    <!-- Turntable Axis Grid Markers -->
+    <line x1="72" y1="236" x2="328" y2="236" stroke="rgba(67, 239, 140, 0.15)" stroke-width="1" />
+    <line x1="200" y1="206" x2="200" y2="266" stroke="rgba(67, 239, 140, 0.15)" stroke-width="1" />
+
+    <!-- Focal Plant Specimen Drawing -->
+    <g id="plantSpecimen">
+        
+            <!-- Tall Slender Bast Fiber Stem -->
+            <path d="M 198 230 L 199 45 L 202 45 L 201 230 Z" fill="#7cb342" stroke="#558b2f" stroke-width="0.8" />
+            <!-- Serrated Oval Leaves with Basal Bristles -->
+            <g fill="#43a047" stroke="#2e7d32" stroke-width="0.8">
+                <!-- Top leaves -->
+                <path d="M 200 65 Q 160 50 145 60 Q 170 75 200 70 Z" />
+                <path d="M 200 60 Q 240 45 255 55 Q 230 70 200 65 Z" />
+                <!-- Mid leaves -->
+                <path d="M 200 95 Q 150 85 130 100 Q 165 115 200 100 Z" />
+                <path d="M 200 90 Q 250 80 270 95 Q 235 110 200 95 Z" />
+                <!-- Lower leaves -->
+                <path d="M 200 135 Q 140 130 120 150 Q 160 165 200 140 Z" fill="#388e3c" />
+                <path d="M 200 130 Q 260 125 280 145 Q 240 160 200 135 Z" fill="#388e3c" />
+                <path d="M 200 170 Q 150 170 135 190 Q 170 200 200 175 Z" fill="#2e7d32" />
+                <path d="M 200 165 Q 250 165 265 185 Q 230 195 200 170 Z" fill="#2e7d32" />
+            </g>
+            <!-- Small 5-petal Yellow Flowers -->
+            <circle cx="198" cy="52" r="3.5" fill="#ffee58" stroke="#fbc02d" stroke-width="0.8" />
+            <circle cx="194" cy="85" r="3.2" fill="#ffee58" stroke="#fbc02d" stroke-width="0.8" />
+            <circle cx="206" cy="115" r="3.2" fill="#ffee58" stroke="#fbc02d" stroke-width="0.8" />
+        
+    </g>
+
+    <!-- Interactive 3D Hotspot Pins (Sketchfab Annotations) -->
+    <g id="hotspots" filter="url(#glow)">
+        <circle cx="200" cy="60" r="5.5" fill="#43ef8c" stroke="#ffffff" stroke-width="1.5" />
+        <circle cx="200" cy="60" r="2" fill="#06150f" />
+
+        <circle cx="200" cy="140" r="5.5" fill="#00e5ff" stroke="#ffffff" stroke-width="1.5" />
+        <circle cx="200" cy="140" r="2" fill="#06150f" />
+
+        <circle cx="200" cy="220" r="5.5" fill="#ffd54f" stroke="#ffffff" stroke-width="1.5" />
+        <circle cx="200" cy="220" r="2" fill="#06150f" />
+    </g>
+
+    <!-- Sketchfab UI HUD Overlays -->
+    <!-- Top-Left: 3D PBR Badge -->
+    <g transform="translate(16, 16)">
+        <rect width="64" height="22" rx="11" fill="rgba(6, 21, 15, 0.75)" stroke="#43ef8c" stroke-width="1" />
+        <circle cx="11" cy="11" r="3" fill="#43ef8c" />
+        <text x="21" y="15" fill="#e2fbe8" font-family="'Inter', sans-serif" font-size="10" font-weight="700" letter-spacing="0.5">3D PBR</text>
+    </g>
+
+    <!-- Top-Right: Scientific Name & Polycount -->
+    <g transform="translate(384, 16)" text-anchor="end">
+        <text y="13" fill="#88c7a1" font-family="'Inter', sans-serif" font-size="10" font-style="italic">Corchorus olitorius</text>
+        <text y="26" fill="rgba(255,255,255,0.4)" font-family="'Inter', sans-serif" font-size="8.5" font-weight="600" letter-spacing="0.8">11.4K POLYS • PBR</text>
+    </g>
+
+    <!-- Bottom Center: Crop Name Banner -->
+    <g transform="translate(200, 286)" text-anchor="middle">
+        <rect x="-85" y="-14" width="170" height="20" rx="10" fill="rgba(6, 21, 15, 0.85)" stroke="rgba(67, 239, 140, 0.3)" stroke-width="1" />
+        <text y="0" fill="#ffffff" font-family="'Hind Siliguri', 'Inter', sans-serif" font-size="11" font-weight="600">
+            পাট · <tspan fill="#81c784">Golden Jute</tspan>
+        </text>
+    </g>
+</svg>

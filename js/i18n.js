@@ -140,6 +140,13 @@ const i18nData = {
     "hud-drone-btn":    { en: "🚁 Drone View",                 bn: "🚁 ড্রোন ভিউ" },
     "hud-field-btn":    { en: "🚜 Field View",                 bn: "🚜 মাঠ ভিউ" },
     "hud-sun-btn":      { en: "☀️ Day",                        bn: "☀️ দিন" },
+    "hud-crop-label":   { en: "Crop:",                         bn: "ফসল:" },
+    "sim-cam-drone":    { en: "Drone View",                    bn: "ড্রোন ভিউ" },
+    "sim-cam-field":    { en: "Field View",                    bn: "মাঠের দৃশ্য" },
+    "sim-cam-studio":   { en: "3D Studio",                     bn: "৩ডি স্টুডিও" },
+    "sim-gallery-btn":  { en: "3D Crops",                      bn: "৩ডি শস্য" },
+    "sim-catalog-heading":{ en: "15 High-Definition 3D Crop Models & Sketchfab Studio", bn: "১৫টি ফসলের হাই-ডেফিনিশন ৩ডি মডেল ও সংগ্রহশালা" },
+    "sim-data-view":    { en: "Soil & Data",                   bn: "মাটি ও তথ্য" },
     
     // Soil Panel
     "hud-soil-title":   { en: "Soil Quality & Health",         bn: "মাটির গুণমান ও স্বাস্থ্য" },

@@ -5650,3 +5650,627 @@ body.lang-bn strong {
         padding: 8px;
     }
 }
+
+
+/* ==========================================================================
+   SKETCHFAB 3D SPECIMEN STUDIO, 3D CROPS & DIGITAL TWIN HUD
+   ========================================================================== */
+
+/* 1. Hotspots 3D Annotation Overlay */
+.studio-hotspots-overlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+    display: none;
+}
+.studio-hotspots-overlay.active {
+    display: block;
+}
+
+.studio-hotspot-pin {
+    position: absolute;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    outline: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.studio-hotspot-pin:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+    z-index: 20;
+}
+
+.pin-ring {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translate(-50%, -50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1.5px solid #43ef8c;
+    opacity: 0.6;
+    animation: pinPulse 2s infinite ease-out;
+}
+
+@keyframes pinPulse {
+    0% { transform: translate(-50%, -50%) scale(0.6); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+.pin-core {
+    position: relative;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #43ef8c, #10b981);
+    color: #06150f;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 14px rgba(67, 239, 140, 0.8), 0 2px 6px rgba(0, 0, 0, 0.5);
+    border: 2px solid #ffffff;
+}
+
+.pin-label {
+    background: rgba(6, 21, 15, 0.88);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(67, 239, 140, 0.4);
+    color: #e2fbe8;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateX(-6px);
+    transition: all 0.25s ease;
+    pointer-events: none;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+.studio-hotspot-pin:hover .pin-label {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* 2. Floating Hotspot Detail Card Modal */
+.hotspot-detail-card {
+    position: absolute;
+    top: 86px;
+    left: 24px;
+    width: 320px;
+    background: rgba(6, 21, 15, 0.90);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(67, 239, 140, 0.35);
+    border-radius: 16px;
+    padding: 16px 18px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.7);
+    z-index: 25;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hotspot-detail-card.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.hcard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+.hcard-badge {
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    color: #43ef8c;
+    background: rgba(67, 239, 140, 0.12);
+    border: 1px solid rgba(67, 239, 140, 0.3);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+.hcard-close {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+.hcard-close:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.hotspot-detail-card h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+}
+.hotspot-detail-card p {
+    font-size: 12px;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin: 0 0 10px 0;
+}
+.hcard-footer {
+    border-top: 1px solid rgba(67, 239, 140, 0.15);
+    padding-top: 8px;
+    font-size: 11px;
+    color: #43ef8c;
+    font-weight: 600;
+}
+
+/* 3. Cyber-Agri Telemetry HUD Overlay */
+.sim-telemetry-hud {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+.hud-stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(6, 21, 15, 0.82);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(67, 239, 140, 0.22);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 11px;
+    color: #cbd5e1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+.pulse-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #43ef8c;
+    box-shadow: 0 0 10px #43ef8c;
+    animation: livePulse 1.8s infinite;
+}
+@keyframes livePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.85); }
+}
+.hud-stat-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    color: #94a3b8;
+}
+.hud-stat-val {
+    color: #ffffff;
+    font-weight: 700;
+}
+.hud-stat-sub {
+    color: #43ef8c;
+    font-size: 9.5px;
+    font-weight: 600;
+}
+
+/* 4. Controls Bar Buttons & Badges */
+.btn-sub-badge {
+    background: rgba(67, 239, 140, 0.2);
+    border: 1px solid #43ef8c;
+    color: #43ef8c;
+    font-size: 8.5px;
+    font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 6px;
+    margin-left: 2px;
+}
+.fctrl-studio-btn.active {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+}
+.fctrl-studio-btn.active .btn-sub-badge {
+    background: #ffffff;
+    color: #06150f;
+    border-color: #ffffff;
+}
+
+.fctrl-shading-pill {
+    padding: 3px 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.fctrl-icon-small {
+    font-size: 13px;
+}
+.fctrl-select-compact {
+    background: none;
+    border: none;
+    color: #e2fbe8;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+}
+.fctrl-select-compact option {
+    background: #0c2317;
+    color: #ffffff;
+}
+
+.fctrl-action-btn {
+    background: rgba(16, 42, 29, 0.6);
+    border: 1px solid rgba(67, 239, 140, 0.25);
+    color: #cbd5e1;
+    border-radius: 20px;
+    padding: 5px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+.fctrl-action-btn:hover {
+    background: rgba(67, 239, 140, 0.15);
+    color: #ffffff;
+    border-color: #43ef8c;
+}
+.fctrl-action-btn.active {
+    background: #43ef8c;
+    color: #06150f;
+    font-weight: 700;
+    box-shadow: 0 0 12px rgba(67, 239, 140, 0.4);
+}
+
+/* 5. Sketchfab 3D Crop Specimen Catalog (Bottom Drawer) */
+.farm-crop-catalog {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%) translateY(140%);
+    width: calc(100% - 48px);
+    max-width: 1440px;
+    background: rgba(6, 21, 15, 0.94);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(67, 239, 140, 0.35);
+    border-radius: 20px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.75);
+    z-index: 30;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.farm-crop-catalog.active {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+    visibility: visible;
+}
+
+.catalog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 22px 10px;
+    border-bottom: 1px solid rgba(67, 239, 140, 0.15);
+}
+.catalog-badge {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #43ef8c;
+    background: rgba(67, 239, 140, 0.12);
+    border: 1px solid rgba(67, 239, 140, 0.3);
+    padding: 2px 8px;
+    border-radius: 8px;
+    display: inline-block;
+    margin-bottom: 4px;
+}
+.catalog-title h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+}
+.catalog-close-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.catalog-close-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #ef4444;
+}
+
+.catalog-scroll-tray {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    padding: 16px 22px 20px;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(67, 239, 140, 0.4) transparent;
+}
+.catalog-scroll-tray::-webkit-scrollbar {
+    height: 6px;
+}
+.catalog-scroll-tray::-webkit-scrollbar-thumb {
+    background: rgba(67, 239, 140, 0.4);
+    border-radius: 6px;
+}
+
+/* 6. Individual Sketchfab 3D Crop Card */
+.sketchfab-crop-card {
+    flex: 0 0 230px;
+    background: rgba(14, 38, 26, 0.6);
+    border: 1px solid rgba(67, 239, 140, 0.18);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    flex-direction: column;
+}
+.sketchfab-crop-card:hover {
+    transform: translateY(-5px);
+    background: rgba(18, 52, 35, 0.85);
+    border-color: #43ef8c;
+    box-shadow: 0 12px 28px rgba(67, 239, 140, 0.18);
+}
+.sketchfab-crop-card.active {
+    border-color: #43ef8c;
+    background: rgba(20, 58, 39, 0.9);
+    box-shadow: 0 0 20px rgba(67, 239, 140, 0.35);
+}
+
+.card-thumb-container {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    background: radial-gradient(circle at center, #0e2318 0%, #030805 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.card-3d-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+.sketchfab-crop-card:hover .card-3d-thumb {
+    transform: scale(1.06);
+}
+
+.card-3d-badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background: rgba(6, 21, 15, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid #43ef8c;
+    color: #43ef8c;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 12px;
+}
+.card-poly-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(8px);
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 8px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.card-info {
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-grow: 1;
+}
+.card-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+}
+.card-title-row h4 {
+    margin: 0;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #ffffff;
+}
+.card-title-row h4 small {
+    font-size: 10.5px;
+    font-weight: 500;
+    color: #94a3b8;
+}
+.card-cat-tag {
+    font-size: 9px;
+    font-weight: 600;
+    color: #43ef8c;
+    background: rgba(67, 239, 140, 0.12);
+    padding: 1px 6px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+.card-sci-name {
+    margin: 0;
+    font-size: 10px;
+    color: #88c7a1;
+}
+
+.card-actions-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(67, 239, 140, 0.12);
+}
+.card-btn-action {
+    flex: 1;
+    background: rgba(67, 239, 140, 0.12);
+    border: 1px solid rgba(67, 239, 140, 0.25);
+    color: #e2fbe8;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 4px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.card-btn-action:hover {
+    background: #43ef8c;
+    color: #06150f;
+}
+.card-btn-sketchfab {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 6px;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+.card-btn-sketchfab:hover {
+    background: #1caad9;
+    border-color: #1caad9;
+    color: #ffffff;
+}
+
+/* 7. Drawer 3D Thumbnail & Sketchfab Link */
+.drawer-crop-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+.drawer-crop-thumb-wrap {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #06150f;
+    border: 1px solid rgba(67, 239, 140, 0.3);
+    flex-shrink: 0;
+}
+.drawer-crop-3d-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.drawer-3d-tag {
+    position: absolute;
+    bottom: 3px;
+    right: 3px;
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #43ef8c;
+    background: rgba(6, 21, 15, 0.85);
+    border: 1px solid #43ef8c;
+    border-radius: 4px;
+    padding: 1px 3px;
+}
+.drawer-crop-text {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+.drawer-crop-badge-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.drawer-crop-cat {
+    font-size: 9.5px;
+    font-weight: 600;
+    color: #43ef8c;
+    background: rgba(67, 239, 140, 0.12);
+    padding: 1px 6px;
+    border-radius: 8px;
+}
+.drawer-sketchfab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #67e8f9;
+    text-decoration: none;
+    background: rgba(6, 182, 212, 0.12);
+    border: 1px solid rgba(6, 182, 212, 0.3);
+    padding: 3px 8px;
+    border-radius: 6px;
+    width: fit-content;
+    transition: all 0.2s ease;
+}
+.drawer-sketchfab-btn:hover {
+    background: #06b6d4;
+    color: #06150f;
+}
+
+/* Mobile Responsiveness for 3D Studio and Catalog */
+@media (max-width: 900px) {
+    .farm-crop-catalog {
+        width: calc(100% - 24px);
+        bottom: 12px;
+    }
+    .sketchfab-crop-card {
+        flex: 0 0 190px;
+    }
+    .card-thumb-container {
+        height: 115px;
+    }
+    .sim-telemetry-hud {
+        bottom: 16px;
+        left: 14px;
+    }
+    .hotspot-detail-card {
+        top: auto;
+        bottom: 90px;
+        left: 14px;
+        right: 14px;
+        width: auto;
+    }
+}

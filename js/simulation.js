@@ -73,6 +73,245 @@ let isTransitioningCamera = false;
 // Reusable Matrix & Math
 const dummy = new THREE.Object3D();
 
+// Studio & Sketchfab 3D Specimen Globals
+let studioGroup = null;
+let studioPedestal = null;
+let studioSpecimenGroup = null;
+let studioLightKey = null, studioLightFill = null, studioLightRim = null;
+let isTurntableActive = true;
+let currentShadingMode = "pbr"; // 'pbr' | 'wireframe' | 'vein' | 'clay'
+let activeHotspots = [];
+
+const CROP_SKETCHFAB_DATA = {
+    rice: {
+        id: "rice",
+        nameBn: "আমন ধান",
+        nameEn: "Aman Rice",
+        sci: "Oryza sativa",
+        categoryBn: "দানাশস্য",
+        categoryEn: "Cereal",
+        polys: "14.8K POLYS",
+        thumb: "assets/crops_3d/rice.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=rice+plant&type=models",
+        hotspots: [
+            { id: "panicle", nameBn: "ধানের শিষ ও দানা", nameEn: "Grain Panicle", pos: [0.08, 0.65, 0], descBn: "দানা গঠন পর্যায়: শিষের প্রতিটি দানায় শ্বেতসার জমা হয়ে পুষ্ট হয়। সুষম পটাসিয়াম পুষ্টি নিশ্চিত করুন।", descEn: "Grain filling stage: Panicle gathers starch and matures. Requires optimal potassium." },
+            { id: "blade", nameBn: "পতাকা পাতা ও সালোকসংশ্লেষণ", nameEn: "Flag Leaf", pos: [-0.15, 0.45, 0.12], descBn: "উদ্ভিদের প্রধান শক্তি কেন্দ্র। ধান গঠনের ৫০% শর্করা এই পাতা থেকে আসে।", descEn: "Primary photosynthetic organ, supplying over 50% of grain carbohydrates." },
+            { id: "culm", nameBn: "কুশি ও কাণ্ড", nameEn: "Tiller Stem", pos: [0, 0.22, 0], descBn: "শক্তিশালী কাণ্ড যা ধান হেলে পড়া (lodging) প্রতিরোধ করে।", descEn: "Vascular tillers providing mechanical strength against lodging." },
+            { id: "roots", nameBn: "অস্থানিক গুচ্ছমূল", nameEn: "Adventitious Roots", pos: [0, 0.05, 0], descBn: "কাদামাটি থেকে পানি ও পুষ্টি শোষণকারী ঘন গুচ্ছমূল।", descEn: "Dense fibrous root system for submerged anaerobic nutrient uptake." }
+        ]
+    },
+    wheat: {
+        id: "wheat",
+        nameBn: "উফশী গম",
+        nameEn: "Golden Wheat",
+        sci: "Triticum aestivum",
+        categoryBn: "দানাশস্য",
+        categoryEn: "Cereal",
+        polys: "12.6K POLYS",
+        thumb: "assets/crops_3d/wheat.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=wheat+plant&type=models",
+        hotspots: [
+            { id: "spike", nameBn: "দানাযুক্ত শিষ ও শুঙ", nameEn: "Bearded Spike", pos: [0, 0.78, 0], descBn: "গমের শিষের কাঁটাযুক্ত শুঙ (awns) যা সালোকসংশ্লেষণ বাড়ায় ও কীটপতঙ্গ দূরে রাখে।", descEn: "Bristled awns assisting photosynthesis and deterring seed predators." },
+            { id: "leaf", nameBn: "খাড়া পত্রফলক", nameEn: "Erect Leaf Blade", pos: [0.12, 0.48, -0.08], descBn: "সূর্যরশ্মি সর্বোচ্চ শোষণের জন্য খাড়া কোণে বিন্যস্ত পাতা।", descEn: "Vertical blade architecture optimized for solar capture in cool seasons." },
+            { id: "stem", nameBn: "ফাঁপা নলাকার কাণ্ড", nameEn: "Hollow Culm", pos: [0, 0.35, 0], descBn: "বায়ু চলাচলে সক্ষম অভ্যন্তরীণ ফাঁপা নোডাল কাণ্ড।", descEn: "Hollow segmented culm providing lightweight elastic resistance to wind." }
+        ]
+    },
+    maize: {
+        id: "maize",
+        nameBn: "হাইব্রিড ভুট্টা",
+        nameEn: "Hybrid Maize",
+        sci: "Zea mays",
+        categoryBn: "দানাশস্য",
+        categoryEn: "Cereal",
+        polys: "18.2K POLYS",
+        thumb: "assets/crops_3d/maize.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=corn+plant&type=models",
+        hotspots: [
+            { id: "tassel", nameBn: "শীর্ষ ফুলমঞ্জরী", nameEn: "Terminal Tassel", pos: [0, 2.2, 0], descBn: "পুরুষ ফুল যা প্রচুর পরিমাণে পরাগরেণু তৈরি করে বাতাসে ছড়ায়।", descEn: "Staminate inflorescence releasing wind-borne pollen onto ear silks." },
+            { id: "cob", nameBn: "ভুট্টার মোচা ও সিল্ক", nameEn: "Ear Cob & Silk", pos: [0.15, 1.15, 0.08], descBn: "বীজ গঠনের কেন্দ্র। মোচার প্রতিটি রেশমি সুতা একটি করে ভুট্টার দানায় রূপান্তরিত হয়।", descEn: "Pistillate ear where each pollinated silk strand produces a kernel." },
+            { id: "leaf", nameBn: "তরঙ্গায়িত ফিতার পাতা", nameEn: "Wavy Ribbon Blade", pos: [-0.35, 1.45, 0.15], descBn: "C4 সালোকসংশ্লেষণের জন্য অত্যন্ত দক্ষ চওড়া পাতা।", descEn: "Broad C4 photosynthetic leaf with arching structural droop." },
+            { id: "roots", nameBn: "বায়বীয় ঠেস মূল", nameEn: "Prop Stilt Roots", pos: [0, 0.12, 0], descBn: "কাণ্ডের নিচের পর্ব থেকে বের হয়ে মাটির গভীরে গিয়ে গাছকে ঝড় থেকে রক্ষা করে।", descEn: "Adventitious brace roots anchoring tall stalks against lodging storms." }
+        ]
+    },
+    jute: {
+        id: "jute",
+        nameBn: "তোষা পাট",
+        nameEn: "Golden Jute",
+        sci: "Corchorus olitorius",
+        categoryBn: "অর্থকরী আঁশ",
+        categoryEn: "Cash Fiber",
+        polys: "11.4K POLYS",
+        thumb: "assets/crops_3d/jute.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=jute+plant&type=models",
+        hotspots: [
+            { id: "crown", nameBn: "শীর্ষ পল্লব ও কুঁড়ি", nameEn: "Foliage Crown", pos: [0, 1.8, 0], descBn: "নরম কচি পাতা যা শাক হিসেবেও পুষ্টিকর ও সুস্বাদু।", descEn: "Tender edible apical leaves rich in antioxidants and minerals." },
+            { id: "bast", nameBn: "আঁশযুক্ত শক্ত কাণ্ড", nameEn: "Bast Fiber Stalk", pos: [0, 0.95, 0], descBn: "এই কাণ্ডের বাকল থেকেই বিশ্বমানের প্রাকৃতিক সোনালী আঁশ উৎপন্ন হয়।", descEn: "High-tensile phloem bast fibers prized as eco-friendly golden fiber." }
+        ]
+    },
+    potato: {
+        id: "potato",
+        nameBn: "ডায়মন্ড আলু",
+        nameEn: "Diamond Potato",
+        sci: "Solanum tuberosum",
+        categoryBn: "কন্দ জাতীয়",
+        categoryEn: "Tuber",
+        polys: "15.9K POLYS",
+        thumb: "assets/crops_3d/potato.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=potato+plant&type=models",
+        hotspots: [
+            { id: "flower", nameBn: "তারা ফুল ও কলি", nameEn: "Star Flower", pos: [0, 0.55, 0], descBn: "সাদা-বেগুনি ফুল যা কন্দের পরিপক্বতা শুরুর ইঙ্গিত দেয়।", descEn: "Blossom cluster marking the start of underground tuber bulking." },
+            { id: "canopy", nameBn: "যৌগিক পাতার ঝোপ", nameEn: "Bushy Canopy", pos: [0.18, 0.35, 0.1], descBn: "ঘন পত্রপল্লব যা মাটিতে সরাসরি রোদ ঠেকিয়ে আর্দ্রতা বজায় রাখে।", descEn: "Dense foliage canopy shading root beds and retaining soil coolness." },
+            { id: "tuber", nameBn: "মাটির নিচের কন্দ/টিউবার", nameEn: "Underground Tuber", pos: [0, 0.05, 0], descBn: "উচ্চ শর্করাযুক্ত রূপান্তরিত কাণ্ড যা মাটির নিচে সঞ্চিত হয়।", descEn: "Swollen subterranean stolons acting as carbohydrate nutrient sinks." }
+        ]
+    },
+    mustard: {
+        id: "mustard",
+        nameBn: "টরি-৭ সরিষা",
+        nameEn: "Yellow Mustard",
+        sci: "Brassica nigra",
+        categoryBn: "তৈলবীজ",
+        categoryEn: "Oilseed",
+        polys: "16.3K POLYS",
+        thumb: "assets/crops_3d/mustard.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=mustard+plant&type=models",
+        hotspots: [
+            { id: "florets", nameBn: "হলুদ ৪-পাপড়ির ফুল", nameEn: "Cruciform Florets", pos: [0, 0.72, 0], descBn: "মৌমাছি আকৃষ্টকারী হলুদ ফুল যা পরাগায়নে সহায়তা করে।", descEn: "Nectar-rich bright yellow crucifer blooms attracting pollinator bees." },
+            { id: "silique", nameBn: "বীজের শুঁটি (সিলিকুয়া)", nameEn: "Seed Silique Pod", pos: [0.12, 0.45, 0.05], descBn: "চিকন সরু শুঁটির ভেতর তৈলসমৃদ্ধ সরিষার বীজ গঠিত হয়।", descEn: "Dehiscent two-valved capsule housing high-lipid oilseeds." }
+        ]
+    },
+    tomato: {
+        id: "tomato",
+        nameBn: "হাইব্রিড টমেটো",
+        nameEn: "Fresh Tomato",
+        sci: "Solanum lycopersicum",
+        categoryBn: "সবজি",
+        categoryEn: "Vegetable",
+        polys: "19.4K POLYS",
+        thumb: "assets/crops_3d/tomato.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=tomato+plant&type=models",
+        hotspots: [
+            { id: "fruit", nameBn: "রসাল লাল পাকা ফল", nameEn: "Ripe Berry Fruit", pos: [-0.18, 0.45, 0.10], descBn: "লাইকোপেন ও ভিটামিন সি সমৃদ্ধ রসাল টমেটো।", descEn: "Fleshy berry fruit high in lycopene and essential antioxidants." },
+            { id: "flower", nameBn: "হলুদ পরাগ ফুল", nameEn: "Star Flower", pos: [0.12, 0.65, 0.05], descBn: "স্ব-পরাগায়িত ফুল যা ফল ধারণের প্রাথমিক পর্যায়।", descEn: "Self-pollinating yellow corolla forming the fruit cluster." }
+        ]
+    },
+    eggplant: {
+        id: "eggplant",
+        nameBn: "বারি বেগুন",
+        nameEn: "Purple Eggplant",
+        sci: "Solanum melongena",
+        categoryBn: "সবজি",
+        categoryEn: "Vegetable",
+        polys: "14.1K POLYS",
+        thumb: "assets/crops_3d/eggplant.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=eggplant+plant&type=models",
+        hotspots: [
+            { id: "fruit", nameBn: "চকচকে বেগুনি ফল", nameEn: "Glossy Purple Fruit", pos: [-0.15, 0.38, 0.12], descBn: "অ্যান্থোসায়ানিন সমৃদ্ধ পুষ্টিকর বেগুনি ত্বক।", descEn: "Glossy berry fruit packed with nasunin anthocyanin antioxidants." },
+            { id: "calyx", nameBn: "কাঁটাযুক্ত সবুজ বোঁটা", nameEn: "Spiny Calyx", pos: [-0.15, 0.50, 0.12], descBn: "ফলকে শক্তভাবে ডালের সাথে আটকে রাখা ক্যালিক্স।", descEn: "Persistent spiny green sepals supporting heavy fruit mass." }
+        ]
+    },
+    chili: {
+        id: "chili",
+        nameBn: "বিন্দু মরিচ",
+        nameEn: "Green & Red Chili",
+        sci: "Capsicum annuum",
+        categoryBn: "মসলা ফসল",
+        categoryEn: "Spice",
+        polys: "13.8K POLYS",
+        thumb: "assets/crops_3d/chili.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=chili+plant&type=models",
+        hotspots: [
+            { id: "pod", nameBn: "তীক্ষ্ণ ক্যাপসাইসিন শুঁটি", nameEn: "Pungent Pod", pos: [0.12, 0.35, 0.08], descBn: "ক্যাপসাইসিন সমৃদ্ধ ঝাল কাঁচামরিচ যা মেটাবলিজম বাড়ায়।", descEn: "Pungent hollow berry rich in vitamin A, C and thermogenic capsaicin." }
+        ]
+    },
+    lentil: {
+        id: "lentil",
+        nameBn: "উফশী মসুর",
+        nameEn: "Red Lentil",
+        sci: "Lens culinaris",
+        categoryBn: "ডালজাতীয়",
+        categoryEn: "Pulse",
+        polys: "12.2K POLYS",
+        thumb: "assets/crops_3d/lentil.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=lentil+plant&type=models",
+        hotspots: [
+            { id: "pod", nameBn: "ডালের শুঁটি", nameEn: "Lentil Pods", pos: [-0.12, 0.32, 0.08], descBn: "প্রতিটি শুঁটিতে ১-২টি করে প্রোটিনসমৃদ্ধ মসুর ডাল থাকে।", descEn: "Rhomboid pods housing protein-rich, iron-dense lentil seeds." },
+            { id: "nodules", nameBn: "নাইট্রোজেন নডিউল", nameEn: "Rhizobium Nodules", pos: [0, 0.04, 0], descBn: "রাইজোবিয়াম ব্যাকটেরিয়া যা বাতাস থেকে নাইট্রোজেন মাটিতে সংবন্ধন করে।", descEn: "Symbiotic root nodules fixing atmospheric nitrogen to fertilize soils." }
+        ]
+    },
+    cucumber: {
+        id: "cucumber",
+        nameBn: "সবুজ শসা",
+        nameEn: "Green Cucumber",
+        sci: "Cucumis sativus",
+        categoryBn: "লতানো সবজি",
+        categoryEn: "Vine Vegetable",
+        polys: "16.7K POLYS",
+        thumb: "assets/crops_3d/cucumber.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=cucumber+plant&type=models",
+        hotspots: [
+            { id: "fruit", nameBn: "পানিসমৃদ্ধ শসা", nameEn: "Cylindrical Pepo", pos: [-0.14, 0.35, 0.1], descBn: "৯৫% পানিযুক্ত শরীর ঠান্ডা রাখার আদর্শ সালাদ ফসল।", descEn: "Elongated pepo fruit composed of 95% water and cooling electrolytes." }
+        ]
+    },
+    cauliflower: {
+        id: "cauliflower",
+        nameBn: "স্নোবল ফুলকপি",
+        nameEn: "White Cauliflower",
+        sci: "Brassica oleracea",
+        categoryBn: "শীতকালীন সবজি",
+        categoryEn: "Vegetable",
+        polys: "17.5K POLYS",
+        thumb: "assets/crops_3d/cauliflower.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=cauliflower+plant&type=models",
+        hotspots: [
+            { id: "curd", nameBn: "নিরেট সাদা হেড/কুঁড়ি", nameEn: "White Compact Curd", pos: [0, 0.35, 0], descBn: "ঘন কুঁড়ির দল যা অপরিপক্ক পুষ্পমঞ্জরীর রূপ।", descEn: "Hypertrophied, tightly clustered floral meristem rich in fiber." }
+        ]
+    },
+    onion: {
+        id: "onion",
+        nameBn: "তাহেরপুরী পেঁয়াজ",
+        nameEn: "Red Onion",
+        sci: "Allium cepa",
+        categoryBn: "কন্দ জাতীয় মসলা",
+        categoryEn: "Bulb Spice",
+        polys: "10.9K POLYS",
+        thumb: "assets/crops_3d/onion.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=onion+plant&type=models",
+        hotspots: [
+            { id: "bulb", nameBn: "রসালো স্তরযুক্ত কন্দ", nameEn: "Tunic Layered Bulb", pos: [0, 0.18, 0], descBn: "সালফার যৌগসমৃদ্ধ ঝাঝালো পুষ্টিকর রসালো কন্দ।", descEn: "Swollen fleshy leaf bases with allicin sulfur oils." }
+        ]
+    },
+    carrot: {
+        id: "carrot",
+        nameBn: "কমলা গাজর",
+        nameEn: "Orange Carrot",
+        sci: "Daucus carota",
+        categoryBn: "মূলজাতীয়",
+        categoryEn: "Root Vegetable",
+        polys: "13.4K POLYS",
+        thumb: "assets/crops_3d/carrot.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=carrot+plant&type=models",
+        hotspots: [
+            { id: "taproot", nameBn: "বিটা-ক্যারোটিন মূল", nameEn: "Carotenoid Taproot", pos: [0, 0.18, 0], descBn: "চোখের দৃষ্টি ও ত্বকের জন্য উপকারি ভিটামিন এ ভাণ্ডার।", descEn: "Thick conical storage taproot loaded with beta-carotene." }
+        ]
+    },
+    papaya: {
+        id: "papaya",
+        nameBn: "রেড লেডি পেঁপে",
+        nameEn: "Tropical Papaya",
+        sci: "Carica papaya",
+        categoryBn: "ফল ও সবজি",
+        categoryEn: "Fruit Tree",
+        polys: "21.3K POLYS",
+        thumb: "assets/crops_3d/papaya.svg",
+        sketchfabUrl: "https://sketchfab.com/search?q=papaya+tree&type=models",
+        hotspots: [
+            { id: "fruits", nameBn: "কাণ্ডে ঝুলন্ত পেঁপের গুচ্ছ", nameEn: "Melon Fruit Cluster", pos: [0, 1.35, 0], descBn: "পেপাইন এনজাইম সমৃদ্ধ যা হজমে অত্যন্ত সহায়ক।", descEn: "Oblong melon-like berries producing digestion-boosting papain." },
+            { id: "crown", nameBn: "ছাতার মতো পাতার মুকুট", nameEn: "Palmate Crown", pos: [0, 2.1, 0], descBn: "গভীরভাবে খাঁজকাটা বড় আকৃতির পাতা।", descEn: "Radiating palmate fronds creating an umbrella canopy." }
+        ]
+    }
+};
+
+
 // 15 Crop Metadata for Live Data Drawer (Bilingual & Agricultural)
 const CROP_METRICS = {
     rice: {
@@ -1321,6 +1560,11 @@ export function init3DFieldSimulation() {
     // 10. Build Initial Crop Field
     createCropField(activeCropId);
 
+    // 10b. Setup Sketchfab 3D Crop Studio & UI Catalog
+    setupStudioEnvironment();
+    populateCropCatalogTray();
+    updateTelemetryHud(activeCropId);
+
     // 11. Bind UI Controls (Drone vs Field, Sun Slider, Data Drawer)
     bindUIControls();
 
@@ -1766,27 +2010,367 @@ function adjustFieldCameraForCrop(cropId) {
     isTransitioningCamera = true;
 }
 
+
+/*
+|--------------------------------------------------------------------------
+| SKETCHFAB 3D SPECIMEN STUDIO & INSPECTOR
+|--------------------------------------------------------------------------
+*/
+function setupStudioEnvironment() {
+    studioGroup = new THREE.Group();
+    studioGroup.visible = false;
+
+    // Dark Brushed Metal Turntable Base
+    const cylGeom = new THREE.CylinderGeometry(1.65, 1.72, 0.06, 64);
+    const cylMat = new THREE.MeshStandardMaterial({
+        color: 0x08150f,
+        roughness: 0.35,
+        metalness: 0.75
+    });
+    studioPedestal = new THREE.Mesh(cylGeom, cylMat);
+    studioPedestal.position.set(0, -0.03, 0);
+    studioPedestal.receiveShadow = true;
+    studioGroup.add(studioPedestal);
+
+    // Glowing Emerald Edge Ring (Radial Cad Grid)
+    const ringGeom = new THREE.RingGeometry(1.60, 1.64, 64);
+    const ringMat = new THREE.MeshBasicMaterial({
+        color: 0x43ef8c,
+        side: THREE.DoubleSide
+    });
+    const ringMesh = new THREE.Mesh(ringGeom, ringMat);
+    ringMesh.rotation.x = -Math.PI / 2;
+    ringMesh.position.y = 0.002;
+    studioGroup.add(ringMesh);
+
+    // Inner Radial Grid Disc
+    const innerRingGeom = new THREE.RingGeometry(1.15, 1.16, 48);
+    const innerRingMat = new THREE.MeshBasicMaterial({
+        color: 0x2e7d32,
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.45
+    });
+    const innerRingMesh = new THREE.Mesh(innerRingGeom, innerRingMat);
+    innerRingMesh.rotation.x = -Math.PI / 2;
+    innerRingMesh.position.y = 0.002;
+    studioGroup.add(innerRingMesh);
+
+    // Specimen Group
+    studioSpecimenGroup = new THREE.Group();
+    studioGroup.add(studioSpecimenGroup);
+
+    // Studio 3-Point Lighting
+    studioLightKey = new THREE.DirectionalLight(0xfff6e8, 3.2);
+    studioLightKey.position.set(2.5, 4.5, 3.5);
+    studioLightKey.castShadow = true;
+    studioLightKey.shadow.bias = -0.0002;
+    studioLightKey.shadow.mapSize.width = 1024;
+    studioLightKey.shadow.mapSize.height = 1024;
+    studioGroup.add(studioLightKey);
+
+    studioLightFill = new THREE.DirectionalLight(0x80deea, 1.4);
+    studioLightFill.position.set(-3.5, 2.8, -2.5);
+    studioGroup.add(studioLightFill);
+
+    studioLightRim = new THREE.DirectionalLight(0xffd54f, 2.0);
+    studioLightRim.position.set(0, 4.0, -3.8);
+    studioGroup.add(studioLightRim);
+
+    scene.add(studioGroup);
+}
+
+function applyShadingToMaterial(mat, mode, defaultColor) {
+    if (!mat) return;
+    if (mode === "wireframe") {
+        mat.wireframe = true;
+        if (mat.color) mat.color.setHex(0x43ef8c);
+    } else if (mode === "clay") {
+        mat.wireframe = false;
+        if (mat.color) mat.color.setHex(0xd0d8cf);
+        mat.roughness = 0.85;
+        if (mat.transmission !== undefined) mat.transmission = 0.0;
+    } else if (mode === "vein") {
+        mat.wireframe = false;
+        if (mat.bumpScale !== undefined) mat.bumpScale = 0.08;
+        mat.roughness = 0.28;
+        if (mat.transmission !== undefined) mat.transmission = 0.42;
+    } else {
+        // PBR Realistic default
+        mat.wireframe = false;
+        if (mat.color && defaultColor) mat.color.setHex(defaultColor);
+        if (mat.bumpScale !== undefined) mat.bumpScale = 0.025;
+        mat.roughness = 0.44;
+        if (mat.transmission !== undefined) mat.transmission = 0.24;
+    }
+}
+
+function loadStudioCropSpecimen(cropId) {
+    if (!studioSpecimenGroup) return;
+
+    while (studioSpecimenGroup.children.length > 0) {
+        const obj = studioSpecimenGroup.children[0];
+        studioSpecimenGroup.remove(obj);
+        if (obj.geometry) obj.geometry.dispose();
+    }
+
+    const assets = buildBotanicalCropAssets(cropId);
+
+    applyShadingToMaterial(assets.stemMat, currentShadingMode, 0x3d7023);
+    applyShadingToMaterial(assets.leafMat, currentShadingMode, 0x43a047);
+    if (assets.fruitMat) {
+        applyShadingToMaterial(assets.fruitMat, currentShadingMode, 0xd4af37);
+    }
+
+    const stemMesh = new THREE.Mesh(assets.stemGeom, assets.stemMat);
+    stemMesh.castShadow = true;
+    stemMesh.receiveShadow = true;
+    studioSpecimenGroup.add(stemMesh);
+
+    const leafMesh = new THREE.Mesh(assets.leafGeom, assets.leafMat);
+    leafMesh.castShadow = true;
+    leafMesh.receiveShadow = true;
+    studioSpecimenGroup.add(leafMesh);
+
+    if (assets.fruitGeom && assets.fruitMat) {
+        const fruitMesh = new THREE.Mesh(assets.fruitGeom, assets.fruitMat);
+        fruitMesh.castShadow = true;
+        fruitMesh.receiveShadow = true;
+        studioSpecimenGroup.add(fruitMesh);
+    }
+
+    const h = assets.maxCropHeight || 1.0;
+    const targetHeight = 1.35;
+    const scale = targetHeight / Math.max(h, 0.6);
+    studioSpecimenGroup.scale.set(scale, scale, scale);
+
+    setupStudioHotspots(cropId, scale);
+}
+
+function setupStudioHotspots(cropId, scale) {
+    const overlay = document.getElementById("studioHotspotsOverlay");
+    if (!overlay) return;
+    overlay.innerHTML = "";
+
+    const cropData = CROP_SKETCHFAB_DATA[cropId] || CROP_SKETCHFAB_DATA.rice;
+    activeHotspots = (cropData.hotspots || []).map((h, idx) => {
+        const pos = new THREE.Vector3(h.pos[0] * scale, h.pos[1] * scale, h.pos[2] * scale);
+
+        const pin = document.createElement("button");
+        pin.className = "studio-hotspot-pin";
+        pin.setAttribute("aria-label", h.nameEn);
+        pin.title = `${h.nameBn} (${h.nameEn})`;
+        pin.innerHTML = `
+            <span class="pin-ring"></span>
+            <span class="pin-core">${idx + 1}</span>
+            <span class="pin-label">${h.nameBn}</span>
+        `;
+
+        pin.addEventListener("click", () => {
+            showHotspotDetail(h, idx + 1, pos);
+        });
+
+        overlay.appendChild(pin);
+
+        return {
+            element: pin,
+            pos: pos,
+            data: h,
+            index: idx + 1
+        };
+    });
+}
+
+function showHotspotDetail(h, idx, pos) {
+    const card = document.getElementById("hotspotDetailCard");
+    if (!card) return;
+
+    const badge = document.getElementById("hcardBadge");
+    const title = document.getElementById("hcardTitle");
+    const desc = document.getElementById("hcardDesc");
+    const action = document.getElementById("hcardAction");
+
+    const isBn = (window.currentLang === "bn" || !window.currentLang);
+
+    if (badge) badge.textContent = `HOTSPOT #${idx} · ${h.id.toUpperCase()}`;
+    if (title) title.textContent = isBn ? `${h.nameBn} (${h.nameEn})` : `${h.nameEn} (${h.nameBn})`;
+    if (desc) desc.textContent = isBn ? h.descBn : h.descEn;
+    if (action) action.textContent = isBn ? `🔬 ফোকাস মোড: ${h.nameBn}` : `🔬 Focus Mode: ${h.nameEn}`;
+
+    card.classList.add("active");
+    card.setAttribute("aria-hidden", "false");
+
+    if (pos && studioGroup) {
+        const worldPos = pos.clone().applyEuler(studioGroup.rotation).add(studioGroup.position);
+        targetLookAt.copy(worldPos);
+        targetCameraPos.set(worldPos.x * 0.8, worldPos.y + 0.25, worldPos.z + 1.25);
+        isTransitioningCamera = true;
+    }
+}
+
+function setShadingMode(mode) {
+    currentShadingMode = mode;
+    if (currentCameraMode === "studio") {
+        loadStudioCropSpecimen(activeCropId);
+    }
+}
+
+function updateTelemetryHud(cropId) {
+    const ndviEl = document.getElementById("telemetryNdvi");
+    const windEl = document.getElementById("telemetryWind");
+    const moistEl = document.getElementById("telemetryMoist");
+
+    const ndviMap = {
+        rice: "0.84", wheat: "0.79", maize: "0.88", jute: "0.82",
+        potato: "0.74", mustard: "0.77", tomato: "0.81", eggplant: "0.78",
+        chili: "0.76", lentil: "0.73", cucumber: "0.83", cauliflower: "0.75",
+        onion: "0.71", carrot: "0.72", papaya: "0.86"
+    };
+
+    if (ndviEl) ndviEl.textContent = ndviMap[cropId] || "0.81";
+    if (windEl) windEl.textContent = "14 km/h S-SW";
+    const meta = CROP_METRICS[cropId] || CROP_METRICS.rice;
+    if (moistEl) moistEl.textContent = meta.moisture ? meta.moisture.split(" ")[0] : "68%";
+}
+
+function populateCropCatalogTray() {
+    const tray = document.getElementById("catalogScrollTray");
+    if (!tray) return;
+    tray.innerHTML = "";
+
+    const cropIds = Object.keys(CROP_SKETCHFAB_DATA);
+    cropIds.forEach(id => {
+        const c = CROP_SKETCHFAB_DATA[id];
+        const card = document.createElement("div");
+        card.className = `sketchfab-crop-card ${id === activeCropId ? "active" : ""}`;
+        card.setAttribute("data-crop-id", id);
+
+        card.innerHTML = `
+            <div class="card-thumb-container">
+                <img src="${c.thumb}" alt="${c.nameEn} 3D Model" class="card-3d-thumb" loading="lazy" />
+                <span class="card-3d-badge">3D PBR</span>
+                <span class="card-poly-badge">${c.polys}</span>
+            </div>
+            <div class="card-info">
+                <div class="card-title-row">
+                    <h4>${c.nameBn} <small>(${c.nameEn})</small></h4>
+                    <span class="card-cat-tag">${c.categoryBn}</span>
+                </div>
+                <p class="card-sci-name"><em>${c.sci}</em></p>
+                <div class="card-actions-row">
+                    <button class="card-btn-action btn-load-field" data-crop="${id}" title="মাঠে লোড করুন">🌾 মাঠ</button>
+                    <button class="card-btn-action btn-inspect-studio" data-crop="${id}" title="৩ডি স্টুডিওতে পরীক্ষা করুন">🔬 ৩ডি স্টুডিও</button>
+                    <a href="${c.sketchfabUrl}" target="_blank" rel="noopener noreferrer" class="card-btn-sketchfab" title="View on Sketchfab">🌐 Sketchfab</a>
+                </div>
+            </div>
+        `;
+
+        card.addEventListener("click", (e) => {
+            if (e.target.closest("button") || e.target.closest("a")) return;
+            updateCropSimulation(id);
+            highlightCatalogActiveCard(id);
+        });
+
+        const btnField = card.querySelector(".btn-load-field");
+        if (btnField) {
+            btnField.addEventListener("click", (e) => {
+                e.stopPropagation();
+                updateCropSimulation(id);
+                switchCameraMode("field");
+                highlightCatalogActiveCard(id);
+            });
+        }
+
+        const btnStudio = card.querySelector(".btn-inspect-studio");
+        if (btnStudio) {
+            btnStudio.addEventListener("click", (e) => {
+                e.stopPropagation();
+                updateCropSimulation(id);
+                switchCameraMode("studio");
+                highlightCatalogActiveCard(id);
+            });
+        }
+
+        tray.appendChild(card);
+    });
+}
+
+function highlightCatalogActiveCard(cropId) {
+    const cards = document.querySelectorAll(".sketchfab-crop-card");
+    cards.forEach(card => {
+        if (card.getAttribute("data-crop-id") === cropId) {
+            card.classList.add("active");
+        } else {
+            card.classList.remove("active");
+        }
+    });
+}
+
 export function switchCameraMode(mode) {
     currentCameraMode = mode;
     const btnDrone = document.getElementById("btnDroneView");
     const btnField = document.getElementById("btnFieldView");
+    const btnStudio = document.getElementById("btnStudioView");
+    const hotspotsOverlay = document.getElementById("studioHotspotsOverlay");
+    const hcard = document.getElementById("hotspotDetailCard");
+
+    // Clear active classes
+    if (btnDrone) btnDrone.classList.remove("active");
+    if (btnField) btnField.classList.remove("active");
+    if (btnStudio) btnStudio.classList.remove("active");
 
     if (mode === "drone") {
+        if (btnDrone) btnDrone.classList.add("active");
+        if (terrainMesh) terrainMesh.visible = true;
+        if (grassTuftsMesh) grassTuftsMesh.visible = true;
+        if (waterMesh) waterMesh.visible = (activeCropId === "rice" || activeCropId === "jute");
+        if (currentCropGroup) currentCropGroup.visible = true;
+        if (studioGroup) studioGroup.visible = false;
+        if (hotspotsOverlay) hotspotsOverlay.classList.remove("active");
+        if (hcard) hcard.classList.remove("active");
+
+        controls.minDistance = 1.6;
+        controls.maxDistance = 24.0;
         targetCameraPos.set(0, 9.8, 12.2);
         targetLookAt.set(0, 0.2, 0);
         isTransitioningCamera = true;
-        if (btnDrone) btnDrone.classList.add("active");
-        if (btnField) btnField.classList.remove("active");
+    } else if (mode === "studio") {
+        if (btnStudio) btnStudio.classList.add("active");
+        if (terrainMesh) terrainMesh.visible = false;
+        if (grassTuftsMesh) grassTuftsMesh.visible = false;
+        if (waterMesh) waterMesh.visible = false;
+        if (currentCropGroup) currentCropGroup.visible = false;
+        if (studioGroup) {
+            studioGroup.visible = true;
+            loadStudioCropSpecimen(activeCropId);
+        }
+        if (hotspotsOverlay) hotspotsOverlay.classList.add("active");
+
+        controls.minDistance = 0.5;
+        controls.maxDistance = 6.0;
+        targetCameraPos.set(0, 0.95, 2.4);
+        targetLookAt.set(0, 0.65, 0);
+        isTransitioningCamera = true;
     } else {
-        adjustFieldCameraForCrop(activeCropId);
+        // Default: 'field'
         if (btnField) btnField.classList.add("active");
-        if (btnDrone) btnDrone.classList.remove("active");
+        if (terrainMesh) terrainMesh.visible = true;
+        if (grassTuftsMesh) grassTuftsMesh.visible = true;
+        if (waterMesh) waterMesh.visible = (activeCropId === "rice" || activeCropId === "jute");
+        if (currentCropGroup) currentCropGroup.visible = true;
+        if (studioGroup) studioGroup.visible = false;
+        if (hotspotsOverlay) hotspotsOverlay.classList.remove("active");
+        if (hcard) hcard.classList.remove("active");
+
+        controls.minDistance = 1.6;
+        controls.maxDistance = 24.0;
+        adjustFieldCameraForCrop(activeCropId);
     }
 }
 window.switchCameraMode = switchCameraMode;
 
 export function updateCropSimulation(cropId) {
-    if (!cropId || (cropId === activeCropId && currentCropGroup)) return;
+    if (!cropId) return;
     activeCropId = cropId;
 
     const cropSelect = document.getElementById("cropSelect");
@@ -1798,11 +2382,19 @@ export function updateCropSimulation(cropId) {
     }
 
     createCropField(cropId);
+
+    if (currentCameraMode === "studio") {
+        loadStudioCropSpecimen(cropId);
+    }
+
+    updateTelemetryHud(cropId);
+    highlightCatalogActiveCard(cropId);
 }
 window.updateCropSimulation = updateCropSimulation;
 
 function updateDrawerData(cropId) {
     const meta = CROP_METRICS[cropId] || CROP_METRICS.rice;
+    const cData = CROP_SKETCHFAB_DATA[cropId] || CROP_SKETCHFAB_DATA.rice;
 
     const nameEl = document.getElementById("drawerCropName");
     if (nameEl) nameEl.textContent = `${meta.nameBn} (${meta.nameEn})`;
@@ -1818,6 +2410,15 @@ function updateDrawerData(cropId) {
 
     const daysEl = document.getElementById("drawerCropDays");
     if (daysEl) daysEl.textContent = meta.duration;
+
+    const thumbEl = document.getElementById("drawerCropThumb");
+    if (thumbEl) thumbEl.src = cData.thumb;
+
+    const skLink = document.getElementById("drawerSketchfabLink");
+    if (skLink) skLink.href = cData.sketchfabUrl;
+
+    const catEl = document.getElementById("drawerCropCategory");
+    if (catEl) catEl.textContent = cData.categoryBn;
 
     const iconEl = document.getElementById("drawerCropIcon");
     if (iconEl) {
@@ -1850,6 +2451,57 @@ function bindUIControls() {
 
     if (btnDrone) btnDrone.addEventListener("click", () => switchCameraMode("drone"));
     if (btnField) btnField.addEventListener("click", () => switchCameraMode("field"));
+
+    const btnStudio = document.getElementById("btnStudioView");
+    if (btnStudio) btnStudio.addEventListener("click", () => switchCameraMode("studio"));
+
+    const shadingSelect = document.getElementById("shadingSelect");
+    if (shadingSelect) {
+        shadingSelect.addEventListener("change", (e) => {
+            setShadingMode(e.target.value);
+        });
+    }
+
+    const btnTurntable = document.getElementById("btnTurntable");
+    if (btnTurntable) {
+        btnTurntable.addEventListener("click", () => {
+            isTurntableActive = !isTurntableActive;
+            btnTurntable.classList.toggle("active", isTurntableActive);
+        });
+    }
+
+    const catalogDrawer = document.getElementById("farmCropCatalog");
+    const btnGalleryToggle = document.getElementById("btnGalleryToggle");
+    const btnCloseCatalog = document.getElementById("btnCloseCatalog");
+
+    function toggleCatalog(open) {
+        if (!catalogDrawer) return;
+        const willOpen = (open !== undefined) ? open : !catalogDrawer.classList.contains("active");
+        if (willOpen) {
+            catalogDrawer.classList.add("active");
+            catalogDrawer.setAttribute("aria-hidden", "false");
+            if (btnGalleryToggle) btnGalleryToggle.classList.add("active");
+        } else {
+            catalogDrawer.classList.remove("active");
+            catalogDrawer.setAttribute("aria-hidden", "true");
+            if (btnGalleryToggle) btnGalleryToggle.classList.remove("active");
+        }
+    }
+
+    if (btnGalleryToggle) btnGalleryToggle.addEventListener("click", () => toggleCatalog());
+    if (btnCloseCatalog) btnCloseCatalog.addEventListener("click", () => toggleCatalog(false));
+
+    const btnCloseHcard = document.getElementById("btnCloseHcard");
+    if (btnCloseHcard) {
+        btnCloseHcard.addEventListener("click", () => {
+            const hcard = document.getElementById("hotspotDetailCard");
+            if (hcard) {
+                hcard.classList.remove("active");
+                hcard.setAttribute("aria-hidden", "true");
+            }
+        });
+    }
+
 
     if (timeSlider) {
         timeSlider.addEventListener("input", (e) => {
@@ -1941,6 +2593,44 @@ function animate() {
             camera.position.copy(targetCameraPos);
             controls.target.copy(targetLookAt);
             isTransitioningCamera = false;
+        }
+    }
+
+
+    if (currentCameraMode === "studio" && studioGroup && studioGroup.visible) {
+        if (isTurntableActive) {
+            studioGroup.rotation.y += 0.005;
+        }
+
+        if (activeHotspots.length > 0 && containerEl) {
+            const width = containerEl.clientWidth;
+            const height = containerEl.clientHeight;
+            const widthHalf = width / 2;
+            const heightHalf = height / 2;
+
+            const tempV = new THREE.Vector3();
+
+            activeHotspots.forEach(hs => {
+                tempV.copy(hs.pos);
+                tempV.applyEuler(studioGroup.rotation);
+                tempV.add(studioGroup.position);
+                tempV.project(camera);
+
+                if (tempV.z < 1.0) {
+                    const x = (tempV.x * widthHalf) + widthHalf;
+                    const y = -(tempV.y * heightHalf) + heightHalf;
+
+                    if (x >= 20 && x <= width - 20 && y >= 20 && y <= height - 20) {
+                        hs.element.style.display = "flex";
+                        hs.element.style.left = `${x}px`;
+                        hs.element.style.top = `${y}px`;
+                    } else {
+                        hs.element.style.display = "none";
+                    }
+                } else {
+                    hs.element.style.display = "none";
+                }
+            });
         }
     }
 
