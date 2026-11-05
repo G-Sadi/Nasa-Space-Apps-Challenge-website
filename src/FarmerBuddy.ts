@@ -1,15 +1,15 @@
 /**
  * ============================================================================
- * FARMER BUDDY (কৃষি বন্ধু) - TYPESCRIPT AI ASSISTANT FRONTEND
+ * FARMER BUDDY (কৃষি বন্ধু) - BILINGUAL AI ASSISTANT FRONTEND (TYPESCRIPT)
  * ============================================================================
- * Features:
- * - Strict TypeScript Interfaces (ChatMessage, ChatPayload, QuickActionChip)
- * - Modern fetch() with ReadableStream & SSE parser for live token streaming
- * - SessionStorage conversation persistence for low-bandwidth reloads
- * - Offline graceful degradation with rich rural agricultural FAQ fallback
- * - Dark slate palette (#0f172a, #1e293b, #10b981) matching NASA Space Apps theme
+ * Default: English ("en")
+ * Dynamic: Switches to Bangla ("bn") upon website #langToggle click
+ * Theme: Strictly matched with AgriVision's deep dark-forest green (#06150f)
+ *        and glowing neon emerald (#43ef8c) aesthetic.
  * ============================================================================
  */
+
+export type AppLanguage = "en" | "bn";
 
 export interface ChatMessage {
     id: string;
@@ -21,6 +21,7 @@ export interface ChatMessage {
 export interface ChatPayload {
     message: string;
     history: Array<{ sender: "user" | "buddy"; text: string }>;
+    lang: AppLanguage;
 }
 
 export interface QuickActionChip {
@@ -32,12 +33,29 @@ export interface QuickActionChip {
 
 export interface OfflineFAQ {
     keywords: string[];
-    answer: string;
+    answerEn: string;
+    answerBn: string;
+}
+
+export interface TranslationDict {
+    fabAria: string;
+    fabLabel: string;
+    title: string;
+    badge: string;
+    status: string;
+    resetTitle: string;
+    minimizeTitle: string;
+    inputPlaceholder: string;
+    sendAria: string;
+    footerNote: string;
+    senderTag: string;
+    welcomeMsg: string;
 }
 
 export class FarmerBuddy {
     private apiUrl: string = "http://127.0.0.1:8000/api/chat/stream";
-    private storageKey: string = "agrivision_farmer_buddy_chat_v1";
+    private storageKeyPrefix: string = "agrivision_farmer_buddy_chat_v2_";
+    private currentLang: AppLanguage = "en";
     private messages: ChatMessage[] = [];
     private isOpen: boolean = false;
     private isStreaming: boolean = false;
@@ -50,80 +68,174 @@ export class FarmerBuddy {
     private inputField!: HTMLInputElement;
     private sendButton!: HTMLButtonElement;
     private chipsContainer!: HTMLElement;
+    private titleEl!: HTMLElement;
+    private badgeEl!: HTMLElement;
+    private statusEl!: HTMLElement;
+    private resetBtnEl!: HTMLButtonElement;
+    private minimizeBtnEl!: HTMLButtonElement;
+    private footerNoteEl!: HTMLElement;
+    private fabLabelEl!: HTMLElement;
 
-    // Quick Action Chips
-    private quickChips: QuickActionChip[] = [
-        {
-            id: "pest",
-            label: "পাতার রোগ নির্ণয়",
-            icon: "🌱",
-            prompt: "আমার ফসলের পাতায় পোকা ও হলুদ দাগ দেখা দিয়েছে, কীভাবে ঘরোয়া উপায়ে দমন করবো?"
+    // Bilingual UI dictionary
+    private i18nDict: Record<AppLanguage, TranslationDict> = {
+        en: {
+            fabAria: "Open Farmer Buddy AI Chat",
+            fabLabel: "Farmer Buddy AI",
+            title: "Farmer Buddy",
+            badge: "AI Assistant",
+            status: "Empathetic Rural Agricultural Advisor",
+            resetTitle: "Start New Conversation",
+            minimizeTitle: "Minimize Chat",
+            inputPlaceholder: "Ask about crops, pests, fertilizers, or weather...",
+            sendAria: "Send Message",
+            footerNote: "⚡ Low-Bandwidth & Offline Backup Enabled · Your Trusted Friend",
+            senderTag: "👨‍🌾 Farmer Buddy",
+            welcomeMsg: "Hello! I am your **Farmer Buddy (কৃষি বন্ধু)**.\n\nFrom crop disease diagnosis, balanced fertilizer calculation, weather alerts, to fair wholesale market prices—I am right by your side. How can I help you with your field today?"
         },
-        {
-            id: "fertilizer",
-            label: "সার ও সেচ হিসাব",
-            icon: "💧",
-            prompt: "ইউরিয়া, টিএসপি ও পটাশ সার কোন সময় কতটুকু দিলে ভালো ফলন পাবো?"
-        },
-        {
-            id: "weather",
-            label: "ঝড়ের প্রস্তুতি",
-            icon: "🌦️",
-            prompt: "আগামী দুদিন পর অতিবৃষ্টির সম্ভাবনা আছে, এখন মাঠে কী কী সতর্কতা নিতে হবে?"
-        },
-        {
-            id: "market",
-            label: "পাইকারি বাজার দর",
-            icon: "💰",
-            prompt: "মধ্যস্বত্বভোগী ফড়িয়াদের এড়িয়ে কীভাবে ফসলের ন্যায্য পাইকারি দাম পেতে পারি?"
-        },
-        {
-            id: "storage",
-            label: "ফসল সংরক্ষণ",
-            icon: "📦",
-            prompt: "ফসল ঘরে তোলার পর পোকার আক্রমণ ছাড়া কীভাবে ড্রামে বীজ সংরক্ষণ করবো?"
+        bn: {
+            fabAria: "কৃষি বন্ধু চ্যাট খুলুন",
+            fabLabel: "কৃষি বন্ধু AI",
+            title: "কৃষি বন্ধু",
+            badge: "AI সহচর",
+            status: "সহানুভূতিশীল মাঠপর্যায়ের কৃষি সহচর",
+            resetTitle: "নতুন আলাপ শুরু করুন",
+            minimizeTitle: "মিনিমাইজ করুন",
+            inputPlaceholder: "আপনার ফসলের সমস্যা বা প্রশ্ন লিখুন...",
+            sendAria: "বার্তা পাঠান",
+            footerNote: "⚡ কম ব্যান্ডউইথ ও অফলাইন ব্যাকআপ সমর্থিত · আপনার বিশ্বস্ত বন্ধু",
+            senderTag: "👨‍🌾 কৃষি বন্ধু",
+            welcomeMsg: "আসসালামু আলাইকুম ভাই! আমি আপনার **কৃষি বন্ধু**।\n\nফসলের রোগবালাই, সার প্রয়োগের হিসাব, ঝড়ের সতর্কতা কিংবা ন্যায্য বাজারদর—যেকোনো প্রয়োজনে আমি আপনার পাশে আছি। আজ আপনাকে কীভাবে সাহায্য করতে পারি?"
         }
-    ];
+    };
 
-    // Comprehensive Rural Offline FAQs (Graceful Degradation)
+    // Bilingual Quick Chips
+    private chipsDict: Record<AppLanguage, QuickActionChip[]> = {
+        en: [
+            {
+                id: "pest",
+                label: "Leaf Disease / Pest",
+                icon: "🌱",
+                prompt: "I see yellow spots and insect damage on my crop leaves. How can I treat them with safe low-cost remedies?"
+            },
+            {
+                id: "fertilizer",
+                label: "Fertilizer & Irrigation",
+                icon: "💧",
+                prompt: "When and how much Urea, TSP, and Potash should I apply for optimal yield?"
+            },
+            {
+                id: "weather",
+                label: "Storm & Rain Prep",
+                icon: "🌦️",
+                prompt: "Heavy rainfall is forecast in the next 48 hours. What protective measures should I take in my field right now?"
+            },
+            {
+                id: "market",
+                label: "Fair Wholesale Price",
+                icon: "💰",
+                prompt: "How can I avoid middlemen and get the best fair wholesale market price for my harvest?"
+            },
+            {
+                id: "storage",
+                label: "Post-Harvest Storage",
+                icon: "📦",
+                prompt: "How should I store seeds in drums after harvest to prevent pest infestation and moisture damage?"
+            }
+        ],
+        bn: [
+            {
+                id: "pest",
+                label: "পাতার রোগ নির্ণয়",
+                icon: "🌱",
+                prompt: "আমার ফসলের পাতায় পোকা ও হলুদ দাগ দেখা দিয়েছে, কীভাবে ঘরোয়া উপায়ে দমন করবো?"
+            },
+            {
+                id: "fertilizer",
+                label: "সার ও সেচ হিসাব",
+                icon: "💧",
+                prompt: "ইউরিয়া, টিএসপি ও পটাশ সার কোন সময় কতটুকু দিলে ভালো ফলন পাবো?"
+            },
+            {
+                id: "weather",
+                label: "ঝড়ের প্রস্তুতি",
+                icon: "🌦️",
+                prompt: "আগামী দুদিন পর অতিবৃষ্টির সম্ভাবনা আছে, এখন মাঠে কী কী সতর্কতা নিতে হবে?"
+            },
+            {
+                id: "market",
+                label: "পাইকারি বাজার দর",
+                icon: "💰",
+                prompt: "মধ্যস্বত্বভোগী ফড়িয়াদের এড়িয়ে কীভাবে ফসলের ন্যায্য পাইকারি দাম পেতে পারি?"
+            },
+            {
+                id: "storage",
+                label: "ফসল সংরক্ষণ",
+                icon: "📦",
+                prompt: "ফসল ঘরে তোলার পর পোকার আক্রমণ ছাড়া কীভাবে ড্রামে বীজ সংরক্ষণ করবো?"
+            }
+        ]
+    };
+
+    // Bilingual Offline FAQs (Graceful Degradation)
     private offlineFAQs: OfflineFAQ[] = [
         {
-            keywords: ["রোগ", "পোকা", "মাজরা", "পচন", "দাগ", "pest", "leaf", "disease"],
-            answer: "ভাই, ইন্টারনেট না থাকলেও চিন্তা নেই! পোকা দমনে তাৎক্ষণিক করণীয়:\n\n• **ঘরোয়া নিম স্প্রে:** ১ লিটার পানিতে ৫ মিলি নিমতেল ও সামান্য শ্যাম্পু মিশিয়ে গাছে স্প্রে করুন।\n• **আলোর ফাঁদ ও ডাল পোঁতা:** জমিতে বাঁশের ডাল পুঁতে দিলে পাখি বসে ক্ষতিকর পোকা খেয়ে ফেলে (পার্চিং পদ্ধতি)।\n• **তীব্র আক্রমণ:** পাতা মোড়ানো বা মাজরা পোকার জন্য 'এমামেকটিন বেনজোয়েট' (১ গ্রাম প্রতি লিটার পানি) স্প্রে করুন।\n\nআপনার গাছের কোন অংশে আক্রমণ বেশি দেখা যাচ্ছে?"
+            keywords: ["রোগ", "পোকা", "মাজরা", "পচন", "দাগ", "pest", "leaf", "disease", "insect", "fungus", "worm"],
+            answerEn: "Friend, don't worry even if you are offline! Immediate actions for crop pests:\n\n• **Organic Neem Spray:** Mix 5ml neem oil with a drop of mild soap in 1 liter of water and spray thoroughly.\n• **Bird Perching:** Erect bamboo sticks across the field so birds can perch and eat harmful stem borers naturally.\n• **Severe Infestation:** For severe leaf rollers or stem borers, consult your local agricultural officer for Emamectin Benzoate (1g per liter).\n\nWhich crop and what specific symptoms are you noticing?",
+            answerBn: "ভাই, ইন্টারনেট না থাকলেও চিন্তা নেই! পোকা দমনে তাৎক্ষণিক করণীয়:\n\n• **ঘরোয়া নিম স্প্রে:** ১ লিটার পানিতে ৫ মিলি নিমতেল ও সামান্য শ্যাম্পু মিশিয়ে গাছে স্প্রে করুন।\n• **আলোর ফাঁদ ও ডাল পোঁতা:** জমিতে বাঁশের ডাল পুঁতে দিলে পাখি বসে ক্ষতিকর পোকা খেয়ে ফেলে (পার্চিং পদ্ধতি)।\n• **তীব্র আক্রমণ:** পাতা মোড়ানো বা মাজরা পোকার জন্য 'এমামেকটিন বেনজোয়েট' (১ গ্রাম প্রতি লিটার পানি) স্প্রে করুন।\n\nআপনার গাছের কোন অংশে আক্রমণ বেশি দেখা যাচ্ছে?"
         },
         {
-            keywords: ["সার", "ইউরিয়া", "পটাশ", "টিএসপি", "fertilizer", "npk", "মাটি"],
-            answer: "ভাই, মাটির উর্বরতা ও সুষম সারের নিয়ম:\n\n• **ইউরিয়া সার:** একবারে না দিয়ে সমান ৩ কিস্তিতে দিন (রোপণের ১৫ দিন, ৩০ দিন ও থোড় আসার ৫ দিন আগে)।\n• **টিএসপি ও পটাশ:** জমি তৈরির শেষ চাষের সময় পুরোটা মাটির সাথে ভালো করে মিশিয়ে দিন।\n• **জৈব সার:** প্রতি শতকে অন্তত ১৫ কেজি পচা গোবর বা কম্পোস্ট দিলে মাটির রস ধরে রাখার ক্ষমতা দ্বিগুণ হয়।\n\nআপনি বর্তমানে কোন ফসলটির জন্য সারের মাত্রা জানতে চান?"
+            keywords: ["সার", "ইউরিয়া", "পটাশ", "টিএসপি", "fertilizer", "npk", "মাটি", "urea", "potash", "tsp", "soil"],
+            answerEn: "Friend, balanced fertilizer management for your soil:\n\n• **Urea Application:** Never apply Urea all at once. Split into 3 equal doses (15 days, 30 days, and 5 days before panicle initiation).\n• **TSP & Potash:** Thoroughly incorporate full doses into the soil during the final land preparation.\n• **Organic Compost:** Apply at least 15 kg well-decomposed manure or vermicompost per decimal to boost soil moisture retention.\n\nWhich crop are you currently fertilizing?",
+            answerBn: "ভাই, মাটির উর্বরতা ও সুষম সারের নিয়ম:\n\n• **ইউরিয়া সার:** একবারে না দিয়ে সমান ৩ কিস্তিতে দিন (রোপণের ১৫ দিন, ৩০ দিন ও থোড় আসার ৫ দিন আগে)।\n• **টিএসপি ও পটাশ:** জমি তৈরির শেষ চাষের সময় পুরোটা মাটির সাথে ভালো করে মিশিয়ে দিন।\n• **জৈব সার:** প্রতি শতকে অন্তত ১৫ কেজি পচা গোবর বা কম্পোস্ট দিলে মাটির রস ধরে রাখার ক্ষমতা দ্বিগুণ হয়।\n\nআপনি বর্তমানে কোন ফসলটির জন্য সারের মাত্রা জানতে চান?"
         },
         {
-            keywords: ["বৃষ্টি", "ঝড়", "বন্যা", "আবহাওয়া", "weather", "rain", "storm"],
-            answer: "ভাই, দুর্যোগের পূর্বাভাসে মাঠের সুরক্ষা:\n\n• **পানি নিষ্কাশন:** জমির চারধারে দ্রুত ১ ফুট গভীর ড্রেন কেটে দিন যাতে পানি জমে শিকড় পচে না যায়।\n• **সেচ ও স্প্রে বন্ধ:** আকাশে মেঘ বা বৃষ্টির পূর্বাভাস থাকলে সব ধরণের কীটনাশক ও সেচ অবিলম্বে স্থগিত রাখুন।\n• **হেলে পড়া গাছ:** ভুট্টার মতো গাছ বাতাসে হেলে পড়লে ৪-৫টি গাছ একসাথে বেঁধে আলতো সাপোর্ট দিন।\n\nআপনার জমির পানি নামার ড্রেনটি কি প্রস্তুত আছে?"
+            keywords: ["বৃষ্টি", "ঝড়", "বন্যা", "আবহাওয়া", "weather", "rain", "storm", "flood", "cyclone", "forecast"],
+            answerEn: "Friend, field protection guidelines ahead of bad weather:\n\n• **Drainage Trenches:** Immediately dig 1-foot drainage trenches around the field borders to prevent root asphyxiation.\n• **Halt Spraying & Irrigation:** If rain or heavy cloud cover is forecast in 48 hours, immediately halt all pesticide spraying and irrigation.\n• **Crop Staking:** For tall crops like maize or vegetables, bundle 4-5 adjacent stalks gently with twine for wind stability.\n\nAre your perimeter drainage channels clear and unobstructed?",
+            answerBn: "ভাই, দুর্যোগের পূর্বাভাসে মাঠের সুরক্ষা:\n\n• **পানি নিষ্কাশন:** জমির চারধারে দ্রুত ১ ফুট গভীর ড্রেন কেটে দিন যাতে পানি জমে শিকড় পচে না যায়।\n• **সেচ ও স্প্রে বন্ধ:** আকাশে মেঘ বা বৃষ্টির পূর্বাভাস থাকলে সব ধরণের কীটনাশক ও সেচ অবিলম্বে স্থগিত রাখুন।\n• **হেলে পড়া গাছ:** ভুট্টার মতো গাছ বাতাসে হেলে পড়লে ৪-৫টি গাছ একসাথে বেঁধে আলতো সাপোর্ট দিন।\n\nআপনার জমির পানি নামার ড্রেনটি কি প্রস্তুত আছে?"
         },
         {
-            keywords: ["দাম", "বাজার", "বিক্রি", "পাইকারি", "market", "price", "টাকা"],
-            answer: "ভাই, ন্যায্য মূল্য নিশ্চিত করতে করণীয়:\n\n• **গ্রেডিং বা বাছাই:** ফসলকে আকার ও রং অনুযায়ী ৩টি গ্রেডে আলাদা করুন। ভালো গ্রেডে ২০% বেশি দাম মেলে।\n• **আড়তে সরাসরি বিক্রয়:** গ্রামের ফড়িয়াদের বদলে উপজেলা পাইকারি মোকামে নিজে গিয়ে বা সমবায় ভিত্তিতে মাল পাঠান।\n• **ডিজিটাল তথ্য:** সরকারি 'কৃষি বাতায়ন' বা স্থানীয় কৃষি কর্মকর্তার সাথে পাইকারি দর যাচাই করে তবেই বিক্রি করুন।\n\nআপনি কোন হাটে ফসল বিক্রি করার পরিকল্পনা করছেন?"
+            keywords: ["দাম", "বাজার", "বিক্রি", "পাইকারি", "market", "price", "টাকা", "wholesale", "sell", "trader"],
+            answerEn: "Friend, practical advice to maximize your wholesale profit:\n\n• **Grade & Sort:** Separate produce into 3 grades by size and color. Graded produce commands a 20-30% premium.\n• **Direct Wholesale Hub:** Avoid middlemen at the village gate; take produce together with neighboring farmers to the regional wholesale market.\n• **Official Market Check:** Verify daily wholesale mandi prices via the government Agri portal or local extension officer before setting your price.\n\nWhich wholesale marketplace are you planning to sell at?",
+            answerBn: "ভাই, ন্যায্য মূল্য নিশ্চিত করতে করণীয়:\n\n• **গ্রেডিং বা বাছাই:** ফসলকে আকার ও রং অনুযায়ী ৩টি গ্রেডে আলাদা করুন। ভালো গ্রেডে ২০% বেশি দাম মেলে।\n• **আড়তে সরাসরি বিক্রয়:** গ্রামের ফড়িয়াদের বদলে উপজেলা পাইকারি মোকামে নিজে গিয়ে বা সমবায় ভিত্তিতে মাল পাঠান।\n• **ডিজিটাল তথ্য:** সরকারি 'কৃষি বাতায়ন' বা স্থানীয় কৃষি কর্মকর্তার সাথে পাইকারি দর যাচাই করে তবেই বিক্রি করুন।\n\nআপনি কোন হাটে ফসল বিক্রি করার পরিকল্পনা করছেন?"
         },
         {
-            keywords: ["সংরক্ষণ", "বীজ", "ড্রাম", "storage", "harvest", "প্যাকেট"],
-            answer: "ভাই, ফসল ও বীজ নষ্ট হওয়া রোধে করণীয়:\n\n• **আর্দ্রতা পরীক্ষা:** বীজ কড়া রোদে ৩ দিন শুকিয়ে আর্দ্রতা ১২%-এর নিচে আনুন (দাঁতে কাটলে 'কট' শব্দ হবে)।\n• **এয়ারটাইট ড্রাম:** পরিষ্কার ড্রামে বীজ রেখে ওপরে শুকনো নিমপাতা বা তেজপাতা দিয়ে মুখ শক্তভাবে বায়ুরোধী করুন।\n• **মেঝে থেকে দূরে:** ড্রাম কখনো মাটির ওপর রাখবেন না, কাঠের তক্তার ওপর রাখুন যাতে নিচের ঠান্ডা না লাগে।\n\nআপনি কি খাবার দানা নাকি আগামী মৌসুমের বীজ সংরক্ষণ করছেন?"
+            keywords: ["সংরক্ষণ", "বীজ", "ড্রাম", "storage", "harvest", "প্যাকেট", "seed", "grain", "moisture"],
+            answerEn: "Friend, grain and seed preservation tips:\n\n• **Sun-Drying:** Thoroughly dry seeds in strong sunlight for 3 days until moisture drops below 12% (a seed cracks cleanly between teeth).\n• **Airtight Drums:** Pack dried seeds in plastic/metal drums with dry neem leaves on top and seal the rim airtight.\n• **Elevate from Floor:** Keep storage containers on wooden pallets at least 6 inches above concrete or earthen floors.\n\nAre you preserving eating grains or seeds for the upcoming season?",
+            answerBn: "ভাই, ফসল ও বীজ নষ্ট হওয়া রোধে করণীয়:\n\n• **আর্দ্রতা পরীক্ষা:** বীজ কড়া রোদে ৩ দিন শুকিয়ে আর্দ্রতা ১২%-এর নিচে আনুন (দাঁতে কাটলে 'কট' শব্দ হবে)।\n• **এয়ারটাইট ড্রাম:** পরিষ্কার ড্রামে বীজ রেখে ওপরে শুকনো নিমপাতা বা তেজপাতা দিয়ে মুখ শক্তভাবে বায়ুরোধী করুন।\n• **মেঝে থেকে দূরে:** ড্রাম কখনো মাটির ওপর রাখবেন না, কাঠের তক্তার ওপর রাখুন যাতে নিচের ঠান্ডা না লাগে।\n\nআপনি কি খাবার দানা নাকি আগামী মৌসুমের বীজ সংরক্ষণ করছেন?"
         }
     ];
 
     constructor() {
-        this.loadSessionMessages();
+        // Detect initial language: English by default or sync with website
+        if (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn") {
+            this.currentLang = "bn";
+        } else {
+            this.currentLang = "en";
+        }
+
         this.initDOM();
+        this.loadSessionMessages();
         this.renderHistory();
         this.bindEvents();
     }
 
     /**
-     * Load past messages from sessionStorage
+     * Get current storage key based on active language
+     */
+    private getStorageKey(): string {
+        return `${this.storageKeyPrefix}${this.currentLang}`;
+    }
+
+    /**
+     * Load past messages from sessionStorage for current language
      */
     private loadSessionMessages(): void {
         try {
-            const raw = sessionStorage.getItem(this.storageKey);
+            const raw = sessionStorage.getItem(this.getStorageKey());
             if (raw) {
                 this.messages = JSON.parse(raw);
+            } else {
+                this.messages = [];
             }
         } catch (e) {
             this.messages = [];
@@ -131,10 +243,11 @@ export class FarmerBuddy {
 
         // Welcome Greeting if no history
         if (this.messages.length === 0) {
+            const texts = this.i18nDict[this.currentLang];
             this.messages.push({
-                id: "welcome-msg",
+                id: `welcome-${this.currentLang}`,
                 sender: "buddy",
-                text: "আসসালামু আলাইকুম ভাই! আমি আপনার **কৃষি বন্ধু**।\n\nফসলের রোগবালাই, সার প্রয়োগের হিসাব, ঝড়ের সতর্কতা কিংবা ন্যায্য বাজারদর—যেকোনো প্রয়োজনে আমি আপনার পাশে আছি। আজ আপনাকে কীভাবে সাহায্য করতে পারি?",
+                text: texts.welcomeMsg,
                 timestamp: Date.now()
             });
         }
@@ -145,11 +258,10 @@ export class FarmerBuddy {
      */
     private saveSessionMessages(): void {
         try {
-            // Retain last 20 messages for storage efficiency
             const trimmed = this.messages.slice(-20);
-            sessionStorage.setItem(this.storageKey, JSON.stringify(trimmed));
+            sessionStorage.setItem(this.getStorageKey(), JSON.stringify(trimmed));
         } catch (e) {
-            // Ignore storage quota errors
+            // Storage quota handled silently
         }
     }
 
@@ -157,6 +269,8 @@ export class FarmerBuddy {
      * Build the Widget DOM elements
      */
     private initDOM(): void {
+        const texts = this.i18nDict[this.currentLang];
+
         // Container
         this.widgetContainer = document.createElement("div");
         this.widgetContainer.id = "farmerBuddyWidget";
@@ -166,14 +280,15 @@ export class FarmerBuddy {
         this.fabButton = document.createElement("button");
         this.fabButton.id = "farmerBuddyFAB";
         this.fabButton.className = "farmer-buddy-fab";
-        this.fabButton.setAttribute("aria-label", "কৃষি বন্ধু চ্যাট খুলুন");
+        this.fabButton.setAttribute("aria-label", texts.fabAria);
         this.fabButton.innerHTML = `
             <div class="fab-icon-wrap">
                 <span class="fab-main-icon">🌾</span>
-                <span class="fab-pulse-badge" title="অনলাইন"></span>
+                <span class="fab-pulse-badge" title="Online"></span>
             </div>
-            <span class="fab-hover-label">কৃষি বন্ধু AI</span>
+            <span class="fab-hover-label" id="fbFabLabel">${texts.fabLabel}</span>
         `;
+        this.fabLabelEl = this.fabButton.querySelector("#fbFabLabel") as HTMLElement;
 
         // Chat Window Container
         this.chatWindow = document.createElement("div");
@@ -190,15 +305,24 @@ export class FarmerBuddy {
                     <span class="fb-online-dot"></span>
                 </div>
                 <div>
-                    <h3 class="fb-title">কৃষি বন্ধু <span class="fb-badge">AI Assistant</span></h3>
-                    <p class="fb-status">সহানুভূতিশীল মাঠপর্যায়ের কৃষি সহচর</p>
+                    <h3 class="fb-title">
+                        <span id="fbTitleText">${texts.title}</span>
+                        <span id="fbBadgeText" class="fb-badge">${texts.badge}</span>
+                    </h3>
+                    <p id="fbStatusText" class="fb-status">${texts.status}</p>
                 </div>
             </div>
             <div class="fb-header-actions">
-                <button id="fbResetBtn" class="fb-hdr-btn" title="নতুন আলাপ শুরু করুন">🔄</button>
-                <button id="fbMinimizeBtn" class="fb-hdr-btn" title="মিনিমাইজ করুন">✕</button>
+                <button id="fbResetBtn" class="fb-hdr-btn" title="${texts.resetTitle}">🔄</button>
+                <button id="fbMinimizeBtn" class="fb-hdr-btn" title="${texts.minimizeTitle}">✕</button>
             </div>
         `;
+
+        this.titleEl = header.querySelector("#fbTitleText") as HTMLElement;
+        this.badgeEl = header.querySelector("#fbBadgeText") as HTMLElement;
+        this.statusEl = header.querySelector("#fbStatusText") as HTMLElement;
+        this.resetBtnEl = header.querySelector("#fbResetBtn") as HTMLButtonElement;
+        this.minimizeBtnEl = header.querySelector("#fbMinimizeBtn") as HTMLButtonElement;
 
         // Messages Container
         this.messagesContainer = document.createElement("div");
@@ -219,19 +343,23 @@ export class FarmerBuddy {
                     type="text"
                     id="fbInput"
                     class="fb-input-field"
-                    placeholder="আপনার ফসলের সমস্যা বা প্রশ্ন লিখুন..."
+                    placeholder="${texts.inputPlaceholder}"
                     autocomplete="off"
                 />
-                <button type="submit" id="fbSendBtn" class="fb-send-btn" aria-label="বার্তা পাঠান">
+                <button type="submit" id="fbSendBtn" class="fb-send-btn" aria-label="${texts.sendAria}">
                     <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                         <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                     </svg>
                 </button>
             </form>
-            <div class="fb-footer-note">
-                ⚡ কম ব্যান্ডউইথ ও অফলাইন ব্যাকআপ সমর্থিত · আপনার বিশ্বস্ত বন্ধু
+            <div id="fbFooterNote" class="fb-footer-note">
+                ${texts.footerNote}
             </div>
         `;
+
+        this.inputField = inputArea.querySelector("#fbInput") as HTMLInputElement;
+        this.sendButton = inputArea.querySelector("#fbSendBtn") as HTMLButtonElement;
+        this.footerNoteEl = inputArea.querySelector("#fbFooterNote") as HTMLElement;
 
         // Assemble Window
         this.chatWindow.appendChild(header);
@@ -243,18 +371,43 @@ export class FarmerBuddy {
         this.widgetContainer.appendChild(this.fabButton);
         this.widgetContainer.appendChild(this.chatWindow);
         document.body.appendChild(this.widgetContainer);
-
-        // Query input references
-        this.inputField = inputArea.querySelector("#fbInput") as HTMLInputElement;
-        this.sendButton = inputArea.querySelector("#fbSendBtn") as HTMLButtonElement;
     }
 
     /**
-     * Render Quick Action Chips
+     * Switch Assistant Language dynamically (triggered by website language toggle)
+     */
+    public setLanguage(lang: AppLanguage): void {
+        if (this.currentLang === lang) return;
+        this.currentLang = lang;
+        const texts = this.i18nDict[lang];
+
+        // 1. Update Header & FAB Elements
+        if (this.fabButton) this.fabButton.setAttribute("aria-label", texts.fabAria);
+        if (this.fabLabelEl) this.fabLabelEl.textContent = texts.fabLabel;
+        if (this.titleEl) this.titleEl.textContent = texts.title;
+        if (this.badgeEl) this.badgeEl.textContent = texts.badge;
+        if (this.statusEl) this.statusEl.textContent = texts.status;
+        if (this.resetBtnEl) this.resetBtnEl.title = texts.resetTitle;
+        if (this.minimizeBtnEl) this.minimizeBtnEl.title = texts.minimizeTitle;
+        if (this.inputField) this.inputField.placeholder = texts.inputPlaceholder;
+        if (this.sendButton) this.sendButton.setAttribute("aria-label", texts.sendAria);
+        if (this.footerNoteEl) this.footerNoteEl.innerHTML = texts.footerNote;
+
+        // 2. Refresh Quick Action Chips for the new language
+        this.renderQuickChips();
+
+        // 3. Reload or Translate Conversation for active language
+        this.loadSessionMessages();
+        this.renderHistory();
+    }
+
+    /**
+     * Render Quick Action Chips for current language
      */
     private renderQuickChips(): void {
         this.chipsContainer.innerHTML = "";
-        this.quickChips.forEach(chip => {
+        const chips = this.chipsDict[this.currentLang] || this.chipsDict.en;
+        chips.forEach(chip => {
             const btn = document.createElement("button");
             btn.type = "button";
             btn.className = "fb-chip-btn";
@@ -267,18 +420,19 @@ export class FarmerBuddy {
     }
 
     /**
-     * Bind UI event listeners
+     * Bind UI event listeners including website i18n synchronization
      */
     private bindEvents(): void {
         // FAB click toggle
         this.fabButton.addEventListener("click", () => this.toggleWindow());
 
         // Header actions
-        const minBtn = this.chatWindow.querySelector("#fbMinimizeBtn");
-        if (minBtn) minBtn.addEventListener("click", () => this.toggleWindow(false));
-
-        const resetBtn = this.chatWindow.querySelector("#fbResetBtn");
-        if (resetBtn) resetBtn.addEventListener("click", () => this.resetConversation());
+        if (this.minimizeBtnEl) {
+            this.minimizeBtnEl.addEventListener("click", () => this.toggleWindow(false));
+        }
+        if (this.resetBtnEl) {
+            this.resetBtnEl.addEventListener("click", () => this.resetConversation());
+        }
 
         // Form submit
         const form = this.chatWindow.querySelector("#fbChatForm");
@@ -290,6 +444,21 @@ export class FarmerBuddy {
                     this.inputField.value = "";
                     this.handleUserSubmit(val);
                 }
+            });
+        }
+
+        // LISTEN TO WEBSITE LANGUAGE TOGGLE EVENT (CustomEvent from js/i18n.js)
+        window.addEventListener("languageChanged", (e: any) => {
+            const targetLang = (e && e.detail && e.detail.lang === "bn") ? "bn" : "en";
+            this.setLanguage(targetLang);
+        });
+
+        // Also observe direct checkbox changes if present
+        const langToggle = document.getElementById("langToggle") as HTMLInputElement | null;
+        if (langToggle) {
+            langToggle.addEventListener("change", () => {
+                const targetLang = langToggle.checked ? "bn" : "en";
+                this.setLanguage(targetLang);
             });
         }
     }
@@ -333,10 +502,11 @@ export class FarmerBuddy {
         bubble.className = `fb-message ${msg.sender === "user" ? "msg-user" : "msg-buddy"}`;
 
         const timeStr = new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+        const senderTag = this.i18nDict[this.currentLang].senderTag;
 
         bubble.innerHTML = `
             <div class="msg-bubble-wrap">
-                ${msg.sender === "buddy" ? '<span class="msg-sender-tag">👨‍🌾 কৃষি বন্ধু</span>' : ''}
+                ${msg.sender === "buddy" ? `<span class="msg-sender-tag">${senderTag}</span>` : ''}
                 <div class="msg-text">${this.formatMarkdown(msg.text)}</div>
                 <span class="msg-time">${timeStr}</span>
             </div>
@@ -389,7 +559,7 @@ export class FarmerBuddy {
             // Stream from Backend
             await this.streamFromBackend(text, textTarget, buddyMsg);
         } catch (err: any) {
-            console.warn("[FarmerBuddy Info] Backend stream unavailable. Using empathetic offline fallback.");
+            console.warn(`[FarmerBuddy] Backend stream unavailable. Using empathetic offline fallback for [${this.currentLang}].`);
             await this.streamFromOfflineFallback(text, textTarget, buddyMsg);
         } finally {
             this.isStreaming = false;
@@ -400,7 +570,7 @@ export class FarmerBuddy {
     }
 
     /**
-     * SSE Streaming via fetch() ReadableStream
+     * SSE Streaming via fetch() ReadableStream with bilingual payload
      */
     private async streamFromBackend(
         message: string,
@@ -415,11 +585,12 @@ export class FarmerBuddy {
 
         const payload: ChatPayload = {
             message: message,
-            history: trimmedHistory
+            history: trimmedHistory,
+            lang: this.currentLang
         };
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6500); // 6.5s timeout for low latency
+        const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
 
         const response = await fetch(this.apiUrl, {
             method: "POST",
@@ -468,7 +639,6 @@ export class FarmerBuddy {
                         this.scrollToBottom();
                     }
                 } catch (e) {
-                    // Raw string chunk fallback
                     accumulatedText += dataContent;
                     buddyMsg.text = accumulatedText;
                     textTarget.innerHTML = this.formatMarkdown(accumulatedText);
@@ -493,21 +663,30 @@ export class FarmerBuddy {
         const q = userQuery.toLowerCase();
         let fallbackText = "";
 
-        // Match keyword
+        // Match keyword across FAQ entries
         for (const faq of this.offlineFAQs) {
-            if (faq.keywords.some(k => q.includes(k))) {
-                fallbackText = faq.answer;
+            if (faq.keywords.some(k => q.includes(k.toLowerCase()))) {
+                fallbackText = (this.currentLang === "en") ? faq.answerEn : faq.answerBn;
                 break;
             }
         }
 
         if (!fallbackText) {
-            fallbackText = (
-                "ভাই, আমি আপনার পাশে আছি! আপনার প্রশ্নটি পেয়েছি।\n\n" +
-                "• **পরামর্শ:** ভালো ফলন পেতে সময়মতো সুষম সার, পরিমিত সেচ ও আগাছা দমন নিশ্চিত করুন।\n" +
-                "• **জরুরি প্রয়োজনে:** আপনার উপজেলা কৃষি অফিসে বা স্থানীয় উপ-সহকারী কৃষি কর্মকর্তার সাথে পরামর্শ করুন।\n\n" +
-                "আপনার জমির ফসলটির বর্তমান বয়স কত দিন বলুন তো?"
-            );
+            if (this.currentLang === "en") {
+                fallbackText = (
+                    "Friend, I am right here by your side! I received your inquiry.\n\n" +
+                    "• **Key Advice:** Ensure timely balanced fertilization, measured irrigation, and regular weeding to protect your crop.\n" +
+                    "• **Official Support:** For immediate disease diagnosis, visit your local Upazila Agriculture Extension office.\n\n" +
+                    "Could you tell me how many days old your crop currently is?"
+                );
+            } else {
+                fallbackText = (
+                    "ভাই, আমি আপনার পাশে আছি! আপনার প্রশ্নটি পেয়েছি।\n\n" +
+                    "• **পরামর্শ:** ভালো ফলন পেতে সময়মতো সুষম সার, পরিমিত সেচ ও আগাছা দমন নিশ্চিত করুন।\n" +
+                    "• **জরুরি প্রয়োজনে:** আপনার উপজেলা কৃষি অফিসে বা স্থানীয় উপ-সহকারী কৃষি কর্মকর্তার সাথে পরামর্শ করুন।\n\n" +
+                    "আপনার জমির ফসলটির বর্তমান বয়স কত দিন বলুন তো?"
+                );
+            }
         }
 
         // Live word-by-word streaming simulation
@@ -519,16 +698,16 @@ export class FarmerBuddy {
             buddyMsg.text = streamed;
             textTarget.innerHTML = this.formatMarkdown(streamed);
             this.scrollToBottom();
-            await new Promise(r => setTimeout(r, 35));
+            await new Promise(r => setTimeout(r, 30));
         }
     }
 
     /**
-     * Reset conversation history
+     * Reset conversation history for active language
      */
     private resetConversation(): void {
         this.messages = [];
-        sessionStorage.removeItem(this.storageKey);
+        sessionStorage.removeItem(this.getStorageKey());
         this.loadSessionMessages();
         this.renderHistory();
     }
@@ -566,7 +745,7 @@ export class FarmerBuddy {
         // Bold (**text**)
         escaped = escaped.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
 
-        // Bullet lists (• or *)
+        // Bullet lists (• or - or *)
         const lines = escaped.split("\n");
         const formattedLines = lines.map(line => {
             const trim = line.trim();
