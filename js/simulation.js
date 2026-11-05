@@ -30,12 +30,29 @@ let sky = null, sun = null;
 let sunLight = null, hemiLight = null, ambientLight = null;
 let terrainMesh = null, waterMesh = null, grassTuftsMesh = null;
 
-// Field Layout: 16x16 Grid (256 Clusters in Plowed Furrows)
-const ROWS = 16;
-const COLS = 16;
-const TOTAL_PLANTS = ROWS * COLS;
-const ROW_SPACING = 0.88;
-const PLANT_SPACING = 0.88;
+// Device Detection for Mobile Responsiveness & 60 FPS Optimization
+export function isMobileDevice() {
+    return (
+        window.innerWidth < 768 ||
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+    );
+}
+
+// Field Layout: Adaptive Grid (8x8 = 64 on mobile for high-FPS 60fps, 16x16 = 256 on desktop)
+let ROWS = 16;
+let COLS = 16;
+let TOTAL_PLANTS = ROWS * COLS;
+let ROW_SPACING = 0.88;
+let PLANT_SPACING = 0.88;
+
+function updateFieldGridDimensions() {
+    const mobile = isMobileDevice();
+    ROWS = mobile ? 8 : 16;
+    COLS = mobile ? 8 : 16;
+    TOTAL_PLANTS = ROWS * COLS;
+    ROW_SPACING = mobile ? 1.05 : 0.88;
+    PLANT_SPACING = mobile ? 1.05 : 0.88;
+}
 
 let instanceData = [];
 let stemInstancedMesh = null;
@@ -403,6 +420,7 @@ function createCompoundTomatoLeafGeometry(length = 0.45, spread = 0.22) {
 // 4. HYPER-DETAILED PHOTOREALISTIC PBR CROP FIELD BUILDER
 // =============================================================================
 export function createCropField(cropId = "tomato") {
+    updateFieldGridDimensions();
     if (currentCropGroup) {
         scene.remove(currentCropGroup);
         currentCropGroup = null;
@@ -873,8 +891,9 @@ function injectWindShader(material) {
 // 7. DYNAMIC PBR SOIL SYSTEM
 // =============================================================================
 function initTerrain() {
+    const mobile = isMobileDevice();
     const size = 16;
-    const segments = 128;
+    const segments = mobile ? 64 : 128;
     const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
     geometry.rotateX(-Math.PI / 2);
 
@@ -971,7 +990,8 @@ window.updateSoilMoisture = updateSoilMoisture;
 // =============================================================================
 
 function initRealisticRainSystem() {
-    const streakCount = 1800;
+    const mobile = isMobileDevice();
+    const streakCount = mobile ? 500 : 1800;
     const positions = new Float32Array(streakCount * 6);
     rainPosArray = positions;
     rainVelArray = new Float32Array(streakCount);
@@ -1008,7 +1028,8 @@ function initRealisticRainSystem() {
 }
 
 function initSprayMistSystem() {
-    const count = 400;
+    const mobile = isMobileDevice();
+    const count = mobile ? 180 : 400;
     sprayMistGeo = new THREE.BufferGeometry();
     const pos = new Float32Array(count * 3);
     const life = new Float32Array(count);
@@ -1036,7 +1057,8 @@ function initSprayMistSystem() {
 }
 
 function initFertilizerGlowSystem() {
-    const count = 350;
+    const mobile = isMobileDevice();
+    const count = mobile ? 150 : 350;
     fertilizerGlowGeo = new THREE.BufferGeometry();
     const pos = new Float32Array(count * 3);
     const life = new Float32Array(count);
@@ -1185,11 +1207,12 @@ function initEnvironmentLighting() {
     hemiLight = new THREE.HemisphereLight(0x7bc676, 0x2d1e12, 0.85);
     scene.add(hemiLight);
 
+    const mobile = isMobileDevice();
     sunLight = new THREE.DirectionalLight(0xfff8e8, 3.2);
     sunLight.position.set(6, 14, 6);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.mapSize.width = mobile ? 1024 : 2048;
+    sunLight.shadow.mapSize.height = mobile ? 1024 : 2048;
     sunLight.shadow.camera.near = 0.5;
     sunLight.shadow.camera.far = 32;
     sunLight.shadow.camera.left = -9;
@@ -1333,7 +1356,23 @@ window.toggleMacroView = toggleMacroView;
 function initRaycasting() {
     raycaster = new THREE.Raycaster();
 
+    let startX = 0, startY = 0, startTime = 0;
+
     const onPointerDown = (event) => {
+        startX = event.clientX;
+        startY = event.clientY;
+        startTime = performance.now();
+    };
+
+    const onPointerUp = (event) => {
+        const moveDist = Math.hypot(event.clientX - startX, event.clientY - startY);
+        const duration = performance.now() - startTime;
+
+        // Discard camera rotation / pinch-zoom drags - only genuine taps inspect crops
+        if (moveDist > 10 || duration > 450) {
+            return;
+        }
+
         const rect = renderer.domElement.getBoundingClientRect();
         mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
         mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -1341,10 +1380,9 @@ function initRaycasting() {
         raycaster.setFromCamera(mouse, camera);
 
         const targets = [];
+        if (fruitInstancedMesh) targets.push(fruitInstancedMesh);
         if (stemInstancedMesh) targets.push(stemInstancedMesh);
         if (leafInstancedMesh) targets.push(leafInstancedMesh);
-        if (fruitInstancedMesh) targets.push(fruitInstancedMesh);
-        if (terrainMesh) targets.push(terrainMesh);
 
         const intersects = raycaster.intersectObjects(targets, false);
 
@@ -1357,10 +1395,12 @@ function initRaycasting() {
             isTransitioningCamera = true;
 
             toggleMacroView(true);
+            openFarmerActionCard(activeCropId);
         }
     };
 
-    renderer.domElement.addEventListener("click", onPointerDown);
+    renderer.domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
+    renderer.domElement.addEventListener("pointerup", onPointerUp);
 }
 
 export function openFarmerActionCard(cropId = "tomato") {
@@ -1904,35 +1944,51 @@ export function init3DFieldSimulation() {
     containerEl = document.getElementById("farm3D");
     if (!containerEl || renderer) return;
 
+    updateFieldGridDimensions();
+    const mobile = isMobileDevice();
+
     const width = containerEl.clientWidth || window.innerWidth;
-    const height = containerEl.clientHeight || 640;
+    const height = containerEl.clientHeight || (mobile ? 560 : 680);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x0e241b);
 
-    camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 0.90, 5.2);
+    camera = new THREE.PerspectiveCamera(mobile ? 52 : 45, width / height, 0.1, 1000);
+    if (mobile) {
+        // Elevated & pulled back for perfect framing on vertical mobile screens
+        camera.position.set(0, 1.45, 6.8);
+    } else {
+        camera.position.set(0, 0.90, 5.2);
+    }
 
-    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: "high-performance" });
+    renderer = new THREE.WebGLRenderer({
+        antialias: !mobile,
+        powerPreference: "high-performance"
+    });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2.0));
     renderer.setClearColor(0x0e241b, 1.0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = mobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
 
     containerEl.innerHTML = "";
     containerEl.appendChild(renderer.domElement);
     canvasEl = renderer.domElement;
+    canvasEl.style.touchAction = "none";
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
+    controls.dampingFactor = 0.08;
     controls.maxPolarAngle = Math.PI * 0.495;
     controls.minDistance = 0.8;
     controls.maxDistance = 24.0;
     controls.target.set(0, 0.65, 0);
+    controls.touches = {
+        ONE: THREE.TOUCH.ROTATE,
+        TWO: THREE.TOUCH.DOLLY_PAN
+    };
 
     initProceduralTextures();
     initEnvironmentLighting();
@@ -1950,23 +2006,44 @@ export function init3DFieldSimulation() {
     initRaycasting();
     bindUIControls();
 
+    // Auto-dismiss gesture hint on first touch or after 4s
+    const hintEl = document.getElementById("mobileGestureHint");
+    if (hintEl) {
+        const dismissHint = () => {
+            hintEl.style.opacity = "0";
+            setTimeout(() => {
+                if (hintEl.parentNode) hintEl.parentNode.removeChild(hintEl);
+            }, 400);
+            window.removeEventListener("pointerdown", dismissHint);
+        };
+        window.addEventListener("pointerdown", dismissHint, { passive: true });
+        setTimeout(dismissHint, 4000);
+    }
+
     window.addEventListener("resize", onWindowResize);
+    window.addEventListener("orientationchange", () => setTimeout(onWindowResize, 150));
     animate();
 
-    console.log("🍅 [Field Shift] Photorealistic 3D & Spatial AR Crop Simulation Engine initialized.");
+    console.log("🍅 [Field Shift] Photorealistic 3D & Spatial AR Crop Simulation Engine initialized (Mobile Optimized).");
 }
 window.init3DFieldSimulation = init3DFieldSimulation;
 
 function onWindowResize() {
     if (!containerEl || !renderer || !camera) return;
+    const mobile = isMobileDevice();
     const width = containerEl.clientWidth || window.innerWidth;
-    const height = containerEl.clientHeight || 640;
+    const height = containerEl.clientHeight || (mobile ? 560 : 680);
 
     camera.aspect = width / height;
+    if (mobile && width < height) {
+        camera.fov = 52;
+    } else {
+        camera.fov = 45;
+    }
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2.0));
 }
 
 if (document.readyState === "loading") {

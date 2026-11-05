@@ -5153,20 +5153,21 @@ body.lang-bn strong {
 
 @media (max-width: 992px) {
     .field-view-controls-bar {
-        flex-direction: column;
-        align-items: stretch;
-        top: 10px;
-        width: calc(100% - 20px);
-        gap: 8px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        top: 12px;
+        width: calc(100% - 24px);
+        gap: 6px;
     }
 
     .fctrl-group {
         justify-content: center;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
     }
 
     .tod-slider {
-        width: 80px;
+        width: 60px;
     }
 }
 
@@ -5631,8 +5632,8 @@ body.lang-bn strong {
 /* Mobile responsive widget */
 @media (max-width: 600px) {
     .farmer-buddy-widget {
-        bottom: 16px;
-        right: 16px;
+        bottom: 84px; /* Floating cleanly above bottom timeline dock to eliminate collision */
+        right: 14px;
     }
 
     .farmer-buddy-window {
@@ -6819,39 +6820,291 @@ body.lang-bn strong {
     font-size: 14px;
 }
 
-/* Mobile & Tablet Responsive Adjustments */
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE SPATIAL AR HUD OVERHAUL (< 900px & < 600px)
+   ========================================================================== */
+
+/* Touch Guidance Indicator */
+.mobile-gesture-hint {
+    display: none;
+    position: absolute;
+    bottom: 96px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(6, 21, 15, 0.78);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    color: #86efac;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    pointer-events: none;
+    z-index: 19;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
+    transition: opacity 0.4s ease;
+    animation: hintPulse 2.5s infinite ease-in-out;
+}
+
+@keyframes hintPulse {
+    0%, 100% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.04); }
+}
+
 @media (max-width: 900px) {
-    .farmer-status-dock {
-        position: static;
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 8px;
-        padding: 10px;
+    .mobile-gesture-hint {
+        display: block;
     }
 
+    #farmSimulation {
+        height: 84vh !important;
+        min-height: 540px !important;
+        max-height: 720px !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .canvas-container {
+        position: absolute !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        overflow: hidden !important;
+        touch-action: none !important;
+    }
+
+    /* Top Controls Bar on Mobile: Ultra-Compact Single Row */
+    .field-view-controls-bar {
+        position: absolute;
+        top: 10px;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        transform: none;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        z-index: 25;
+        pointer-events: none;
+    }
+
+    .field-view-controls-bar .fctrl-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .fctrl-crop-pill {
+        padding: 4px 8px;
+    }
+    .fctrl-crop-select {
+        font-size: 12px;
+        max-width: 130px;
+    }
+    .fctrl-crop-pill .fctrl-label {
+        display: none;
+    }
+
+    .fctrl-cam-pill {
+        padding: 3px;
+        gap: 2px;
+    }
+    .fctrl-cam-btn {
+        padding: 5px 8px;
+    }
+    .fctrl-cam-btn .btn-text {
+        display: none;
+    }
+
+    .fctrl-action-pill {
+        padding: 3px;
+        gap: 4px;
+    }
+    .fctrl-sf-btn .btn-text,
+    .fctrl-toggle-btn .btn-text {
+        display: none;
+    }
+    .fctrl-sf-btn, .fctrl-toggle-btn, .fctrl-action-btn {
+        padding: 6px 9px;
+        font-size: 13px;
+    }
+
+    .fctrl-tod-pill {
+        display: none;
+    }
+
+    /* Left Telemetry Dock: Sleek Horizontal Scrollable Status Bar */
+    .farmer-status-dock {
+        position: absolute;
+        top: 54px;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        z-index: 20;
+        pointer-events: auto;
+        padding: 2px 2px;
+    }
+    .farmer-status-dock::-webkit-scrollbar {
+        display: none;
+    }
+
+    .farmer-status-dock .dock-card {
+        flex: 0 0 auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        background: rgba(10, 24, 18, 0.82);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        border: 1px solid rgba(74, 222, 128, 0.25);
+        border-radius: 9999px;
+        margin: 0;
+    }
+
+    .farmer-status-dock .dock-card-header {
+        margin: 0;
+        gap: 4px;
+    }
+    .farmer-status-dock .dock-icon {
+        font-size: 13px;
+        width: 18px;
+        height: 18px;
+    }
+    .farmer-status-dock .dock-title-group h5 {
+        font-size: 11px;
+        margin: 0;
+        white-space: nowrap;
+    }
+    .farmer-status-dock .dock-title-group small {
+        display: none;
+    }
+    .farmer-status-dock .dock-card-body {
+        margin: 0;
+        gap: 4px;
+        display: inline-flex;
+        align-items: center;
+    }
+    .farmer-status-dock .dock-val {
+        font-size: 11px;
+    }
+    .farmer-status-dock .status-pill {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    .farmer-status-dock .dock-weather-text {
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    /* Right Action Card: Native Bottom Sheet Pattern */
     .farmer-action-card.streamlined {
-        width: calc(100vw - 24px);
-        right: 12px;
-        top: 70px;
+        position: absolute;
+        top: auto;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: 75vh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 20px 20px 0 0;
+        border-bottom: none;
+        transform: translateY(120%);
+        transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+        z-index: 50;
+        padding: 16px 18px 24px;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    .farmer-action-card.active {
+        transform: translateY(0) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+
+    /* Bottom Timeline Dock on Mobile */
+    .farmer-bottom-timeline {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        width: auto;
+        transform: none;
+        padding: 8px 12px;
+        border-radius: 14px;
+        z-index: 22;
+        gap: 6px;
+    }
+
+    .timeline-meta-bar {
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: space-between;
+    }
+
+    .timeline-day-badge {
+        font-size: 11px;
+        padding: 4px 8px;
+    }
+
+    .stage-pill {
+        font-size: 10px;
+        padding: 3px 8px;
+        max-width: 140px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .timeline-playback-group {
+        gap: 4px;
+    }
+    .timeline-play-btn {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    .timeline-speed-pills {
+        display: none;
+    }
+
+    .timeline-weather-switcher {
+        gap: 4px;
+    }
+    .timeline-weather-switcher .weather-label {
+        display: none;
+    }
+    .weather-toggle-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .timeline-milestones {
+        display: none;
+    }
+
+    .ar-callout-card {
+        left: 8px;
+        right: 8px;
+        top: 100px;
+        width: auto;
+        max-width: 310px;
     }
 
     .sf-modal-body {
         grid-template-columns: 1fr;
-    }
-
-    .farmer-bottom-timeline {
-        width: calc(100% - 20px);
-        bottom: 10px;
-        padding: 10px;
-    }
-
-    .timeline-milestones {
-        font-size: 9px;
-    }
-
-    .ar-callout-card {
-        left: 0;
-        top: 155px;
     }
 }
