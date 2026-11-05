@@ -1,22 +1,16 @@
 @echo off
+title AgriVision - Gemini AI Backend Proxy
 echo ========================================================
-echo   Starting Farmer Buddy (কৃষি বন্ধু) AI Backend Server
+echo   Starting Farmer Buddy (কৃষি বন্ধু) Gemini Backend Proxy
+echo   Listening on: http://localhost:5000/api/ask
 echo ========================================================
 echo.
 
-if not exist venv (
-    echo [1/3] Creating virtual environment...
-    python -m venv venv
+if not exist node_modules (
+    echo [1/2] Installing Node.js dependencies...
+    call npm.cmd install
 )
 
-echo [2/3] Activating virtual environment...
-call venv\Scripts\activate.bat
-
-echo [3/3] Installing/checking dependencies...
-pip install -r requirements.txt
-
-echo.
-echo Launching FastAPI Server on http://127.0.0.1:8000
-echo.
-python main.py
+echo [2/2] Launching Node.js Express server...
+node server.js
 pause
