@@ -140,13 +140,6 @@ const i18nData = {
     "hud-drone-btn":    { en: "🚁 Drone View",                 bn: "🚁 ড্রোন ভিউ" },
     "hud-field-btn":    { en: "🚜 Field View",                 bn: "🚜 মাঠ ভিউ" },
     "hud-sun-btn":      { en: "☀️ Day",                        bn: "☀️ দিন" },
-    "hud-crop-label":   { en: "Crop:",                         bn: "ফসল:" },
-    "sim-cam-drone":    { en: "Drone View",                    bn: "ড্রোন ভিউ" },
-    "sim-cam-field":    { en: "Field View",                    bn: "মাঠের দৃশ্য" },
-    "sim-cam-studio":   { en: "3D Studio",                     bn: "৩ডি স্টুডিও" },
-    "sim-gallery-btn":  { en: "3D Crops",                      bn: "৩ডি শস্য" },
-    "sim-catalog-heading":{ en: "15 High-Definition 3D Crop Models & Sketchfab Studio", bn: "১৫টি ফসলের হাই-ডেফিনিশন ৩ডি মডেল ও সংগ্রহশালা" },
-    "sim-data-view":    { en: "Soil & Data",                   bn: "মাটি ও তথ্য" },
     
     // Soil Panel
     "hud-soil-title":   { en: "Soil Quality & Health",         bn: "মাটির গুণমান ও স্বাস্থ্য" },
@@ -190,6 +183,69 @@ const i18nData = {
     "hud-rain-prob-lbl":{ en: "Precipitation",                 bn: "বৃষ্টির সম্ভাবনা" },
     "hud-rain-status":  { en: "Moderate Rain",                 bn: "মাঝারি বৃষ্টি" },
     "hud-rain-time":    { en: "In 48 Hours",                   bn: "পরশুদিন" },
+
+    // ===== 3D AGRICULTURAL HUD & TRAFFIC LIGHT INDICATORS =====
+    "hud-dock-moisture":     { en: "Soil Moisture",                bn: "মাটির আর্দ্রতা" },
+    "hud-dock-moisture-sub": { en: "Root Zone 0-15cm",             bn: "মূল অঞ্চল ০-১৫ সেমি" },
+    "hud-dock-moist-good":   { en: "Optimal",                      bn: "পর্যাপ্ত রস" },
+    "hud-dock-moist-warn":   { en: "Needs Irrigation",             bn: "সেচ দিন" },
+    "hud-dock-moist-bad":    { en: "Severe Drought",               bn: "খরা / দ্রুত সেচ" },
+
+    "hud-dock-npk":          { en: "Fertilizer N-P-K",             bn: "সার ও পুষ্টির মাত্রা" },
+    "hud-dock-npk-sub":      { en: "Soil Balance",                 bn: "মাটির পুষ্টি স্থিতি" },
+    "hud-dock-npk-good":     { en: "Balanced",                     bn: "সুষম পুষ্টি" },
+    "hud-dock-npk-warn":     { en: "Low Nitrogen",                 bn: "নাইট্রোজেন ঘাটতি" },
+    "hud-dock-npk-bad":      { en: "Deficient",                    bn: "তীব্র সার ঘাটতি" },
+
+    "hud-dock-pest":         { en: "Pest & Disease Risk",          bn: "রোগ ও বালাই ঝুঁকি" },
+    "hud-dock-pest-sub":     { en: "Field Health Sentinel",        bn: "ফসল স্বাস্থ্য পর্যবেক্ষণ" },
+    "hud-dock-pest-good":    { en: "Safe & Healthy",               bn: "ঝুঁকিমুক্ত" },
+    "hud-dock-pest-warn":    { en: "Watch Closely",                bn: "সতর্ক দৃষ্টি রাখুন" },
+    "hud-dock-pest-bad":     { en: "Urgent Spray",                 bn: "দ্রুত স্প্রে করুন" },
+
+    "hud-dock-weather":      { en: "Field Climate",                bn: "মাঠের আবহাওয়া" },
+    "hud-dock-weather-sub":  { en: "Solar & Wind",                 bn: "সূর্য ও বাতাস" },
+
+    // ===== BOTTOM GROWTH TIMELINE SCRUBBER =====
+    "timeline-label":        { en: "Growth Timeline:",             bn: "ফসল জীবনচক্র:" },
+    "timeline-day-prefix":   { en: "Day",                          bn: "দিন" },
+    "timeline-speed":        { en: "Speed",                        bn: "গতি" },
+    "timeline-play":         { en: "Play",                         bn: "চালান" },
+    "timeline-pause":        { en: "Pause",                        bn: "থামান" },
+
+    "weather-label":         { en: "Weather Switcher:",            bn: "আবহাওয়া নির্বাচন:" },
+    "weather-sunny":         { en: "☀️ Sunny",                     bn: "☀️ রোদ" },
+    "weather-rain":          { en: "🌧️ Rain",                      bn: "🌧️ বৃষ্টি" },
+    "weather-wind":          { en: "💨 Windy",                     bn: "💨 বাতাস" },
+    "weather-sprinkler":     { en: "💦 Sprinkler",                 bn: "💦 সেচ" },
+
+    "cam-drone":             { en: "🚁 Drone Top View",            bn: "🚁 ড্রোন ভিউ" },
+    "cam-field":             { en: "🌾 Crop Close-up",             bn: "🌾 কাছ থেকে দেখুন" },
+    "cam-root":              { en: "🌱 Root & Soil View",          bn: "🌱 মাটির গভীরে" },
+
+    // ===== 5 GROWTH STAGES =====
+    "stage-1-name":          { en: "1. Sprout / Seedling",         bn: "১. অঙ্কুরোদগম ও চারা" },
+    "stage-2-name":          { en: "2. Vegetative Growth",         bn: "২. অঙ্গজ বৃদ্ধি" },
+    "stage-3-name":          { en: "3. Flowering / Panicle",       bn: "৩. ফুল ও শীষ আসা" },
+    "stage-4-name":          { en: "4. Grain / Fruit Filling",     bn: "৪. ফল ও দানা গঠন" },
+    "stage-5-name":          { en: "5. Harvest Ready",             bn: "৫. ফসল কাটার সময়" },
+
+    // ===== FARMER ACTION CARD =====
+    "action-card-heading":   { en: "Spatial AR Dock",              bn: "স্পেশিয়াল এআর ডক" },
+    "action-macro-btn":      { en: "3D Crop Macro View / AR X-Ray", bn: "৩ডি ম্যাক্রো ভিউ / এআর এক্স-রে" },
+    "action-advice-title":   { en: "Field Guidance:",              bn: "মাঠের নির্দেশিকা:" },
+    "action-btn-irrigate":   { en: "💦 Start Irrigation",          bn: "💦 সেচ চালু করুন" },
+    "action-btn-fertilize":  { en: "🌿 Apply Fertilizer",         bn: "🌿 সার প্রয়োগ করুন" },
+    "action-btn-spray":      { en: "🛡️ Spray Protection",          bn: "🛡️ ওষুধ স্প্রে করুন" },
+    "action-inspect-3d":     { en: "🔍 Sketchfab 3D Inspect",      bn: "🔍 Sketchfab 3D মডেল" },
+    "action-crop-health":    { en: "Crop Health Status:",          bn: "ফসলের বর্তমান অবস্থা:" },
+    "action-health-lush":    { en: "🟢 Lush & Thriving",           bn: "🟢 তরতাজা ও সুস্থ" },
+    "action-health-droop":   { en: "🟡 Nutrient / Water Deficit",  bn: "🟡 অপুষ্টি বা পানিস্বল্পতা" },
+    "action-health-pest":    { en: "🔴 Pest / Blight Alert",       bn: "🔴 বালাই বা রোগের লক্ষণ" },
+
+    // ===== SKETCHFAB ASSET EXPLORER =====
+    "sf-explorer-btn":       { en: "Sketchfab 3D Models",          bn: "Sketchfab 3D মডেল" },
+    "sf-explorer-title":     { en: "Sketchfab Agricultural Assets", bn: "Sketchfab কৃষি ৩ডি লাইব্রেরি" },
 
     // ===== CROP LIFECYCLE TRACKER =====
     "lifecycle-eyebrow":    { en: "PRECISION CROP INTELLIGENCE",   bn: "নির্ভুল ফসল চাষাবাদ বুদ্ধিমত্তা" },

@@ -20,7 +20,9 @@
     <!-- Google Fonts: Inter and Hind Siliguri for Bengali -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="style.css">
@@ -29,7 +31,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
 
@@ -248,7 +250,8 @@
                 </div>
                 <div class="krishi-alert-content">
                     <div class="krishi-alert-header">
-                        <strong class="krishi-alert-title" data-i18n="krishi-alert-title">KRISHI WEATHER ADVISORY</strong>
+                        <strong class="krishi-alert-title" data-i18n="krishi-alert-title">KRISHI WEATHER
+                            ADVISORY</strong>
                         <span class="krishi-alert-tag" id="krishiAlertTag">Next 48 Hours</span>
                     </div>
                     <p class="krishi-alert-message" id="krishiAlertMessage">
@@ -808,7 +811,8 @@
                 </strong>
 
                 <p id="rotationResultText">
-                    The 4-year rotation shows a positive long-term trajectory. Soil health improves during the legume phase while water pressure decreases.
+                    The 4-year rotation shows a positive long-term trajectory. Soil health improves during the legume
+                    phase while water pressure decreases.
                 </p>
 
             </div>
@@ -830,7 +834,8 @@
                 <span class="highlight" data-i18n="lifecycle-h2-span">Crop Lifecycle Tracker.</span>
             </h2>
             <p class="section-subtitle" data-i18n="lifecycle-desc">
-                Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K fertilizer schedules, critical pest/disease alerts, and actionable management tips.
+                Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K
+                fertilizer schedules, critical pest/disease alerts, and actionable management tips.
             </p>
         </div>
 
@@ -845,13 +850,20 @@
                     </label>
 
                     <div class="category-filters" id="categoryFilters" role="tablist">
-                        <button class="cat-pill active" data-category="all" data-i18n="lifecycle-category-all">All Crops</button>
-                        <button class="cat-pill" data-category="cereal" data-i18n="lifecycle-category-cereal">Cereals</button>
-                        <button class="cat-pill" data-category="vegetable" data-i18n="lifecycle-category-veg">Vegetables</button>
-                        <button class="cat-pill" data-category="cash" data-i18n="lifecycle-category-cash">Cash Crops</button>
-                        <button class="cat-pill" data-category="pulse" data-i18n="lifecycle-category-pulse">Pulses</button>
-                        <button class="cat-pill" data-category="oil-spice" data-i18n="lifecycle-category-oil">Oilseeds & Spices</button>
-                        <button class="cat-pill" data-category="fruit" data-i18n="lifecycle-category-fruit">Fruits</button>
+                        <button class="cat-pill active" data-category="all" data-i18n="lifecycle-category-all">All
+                            Crops</button>
+                        <button class="cat-pill" data-category="cereal"
+                            data-i18n="lifecycle-category-cereal">Cereals</button>
+                        <button class="cat-pill" data-category="vegetable"
+                            data-i18n="lifecycle-category-veg">Vegetables</button>
+                        <button class="cat-pill" data-category="cash" data-i18n="lifecycle-category-cash">Cash
+                            Crops</button>
+                        <button class="cat-pill" data-category="pulse"
+                            data-i18n="lifecycle-category-pulse">Pulses</button>
+                        <button class="cat-pill" data-category="oil-spice" data-i18n="lifecycle-category-oil">Oilseeds &
+                            Spices</button>
+                        <button class="cat-pill" data-category="fruit"
+                            data-i18n="lifecycle-category-fruit">Fruits</button>
                     </div>
                 </div>
 
@@ -1061,12 +1073,7 @@
 
                 <label data-i18n="lat-label">LATITUDE</label>
 
-                <input
-                    type="number"
-                    id="latitudeInput"
-                    value="24.7471"
-                    step="0.000001"
-                >
+                <input type="number" id="latitudeInput" value="24.7471" step="0.000001">
 
             </div>
 
@@ -1075,12 +1082,7 @@
 
                 <label data-i18n="lon-label">LONGITUDE</label>
 
-                <input
-                    type="number"
-                    id="longitudeInput"
-                    value="90.4203"
-                    step="0.000001"
-                >
+                <input type="number" id="longitudeInput" value="90.4203" step="0.000001">
 
             </div>
 
@@ -1116,83 +1118,94 @@
         </div>
 
 
-        <button
-            id="analyzeLand"
-            class="analyze-btn"
-            data-i18n="analyze-land-btn"
-        >
+        <button id="analyzeLand" class="analyze-btn" data-i18n="analyze-land-btn">
             Analyze this land
         </button>
 
     </section>
 
 
-    <!-- 3D FARM SIMULATION & SKETCHFAB 3D SPECIMEN STUDIO -->
+    <!-- 3D FARM SIMULATION -->
     <section id="farmSimulation" class="cinema-mode">
 
         <!-- 3D Viewport Canvas -->
         <div id="farm3D" class="canvas-container"></div>
 
-        <!-- 3D Hotspot Annotation Screen Overlay (Sketchfab Pins) -->
-        <div id="studioHotspotsOverlay" class="studio-hotspots-overlay" aria-hidden="true"></div>
-
-        <!-- Hotspot Inspection Card (Floating interactive callout modal) -->
-        <div id="hotspotDetailCard" class="hotspot-detail-card" aria-hidden="true">
-            <div class="hcard-header">
-                <span id="hcardBadge" class="hcard-badge">3D ANATOMY</span>
-                <button id="btnCloseHcard" class="hcard-close" title="Close callout">✕</button>
+        <!-- In-Scene 3D Spatial AR HUD Overlay (World-to-Screen Projected Pins & Holographic Rings) -->
+        <div id="spatialArContainer" class="spatial-ar-container" aria-hidden="true">
+            <!-- 3D World-Space Zone Pins -->
+            <div id="arPinZoneA" class="ar-spatial-pin pin-zone" title="Zone A Moisture Status">
+                <span class="ar-pin-pulse"></span>
+                <span class="ar-pin-icon">💧</span>
+                <span class="ar-pin-label">Zone A: ৭8% আর্দ্রতা (Optimal)</span>
             </div>
-            <h4 id="hcardTitle">ধানের শিষ (Golden Grain Panicle)</h4>
-            <p id="hcardDesc">দানা গঠনের পর্যায়: শিষের প্রতিটি দানায় শ্বেতসার জমা হয়ে পুষ্ট হয়। সুষম পটাসিয়াম পুষ্টি নিশ্চিত করুন।</p>
-            <div class="hcard-footer">
-                <span id="hcardAction">🔬 3D Specimen Hotspot Active</span>
+            <div id="arPinRow4" class="ar-spatial-pin pin-crop" title="Row 4 Ripening Cluster">
+                <span class="ar-pin-pulse"></span>
+                <span class="ar-pin-icon">🍅</span>
+                <span class="ar-pin-label">Row 4: পাকা ফলন (Ready in 6 Days)</span>
+            </div>
+            <div id="arPinSprinkler" class="ar-spatial-pin pin-device" title="Sprinkler Node #2">
+                <span class="ar-pin-pulse"></span>
+                <span class="ar-pin-icon">💦</span>
+                <span class="ar-pin-label">Node #2: সেচ নোজল (Active)</span>
+            </div>
+
+            <!-- In-Field Holographic AR Plant Inspection Ring -->
+            <div id="arMacroInspectionRing" class="ar-macro-inspection-ring">
+                <div class="ar-reticle-ring"></div>
+                <div class="ar-reticle-scanner"></div>
+                <div class="ar-callout-card">
+                    <div class="ar-callout-header">
+                        <span class="ar-tag">AR PRECISION SCAN</span>
+                        <h5 id="arCalloutCropTitle">টমেটো ক্লাস্টার (PBR Tomato)</h5>
+                    </div>
+                    <div class="ar-callout-metrics">
+                        <div class="ar-m-item">
+                            <span>ফলন সংখ্যা:</span>
+                            <strong id="arFruitCount">১৪টি / থোকা</strong>
+                        </div>
+                        <div class="ar-m-item">
+                            <span>পরিপক্বতা সূচক:</span>
+                            <strong id="arRipeness">৮৭% (Breaker to Vine-Ripe)</strong>
+                        </div>
+                        <div class="ar-m-item">
+                            <span>ক্লোরোফিল সূচক:</span>
+                            <strong id="arChlorophyll">SPAD ৪৮.২ (উত্তম)</strong>
+                        </div>
+                        <div class="ar-m-item">
+                            <span>বালাই উপস্থিতি:</span>
+                            <strong id="arPestStatus" class="text-emerald">০% (ঝুঁকিমুক্ত)</strong>
+                        </div>
+                    </div>
+                    <button id="btnCloseMacroView" class="ar-close-macro-btn">✕ স্বাভাবিক দৃশ্য (Exit AR
+                        Close-up)</button>
+                </div>
             </div>
         </div>
 
-        <!-- Cyber-Agri Telemetry HUD (Bottom-Left Floating Overlay) -->
-        <div class="sim-telemetry-hud" id="simTelemetryHud">
-            <div class="hud-stat-pill">
-                <span class="pulse-indicator"></span>
-                <span class="hud-stat-label">🛰️ SENTINEL-2 NDVI</span>
-                <strong class="hud-stat-val" id="telemetryNdvi">0.82</strong>
-                <span class="hud-stat-sub">High Health</span>
-            </div>
-            <div class="hud-stat-pill">
-                <span class="hud-stat-icon">💨</span>
-                <span class="hud-stat-label">WIND VECTOR</span>
-                <strong class="hud-stat-val" id="telemetryWind">14 km/h S-SW</strong>
-            </div>
-            <div class="hud-stat-pill">
-                <span class="hud-stat-icon">💧</span>
-                <span class="hud-stat-label">ROOT MOISTURE</span>
-                <strong class="hud-stat-val" id="telemetryMoist">68%</strong>
-            </div>
-        </div>
-
-        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Studio Mode vs Data Mode) -->
+        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Data Mode) -->
         <div class="field-view-controls-bar">
-            <!-- Top Left: Triple Camera Modes (Drone vs Field vs 3D Studio) -->
+            <!-- Top Left: Camera Presets (Drone / Field / Root) -->
             <div class="fctrl-group fctrl-left">
                 <div class="fctrl-pill fctrl-cam-pill">
                     <button id="btnDroneView" class="fctrl-cam-btn" title="ড্রোন ভিউ (Drone Aerial View)">
                         <span class="btn-icon">🚁</span>
-                        <span class="btn-text" data-i18n="sim-cam-drone">ড্রোন ভিউ</span>
+                        <span class="btn-text" data-i18n="cam-drone">ড্রোন ভিউ</span>
                     </button>
                     <button id="btnFieldView" class="fctrl-cam-btn active" title="মাঠের দৃশ্য (Ground Field View)">
                         <span class="btn-icon">🌾</span>
-                        <span class="btn-text" data-i18n="sim-cam-field">মাঠের দৃশ্য</span>
+                        <span class="btn-text" data-i18n="cam-field">মাঠের দৃশ্য</span>
                     </button>
-                    <button id="btnStudioView" class="fctrl-cam-btn fctrl-studio-btn" title="৩ডি স্টুডিও - স্কেচফ্যাব ইন্সপেক্টর (Sketchfab 3D Studio)">
-                        <span class="btn-icon">🔬</span>
-                        <span class="btn-text" data-i18n="sim-cam-studio">৩ডি স্টুডিও</span>
-                        <span class="btn-sub-badge">3D</span>
+                    <button id="btnRootView" class="fctrl-cam-btn" title="মাটির গভীরে ও মূল অঞ্চল (Root & Soil View)">
+                        <span class="btn-icon">🌱</span>
+                        <span class="btn-text" data-i18n="cam-root">মাটির গভীরে</span>
                     </button>
                 </div>
             </div>
 
             <!-- Top Center: Crop Selector & Time of Day Slider -->
             <div class="fctrl-group fctrl-center">
-                <!-- Crop Selector Pill -->
+                <!-- Crop Selector Pill with Sketchfab 3D Badge -->
                 <div class="fctrl-pill fctrl-crop-pill">
                     <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
                     <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
@@ -1216,42 +1229,23 @@
 
                 <!-- ☀️ Time of Day Slider -->
                 <div class="fctrl-pill fctrl-tod-pill" title="সূর্যের অবস্থান ও আলো পরিবর্তন (Time of Day)">
-                    <span id="todIcon" class="tod-label">☀️</span>
-                    <input type="range" id="timeOfDaySlider" class="tod-slider" min="0" max="100" value="45" step="1" aria-label="Time of Day">
+                    <span class="tod-label">☀️</span>
+                    <input type="range" id="timeOfDaySlider" class="tod-slider" min="0" max="100" value="45" step="1"
+                        aria-label="Time of Day">
                     <span id="timeOfDayLabel" class="tod-val-text">দুপুর (Noon)</span>
                 </div>
             </div>
 
-            <!-- Top Right: Shading, Turntable, Catalog & Drawer Toggles -->
+            <!-- Top Right: Sketchfab 3D Explorer, Data Drawer Toggle & Fullscreen -->
             <div class="fctrl-group fctrl-right">
-                <!-- Shading Mode Pill (Sketchfab Inspector) -->
-                <div class="fctrl-pill fctrl-shading-pill" id="shadingControlPill" title="৩ডি শেডিং মোড (PBR Lit / Wireframe / X-Ray / Clay)">
-                    <span class="fctrl-icon-small">🎨</span>
-                    <select id="shadingSelect" class="fctrl-select-compact" aria-label="3D Shading Mode">
-                        <option value="pbr" selected>🌟 PBR Lit</option>
-                        <option value="wireframe">🕸️ Wireframe</option>
-                        <option value="vein">🌿 Vein X-Ray</option>
-                        <option value="clay">🏺 Clay Studio</option>
-                    </select>
-                </div>
-
-                <!-- Turntable Auto-Rotate Button -->
-                <button id="btnTurntable" class="fctrl-action-btn" title="৩৬০° স্বয়ংক্রিয় ঘূর্ণন (360° Auto-Rotate Turntable)">
-                    <span class="btn-icon">🔄</span>
-                    <span class="btn-text">360°</span>
-                </button>
-
-                <!-- 3D Crop Catalog Gallery Toggle Button -->
-                <button id="btnGalleryToggle" class="fctrl-action-btn fctrl-gallery-btn" title="১৫টি ফসলের ৩ডি গ্যালারি দেখুন (Sketchfab 3D Crop Catalog)">
-                    <span class="btn-icon">🖼️</span>
-                    <span class="btn-text" data-i18n="sim-gallery-btn">৩ডি শস্য</span>
-                </button>
-
-                <!-- Data Drawer Toggle & Fullscreen -->
                 <div class="fctrl-pill fctrl-action-pill">
+                    <button id="btnSketchfabExplorer" class="fctrl-sf-btn" title="Sketchfab 3D Model Explorer">
+                        <span class="btn-icon">🎨</span>
+                        <span class="btn-text" data-i18n="sf-explorer-btn">Sketchfab 3D</span>
+                    </button>
                     <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
                         <span class="btn-icon">📊</span>
-                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও তথ্য</span>
+                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
                     </button>
                     <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
                         <span>⛶</span>
@@ -1260,19 +1254,182 @@
             </div>
         </div>
 
-        <!-- Sketchfab 3D Crop Specimen Catalog (Collapsible Horizontal Gallery Drawer) -->
-        <div id="farmCropCatalog" class="farm-crop-catalog" aria-hidden="true">
-            <div class="catalog-header">
-                <div class="catalog-title">
-                    <span class="catalog-badge">SKETCHFAB 3D COLLECTION</span>
-                    <h3 data-i18n="sim-catalog-heading">১৫টি ফসলের হাই-ডেফিনিশন ৩ডি মডেল ও সংগ্রহশালা</h3>
+        <!-- LEFT FLOATING HUD DOCK: COLOR-CODED TRAFFIC-LIGHT STATUS CARDS -->
+        <aside id="farmerStatusDock" class="farmer-status-dock" aria-label="Live Farm Conditions">
+            <!-- 1. Soil Moisture Card -->
+            <div class="dock-card" id="dockMoistureCard">
+                <div class="dock-card-header">
+                    <span class="dock-icon water-drop-icon">💧</span>
+                    <div class="dock-title-group">
+                        <h5 data-i18n="hud-dock-moisture">মাটির আর্দ্রতা</h5>
+                        <small data-i18n="hud-dock-moisture-sub">মূল অঞ্চল ০-১৫ সেমি</small>
+                    </div>
                 </div>
-                <div class="catalog-actions">
-                    <button id="btnCloseCatalog" class="catalog-close-btn" title="গ্যালারি বন্ধ করুন">✕</button>
+                <div class="dock-card-body">
+                    <strong class="dock-val" id="hudDockMoistVal">68%</strong>
+                    <span id="hudDockMoistBadge" class="status-pill status-optimal" data-i18n="hud-dock-moist-good">🟢
+                        পর্যাপ্ত</span>
                 </div>
             </div>
-            <div class="catalog-scroll-tray" id="catalogScrollTray">
-                <!-- Populated dynamically with Sketchfab 3D crop cards -->
+
+            <!-- 2. Fertilizer NPK Card -->
+            <div class="dock-card" id="dockNPKCard">
+                <div class="dock-card-header">
+                    <span class="dock-icon npk-icon">🧪</span>
+                    <div class="dock-title-group">
+                        <h5 data-i18n="hud-dock-npk">সার ও পুষ্টির মাত্রা</h5>
+                        <small data-i18n="hud-dock-npk-sub">মাটির পুষ্টি স্থিতি</small>
+                    </div>
+                </div>
+                <div class="dock-card-body">
+                    <strong class="dock-val" id="hudDockNPKVal">84%</strong>
+                    <span id="hudDockNPKBadge" class="status-pill status-optimal" data-i18n="hud-dock-npk-good">🟢
+                        সুষম</span>
+                </div>
+            </div>
+
+            <!-- 3. Pest Risk Card -->
+            <div class="dock-card" id="dockPestCard">
+                <div class="dock-card-header">
+                    <span class="dock-icon pest-icon">🐛</span>
+                    <div class="dock-title-group">
+                        <h5 data-i18n="hud-dock-pest">রোগ ও বালাই ঝুঁকি</h5>
+                        <small data-i18n="hud-dock-pest-sub">ফসল স্বাস্থ্য পর্যবেক্ষণ</small>
+                    </div>
+                </div>
+                <div class="dock-card-body">
+                    <span id="hudDockPestBadge" class="status-pill status-optimal" data-i18n="hud-dock-pest-good">🟢
+                        ঝুঁকিমুক্ত</span>
+                </div>
+            </div>
+
+            <!-- 4. Weather & Microclimate Card -->
+            <div class="dock-card" id="dockWeatherCard">
+                <div class="dock-card-header">
+                    <span class="dock-icon weather-icon">🌦️</span>
+                    <div class="dock-title-group">
+                        <h5 data-i18n="hud-dock-weather">মাঠের আবহাওয়া</h5>
+                        <small data-i18n="hud-dock-weather-sub">সূর্য ও বাতাস</small>
+                    </div>
+                </div>
+                <div class="dock-card-body">
+                    <span id="hudDockWeatherStatus" class="dock-weather-text">☀️ পরিষ্কার রোদ · ২৬°C</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- RIGHT STREAMLINED SPATIAL AR INSPECTOR & ACTION DOCK -->
+        <article id="farmerActionCard" class="farmer-action-card streamlined" aria-hidden="true">
+            <div class="action-card-header">
+                <div class="action-card-badge-row">
+                    <span class="action-tag">🛰️ <span data-i18n="action-card-heading">SPATIAL AR DOCK</span></span>
+                    <button id="btnCloseActionCard" class="action-close-btn" title="Close Panel">✕</button>
+                </div>
+                <div class="action-title-row">
+                    <h4 id="actionCardCropName">বারি টমেটো (PBR Tomato)</h4>
+                    <span id="actionCardHealthBadge" class="status-pill status-optimal"
+                        data-i18n="action-health-lush">🟢 সুস্থ</span>
+                </div>
+                <p id="actionCardGrowthStage" class="action-stage-text">দিন ৪৮ / ১০৫ — ৩. ফুল ও ফল গঠন (Flowering &
+                    Fruit Set)</p>
+            </div>
+
+            <div class="action-card-body">
+                <!-- AR Macro Close-Up & 3D Inspector Launcher -->
+                <div class="action-interactive-controls">
+                    <button id="btnToggleMacroView" class="ar-macro-btn" title="উদ্ভিদের অতি নিকটতম ৩ডি দৃশ্য দেখুন">
+                        <span class="btn-ar-icon">🔬</span>
+                        <span class="btn-ar-text" data-i18n="action-macro-btn">3D Crop Macro View / AR X-Ray</span>
+                        <span class="ar-live-pulse">LIVE</span>
+                    </button>
+                    <button id="btnActInspect3D" class="btn-inspect-3d-compact" title="Sketchfab 3D Inspector">
+                        <span>🎨</span>
+                        <span data-i18n="action-inspect-3d">Sketchfab 3D Asset</span>
+                    </button>
+                </div>
+
+                <!-- Actionable Agronomic Guidance with Left Emerald Accent Bar -->
+                <div class="action-advice-box compact">
+                    <div class="advice-header-line">
+                        <span class="advice-dot"></span>
+                        <h6 data-i18n="action-advice-title">মাঠের নির্দেশিকা (Field Action):</h6>
+                    </div>
+                    <p id="actionCardAdviceText">গাছের ডালে বাঁশের খুঁটি দিয়ে সাপোর্ট দিন। ফুল ও ফল বৃদ্ধির জন্য ড্রিপ
+                        সেচ দিন এবং ফল আর্মিওয়ার্ম দমনে ফেরোমোন ফাঁদ টানান।</p>
+                </div>
+
+                <!-- Sleek Tactile AR Action Pills with Cooldown Indicator -->
+                <div class="action-buttons-group tactile-ar">
+                    <button id="btnActIrrigate" class="action-btn irrigate-btn" title="সেচ চালু করুন ও আর্দ্রতা বাড়ান">
+                        <div class="action-btn-glow"></div>
+                        <span class="btn-ico">💦</span>
+                        <span class="btn-label" data-i18n="action-btn-irrigate">সেচ দিন</span>
+                        <span class="action-subtext">Irrigation</span>
+                    </button>
+                    <button id="btnActFertilize" class="action-btn fertilize-btn"
+                        title="সুষম এন-পি-কে সার প্রয়োগ করুন">
+                        <div class="action-btn-glow"></div>
+                        <span class="btn-ico">🌿</span>
+                        <span class="btn-label" data-i18n="action-btn-fertilize">সার দিন</span>
+                        <span class="action-subtext">Nutrients</span>
+                    </button>
+                    <button id="btnActSpray" class="action-btn spray-btn" title="নিরাপদ বালাইনাশক স্প্রে করুন">
+                        <div class="action-btn-glow"></div>
+                        <span class="btn-ico">🛡️</span>
+                        <span class="btn-label" data-i18n="action-btn-spray">স্প্রে করুন</span>
+                        <span class="action-subtext">Protection</span>
+                    </button>
+                </div>
+            </div>
+        </article>
+
+        <!-- BOTTOM INTERACTIVE TIMELINE & SIMULATION CONTROLS -->
+        <div id="farmerBottomTimeline" class="farmer-bottom-timeline">
+            <!-- Top Row: Day Display & Growth Stage Milestone Badge -->
+            <div class="timeline-meta-bar">
+                <div class="timeline-day-badge">
+                    <span class="calendar-icon">📅</span>
+                    <strong id="timelineDayLabel">দিন ৪৫ / ১২৫</strong>
+                </div>
+
+                <div class="timeline-stage-indicator">
+                    <span id="timelineStageBadge" class="stage-pill">৩. ফুল ও শীষ আসা (Flowering)</span>
+                </div>
+
+                <!-- Simulation Playback & Speed Controls -->
+                <div class="timeline-playback-group">
+                    <button id="btnTimelinePlay" class="timeline-play-btn" title="Play / Pause Timeline">
+                        <span>▶</span>
+                        <span data-i18n="timeline-play">চালান</span>
+                    </button>
+                    <div class="timeline-speed-pills">
+                        <button id="btnSpeed1x" class="speed-btn active">1x</button>
+                        <button id="btnSpeed2x" class="speed-btn">2x</button>
+                        <button id="btnSpeed5x" class="speed-btn">5x</button>
+                    </div>
+                </div>
+
+                <!-- 1-Click Weather Switcher -->
+                <div class="timeline-weather-switcher">
+                    <span class="weather-label" data-i18n="weather-label">আবহাওয়া:</span>
+                    <button id="btnWeatherSunny" class="weather-toggle-btn active" title="☀️ রোদ (Sunny)">☀️</button>
+                    <button id="btnWeatherRain" class="weather-toggle-btn" title="🌧️ বৃষ্টি (Rain)">🌧️</button>
+                    <button id="btnWeatherWind" class="weather-toggle-btn" title="💨 বাতাস (Windy)">💨</button>
+                    <button id="btnWeatherSprinkler" class="weather-toggle-btn" title="💦 সেচ (Sprinkler)">💦</button>
+                </div>
+            </div>
+
+            <!-- Bottom Row: Large Touch-Friendly Scrubber Range Track -->
+            <div class="timeline-scrubber-track">
+                <input type="range" id="growthTimelineSlider" class="growth-timeline-slider" min="1" max="125"
+                    value="45" step="1" aria-label="Crop Growth Day Timeline Scrubber">
+                <div class="timeline-milestones">
+                    <span class="m-point p-1" data-i18n="stage-1-name">১. অঙ্কুরোদগম</span>
+                    <span class="m-point p-2" data-i18n="stage-2-name">২. চারা বৃদ্ধি</span>
+                    <span class="m-point p-3" data-i18n="stage-3-name">৩. ফুল ও শীষ</span>
+                    <span class="m-point p-4" data-i18n="stage-4-name">৪. ফল ও দানা</span>
+                    <span class="m-point p-5" data-i18n="stage-5-name">৫. ফসল কাটা</span>
+                </div>
             </div>
         </div>
 
@@ -1287,24 +1444,13 @@
             </div>
 
             <div class="drawer-scroll-body">
-                <!-- Active Crop Dynamic Info Badge with 3D Thumbnail -->
+                <!-- Active Crop Dynamic Info Badge -->
                 <div class="drawer-crop-card">
                     <div class="drawer-crop-header">
-                        <div class="drawer-crop-thumb-wrap">
-                            <img id="drawerCropThumb" src="assets/crops_3d/rice.svg" alt="3D Crop Specimen" class="drawer-crop-3d-img" />
-                            <span class="drawer-3d-tag">3D PBR</span>
-                        </div>
-                        <div class="drawer-crop-text">
-                            <div class="drawer-crop-badge-row">
-                                <span id="drawerCropIcon" class="drawer-crop-icon">🌾</span>
-                                <span id="drawerCropCategory" class="drawer-crop-cat">দানাশস্য</span>
-                            </div>
+                        <span id="drawerCropIcon" class="drawer-crop-icon">🌾</span>
+                        <div>
                             <h4 id="drawerCropName">আমন ধান (Aman Rice Field)</h4>
                             <p id="drawerCropSubtitle">হাই-ইয়েল্ডিং স্থানীয় জাত · দানা গঠনের পর্যায়</p>
-                            <a id="drawerSketchfabLink" href="https://sketchfab.com/search?q=rice+plant&type=models" target="_blank" rel="noopener noreferrer" class="drawer-sketchfab-btn" title="View 3D Model on Sketchfab">
-                                <span class="sk-icon">🌐</span>
-                                <span>Sketchfab 3D Model</span>
-                            </a>
                         </div>
                     </div>
                     <div class="drawer-crop-metrics">
@@ -1343,7 +1489,8 @@
                         <div class="hud-npk-row">
                             <span data-i18n="hud-phosphorus">Phosphorus</span>
                             <div class="hud-bar-track">
-                                <div id="hudPhosphorusBar" class="hud-bar-fill bar-phosphorus" style="width: 52%;"></div>
+                                <div id="hudPhosphorusBar" class="hud-bar-fill bar-phosphorus" style="width: 52%;">
+                                </div>
                             </div>
                             <strong id="hudPhosphorusVal">52%</strong>
                         </div>
@@ -1375,7 +1522,8 @@
                             <div class="moisture-ring-gauge">
                                 <svg viewBox="0 0 80 80">
                                     <circle class="gauge-bg" cx="40" cy="40" r="32"></circle>
-                                    <circle class="gauge-meter" cx="40" cy="40" r="32" stroke-dasharray="201" stroke-dashoffset="64"></circle>
+                                    <circle class="gauge-meter" cx="40" cy="40" r="32" stroke-dasharray="201"
+                                        stroke-dashoffset="64"></circle>
                                 </svg>
                                 <div class="gauge-val" id="hudMoistureVal">68%</div>
                             </div>
@@ -1388,7 +1536,8 @@
                             <h4 data-i18n="hud-ph-title">Soil pH</h4>
                             <div class="ph-gauge-viz">
                                 <svg viewBox="0 0 100 55">
-                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#phGradient)" stroke-width="8" stroke-linecap="round"></path>
+                                    <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="url(#phGradient)"
+                                        stroke-width="8" stroke-linecap="round"></path>
                                     <defs>
                                         <linearGradient id="phGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                             <stop offset="0%" stop-color="#e74c3c" />
@@ -1398,7 +1547,8 @@
                                         </linearGradient>
                                     </defs>
                                     <circle cx="50" cy="50" r="4" fill="#2d3748" />
-                                    <line x1="50" y1="50" x2="56" y2="18" stroke="#1a3e23" stroke-width="2.5" stroke-linecap="round" />
+                                    <line x1="50" y1="50" x2="56" y2="18" stroke="#1a3e23" stroke-width="2.5"
+                                        stroke-linecap="round" />
                                 </svg>
                                 <strong id="hudPHVal">6.5</strong>
                             </div>
@@ -1406,7 +1556,8 @@
 
                         <div class="hud-sub-box texture-box">
                             <h4 data-i18n="hud-texture-title">Soil Texture</h4>
-                            <p data-i18n="hud-texture-desc">Loamy soil with rich organic nutrients and adequate natural drainage for maximum crop yield.</p>
+                            <p data-i18n="hud-texture-desc">Loamy soil with rich organic nutrients and adequate natural
+                                drainage for maximum crop yield.</p>
                         </div>
                     </div>
 
