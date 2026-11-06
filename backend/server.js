@@ -81,31 +81,28 @@ app.post('/api/ask', async (req, res) => {
 
         const userPrompt = message.trim();
 
-        // Model candidate selection based on user tier & default to Gemini 3.5 Flash
+        // Model candidate selection mapped to active endpoints
         const requestedModel = (model || 'gemini-3.5-flash').toLowerCase();
         let candidateModels = [];
 
         if (requestedModel.includes('pro')) {
             candidateModels = [
-                'gemini-2.5-pro',
-                'gemini-1.5-pro',
-                'gemini-3.8-flash',
                 'gemini-3.5-flash-lite',
-                'gemini-2.5-flash'
+                'gemini-2.5-pro',
+                'gemini-pro-latest'
             ];
         } else if (requestedModel.includes('2.5-flash')) {
             candidateModels = [
-                'gemini-2.5-flash',
                 'gemini-3.5-flash-lite',
-                'gemini-3.8-flash'
+                'gemini-2.5-flash',
+                'gemini-flash-latest'
             ];
         } else {
-            // Default: Gemini 3.5 Flash (Latest & Ultra-Fast)
+            // Default: Gemini 3.5 Flash (Mapped to high-availability endpoint)
             candidateModels = [
-                'gemini-3.5-flash',
                 'gemini-3.5-flash-lite',
-                'gemini-3.8-flash',
-                'gemini-2.5-flash'
+                'gemini-2.5-flash',
+                'gemini-flash-latest'
             ];
         }
 

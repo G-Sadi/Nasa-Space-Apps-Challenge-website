@@ -5792,57 +5792,124 @@ body.lang-bn strong {
 }
 
 /* Mobile responsive widget (Messenger in-app browser & mobile viewport collapse fix) */
-@media (max-width: 640px) {
+@media (max-width: 768px) {
     .farmer-buddy-widget {
-        bottom: 84px; /* Floating cleanly above bottom timeline dock to eliminate collision */
-        right: 12px;
-        left: 12px;
-        width: auto;
-        pointer-events: none;
+        bottom: 80px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: auto !important;
+        max-width: 100vw !important;
+        pointer-events: none !important;
+        position: fixed !important;
+        z-index: 99999 !important;
     }
 
     .farmer-buddy-fab {
-        pointer-events: auto;
-        margin-left: auto;
-        padding: 8px;
+        pointer-events: auto !important;
+        margin-left: auto !important;
+        padding: 8px 12px !important;
     }
 
     .fab-hover-label {
-        display: none;
+        display: none !important;
     }
 
     .farmer-buddy-window {
-        position: fixed;
-        left: 12px;
-        right: 12px;
-        bottom: 84px;
-        width: calc(100vw - 24px) !important;
-        max-width: calc(100vw - 24px) !important;
-        height: min(540px, calc(100dvh - 100px)) !important;
-        max-height: calc(100dvh - 100px) !important;
+        position: fixed !important;
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 76px !important;
+        width: auto !important;
+        max-width: calc(100vw - 20px) !important;
+        height: min(520px, calc(100dvh - 90px)) !important;
+        max-height: calc(100dvh - 90px) !important;
         box-sizing: border-box !important;
         overflow-x: hidden !important;
-        pointer-events: auto;
-        transform-origin: bottom center;
+        pointer-events: auto !important;
+        transition: opacity 0.25s ease, transform 0.25s ease !important;
+    }
+
+    .farmer-buddy-window.expanded {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+        transform: none !important; /* Critical: Disables WebKit transform matrix so viewport never shrinks */
     }
 
     .farmer-buddy-window.collapsed {
-        pointer-events: none;
+        opacity: 0 !important;
+        pointer-events: none !important;
+        visibility: hidden !important;
+        transform: translateY(20px) !important;
+    }
+
+    .fb-header {
+        padding: 10px 14px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex-shrink: 0 !important;
     }
 
     .fb-model-toolbar {
-        padding: 6px 10px;
-        gap: 6px;
+        padding: 6px 10px !important;
+        gap: 6px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex-shrink: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .fb-model-selector-group {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        box-sizing: border-box !important;
     }
 
     .fb-model-select {
-        font-size: 10.5px;
-        padding: 4px 6px;
+        font-size: 11px !important;
+        padding: 4px 6px !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .fb-model-pill {
-        font-size: 9.5px;
-        padding: 2px 6px;
+        font-size: 9.5px !important;
+        padding: 2px 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .fb-messages-body {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex: 1 1 auto !important;
+        overflow-x: hidden !important;
+    }
+
+    .fb-chips-row {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex-shrink: 0 !important;
+    }
+
+    .fb-input-area {
+        padding: 8px 10px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex-shrink: 0 !important;
+    }
+
+    .fb-form {
+        box-sizing: border-box !important;
+        width: 100% !important;
+        flex-shrink: 0 !important;
+    }
+
+    .fb-input-field {
+        min-width: 0 !important;
+        flex: 1 1 auto !important;
+        box-sizing: border-box !important;
+        font-size: 13px !important;
     }
 }
 
