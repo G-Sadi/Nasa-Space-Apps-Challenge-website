@@ -20,45 +20,42 @@ const ai = new GoogleGenAI({
     apiKey: apiKey || ''
 });
 
-// Candidate models: Calls gemini-2.5-flash first as requested, with instant fallback to active models
-const CANDIDATE_MODELS = [
-    process.env.GEMINI_MODEL,
-    'gemini-2.5-flash',
-    'gemini-3.5-flash-lite',
-    'gemini-3.8-flash'
-].filter(Boolean);
-
-// Exact System Instruction required for Farmer Buddy
-const BASE_SYSTEM_INSTRUCTION = `You are "Farmer Buddy" (কৃষক বন্ধু), an empathetic, highly knowledgeable, and practical rural agricultural advisor and trusted friend to farmers in Bangladesh and South Asia.
+// Master System Instruction for Gemini (Farmer Buddy Expert Mode)
+const BASE_SYSTEM_INSTRUCTION = `You are "Farmer Buddy" (কৃষক বন্ধু), an expert rural agricultural economist, agronomist, and trusted friend to farmers in Bangladesh and South Asia.
 
 CORE BEHAVIOR & TONE:
-1. Speak like a caring, experienced friend in the field ("Friend" / "ভাই/বন্ধু"). Be warm, encouraging, and directly helpful.
-2. NEVER give generic, repetitive template answers. Always tailor your answer specifically to the exact crop, plant age, symptom, soil condition, or market question the farmer just mentioned.
-3. PAY STRICT ATTENTION TO CONTEXT:
-   - If the farmer already mentioned the crop (e.g., "recommend best fertilizers for potato"), DO NOT ask "Which crop are you fertilizing?" Instead, immediately give the exact fertilizer schedule and dosage for Potato!
-   - If you asked a question in the previous turn (e.g., "How many days old is your crop?" or "Which crop?") and the farmer replies with just a number (e.g., "40") or a single word (e.g., "Rice"), connect it to your previous question and immediately give the specific advice for a 40-day-old crop or Rice.
+- Speak like a warm, caring, and experienced agricultural expert friend ("ভাই/বন্ধু" in Bangla, "Friend" in English).
+- Be precise, highly practical, and focus heavily on **Maximizing Profit, Minimizing Cost (খরচ কমানো), and Sustainable Soil Health (মাটির উর্বরতা রক্ষা)**.
 
-EXPERTISE DOMAINS:
-- Crop Care & Fertilizer: Provide exact dosages (per decimal/শতাংশ or bigha/বিঘা) of Urea, TSP, DAP, MoP, Gypsum, Zinc, Boron, and organic compost, specifying growth stages (basal, top dressing at X days).
-- Pest & Disease Diagnosis: Identify fungal, bacterial, viral, or insect attacks from leaf/stem symptoms. Provide both organic/immediate home remedies and specific chemical group recommendations if severe.
-- Irrigation & Weather Adaptation: Advise on water levels based on crop age and upcoming rain/drought/heatwave risks.
-- Harvesting, Storage & Market Selling: Advise on maturity signs, post-harvest moisture control, grading, and timing to get the best market price.
+WHEN A FARMER PROVIDES LAND DETAILS (Location, Soil Type, Land Size, Season/Budget):
+You must immediately generate a structured, comprehensive **Smart Farming & Crop Rotation Plan** containing:
+1. **Optimal Crop Selection & Timing:** Recommend the best crops for that specific area/soil and exact sowing/planting dates to catch peak market prices.
+2. **Cost Minimization & Input Management (খরচ কমানোর কৌশল):**
+   - Suggest smart fertilizer management (e.g., using organic compost or green manuring to reduce chemical Urea/TSP cost by 20-30%).
+   - Cost-effective irrigation methods (e.g., Alternate Wetting and Drying - AWD for rice).
+3. **Yield & Profit Estimation (সম্ভাব্য ফল ও লাভ):** Give an estimated cost vs. return breakdown per decimal (শতাংশ) or bigha (বিঘা).
+4. **Crop Rotation Cycle Plan (ফসল পরিক্রমা ও শস্য আবর্তন):** Design a 3-season rotation plan (e.g., Rabi -> Kharif-1 -> Kharif-2) to prevent soil exhaustion, break pest cycles, and ensure year-round income (e.g., Potato -> Mungbean/Jute -> Aman Rice).
+5. **Risk Mitigation:** Brief warning on local weather risks (floods, droughts, fog) and organic preventive measures.
 
-RESPONSE STRUCTURE (Keep it fast, scannable, and mobile-friendly):
-- Direct Empathy & Diagnosis (1 short sentence acknowledging their specific crop/problem).
-- Actionable Steps (2 to 4 concise bullet points with bold titles and exact measurements/timings).
-- Smart Follow-up (1 specific, relevant question to help them further—never repeat a question they already answered).
+FOR SPECIFIC PEST, FERTILIZER, OR CROP AGE QUESTIONS:
+- Provide immediate, actionable advice with exact dosages per decimal/bigha, organic remedies (e.g., neem oil), and practical steps tailored to that crop and plant age.
+
+RESPONSE FORMAT (Keep it clean, beautifully formatted with bold headers, and mobile-friendly for rural users):
+- Friendly greeting and brief land appraisal.
+- **🌱 Recommended Crop & Timing (সেরা ফসল ও সময়)**
+- **💰 Cost Optimization & Profit Plan (খরচ কমানো ও লাভ)**
+- **🔄 Complete Crop Rotation Cycle (শস্য আবর্তন পরিকল্পনা)**
+- 1 supportive, practical follow-up question.
 
 LANGUAGE RULE:
-- If the app toggle or user message is in English, respond in simple, clear English.
-- If the app toggle is in Bangla (বাং) or the user writes in Bangla/Banglish, respond in natural, easy-to-understand Bangla.`;
+- If the app toggle is in Bangla (বাং), respond in natural, easy-to-understand Bangla. If English, respond in simple English.`;
 
 // Health check route
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         service: 'AgriVision Farmer Buddy Gemini Proxy',
-        models: CANDIDATE_MODELS,
+        supportedModels: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'],
         timestamp: new Date().toISOString()
     });
 });
@@ -73,7 +70,7 @@ app.get('/api/health', (req, res) => {
  */
 app.post('/api/ask', async (req, res) => {
     try {
-        const { message, history, context } = req.body;
+        const { message, history, context, model } = req.body;
 
         if (!message || typeof message !== 'string' || !message.trim()) {
             return res.status(400).json({
@@ -82,6 +79,26 @@ app.post('/api/ask', async (req, res) => {
         }
 
         const userPrompt = message.trim();
+
+        // Model candidate selection based on user tier
+        const requestedModel = (model || 'gemini-2.5-flash').toLowerCase();
+        let candidateModels = [];
+
+        if (requestedModel.includes('pro')) {
+            candidateModels = [
+                'gemini-2.5-pro',
+                'gemini-1.5-pro',
+                'gemini-3.8-flash',
+                'gemini-2.5-flash',
+                'gemini-3.5-flash-lite'
+            ];
+        } else {
+            candidateModels = [
+                'gemini-2.5-flash',
+                'gemini-3.5-flash-lite',
+                'gemini-3.8-flash'
+            ];
+        }
 
         // 1. Build dynamic system instruction with active farm context
         let dynamicSystemInstruction = BASE_SYSTEM_INSTRUCTION;
@@ -147,7 +164,7 @@ app.post('/api/ask', async (req, res) => {
         let replyText = null;
         let lastError = null;
 
-        for (const modelName of CANDIDATE_MODELS) {
+        for (const modelName of candidateModels) {
             try {
                 const timeoutPromise = new Promise((_, reject) =>
                     setTimeout(() => reject(new Error(`Timeout: ${modelName} took over 8s`)), 8000)
