@@ -15,6 +15,7 @@ class FarmerBuddy {
         this.storageKeyPrefix = "agrivision_farmer_buddy_chat_v2_";
         this.currentLang = (typeof window !== "undefined" && window.currentAppLanguage === "bn") ? "bn" : "en";
         this.messages = [];
+        this.chatHistory = []; // Multi-turn Gemini memory: Array<{ role: 'user' | 'model', parts: [{ text: string }] }>
         this.isOpen = false;
         this.isStreaming = false;
 
@@ -178,6 +179,18 @@ class FarmerBuddy {
                 timestamp: Date.now()
             });
         }
+
+        // Reconstruct multi-turn chatHistory from session messages (excluding welcome banner)
+        this.chatHistory = [];
+        this.messages.forEach(m => {
+            if (m.id && m.id.startsWith("welcome-")) return;
+            if (m.text && typeof m.text === "string" && m.text.trim()) {
+                this.chatHistory.push({
+                    role: m.sender === "user" ? "user" : "model",
+                    parts: [{ text: m.text.trim() }]
+                });
+            }
+        });
     }
 
     saveSessionMessages() {
@@ -185,6 +198,50 @@ class FarmerBuddy {
             const trimmed = this.messages.slice(-20);
             sessionStorage.setItem(this.getStorageKey(), JSON.stringify(trimmed));
         } catch (e) {}
+    }
+
+    /**
+     * Retrieve the last N turns of conversation memory for multi-turn Gemini reasoning
+     * @param {number} count 
+     * @returns {Array<{ role: 'user' | 'model', parts: [{ text: string }] }>}
+     */
+    getRecentChatHistory(count = 10) {
+        if (!Array.isArray(this.chatHistory)) return [];
+        return this.chatHistory.slice(-count);
+    }
+
+    /**
+     * Dynamically extract active farm telemetry and dashboard state
+     * @returns {Object} Active field context (crop, growth stage, soil, weather, language)
+     */
+    getActiveFarmContext() {
+        const isBn = (typeof window !== "undefined" && window.currentAppLanguage === "bn") || (this.currentLang === "bn");
+
+        // Selected crop from 3D field selector
+        const cropSelect = document.getElementById("cropSelect");
+        let selectedCrop = isBn ? "টমেটো (Tomato)" : "Tomato";
+        if (cropSelect && cropSelect.selectedIndex >= 0) {
+            selectedCrop = cropSelect.options[cropSelect.selectedIndex]?.text?.trim() || cropSelect.value;
+        }
+
+        // Live HUD Telemetry
+        const soilMoisture = document.getElementById("hudDockMoistVal")?.textContent?.trim() || "68%";
+        const soilNPK = document.getElementById("hudDockNPKVal")?.textContent?.trim() || "84%";
+        const pestRisk = document.getElementById("hudDockPestBadge")?.textContent?.trim() || (isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk");
+        const weather = document.getElementById("hudDockWeatherStatus")?.textContent?.trim() || (isBn ? "☀️ রোদ · ২৬°C" : "☀️ Sunny · 26°C");
+        const growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
+                            document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
+                            (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
+
+        return {
+            language: isBn ? "বাং" : "EN",
+            crop: selectedCrop,
+            growthStage: growthStage,
+            soilMoisture: soilMoisture,
+            soilNPK: soilNPK,
+            pestRisk: pestRisk,
+            weather: weather
+        };
     }
 
     initDOM() {
@@ -411,10 +468,13 @@ class FarmerBuddy {
     }
 
     async handleUserSubmit(text) {
+        if (!text || !text.trim() || this.isStreaming) return;
+        const cleanText = text.trim();
+
         const userMsg = {
             id: "u-" + Date.now(),
             sender: "user",
-            text: text,
+            text: cleanText,
             timestamp: Date.now()
         };
         this.messages.push(userMsg);
@@ -439,21 +499,32 @@ class FarmerBuddy {
         this.setInputsDisabled(true);
 
         try {
+            // Strictly check connectivity: only fallback offline if truly disconnected
             if (!navigator.onLine) {
+                console.warn("[FarmerBuddy] Browser is offline (navigator.onLine === false). Running offline fallback.");
                 throw new Error("OFFLINE_NETWORK");
             }
 
-            await this.askGeminiBackend(text, textTarget, buddyMsg);
+            // Always call real Gemini API proxy with full conversation memory and farm context
+            await this.askGeminiBackend(cleanText, textTarget, buddyMsg);
+
+            // Record conversation turns into multi-turn memory state
+            this.chatHistory.push({ role: "user", parts: [{ text: cleanText }] });
+            this.chatHistory.push({ role: "model", parts: [{ text: buddyMsg.text }] });
+            this.saveSessionMessages();
         } catch (err) {
-            console.warn(`[FarmerBuddy] Gemini backend unreachable or error: ${err.message}. Showing status & using offline advisor.`);
+            console.error("[FarmerBuddy API Error]:", err);
+
             const isBn = (this.currentLang === "bn");
-            const notice = isBn
-                ? `⚠️ *ব্যাকএন্ড সার্ভারে সংযোগ পাওয়া যায়নি (http://localhost:5000/api/ask)। Gemini API সক্রিয় করতে টার্মিনালে \`npm start\` রান করুন।*\n\n`
-                : `⚠️ *Unable to reach Gemini backend proxy (http://localhost:5000/api/ask). Please ensure your Node server is running with \`npm start\`.*\n\n`;
+            const isOffline = (err.message === "OFFLINE_NETWORK" || !navigator.onLine);
+
+            const notice = isOffline
+                ? (isBn ? `📡 *আপনি বর্তমানে অফলাইনে আছেন। সংরক্ষিত অফলাইন পরামর্শ:* \n\n` : `📡 *You appear to be offline. Displaying saved offline guidance:* \n\n`)
+                : (isBn ? `⚠️ *সার্ভারে সংযোগ করা যায়নি (${err.message})। সার্ভার চালু করতে \`npm start\` রান করুন। সংরক্ষিত পরামর্শ:* \n\n` : `⚠️ *Unable to reach Gemini backend proxy (${err.message}). Ensure Node server is running with \`npm start\`. Saved guidance:* \n\n`);
 
             buddyMsg.text = notice;
             textTarget.innerHTML = this.formatMarkdown(notice);
-            await this.streamFromOfflineFallback(text, textTarget, buddyMsg);
+            await this.streamFromOfflineFallback(cleanText, textTarget, buddyMsg);
         } finally {
             this.isStreaming = false;
             this.setInputsDisabled(false);
@@ -463,6 +534,12 @@ class FarmerBuddy {
     }
 
     async askGeminiBackend(message, textTarget, buddyMsg) {
+        // Multi-turn history (last 10 turns) & active dashboard context
+        const recentHistory = this.getRecentChatHistory(10);
+        const farmContext = this.getActiveFarmContext();
+
+        console.log(`[FarmerBuddy] Calling Gemini API proxy (History: ${recentHistory.length} turns, Crop: ${farmContext.crop})...`);
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -471,14 +548,18 @@ class FarmerBuddy {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ message: message }),
+            body: JSON.stringify({
+                message: message,
+                history: recentHistory,
+                context: farmContext
+            }),
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
         if (!response.ok) {
-            let errorText = `HTTP_${response.status}`;
+            let errorText = `HTTP_${response.status} ${response.statusText}`;
             try {
                 const errData = await response.json();
                 if (errData?.error) errorText = errData.error;
@@ -540,9 +621,11 @@ class FarmerBuddy {
 
     resetConversation() {
         this.messages = [];
+        this.chatHistory = [];
         sessionStorage.removeItem(this.getStorageKey());
         this.loadSessionMessages();
         this.renderHistory();
+        console.log("[FarmerBuddy] Multi-turn conversation history reset.");
     }
 
     scrollToBottom() {

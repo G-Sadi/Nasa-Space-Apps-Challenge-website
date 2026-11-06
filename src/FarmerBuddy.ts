@@ -18,6 +18,21 @@ export interface ChatMessage {
     timestamp: number;
 }
 
+export interface ChatMessageTurn {
+    role: "user" | "model";
+    parts: Array<{ text: string }>;
+}
+
+export interface FarmContext {
+    language: string;
+    crop: string;
+    growthStage: string;
+    soilMoisture: string;
+    soilNPK: string;
+    pestRisk: string;
+    weather: string;
+}
+
 export interface ChatPayload {
     message: string;
     history: Array<{ sender: "user" | "buddy"; text: string }>;
@@ -53,10 +68,11 @@ export interface TranslationDict {
 }
 
 export class FarmerBuddy {
-    private apiUrl: string = "http://127.0.0.1:8000/api/chat/stream";
+    private apiUrl: string = "http://localhost:5000/api/ask";
     private storageKeyPrefix: string = "agrivision_farmer_buddy_chat_v2_";
     private currentLang: AppLanguage = "en";
     private messages: ChatMessage[] = [];
+    private chatHistory: ChatMessageTurn[] = []; // Multi-turn Gemini memory: Array<{ role: 'user' | 'model', parts: [{ text: string }] }>
     private isOpen: boolean = false;
     private isStreaming: boolean = false;
 
@@ -251,6 +267,18 @@ export class FarmerBuddy {
                 timestamp: Date.now()
             });
         }
+
+        // Reconstruct multi-turn chatHistory from session messages (excluding welcome banner)
+        this.chatHistory = [];
+        this.messages.forEach(m => {
+            if (m.id && m.id.startsWith("welcome-")) return;
+            if (m.text && typeof m.text === "string" && m.text.trim()) {
+                this.chatHistory.push({
+                    role: m.sender === "user" ? "user" : "model",
+                    parts: [{ text: m.text.trim() }]
+                });
+            }
+        });
     }
 
     /**
@@ -263,6 +291,50 @@ export class FarmerBuddy {
         } catch (e) {
             // Storage quota handled silently
         }
+    }
+
+    /**
+     * Retrieve the last N turns of conversation memory for multi-turn Gemini reasoning
+     * @param count Number of turns to retrieve
+     * @returns Array of chat turns
+     */
+    public getRecentChatHistory(count: number = 10): ChatMessageTurn[] {
+        if (!Array.isArray(this.chatHistory)) return [];
+        return this.chatHistory.slice(-count);
+    }
+
+    /**
+     * Dynamically extract active farm telemetry and dashboard state
+     * @returns Active field context (crop, growth stage, soil, weather, language)
+     */
+    public getActiveFarmContext(): FarmContext {
+        const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn") || (this.currentLang === "bn");
+
+        // Selected crop from 3D field selector
+        const cropSelect = document.getElementById("cropSelect") as HTMLSelectElement | null;
+        let selectedCrop = isBn ? "টমেটো (Tomato)" : "Tomato";
+        if (cropSelect && cropSelect.selectedIndex >= 0) {
+            selectedCrop = cropSelect.options[cropSelect.selectedIndex]?.text?.trim() || cropSelect.value;
+        }
+
+        // Live HUD Telemetry
+        const soilMoisture = document.getElementById("hudDockMoistVal")?.textContent?.trim() || "68%";
+        const soilNPK = document.getElementById("hudDockNPKVal")?.textContent?.trim() || "84%";
+        const pestRisk = document.getElementById("hudDockPestBadge")?.textContent?.trim() || (isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk");
+        const weather = document.getElementById("hudDockWeatherStatus")?.textContent?.trim() || (isBn ? "☀️ রোদ · ২৬°C" : "☀️ Sunny · 26°C");
+        const growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
+                            document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
+                            (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
+
+        return {
+            language: isBn ? "বাং" : "EN",
+            crop: selectedCrop,
+            growthStage: growthStage,
+            soilMoisture: soilMoisture,
+            soilNPK: soilNPK,
+            pestRisk: pestRisk,
+            weather: weather
+        };
     }
 
     /**
@@ -518,14 +590,17 @@ export class FarmerBuddy {
     }
 
     /**
-     * Process User Prompt and trigger streaming response
+     * Process User Prompt and trigger Gemini API response
      */
     private async handleUserSubmit(text: string): Promise<void> {
+        if (!text || !text.trim() || this.isStreaming) return;
+        const cleanText = text.trim();
+
         // 1. Add User Message
         const userMsg: ChatMessage = {
             id: "u-" + Date.now(),
             sender: "user",
-            text: text,
+            text: cleanText,
             timestamp: Date.now()
         };
         this.messages.push(userMsg);
@@ -551,16 +626,32 @@ export class FarmerBuddy {
         this.setInputsDisabled(true);
 
         try {
-            // Check online state first
+            // Strictly check connectivity: only fallback offline if truly disconnected
             if (!navigator.onLine) {
+                console.warn("[FarmerBuddy] Browser is offline (navigator.onLine === false). Running offline fallback.");
                 throw new Error("OFFLINE_NETWORK");
             }
 
-            // Stream from Backend
-            await this.streamFromBackend(text, textTarget, buddyMsg);
+            // Always call real Gemini API proxy with full conversation memory and farm context
+            await this.askGeminiBackend(cleanText, textTarget, buddyMsg);
+
+            // Record conversation turns into multi-turn memory state
+            this.chatHistory.push({ role: "user", parts: [{ text: cleanText }] });
+            this.chatHistory.push({ role: "model", parts: [{ text: buddyMsg.text }] });
+            this.saveSessionMessages();
         } catch (err: any) {
-            console.warn(`[FarmerBuddy] Backend stream unavailable. Using empathetic offline fallback for [${this.currentLang}].`);
-            await this.streamFromOfflineFallback(text, textTarget, buddyMsg);
+            console.error("[FarmerBuddy API Error]:", err);
+
+            const isBn = (this.currentLang === "bn");
+            const isOffline = (err.message === "OFFLINE_NETWORK" || !navigator.onLine);
+
+            const notice = isOffline
+                ? (isBn ? `📡 *আপনি বর্তমানে অফলাইনে আছেন। সংরক্ষিত অফলাইন পরামর্শ:* \n\n` : `📡 *You appear to be offline. Displaying saved offline guidance:* \n\n`)
+                : (isBn ? `⚠️ *সার্ভারে সংযোগ করা যায়নি (${err.message})। সার্ভার চালু করতে \`npm start\` রান করুন। সংরক্ষিত পরামর্শ:* \n\n` : `⚠️ *Unable to reach Gemini backend proxy (${err.message}). Ensure Node server is running with \`npm start\`. Saved guidance:* \n\n`);
+
+            buddyMsg.text = notice;
+            textTarget.innerHTML = this.formatMarkdown(notice);
+            await this.streamFromOfflineFallback(cleanText, textTarget, buddyMsg);
         } finally {
             this.isStreaming = false;
             this.setInputsDisabled(false);
@@ -570,86 +661,55 @@ export class FarmerBuddy {
     }
 
     /**
-     * SSE Streaming via fetch() ReadableStream with bilingual payload
+     * Direct Gemini API proxy request with multi-turn history & active farm context
      */
-    private async streamFromBackend(
+    private async askGeminiBackend(
         message: string,
         textTarget: HTMLElement,
         buddyMsg: ChatMessage
     ): Promise<void> {
-        // Context limited to last 2 turns (4 messages) to minimize data usage
-        const trimmedHistory = this.messages.slice(-5, -1).map(m => ({
-            sender: m.sender,
-            text: m.text
-        }));
+        // Multi-turn history (last 10 turns) & active dashboard context
+        const recentHistory = this.getRecentChatHistory(10);
+        const farmContext = this.getActiveFarmContext();
 
-        const payload: ChatPayload = {
-            message: message,
-            history: trimmedHistory,
-            lang: this.currentLang
-        };
+        console.log(`[FarmerBuddy] Calling Gemini API proxy (History: ${recentHistory.length} turns, Crop: ${farmContext.crop})...`);
 
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 7000); // 7s timeout
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
 
         const response = await fetch(this.apiUrl, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json",
-                "Accept": "text/event-stream"
+                "Content-Type": "application/json"
             },
-            body: JSON.stringify(payload),
+            body: JSON.stringify({
+                message: message,
+                history: recentHistory,
+                context: farmContext
+            }),
             signal: controller.signal
         });
 
         clearTimeout(timeoutId);
 
-        if (!response.ok || !response.body) {
-            throw new Error(`HTTP_${response.status}`);
+        if (!response.ok) {
+            let errorText = `HTTP_${response.status} ${response.statusText}`;
+            try {
+                const errData = await response.json();
+                if (errData?.error) errorText = errData.error;
+            } catch (_) {}
+            throw new Error(errorText);
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let accumulatedText = "";
-        let buffer = "";
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n\n");
-            buffer = lines.pop() || "";
-
-            for (const line of lines) {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith("data:")) continue;
-
-                const dataContent = trimmed.replace("data:", "").trim();
-                if (dataContent === "[DONE]") {
-                    break;
-                }
-
-                try {
-                    const parsed = JSON.parse(dataContent);
-                    if (parsed.text) {
-                        accumulatedText += parsed.text;
-                        buddyMsg.text = accumulatedText;
-                        textTarget.innerHTML = this.formatMarkdown(accumulatedText);
-                        this.scrollToBottom();
-                    }
-                } catch (e) {
-                    accumulatedText += dataContent;
-                    buddyMsg.text = accumulatedText;
-                    textTarget.innerHTML = this.formatMarkdown(accumulatedText);
-                    this.scrollToBottom();
-                }
-            }
+        const data = await response.json();
+        if (!data || typeof data.reply !== "string") {
+            throw new Error("EMPTY_REPLY");
         }
 
-        if (!accumulatedText.trim()) {
-            throw new Error("EMPTY_STREAM_RESPONSE");
-        }
+        const replyText = data.reply.trim();
+        buddyMsg.text = replyText;
+        textTarget.innerHTML = this.formatMarkdown(replyText);
+        this.scrollToBottom();
     }
 
     /**
@@ -707,9 +767,11 @@ export class FarmerBuddy {
      */
     private resetConversation(): void {
         this.messages = [];
+        this.chatHistory = [];
         sessionStorage.removeItem(this.getStorageKey());
         this.loadSessionMessages();
         this.renderHistory();
+        console.log("[FarmerBuddy] Multi-turn conversation history reset.");
     }
 
     /**
