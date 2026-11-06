@@ -3,8 +3,9 @@
  * FARMER BUDDY (কৃষি বন্ধু) - TWO-LAYER HYBRID AGRICULTURAL AI ENGINE
  * ============================================================================
  * LAYER 1 (Primary): Real Google Gemini API with Model Selector:
- *                    - Gemini 2.5 Flash (Fast & Low-Bandwidth / দ্রুত ও হালকা)
- *                    - Gemini 2.5 Pro (Deep Crop & Profit Planner / বিশেষজ্ঞ প্রফিট প্ল্যানার)
+ *                    - Gemini 3.5 Flash (Latest & Ultra-Fast / নতুন ও দ্রুততম) [Default]
+ *                    - Gemini 2.5 Pro (Deep Agronomy Planner / বিশেষজ্ঞ প্রফিট প্ল্যানার)
+ *                    - Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী ও হালকা)
  *                    + Pre-configured secure API Key auto-injection (Zero farmer setup!)
  * LAYER 2 (Fallback): Stateful Agricultural Economics & Crop Rotation Planner
  *                    - 3-Season Rotation (Rabi -> Kharif-1 -> Kharif-2)
@@ -669,8 +670,10 @@ class FarmerBuddy {
         this.isOpen = false;
         this.isStreaming = false;
 
-        // Model Selector State (Default: Gemini 2.5 Flash)
-        this.selectedModel = (typeof window !== "undefined" && localStorage.getItem("agrivision_selected_model")) || "gemini-2.5-flash";
+        // Model Selector State (Default: Gemini 3.5 Flash)
+        const savedModel = (typeof window !== "undefined" && localStorage.getItem("agrivision_selected_model"));
+        const validModels = ["gemini-3.5-flash", "gemini-2.5-pro", "gemini-2.5-flash"];
+        this.selectedModel = (savedModel && validModels.includes(savedModel)) ? savedModel : "gemini-3.5-flash";
 
         // Pre-configured secure API keys (injected automatically in code)
         this.geminiApiKey = this.getPreconfiguredApiKey();
@@ -948,17 +951,20 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
             <div class="fb-model-selector-group">
                 <span class="fb-model-icon">🤖</span>
                 <select id="fbModelSelect" class="fb-model-select" aria-label="Select AI Model">
-                    <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "⚡ Gemini 2.5 Flash (দ্রুত ও হালকা · সার/বালাই দমন)" : "⚡ Gemini 2.5 Flash (Fast & Low-Bandwidth · Pest/Fertilizer)"}
+                    <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
+                        ${isBn ? "⚡ Gemini 3.5 Flash (নতুন ও দ্রুততম · উচ্চ কার্যক্ষমতা)" : "⚡ Gemini 3.5 Flash (Latest & Ultra-Fast / নতুন ও দ্রুততম)"}
                     </option>
                     <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                        ${isBn ? "🎯 Gemini 2.5 Pro (বিশেষজ্ঞ প্রফিট প্ল্যানার · শস্য পরিক্রমা)" : "🎯 Gemini 2.5 Pro (Deep Crop & Profit Planner · Rotation)"}
+                        ${isBn ? "🎯 Gemini 2.5 Pro (Deep Agronomy Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Agronomy Planner)"}
+                    </option>
+                    <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
+                        ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
                     </option>
                 </select>
             </div>
-            <div id="fbModelPill" class="fb-model-pill ${this.selectedModel === 'gemini-2.5-pro' ? 'pro' : 'flash'}" title="${isBn ? 'বর্তমান AI মোড' : 'Active AI Mode'}">
+            <div id="fbModelPill" class="fb-model-pill ${this.getModelPillClass()}" title="${isBn ? 'বর্তমান AI মোড' : 'Active AI Mode'}">
                 <span class="fb-pulse-dot"></span>
-                <span id="fbModelPillText">${this.selectedModel === 'gemini-2.5-pro' ? (isBn ? 'Pro · প্ল্যানার' : 'Pro · Planner') : (isBn ? 'Flash · দ্রুত' : 'Flash · Fast')}</span>
+                <span id="fbModelPillText">${this.getModelPillLabel(isBn)}</span>
             </div>
         `;
 
@@ -1012,24 +1018,42 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         document.body.appendChild(this.widgetContainer);
     }
 
+    getModelPillClass() {
+        if (this.selectedModel === "gemini-2.5-pro") return "pro";
+        if (this.selectedModel === "gemini-2.5-flash") return "lite";
+        return "ultra"; // gemini-3.5-flash
+    }
+
+    getModelPillLabel(isBn) {
+        if (this.selectedModel === "gemini-2.5-pro") {
+            return isBn ? "Pro · প্ল্যানার" : "Pro · Planner";
+        }
+        if (this.selectedModel === "gemini-2.5-flash") {
+            return isBn ? "2.5 · হালকা" : "2.5 · Lite";
+        }
+        return isBn ? "3.5 · দ্রুততম" : "3.5 · Ultra";
+    }
+
     updateModelUI() {
         const isBn = (this.currentLang === "bn");
         const pill = this.chatWindow ? this.chatWindow.querySelector("#fbModelPill") : null;
         const pillText = this.chatWindow ? this.chatWindow.querySelector("#fbModelPillText") : null;
         const badge = this.badgeEl;
 
-        const isPro = this.selectedModel === "gemini-2.5-pro";
-
         if (pill) {
-            pill.className = `fb-model-pill ${isPro ? 'pro' : 'flash'}`;
+            pill.className = `fb-model-pill ${this.getModelPillClass()}`;
         }
         if (pillText) {
-            pillText.textContent = isPro ? (isBn ? 'Pro · প্ল্যানার' : 'Pro · Planner') : (isBn ? 'Flash · দ্রুত' : 'Flash · Fast');
+            pillText.textContent = this.getModelPillLabel(isBn);
         }
         if (badge) {
-            badge.textContent = isPro
-                ? (isBn ? "AI প্রফিট প্ল্যানার" : "AI Profit Planner")
-                : (isBn ? "AI কৃষিবিদ" : "AI Agronomist");
+            if (this.selectedModel === "gemini-2.5-pro") {
+                badge.textContent = isBn ? "AI প্রফিট প্ল্যানার" : "AI Profit Planner";
+            } else if (this.selectedModel === "gemini-2.5-flash") {
+                badge.textContent = isBn ? "AI লাইট মোড" : "AI Low-Bandwidth";
+            } else {
+                badge.textContent = isBn ? "AI দ্রুততম 3.5" : "AI Ultra-Fast 3.5";
+            }
         }
     }
 
@@ -1053,11 +1077,14 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         const modelSelect = this.chatWindow ? this.chatWindow.querySelector("#fbModelSelect") : null;
         if (modelSelect) {
             modelSelect.innerHTML = `
-                <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "⚡ Gemini 2.5 Flash (দ্রুত ও হালকা · সার/বালাই দমন)" : "⚡ Gemini 2.5 Flash (Fast & Low-Bandwidth · Pest/Fertilizer)"}
+                <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
+                    ${isBn ? "⚡ Gemini 3.5 Flash (নতুন ও দ্রুততম · উচ্চ কার্যক্ষমতা)" : "⚡ Gemini 3.5 Flash (Latest & Ultra-Fast / নতুন ও দ্রুততম)"}
                 </option>
                 <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                    ${isBn ? "🎯 Gemini 2.5 Pro (বিশেষজ্ঞ প্রফিট প্ল্যানার · শস্য পরিক্রমা)" : "🎯 Gemini 2.5 Pro (Deep Crop & Profit Planner · Rotation)"}
+                    ${isBn ? "🎯 Gemini 2.5 Pro (Deep Agronomy Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Agronomy Planner)"}
+                </option>
+                <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
+                    ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
                 </option>
             `;
         }
@@ -1203,9 +1230,14 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         const textTarget = buddyBubble.querySelector(".msg-text");
 
         const isBn = (this.currentLang === "bn");
-        const thinkingLabel = this.selectedModel === "gemini-2.5-pro"
-            ? (isBn ? "শস্য পরিক্রমা ও লাভ পরিকল্পনা হিসাব করছি..." : "Calculating Crop Rotation & Profit Plan...")
-            : (isBn ? "কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing Agricultural Advisory...");
+        let thinkingLabel;
+        if (this.selectedModel === "gemini-2.5-pro") {
+            thinkingLabel = isBn ? "শস্য পরিক্রমা ও লাভ পরিকল্পনা হিসাব করছি..." : "Calculating Crop Rotation & Profit Plan...";
+        } else if (this.selectedModel === "gemini-2.5-flash") {
+            thinkingLabel = isBn ? "হালকা ব্যান্ডউইথে কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing in Low-Bandwidth Mode...";
+        } else {
+            thinkingLabel = isBn ? "Gemini 3.5 দিয়ে কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing Advisory with Gemini 3.5...";
+        }
 
         textTarget.innerHTML = `<span class="fb-typing-indicator"><span class="fb-typing-dots"><span></span><span></span><span></span></span> <span class="fb-thinking-text">${thinkingLabel}</span></span>`;
 
@@ -1291,9 +1323,15 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         }
 
         // Candidate models list prioritizing user selected model
-        const candidateModels = this.selectedModel === "gemini-2.5-pro"
-            ? ['gemini-2.5-pro', 'gemini-1.5-pro', 'gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-3.5-flash-lite']
-            : ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+        let candidateModels;
+        if (this.selectedModel === "gemini-2.5-pro") {
+            candidateModels = ['gemini-2.5-pro', 'gemini-1.5-pro', 'gemini-3.8-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-flash'];
+        } else if (this.selectedModel === "gemini-2.5-flash") {
+            candidateModels = ['gemini-2.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'];
+        } else {
+            // Default: Gemini 3.5 Flash (Ultra-Fast)
+            candidateModels = ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.8-flash', 'gemini-2.5-flash'];
+        }
 
         let lastError = null;
 

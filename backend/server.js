@@ -55,7 +55,7 @@ app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         service: 'AgriVision Farmer Buddy Gemini Proxy',
-        supportedModels: ['gemini-2.5-flash', 'gemini-2.5-pro', 'gemini-3.5-flash-lite', 'gemini-3.8-flash'],
+        supportedModels: ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-3.8-flash'],
         timestamp: new Date().toISOString()
     });
 });
@@ -66,6 +66,7 @@ app.get('/api/health', (req, res) => {
  *   - message: string (current user message)
  *   - history: Array<{ role: 'user' | 'model', parts: [{ text: string }] }> (conversation memory)
  *   - context: Object (active farm dashboard state: crop, growthStage, soilMoisture, weather, etc.)
+ *   - model: string (e.g. 'gemini-3.5-flash', 'gemini-2.5-pro', 'gemini-2.5-flash')
  * Returns: { reply: string }
  */
 app.post('/api/ask', async (req, res) => {
@@ -80,8 +81,8 @@ app.post('/api/ask', async (req, res) => {
 
         const userPrompt = message.trim();
 
-        // Model candidate selection based on user tier
-        const requestedModel = (model || 'gemini-2.5-flash').toLowerCase();
+        // Model candidate selection based on user tier & default to Gemini 3.5 Flash
+        const requestedModel = (model || 'gemini-3.5-flash').toLowerCase();
         let candidateModels = [];
 
         if (requestedModel.includes('pro')) {
@@ -89,14 +90,22 @@ app.post('/api/ask', async (req, res) => {
                 'gemini-2.5-pro',
                 'gemini-1.5-pro',
                 'gemini-3.8-flash',
-                'gemini-2.5-flash',
-                'gemini-3.5-flash-lite'
+                'gemini-3.5-flash-lite',
+                'gemini-2.5-flash'
             ];
-        } else {
+        } else if (requestedModel.includes('2.5-flash')) {
             candidateModels = [
                 'gemini-2.5-flash',
                 'gemini-3.5-flash-lite',
                 'gemini-3.8-flash'
+            ];
+        } else {
+            // Default: Gemini 3.5 Flash (Latest & Ultra-Fast)
+            candidateModels = [
+                'gemini-3.5-flash',
+                'gemini-3.5-flash-lite',
+                'gemini-3.8-flash',
+                'gemini-2.5-flash'
             ];
         }
 
