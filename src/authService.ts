@@ -274,6 +274,9 @@ export class FarmerAuthEngine {
             this.activeSession = DEMO_FARMER;
         }
 
+        // 6. Initialize UI bindings & Navbar badge
+        this.initUI();
+
         // Broadcast initial state
         if (this.activeSession) {
             this.dispatchAuthChanged(this.activeSession);
@@ -421,6 +424,7 @@ export class FarmerAuthEngine {
 
         // Broadcast to ecosystem
         this.dispatchAuthChanged(farmer);
+        this.updateNavbarBadge();
 
         return { success: true, farmer };
     }
@@ -489,6 +493,7 @@ export class FarmerAuthEngine {
 
         // Broadcast to ecosystem
         this.dispatchAuthChanged(newFarmer);
+        this.updateNavbarBadge();
 
         return { success: true, farmer: newFarmer };
     }
@@ -529,6 +534,7 @@ export class FarmerAuthEngine {
         } catch (e) { }
 
         this.dispatchAuthChanged(updated);
+        this.updateNavbarBadge();
         return { success: true, farmer: updated };
     }
 
@@ -541,6 +547,7 @@ export class FarmerAuthEngine {
             localStorage.removeItem(STORAGE_SESSION_KEY);
         } catch (e) { }
         this.dispatchAuthChanged(null);
+        this.updateNavbarBadge();
     }
 
     /**
@@ -554,6 +561,479 @@ export class FarmerAuthEngine {
             } catch (e) { }
         }
     }
+
+    // =========================================================================
+    // UI BINDINGS & NATIVE AUTO-FILL MODAL CONTROLLER
+    // =========================================================================
+
+    public initUI(): void {
+        if (typeof document === "undefined") return;
+
+        this.updateNavbarBadge();
+        this.bindModalEvents();
+    }
+
+    public updateNavbarBadge(): void {
+        const container = document.getElementById("navFarmerAuthContainer");
+        if (!container) return;
+
+        const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn");
+        const farmer = this.activeSession;
+
+        if (farmer) {
+            const distBn = BANGLADESH_DISTRICTS[farmer.district.toLowerCase()]?.nameBn || farmer.district;
+            const distName = isBn ? distBn : farmer.district;
+            const cropInfo = CROP_LABELS[farmer.primaryCrop];
+            const cropName = cropInfo ? (isBn ? cropInfo.bn : cropInfo.en) : farmer.primaryCrop;
+
+            container.innerHTML = `
+                <button class="nav-farmer-badge" id="btnNavFarmerProfile" title="${isBn ? 'কৃষক প্রোফাইল দেখুন ও পরিবর্তন করুন' : 'View & Switch Farmer Profile'}">
+                    <span class="farmer-avatar">👨‍🌾</span>
+                    <span class="farmer-info">
+                        <strong class="farmer-name">${farmer.name}</strong>
+                        <small class="farmer-meta">📍 ${distName} • ${farmer.landSizeDecimals} ${isBn ? 'শতক' : 'dec'} (${cropName})</small>
+                    </span>
+                    <span class="farmer-chevron">▾</span>
+                </button>
+            `;
+
+            const btn = document.getElementById("btnNavFarmerProfile");
+            if (btn) {
+                btn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    this.toggleProfilePopover();
+                });
+            }
+        } else {
+            container.innerHTML = `
+                <button class="nav-farmer-login-btn" id="btnNavFarmerLogin">
+                    <span class="btn-icon">👨‍🌾</span>
+                    <span class="btn-text">${isBn ? 'কৃষক প্রবেশ (Login)' : 'Farmer Login'}</span>
+                </button>
+            `;
+
+            const btn = document.getElementById("btnNavFarmerLogin");
+            if (btn) {
+                btn.addEventListener("click", () => {
+                    this.openAuthModal("login");
+                });
+            }
+        }
+    }
+
+    public toggleProfilePopover(): void {
+        const popover = document.getElementById("farmerProfilePopover");
+        if (!popover) return;
+
+        const isVisible = popover.classList.contains("visible");
+        if (isVisible) {
+            popover.classList.remove("visible");
+        } else {
+            this.renderProfilePopoverContent();
+            popover.classList.add("visible");
+        }
+    }
+
+    public renderProfilePopoverContent(): void {
+        const popover = document.getElementById("farmerProfilePopover");
+        if (!popover || !this.activeSession) return;
+
+        const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn");
+        const farmer = this.activeSession;
+        const distBn = BANGLADESH_DISTRICTS[farmer.district.toLowerCase()]?.nameBn || farmer.district;
+        const cropInfo = CROP_LABELS[farmer.primaryCrop];
+        const soilInfo = SOIL_LABELS[farmer.soilType];
+
+        popover.innerHTML = `
+            <div class="popover-header">
+                <div class="popover-avatar">👨‍🌾</div>
+                <div class="popover-title-wrap">
+                    <h4>${farmer.name}</h4>
+                    <span class="popover-phone">📱 ${farmer.phone}</span>
+                </div>
+            </div>
+            <div class="popover-details-grid">
+                <div class="popover-detail-item">
+                    <span>📍 ${isBn ? 'জেলা' : 'District'}</span>
+                    <strong>${isBn ? distBn : farmer.district}</strong>
+                </div>
+                <div class="popover-detail-item">
+                    <span>🌱 ${isBn ? 'প্রধান ফসল' : 'Primary Crop'}</span>
+                    <strong>${cropInfo ? (isBn ? cropInfo.bn : cropInfo.en) : farmer.primaryCrop}</strong>
+                </div>
+                <div class="popover-detail-item">
+                    <span>📐 ${isBn ? 'জমির পরিমাণ' : 'Land Size'}</span>
+                    <strong>${farmer.landSizeDecimals} ${isBn ? 'শতাংশ' : 'Decimals'}</strong>
+                </div>
+                <div class="popover-detail-item">
+                    <span>🌾 ${isBn ? 'মাটির ধরন' : 'Soil Type'}</span>
+                    <strong>${soilInfo ? (isBn ? soilInfo.bn : soilInfo.en) : farmer.soilType}</strong>
+                </div>
+            </div>
+            <div class="popover-actions">
+                <button id="btnPopoverSwitch" class="popover-action-btn switch-btn">
+                    <span>🔄</span> ${isBn ? 'অ্যাকাউন্ট পরিবর্তন' : 'Switch Account'}
+                </button>
+                <button id="btnPopoverEdit" class="popover-action-btn edit-btn">
+                    <span>✏️</span> ${isBn ? 'প্রোফাইল সম্পাদনা' : 'Edit Profile'}
+                </button>
+                <button id="btnPopoverLogout" class="popover-action-btn logout-btn">
+                    <span>🚪</span> ${isBn ? 'লগআউট' : 'Logout'}
+                </button>
+            </div>
+        `;
+
+        const btnSwitch = document.getElementById("btnPopoverSwitch");
+        const btnEdit = document.getElementById("btnPopoverEdit");
+        const btnLogout = document.getElementById("btnPopoverLogout");
+
+        if (btnSwitch) {
+            btnSwitch.addEventListener("click", () => {
+                popover.classList.remove("visible");
+                this.openAuthModal("login");
+            });
+        }
+
+        if (btnEdit) {
+            btnEdit.addEventListener("click", () => {
+                popover.classList.remove("visible");
+                this.openAuthModal("edit");
+            });
+        }
+
+        if (btnLogout) {
+            btnLogout.addEventListener("click", () => {
+                popover.classList.remove("visible");
+                this.logout();
+            });
+        }
+    }
+
+    public openAuthModal(tab: "login" | "register" | "edit" = "login"): void {
+        const modal = document.getElementById("farmerAuthModal");
+        if (!modal) return;
+
+        modal.classList.add("visible");
+        this.switchTab(tab);
+        this.renderQuickLoginChips();
+
+        if (tab === "login") {
+            const last = this.getLastAutofill() || { phone: DEMO_FARMER.phone, pin: DEMO_FARMER.pin };
+            const phoneInput = document.getElementById("login-phone") as HTMLInputElement | null;
+            const pinInput = document.getElementById("login-pin") as HTMLInputElement | null;
+            const loginBtn = document.getElementById("btnLoginSubmit");
+
+            if (phoneInput && !phoneInput.value) {
+                phoneInput.value = last.phone;
+            }
+            if (pinInput && !pinInput.value) {
+                pinInput.value = last.pin;
+            }
+
+            if (loginBtn) {
+                loginBtn.classList.add("btn-pulse");
+                setTimeout(() => loginBtn.classList.remove("btn-pulse"), 4500);
+            }
+        } else if (tab === "edit" && this.activeSession) {
+            this.populateEditForm(this.activeSession);
+        }
+    }
+
+    public closeAuthModal(): void {
+        const modal = document.getElementById("farmerAuthModal");
+        if (modal) modal.classList.remove("visible");
+        const suggestions = document.getElementById("phoneSuggestionsList");
+        if (suggestions) suggestions.style.display = "none";
+    }
+
+    public switchTab(tab: "login" | "register" | "edit"): void {
+        const tabLogin = document.getElementById("authTabLogin");
+        const tabRegister = document.getElementById("authTabRegister");
+        const contentLogin = document.getElementById("authContentLogin");
+        const contentRegister = document.getElementById("authContentRegister");
+        const regTitle = document.getElementById("authRegTitle");
+
+        const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn");
+
+        if (tab === "login") {
+            tabLogin?.classList.add("active");
+            tabRegister?.classList.remove("active");
+            if (contentLogin) contentLogin.style.display = "block";
+            if (contentRegister) contentRegister.style.display = "none";
+        } else {
+            tabLogin?.classList.remove("active");
+            tabRegister?.classList.add("active");
+            if (contentLogin) contentLogin.style.display = "none";
+            if (contentRegister) contentRegister.style.display = "block";
+
+            if (regTitle) {
+                regTitle.textContent = (tab === "edit")
+                    ? (isBn ? "✏️ কৃষক প্রোফাইল পরিবর্তন করুন" : "✏️ Update Farmer Profile")
+                    : (isBn ? "📝 নতুন কৃষক নিবন্ধন" : "📝 New Farmer Registration");
+            }
+        }
+    }
+
+    public renderQuickLoginChips(): void {
+        const container = document.getElementById("quickLoginChipsContainer");
+        if (!container) return;
+
+        const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn");
+        const savedFarmers = this.getSavedFarmers();
+
+        if (savedFarmers.length === 0) {
+            savedFarmers.push(DEMO_FARMER);
+        }
+
+        let chipsHtml = `
+            <div class="quick-chips-header">
+                <span class="quick-chips-title">⚡ ${isBn ? '১-ক্লিকে তাৎক্ষণিক প্রবেশ (Quick Login):' : '1-Click Instant Login:'}</span>
+            </div>
+            <div class="quick-chips-list">
+        `;
+
+        savedFarmers.slice(0, 3).forEach(farmer => {
+            const distBn = BANGLADESH_DISTRICTS[farmer.district.toLowerCase()]?.nameBn || farmer.district;
+            const distName = isBn ? distBn : farmer.district;
+            chipsHtml += `
+                <button type="button" class="quick-farmer-chip" data-phone="${farmer.phone}" data-pin="${farmer.pin}">
+                    <span class="chip-avatar">👨‍🌾</span>
+                    <span class="chip-body">
+                        <strong>${farmer.name}</strong>
+                        <small>${farmer.phone} • ${distName} (${farmer.landSizeDecimals} শতক)</small>
+                    </span>
+                    <span class="chip-arrow">→</span>
+                </button>
+            `;
+        });
+
+        chipsHtml += `</div>`;
+        container.innerHTML = chipsHtml;
+
+        container.querySelectorAll(".quick-farmer-chip").forEach(chip => {
+            chip.addEventListener("click", async () => {
+                const phone = chip.getAttribute("data-phone");
+                const pin = chip.getAttribute("data-pin");
+                if (phone && pin) {
+                    const res = await this.login(phone, pin, true);
+                    if (res.success) {
+                        this.closeAuthModal();
+                    }
+                }
+            });
+        });
+    }
+
+    public populateEditForm(farmer: FarmerProfile): void {
+        const phoneInput = document.getElementById("reg-phone") as HTMLInputElement | null;
+        const nameInput = document.getElementById("reg-name") as HTMLInputElement | null;
+        const districtSelect = document.getElementById("reg-district") as HTMLSelectElement | null;
+        const soilSelect = document.getElementById("reg-soil") as HTMLSelectElement | null;
+        const landInput = document.getElementById("reg-land") as HTMLInputElement | null;
+        const cropSelect = document.getElementById("reg-crop") as HTMLSelectElement | null;
+        const pinInput = document.getElementById("reg-pin") as HTMLInputElement | null;
+
+        if (phoneInput) {
+            phoneInput.value = farmer.phone;
+            phoneInput.readOnly = true;
+        }
+        if (nameInput) nameInput.value = farmer.name;
+        if (districtSelect) districtSelect.value = farmer.district.toLowerCase();
+        if (soilSelect) soilSelect.value = farmer.soilType;
+        if (landInput) landInput.value = String(farmer.landSizeDecimals);
+        if (cropSelect) cropSelect.value = farmer.primaryCrop;
+        if (pinInput) pinInput.value = farmer.pin;
+
+        const submitBtn = document.getElementById("btnRegisterSubmit");
+        if (submitBtn) {
+            const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn");
+            submitBtn.textContent = isBn ? "💾 তথ্য সংরক্ষণ করুন (Save Profile)" : "💾 Save Profile Changes";
+        }
+    }
+
+    public bindModalEvents(): void {
+        const btnClose = document.getElementById("btnFarmerAuthClose");
+        if (btnClose) {
+            btnClose.addEventListener("click", () => this.closeAuthModal());
+        }
+
+        const modal = document.getElementById("farmerAuthModal");
+        if (modal) {
+            modal.addEventListener("click", (e) => {
+                if (e.target === modal) {
+                    this.closeAuthModal();
+                }
+            });
+        }
+
+        document.addEventListener("click", (e: MouseEvent) => {
+            const popover = document.getElementById("farmerProfilePopover");
+            const btnBadge = document.getElementById("btnNavFarmerProfile");
+            const target = e.target as Node;
+            if (popover && popover.classList.contains("visible")) {
+                if (!popover.contains(target) && (!btnBadge || !btnBadge.contains(target))) {
+                    popover.classList.remove("visible");
+                }
+            }
+        });
+
+        const tabLogin = document.getElementById("authTabLogin");
+        const tabRegister = document.getElementById("authTabRegister");
+        if (tabLogin) tabLogin.addEventListener("click", () => this.switchTab("login"));
+        if (tabRegister) tabRegister.addEventListener("click", () => {
+            const phoneInput = document.getElementById("reg-phone") as HTMLInputElement | null;
+            if (phoneInput) phoneInput.readOnly = false;
+            this.switchTab("register");
+        });
+
+        const loginPinToggle = document.getElementById("loginPinToggle");
+        if (loginPinToggle) {
+            loginPinToggle.addEventListener("click", () => {
+                const pinInput = document.getElementById("login-pin") as HTMLInputElement | null;
+                if (pinInput) {
+                    const isPass = pinInput.type === "password";
+                    pinInput.type = isPass ? "text" : "password";
+                    loginPinToggle.textContent = isPass ? "🙈" : "👁️";
+                }
+            });
+        }
+
+        const regPinToggle = document.getElementById("regPinToggle");
+        if (regPinToggle) {
+            regPinToggle.addEventListener("click", () => {
+                const pinInput = document.getElementById("reg-pin") as HTMLInputElement | null;
+                if (pinInput) {
+                    const isPass = pinInput.type === "password";
+                    pinInput.type = isPass ? "text" : "password";
+                    regPinToggle.textContent = isPass ? "🙈" : "👁️";
+                }
+            });
+        }
+
+        const phoneInput = document.getElementById("login-phone") as HTMLInputElement | null;
+        const suggestionsBox = document.getElementById("phoneSuggestionsList");
+        if (phoneInput && suggestionsBox) {
+            phoneInput.addEventListener("input", () => {
+                const val = normalizeBdPhone(phoneInput.value);
+                if (val.length >= 3) {
+                    const matches = this.getSavedFarmers().filter(f => f.phone.includes(val) || f.name.includes(val));
+                    if (matches.length > 0) {
+                        let html = "";
+                        matches.forEach(m => {
+                            html += `
+                                <div class="suggestion-item" data-phone="${m.phone}" data-pin="${m.pin}">
+                                    <div class="sugg-name">👨‍🌾 ${m.name}</div>
+                                    <div class="sugg-meta">${m.phone} · ${m.district}</div>
+                                </div>
+                            `;
+                        });
+                        suggestionsBox.innerHTML = html;
+                        suggestionsBox.style.display = "block";
+
+                        suggestionsBox.querySelectorAll(".suggestion-item").forEach(item => {
+                            item.addEventListener("click", () => {
+                                const phone = item.getAttribute("data-phone");
+                                const pin = item.getAttribute("data-pin");
+                                if (phone) phoneInput.value = phone;
+                                const pinInput = document.getElementById("login-pin") as HTMLInputElement | null;
+                                if (pinInput && pin) pinInput.value = pin;
+                                suggestionsBox.style.display = "none";
+                            });
+                        });
+                    } else {
+                        suggestionsBox.style.display = "none";
+                    }
+                } else {
+                    suggestionsBox.style.display = "none";
+                }
+            });
+
+            document.addEventListener("click", (e: MouseEvent) => {
+                const target = e.target as Node;
+                if (!phoneInput.contains(target) && !suggestionsBox.contains(target)) {
+                    suggestionsBox.style.display = "none";
+                }
+            });
+        }
+
+        const loginForm = document.getElementById("farmer-login-form");
+        if (loginForm) {
+            loginForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const phone = (document.getElementById("login-phone") as HTMLInputElement)?.value || "";
+                const pin = (document.getElementById("login-pin") as HTMLInputElement)?.value || "";
+                const rememberMe = (document.getElementById("login-remember-me") as HTMLInputElement)?.checked ?? true;
+                const errorBox = document.getElementById("loginErrorMsg");
+
+                if (errorBox) errorBox.style.display = "none";
+
+                const res = await this.login(phone, pin, rememberMe);
+                if (res.success) {
+                    this.closeAuthModal();
+                } else {
+                    if (errorBox) {
+                        errorBox.textContent = res.error || "লগইন ব্যর্থ হয়েছে";
+                        errorBox.style.display = "block";
+                    }
+                }
+            });
+        }
+
+        const regForm = document.getElementById("farmer-register-form");
+        if (regForm) {
+            regForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const phoneInputEl = document.getElementById("reg-phone") as HTMLInputElement | null;
+                const phone = phoneInputEl?.value || "";
+                const name = (document.getElementById("reg-name") as HTMLInputElement)?.value || "";
+                const district = (document.getElementById("reg-district") as HTMLSelectElement)?.value || "mymensingh";
+                const soilType = (document.getElementById("reg-soil") as HTMLSelectElement)?.value || "loamy";
+                const landSizeDecimals = parseFloat((document.getElementById("reg-land") as HTMLInputElement)?.value || "30");
+                const primaryCrop = (document.getElementById("reg-crop") as HTMLSelectElement)?.value || "rice";
+                const pin = (document.getElementById("reg-pin") as HTMLInputElement)?.value || "";
+                const rememberMe = (document.getElementById("reg-remember-me") as HTMLInputElement)?.checked ?? true;
+                const errorBox = document.getElementById("regErrorMsg");
+
+                if (errorBox) errorBox.style.display = "none";
+
+                if (phoneInputEl && phoneInputEl.readOnly && this.activeSession) {
+                    const res = await this.updateProfile({
+                        name,
+                        district,
+                        soilType,
+                        landSizeDecimals,
+                        primaryCrop,
+                        pin
+                    });
+
+                    if (res.success) {
+                        this.closeAuthModal();
+                    } else if (errorBox) {
+                        errorBox.textContent = res.error || "আপডেট ব্যর্থ হয়েছে";
+                        errorBox.style.display = "block";
+                    }
+                } else {
+                    const res = await this.register({
+                        phone,
+                        name,
+                        district,
+                        soilType,
+                        landSizeDecimals,
+                        primaryCrop,
+                        pin,
+                        rememberMe
+                    });
+
+                    if (res.success) {
+                        this.closeAuthModal();
+                    } else if (errorBox) {
+                        errorBox.textContent = res.error || "নিবন্ধন ব্যর্থ হয়েছে";
+                        errorBox.style.display = "block";
+                    }
+                }
+            });
+        }
+    }
 }
 
 // Global Singleton Instance
@@ -562,3 +1042,4 @@ if (typeof window !== "undefined") {
     (window as any).FarmerAuthEngine = FarmerAuthEngine;
     (window as any).authService = authEngine;
 }
+
