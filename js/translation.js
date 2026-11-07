@@ -182,7 +182,29 @@ const translations = {
         tod_morning: "Morning",
         tod_noon: "Noon",
         tod_night: "Night",
-        sim_data_view: "Soil & Crop Data"
+        sim_data_view: "Soil & Crop Data",
+
+        // NASA Agriculture Data Integration & Telemetry Dock
+        "fctrl-loc-label": "Zone:",
+        "fctrl-nasa-hub": "NASA Agri-Data",
+        "nasa-hub-title": "🛰️ NASA Agri-Intelligence & Satellite Hub",
+        "tab-farmer-title": "Farmer's Daily Action Guidance",
+        "tab-telemetry-title": "NASA Satellite Telemetry & Sources (For Judges)",
+        "check-irr-title": "1. Irrigation Guidance",
+        "check-fert-title": "2. Fertilizer Timing",
+        "check-pest-title": "3. Pest & Blight Alert",
+        "check-harvest-title": "4. Harvest & Spray Window",
+        "dock-root-moist": "Root:",
+        "dock-par-flux": "Solar PAR:",
+        "dock-disease-status": "Risk:",
+        "hud-dock-moisture": "Soil Moisture & Irrigation",
+        "hud-dock-moisture-sub": "Root & Topsoil (NASA SMAP)",
+        "hud-dock-npk": "Growth, Sunlight & NPK",
+        "hud-dock-npk-sub": "Photosynthesis & PAR Flux",
+        "hud-dock-pest": "Disease, Blight & Heat",
+        "hud-dock-pest-sub": "Fungal & Heat Stress (ECOSTRESS)",
+        "hud-dock-weather": "Weather, Spray & Harvest",
+        "hud-dock-weather-sub": "Wind & Rain (GPM IMERG)"
     },
 
     bn: {
@@ -362,7 +384,29 @@ const translations = {
         tod_morning: "সকাল",
         tod_noon: "দুপুর",
         tod_night: "রাত",
-        sim_data_view: "মাটি ও ফসলের তথ্য"
+        sim_data_view: "মাটি ও ফসলের তথ্য",
+
+        // NASA Agriculture Data Integration & Telemetry Dock
+        "fctrl-loc-label": "অঞ্চল:",
+        "fctrl-nasa-hub": "NASA কৃষি ডেটা",
+        "nasa-hub-title": "🛰️ NASA কৃষি বুদ্ধিমত্তা ও স্যাটেলাইট ডেটা হাব",
+        "tab-farmer-title": "কৃষকের আজকের কৃষি নির্দেশিকা (Daily Farmer Action)",
+        "tab-telemetry-title": "NASA স্যাটেলাইট টেলিমেট্রি ও উৎস (For Space Apps Judges)",
+        "check-irr-title": "১. সেচ পরামর্শ (Irrigation Guidance)",
+        "check-fert-title": "২. সার প্রয়োগের সময় (Fertilizer Timing)",
+        "check-pest-title": "৩. স্প্রে ও রোগ সতর্কতা (Pest & Blight Alert)",
+        "check-harvest-title": "৪. ফসল পরিচর্যা ও আবহাওয়া (Harvest & Spray Window)",
+        "dock-root-moist": "শিকড়:",
+        "dock-par-flux": "সৌরশক্তি:",
+        "dock-disease-status": "ঝুঁকি:",
+        "hud-dock-moisture": "মাটির আর্দ্রতা ও সেচ",
+        "hud-dock-moisture-sub": "মূল ও উপরিভাগ (NASA SMAP)",
+        "hud-dock-npk": "ফসল বৃদ্ধি, রোদ ও সার",
+        "hud-dock-npk-sub": "সালোকসংশ্লেষণ ও পুষ্টি (PAR Flux)",
+        "hud-dock-pest": "রোগ, ব্লাইট ও তাপপ্রবাহ",
+        "hud-dock-pest-sub": "ছত্রাক ও উষ্ণতা ঝুঁকি (ECOSTRESS)",
+        "hud-dock-weather": "আবহাওয়া, স্প্রে ও ফসল কাটা",
+        "hud-dock-weather-sub": "বাতাস ও বৃষ্টি পূর্বাভাস (GPM IMERG)"
     }
 };
 

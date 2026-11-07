@@ -4744,6 +4744,79 @@ body.lang-bn strong {
     box-shadow: 0 10px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(67, 239, 140, 0.25);
 }
 
+/* Location Select Pill (NASA Farming Presets & GPS) */
+.fctrl-loc-pill {
+    padding: 4px 12px 4px 16px;
+    gap: 8px;
+}
+
+.fctrl-loc-select {
+    background: rgba(10, 33, 23, 0.85);
+    color: #e2fbe8;
+    border: 1px solid rgba(67, 239, 140, 0.3);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.fctrl-loc-select:hover,
+.fctrl-loc-select:focus {
+    border-color: #43ef8c;
+    box-shadow: 0 0 14px rgba(67, 239, 140, 0.35);
+}
+
+.fctrl-loc-select option {
+    background: #0a2117;
+    color: #e2fbe8;
+}
+
+/* Glowing NASA Farming Data Hub Button */
+.fctrl-nasa-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 15px;
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(37, 99, 235, 0.3));
+    border: 1px solid rgba(56, 189, 248, 0.45);
+    border-radius: 999px;
+    color: #e0f2fe;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 10px rgba(14, 165, 233, 0.2);
+}
+
+.fctrl-nasa-btn:hover {
+    background: linear-gradient(135deg, rgba(14, 165, 233, 0.4), rgba(37, 99, 235, 0.5));
+    border-color: #38bdf8;
+    color: #ffffff;
+    box-shadow: 0 0 18px rgba(56, 189, 248, 0.5);
+    transform: translateY(-1px);
+}
+
+.nasa-live-pulse-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    background: #0284c7;
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(14, 165, 233, 0.6);
+    animation: pulseNasaGlow 2s infinite;
+}
+
+@keyframes pulseNasaGlow {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.75; transform: scale(0.95); }
+}
+
 /* Crop Select Pill */
 .fctrl-crop-pill {
     padding: 4px 12px 4px 16px;
@@ -6522,12 +6595,12 @@ body.lang-bn strong {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    width: 220px;
+    width: 260px;
     pointer-events: auto;
 }
 
 .dock-card {
-    background: rgba(10, 24, 18, 0.58);
+    background: rgba(10, 24, 18, 0.65);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
     border: 1px solid rgba(74, 222, 128, 0.22);
@@ -6572,17 +6645,75 @@ body.lang-bn strong {
 
 .dock-card-body {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dock-metric-row {
+    display: flex;
+    align-items: baseline;
     justify-content: space-between;
     gap: 8px;
 }
 
+.dock-metric-label {
+    font-size: 11px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
 .dock-val {
-    font-size: 18px;
+    font-size: 15px;
     font-weight: 800;
     color: #43ef8c;
-    letter-spacing: -0.5px;
+    font-family: monospace, system-ui;
+    letter-spacing: -0.3px;
 }
+
+.dock-subval {
+    font-size: 11px;
+    font-weight: 600;
+    color: #cbd5e1;
+}
+
+.dock-action-badge {
+    padding: 5px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.35;
+    transition: all 0.2s ease;
+}
+
+.dock-action-badge.optimal {
+    background: rgba(34, 197, 94, 0.16);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.dock-action-badge.warning {
+    background: rgba(234, 179, 8, 0.16);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.3);
+}
+
+.dock-action-badge.urgent {
+    background: rgba(239, 68, 68, 0.16);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.dock-source-tag {
+    font-size: 9px;
+    color: #38bdf8;
+    opacity: 0.85;
+    letter-spacing: 0.2px;
+    margin-top: 2px;
+}
+
+.text-optimal { color: #4ade80 !important; }
+.text-warning { color: #facc15 !important; }
+.text-urgent { color: #f87171 !important; }
 
 .dock-weather-text {
     font-size: 11.5px;
@@ -7722,5 +7853,477 @@ body.lang-bn strong {
 
     .sf-modal-body {
         grid-template-columns: 1fr;
+    }
+}
+
+/* =============================================================================
+   🛰️ NASA FARMING DATA HUB MODAL STYLES
+   ============================================================================= */
+.nasa-hub-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(3, 11, 7, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.nasa-hub-modal {
+    background: #071710;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 880px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8), 0 0 32px rgba(14, 165, 233, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.nasa-hub-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+    background: linear-gradient(180deg, rgba(14, 165, 233, 0.12), rgba(7, 23, 16, 0.95));
+}
+
+.nasa-hub-header-title h3 {
+    margin: 6px 0 2px 0;
+    font-size: 19px;
+    font-weight: 800;
+    color: #f0fdf4;
+}
+
+.nasa-hub-sub {
+    margin: 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.nasa-hub-logo-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.nasa-meatball-badge {
+    background: #0b3d91;
+    color: #ffffff;
+    font-size: 10.5px;
+    font-weight: 900;
+    padding: 2px 7px;
+    border-radius: 4px;
+    letter-spacing: 1px;
+}
+
+.nasa-hub-tag {
+    font-size: 10px;
+    color: #38bdf8;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.nasa-hub-status-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.nasa-hub-status-badge.live {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.35);
+}
+
+.nasa-hub-status-badge.cached {
+    background: rgba(234, 179, 8, 0.2);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.35);
+}
+
+.nasa-hub-status-badge.prebundled {
+    background: rgba(56, 189, 248, 0.2);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.35);
+}
+
+.nasa-hub-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.nasa-hub-close-btn:hover {
+    background: rgba(239, 68, 68, 0.4);
+    color: #ffffff;
+    transform: scale(1.08);
+}
+
+.nasa-hub-tabs {
+    display: flex;
+    background: #05120c;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+    padding: 0 16px;
+    gap: 8px;
+    overflow-x: auto;
+}
+
+.nasa-tab-btn {
+    padding: 12px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: #94a3b8;
+    font-size: 13.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nasa-tab-btn:hover {
+    color: #e2fbe8;
+}
+
+.nasa-tab-btn.active {
+    color: #38bdf8;
+    border-bottom-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.08);
+}
+
+.nasa-tab-content {
+    padding: 20px 24px;
+}
+
+/* Tab 1: Checklist Cards Grid */
+.farmer-checklist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 16px;
+}
+
+.checklist-card {
+    background: rgba(10, 29, 20, 0.7);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.checklist-card:hover {
+    border-color: rgba(67, 239, 140, 0.45);
+    transform: translateY(-2px);
+}
+
+.checklist-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.checklist-icon {
+    font-size: 24px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.checklist-card-top h4 {
+    margin: 0;
+    font-size: 14.5px;
+    font-weight: 700;
+    color: #f1f5f9;
+}
+
+.checklist-sat-tag {
+    display: block;
+    font-size: 10px;
+    color: #38bdf8;
+    margin-top: 2px;
+}
+
+.checklist-pill {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.checklist-pill.optimal {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.4);
+}
+
+.checklist-pill.warning {
+    background: rgba(234, 179, 8, 0.2);
+    color: #facc15;
+    border: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+.checklist-pill.urgent {
+    background: rgba(239, 68, 68, 0.2);
+    color: #f87171;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+}
+
+.checklist-metric-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(5, 18, 12, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #cbd5e1;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.checklist-metric-box strong {
+    color: #4ade80;
+    font-family: monospace, system-ui;
+    font-size: 13px;
+}
+
+.checklist-desc {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #94a3b8;
+}
+
+/* Tab 2: NASA Satellite Telemetry */
+.telemetry-judges-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.telemetry-judges-header h4 {
+    margin: 0;
+    font-size: 15px;
+    color: #38bdf8;
+}
+
+.telemetry-judges-header p {
+    margin: 2px 0 0 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.nasa-refresh-btn {
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    color: #e0f2fe;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nasa-refresh-btn:hover {
+    background: rgba(56, 189, 248, 0.3);
+    color: #ffffff;
+}
+
+.nasa-param-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.param-box {
+    background: rgba(9, 26, 18, 0.65);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.param-code {
+    font-size: 10.5px;
+    font-family: monospace;
+    font-weight: 700;
+    color: #38bdf8;
+}
+
+.param-val {
+    font-size: 17px;
+    font-weight: 800;
+    color: #ffffff;
+    font-family: monospace;
+}
+
+.param-unit {
+    font-size: 10px;
+    color: #cbd5e1;
+}
+
+.param-desc {
+    font-size: 9.5px;
+    color: #64748b;
+    line-height: 1.25;
+    margin-top: 4px;
+}
+
+/* 7-Day Trend Visualizer */
+.nasa-trend-card {
+    background: rgba(9, 26, 18, 0.65);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 18px;
+}
+
+.nasa-trend-card h5 {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    color: #e2e8f0;
+}
+
+.trend-bars-container {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+    height: 130px;
+    padding: 8px 4px 0 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.trend-bar-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+}
+
+.trend-bar-track {
+    width: 22px;
+    flex: 1;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    position: relative;
+}
+
+.trend-bar-fill.moist {
+    width: 10px;
+    background: linear-gradient(180deg, #38bdf8, #0284c7);
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease;
+}
+
+.trend-bar-fill.rain {
+    width: 6px;
+    background: linear-gradient(180deg, #a855f7, #6b21a8);
+    border-radius: 3px 3px 0 0;
+    transition: height 0.3s ease;
+}
+
+.trend-bar-val {
+    font-size: 10px;
+    color: #38bdf8;
+    font-weight: 700;
+    font-family: monospace;
+    margin-top: 6px;
+}
+
+.trend-bar-day {
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+/* Academic Citations */
+.nasa-citations-card {
+    background: rgba(5, 18, 12, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 14px 18px;
+}
+
+.nasa-citations-card h5 {
+    margin: 0 0 8px 0;
+    font-size: 12.5px;
+    color: #38bdf8;
+}
+
+.nasa-citation-list {
+    margin: 0;
+    padding-left: 18px;
+    font-size: 11px;
+    color: #94a3b8;
+    line-height: 1.6;
+}
+
+.nasa-citation-list strong {
+    color: #e2e8f0;
+}
+
+@media (max-width: 768px) {
+    .fctrl-loc-pill {
+        padding: 4px 8px;
+    }
+    .fctrl-loc-select {
+        font-size: 12px;
+        max-width: 120px;
+        padding: 5px 8px;
+    }
+    .fctrl-loc-pill .fctrl-label {
+        display: none;
+    }
+    .fctrl-nasa-btn {
+        padding: 5px 10px;
+        font-size: 11.5px;
+    }
+    .fctrl-nasa-btn .btn-text {
+        display: none;
+    }
+    .farmer-checklist-grid {
+        grid-template-columns: 1fr;
+    }
+    .nasa-param-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

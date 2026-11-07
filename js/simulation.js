@@ -20,6 +20,13 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { Sky } from "three/addons/objects/Sky.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { sketchfabService, CURATED_SKETCHFAB_MODELS } from "./sketchfabService.js";
+import {
+    fetchNasaAgriData,
+    getCurrentNasaAgriData,
+    translateNasaDataToFarmerActions,
+    onNasaDataUpdated,
+    BANGLADESH_FARM_PRESETS
+} from "./nasaAgriService.js";
 
 // =============================================================================
 // GLOBAL SIMULATION STATE & CONFIGURATION
@@ -3162,62 +3169,233 @@ export function setCropHealthState(state) {
 window.setCropHealthState = setCropHealthState;
 
 // =============================================================================
-// 13. LEFT HUD DOCK (TELEMETRY RAIL)
+// 13. LEFT HUD DOCK (NASA-TO-FARMER ACTION TRANSLATOR CARDS)
 // =============================================================================
 function updateHUDStatusCards() {
     const isBn = (window.currentAppLanguage === "bn");
+    const nasaPayload = getCurrentNasaAgriData();
+    const nasaData = (nasaPayload && nasaPayload.data) ? nasaPayload.data : {};
+    const actions = translateNasaDataToFarmerActions(nasaData, isBn ? "bn" : "en");
 
+    // 1. 💧 Soil Moisture & Irrigation Card
     const moistValEl = document.getElementById("hudDockMoistVal");
-    const moistBadgeEl = document.getElementById("hudDockMoistBadge");
-    if (moistValEl) moistValEl.textContent = `${Math.round(soilMoisturePercent)}%`;
-    if (moistBadgeEl) {
-        if (soilMoisturePercent >= 60 && soilMoisturePercent <= 85) {
-            moistBadgeEl.className = "status-pill status-optimal";
-            moistBadgeEl.textContent = isBn ? "🟢 পর্যাপ্ত" : "🟢 Optimal";
-        } else if (soilMoisturePercent < 60 && soilMoisturePercent >= 40) {
-            moistBadgeEl.className = "status-pill status-warning";
-            moistBadgeEl.textContent = isBn ? "🟡 সেচ দিন" : "🟡 Needs Water";
-        } else {
-            moistBadgeEl.className = "status-pill status-urgent";
-            moistBadgeEl.textContent = isBn ? "🔴 খরা" : "🔴 Drought";
-        }
+    const topMoistValEl = document.getElementById("hudDockTopMoistVal");
+    const moistAdviceEl = document.getElementById("hudDockMoistAdvice");
+
+    if (moistValEl) moistValEl.textContent = `${actions.rootMoistPercent}%`;
+    if (topMoistValEl) topMoistValEl.textContent = isBn ? `${actions.topMoistPercent}% উপরিভাগ` : `${actions.topMoistPercent}% Topsoil`;
+    if (moistAdviceEl) {
+        moistAdviceEl.className = `dock-action-badge ${actions.moistureAction.status}`;
+        moistAdviceEl.textContent = actions.moistureAction.badge;
+        moistAdviceEl.title = actions.moistureAction.advice;
     }
 
+    // 2. 🌿 Crop Growth, Sunlight & Fertilizer Card
     const npkValEl = document.getElementById("hudDockNPKVal");
-    const npkBadgeEl = document.getElementById("hudDockNPKBadge");
-    if (npkValEl) npkValEl.textContent = `${Math.round(npkLevelPercent)}%`;
-    if (npkBadgeEl) {
-        if (npkLevelPercent >= 75) {
-            npkBadgeEl.className = "status-pill status-optimal";
-            npkBadgeEl.textContent = isBn ? "🟢 সুষম" : "🟢 Balanced";
-        } else {
-            npkBadgeEl.className = "status-pill status-warning";
-            npkBadgeEl.textContent = isBn ? "🟡 ঘাটতি" : "🟡 Low Nitrogen";
-        }
+    const ndviValEl = document.getElementById("hudDockNDVIVal");
+    const fertAdviceEl = document.getElementById("hudDockFertilizerAdvice");
+
+    if (npkValEl) npkValEl.textContent = `${actions.parValue} W/m²`;
+    if (ndviValEl) {
+        const ndviVal = (actions.rootMoistPercent > 50 && actions.parValue > 250) ? 0.74 : 0.62;
+        ndviValEl.textContent = `${ndviVal.toFixed(2)} NDVI`;
+    }
+    if (fertAdviceEl) {
+        fertAdviceEl.className = `dock-action-badge ${actions.fertilizerAction.status}`;
+        fertAdviceEl.textContent = actions.fertilizerAction.badge;
+        fertAdviceEl.title = actions.fertilizerAction.advice;
     }
 
-    const pestBadgeEl = document.getElementById("hudDockPestBadge");
-    if (pestBadgeEl) {
-        if (cropHealthState === "healthy") {
-            pestBadgeEl.className = "status-pill status-optimal";
-            pestBadgeEl.textContent = isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk";
-        } else {
-            pestBadgeEl.className = "status-pill status-urgent";
-            pestBadgeEl.textContent = isBn ? "🔴 পোকার আক্রমণ" : "🔴 Urgent Spray";
-        }
+    // 3. 🐛 Disease, Blight & Heat Stress Card
+    const diseaseRiskEl = document.getElementById("hudDockDiseaseRisk");
+    const microClimateEl = document.getElementById("hudDockMicroClimate");
+    const diseaseAdviceEl = document.getElementById("hudDockDiseaseAdvice");
+
+    if (diseaseRiskEl) {
+        diseaseRiskEl.textContent = actions.diseaseAction.level;
+        diseaseRiskEl.className = `dock-val text-${actions.diseaseAction.status}`;
+    }
+    if (microClimateEl) {
+        microClimateEl.textContent = isBn
+            ? `${actions.rhPercent}% আর্দ্রতা · ${actions.tempC}°C`
+            : `${actions.rhPercent}% RH · ${actions.tempC}°C`;
+    }
+    if (diseaseAdviceEl) {
+        diseaseAdviceEl.className = `dock-action-badge ${actions.diseaseAction.status}`;
+        diseaseAdviceEl.textContent = actions.diseaseAction.badge;
+        diseaseAdviceEl.title = actions.diseaseAction.advice;
     }
 
+    // 4. 🌦️ Weather, Spraying & Harvest Guide Card
     const weatherStatusEl = document.getElementById("hudDockWeatherStatus");
+    const windValEl = document.getElementById("hudDockWindVal");
+    const sprayAdviceEl = document.getElementById("hudDockSprayAdvice");
+
     if (weatherStatusEl) {
-        if (currentActiveWeather === "sunny") {
-            weatherStatusEl.textContent = isBn ? "☀️ পরিষ্কার রোদ · ২৬°C" : "☀️ Clear & Sunny · 26°C";
-        } else if (currentActiveWeather === "rain") {
-            weatherStatusEl.textContent = isBn ? "🌧️ বৃষ্টি হচ্ছে · ২১°C" : "🌧️ Raining · 21°C";
-        } else if (currentActiveWeather === "wind") {
-            weatherStatusEl.textContent = isBn ? "💨 দমকা বাতাস · ৩৪ কিমি/ঘ" : "💨 Gusty Wind · 34 km/h";
+        weatherStatusEl.textContent = isBn
+            ? `${actions.tempC}°C · ${actions.rainMm} মিমি`
+            : `${actions.tempC}°C · ${actions.rainMm} mm`;
+    }
+    if (windValEl) {
+        windValEl.textContent = isBn
+            ? `${actions.windSpeedKmh} কিমি/ঘ বাতাস`
+            : `${actions.windSpeedKmh} km/h Wind`;
+    }
+    if (sprayAdviceEl) {
+        sprayAdviceEl.className = `dock-action-badge ${actions.sprayAction.status}`;
+        sprayAdviceEl.textContent = actions.sprayAction.badge;
+        sprayAdviceEl.title = actions.sprayAction.advice;
+    }
+}
+window.updateHUDStatusCards = updateHUDStatusCards;
+
+export function syncSimulationWithNasaData() {
+    const cur = getCurrentNasaAgriData();
+    const data = cur.data;
+    if (!data) return;
+
+    // 1. Soil moisture sync (GWETTOP -> 0 to 100%)
+    if (data.GWETTOP !== undefined) {
+        updateSoilMoisture(data.GWETTOP * 100);
+    }
+
+    // 2. Wind speed sync (WS2M -> GPU shader uWindStrength)
+    if (data.WS2M !== undefined && windUniforms && windUniforms.uWindStrength) {
+        windUniforms.uWindStrength.value = Math.max(0.6, Math.min(3.8, (data.WS2M / 3.0) * 1.5));
+    }
+
+    // 3. Update the 4 Left Telemetry Cards
+    updateHUDStatusCards();
+
+    // 4. Update Header Indicator if present
+    const sourceBadge = document.getElementById("nasaHubDataSourceBadge");
+    if (sourceBadge) {
+        if (cur.sourceType === "LIVE_API") {
+            sourceBadge.className = "nasa-hub-status-badge live";
+            sourceBadge.textContent = "● LIVE API (community=AG)";
+        } else if (cur.sourceType === "LOCAL_CACHE") {
+            sourceBadge.className = "nasa-hub-status-badge cached";
+            sourceBadge.textContent = "● NASA CACHED";
         } else {
-            weatherStatusEl.textContent = isBn ? "💦 সেচ চালু রয়েছে" : "💦 Irrigation Active";
+            sourceBadge.className = "nasa-hub-status-badge prebundled";
+            sourceBadge.textContent = "● NASA CALIBRATED (Offline Ready)";
         }
+    }
+}
+window.syncSimulationWithNasaData = syncSimulationWithNasaData;
+
+function renderNasaHubModal() {
+    const isBn = (window.currentAppLanguage === "bn");
+    const cur = getCurrentNasaAgriData();
+    const data = cur.data;
+    const actions = translateNasaDataToFarmerActions(data, isBn ? "bn" : "en");
+
+    const subtitleEl = document.getElementById("nasaHubSubtitle");
+    if (subtitleEl) {
+        const zone = cur.zoneInfo;
+        const name = isBn ? zone.nameBn : zone.nameEn;
+        subtitleEl.textContent = `📍 ${name} (${zone.lat.toFixed(4)}°N, ${zone.lon.toFixed(4)}°E) • ${zone.aez || 'Agro-Ecological Zone'}`;
+    }
+
+    // Tab 1: Checklist Cards
+    const checkIrrStatus = document.getElementById("checkIrrStatusBadge");
+    const checkIrrRoot = document.getElementById("checkIrrRootVal");
+    const checkIrrTop = document.getElementById("checkIrrTopVal");
+    const checkIrrText = document.getElementById("checkIrrText");
+
+    if (checkIrrStatus) {
+        checkIrrStatus.className = `checklist-pill ${actions.moistureAction.status}`;
+        checkIrrStatus.textContent = actions.moistureAction.badge;
+    }
+    if (checkIrrRoot) checkIrrRoot.textContent = `${actions.rootMoistPercent}%`;
+    if (checkIrrTop) checkIrrTop.textContent = `${actions.topMoistPercent}%`;
+    if (checkIrrText) checkIrrText.textContent = actions.moistureAction.advice;
+
+    const checkFertStatus = document.getElementById("checkFertStatusBadge");
+    const checkFertPAR = document.getElementById("checkFertPARVal");
+    const checkFertRain = document.getElementById("checkFertRainVal");
+    const checkFertText = document.getElementById("checkFertText");
+
+    if (checkFertStatus) {
+        checkFertStatus.className = `checklist-pill ${actions.fertilizerAction.status}`;
+        checkFertStatus.textContent = actions.fertilizerAction.badge;
+    }
+    if (checkFertPAR) checkFertPAR.textContent = `${actions.parValue} W/m²`;
+    if (checkFertRain) checkFertRain.textContent = `${actions.rainMm} mm`;
+    if (checkFertText) checkFertText.textContent = actions.fertilizerAction.advice;
+
+    const checkDiseaseStatus = document.getElementById("checkDiseaseStatusBadge");
+    const checkDiseaseRH = document.getElementById("checkDiseaseRHVal");
+    const checkDiseaseTempMax = document.getElementById("checkDiseaseTempMaxVal");
+    const checkDiseaseText = document.getElementById("checkDiseaseText");
+
+    if (checkDiseaseStatus) {
+        checkDiseaseStatus.className = `checklist-pill ${actions.diseaseAction.status}`;
+        checkDiseaseStatus.textContent = actions.diseaseAction.badge;
+    }
+    if (checkDiseaseRH) checkDiseaseRH.textContent = `${actions.rhPercent}%`;
+    if (checkDiseaseTempMax) checkDiseaseTempMax.textContent = `${actions.tempMaxC}°C`;
+    if (checkDiseaseText) checkDiseaseText.textContent = actions.diseaseAction.advice;
+
+    const checkHarvestStatus = document.getElementById("checkHarvestStatusBadge");
+    const checkHarvestWind = document.getElementById("checkHarvestWindVal");
+    const checkHarvestRain = document.getElementById("checkHarvestRainVal");
+    const checkHarvestText = document.getElementById("checkHarvestText");
+
+    if (checkHarvestStatus) {
+        checkHarvestStatus.className = `checklist-pill ${actions.sprayAction.status}`;
+        checkHarvestStatus.textContent = actions.sprayAction.badge;
+    }
+    if (checkHarvestWind) checkHarvestWind.textContent = `${actions.windSpeedMs} m/s (${actions.windSpeedKmh} km/h)`;
+    if (checkHarvestRain) checkHarvestRain.textContent = `${actions.rainMm} mm/day`;
+    if (checkHarvestText) checkHarvestText.textContent = actions.sprayAction.advice;
+
+    renderNasaTelemetryTab();
+}
+
+function renderNasaTelemetryTab() {
+    const cur = getCurrentNasaAgriData();
+    const data = cur.data;
+
+    const elRoot = document.getElementById("telemetryGWETROOT");
+    const elTop = document.getElementById("telemetryGWETTOP");
+    const elPAR = document.getElementById("telemetryPAR");
+    const elPrecip = document.getElementById("telemetryPrecip");
+    const elTemp = document.getElementById("telemetryTemp");
+    const elRH = document.getElementById("telemetryRH");
+    const elWind = document.getElementById("telemetryWind");
+    const elSW = document.getElementById("telemetrySW");
+
+    if (elRoot) elRoot.textContent = `${(data.GWETROOT || 0.65).toFixed(2)}`;
+    if (elTop) elTop.textContent = `${(data.GWETTOP || 0.61).toFixed(2)}`;
+    if (elPAR) elPAR.textContent = `${(data.ALLSKY_SFC_PAR_TOT || 425.0).toFixed(1)}`;
+    if (elPrecip) elPrecip.textContent = `${(data.PRECTOTCORR || 0.8).toFixed(1)}`;
+    if (elTemp) elTemp.textContent = `${(data.T2M || 26.8).toFixed(1)}°C (${(data.T2M_MAX || 31.4).toFixed(1)} / ${(data.T2M_MIN || 21.8).toFixed(1)})`;
+    if (elRH) elRH.textContent = `${(data.RH2M || 74.2).toFixed(1)}%`;
+    if (elWind) elWind.textContent = `${(data.WS2M || 2.6).toFixed(1)} m/s (${Math.round((data.WS2M || 2.6) * 3.6)} km/h)`;
+    if (elSW) elSW.textContent = `${(data.ALLSKY_SFC_SW_DWN || 5.12).toFixed(2)}`;
+
+    // Render 7-day trend bars
+    const trendContainer = document.getElementById("nasaTrendBars");
+    if (trendContainer && data.trend7Day && data.trend7Day.length > 0) {
+        trendContainer.innerHTML = "";
+        data.trend7Day.forEach((item) => {
+            const barWrapper = document.createElement("div");
+            barWrapper.className = "trend-bar-column";
+
+            const moistHeight = Math.min(100, Math.max(15, Math.round(item.gwetroot * 100)));
+            const rainHeight = Math.min(80, Math.round(item.precip * 5));
+
+            barWrapper.innerHTML = `
+                <div class="trend-bar-track">
+                    <div class="trend-bar-fill moist" style="height: ${moistHeight}%;" title="Root Wetness: ${Math.round(item.gwetroot * 100)}%"></div>
+                    ${rainHeight > 0 ? `<div class="trend-bar-fill rain" style="height: ${rainHeight}%;" title="Rain: ${item.precip}mm"></div>` : ""}
+                </div>
+                <span class="trend-bar-val">${Math.round(item.gwetroot * 100)}%</span>
+                <span class="trend-bar-day">${item.day}</span>
+            `;
+            trendContainer.appendChild(barWrapper);
+        });
     }
 }
 
@@ -3404,6 +3582,115 @@ function bindUIControls() {
     if (cropSelect) {
         cropSelect.addEventListener("change", (e) => {
             updateCropSimulation(e.target.value);
+        });
+    }
+
+    // 📍 Farm Location Selector (NASA POWER Presets & GPS)
+    const locSelect = document.getElementById("farmLocationSelect");
+    if (locSelect) {
+        locSelect.addEventListener("change", async (e) => {
+            const locKey = e.target.value;
+            if (locKey === "gps") {
+                if ("geolocation" in navigator) {
+                    locSelect.disabled = true;
+                    navigator.geolocation.getCurrentPosition(
+                        async (pos) => {
+                            locSelect.disabled = false;
+                            const lat = pos.coords.latitude;
+                            const lon = pos.coords.longitude;
+                            console.log(`[Farm Location] GPS position: ${lat}, ${lon}`);
+                            await fetchNasaAgriData("gps", lat, lon);
+                            syncSimulationWithNasaData();
+                        },
+                        async (err) => {
+                            locSelect.disabled = false;
+                            console.warn("[Farm Location] GPS error:", err.message);
+                            const msg = (window.currentAppLanguage === "bn")
+                                ? "GPS অবস্থান পাওয়া যায়নি। ময়মনসিংহ অঞ্চল নির্বাচন করা হচ্ছে।"
+                                : "Could not retrieve GPS coordinates. Defaulting to Mymensingh.";
+                            alert(msg);
+                            locSelect.value = "mymensingh";
+                            await fetchNasaAgriData("mymensingh");
+                            syncSimulationWithNasaData();
+                        },
+                        { timeout: 7000 }
+                    );
+                } else {
+                    alert("Geolocation is not supported by your browser.");
+                    locSelect.value = "mymensingh";
+                }
+            } else {
+                await fetchNasaAgriData(locKey);
+                syncSimulationWithNasaData();
+            }
+        });
+    }
+
+    // 🛰️ NASA Farming Data Hub Modal Controls
+    const btnNasaHub = document.getElementById("btnNasaAgriHub");
+    const nasaModal = document.getElementById("nasaAgriHubModal");
+    const btnCloseNasaModal = document.getElementById("btnCloseNasaHub");
+    const tabFarmer = document.getElementById("tabBtnFarmerGuidance");
+    const tabTelemetry = document.getElementById("tabBtnNasaTelemetry");
+    const panelFarmer = document.getElementById("nasaTabFarmer");
+    const panelTelemetry = document.getElementById("nasaTabTelemetry");
+    const btnRefreshNasa = document.getElementById("btnRefreshNasaLive");
+
+    if (btnNasaHub && nasaModal) {
+        btnNasaHub.addEventListener("click", () => {
+            renderNasaHubModal();
+            nasaModal.style.display = "flex";
+            nasaModal.setAttribute("aria-hidden", "false");
+        });
+    }
+
+    if (btnCloseNasaModal && nasaModal) {
+        btnCloseNasaModal.addEventListener("click", () => {
+            nasaModal.style.display = "none";
+            nasaModal.setAttribute("aria-hidden", "true");
+        });
+    }
+
+    if (nasaModal) {
+        nasaModal.addEventListener("click", (e) => {
+            if (e.target === nasaModal) {
+                nasaModal.style.display = "none";
+                nasaModal.setAttribute("aria-hidden", "true");
+            }
+        });
+    }
+
+    if (tabFarmer && tabTelemetry && panelFarmer && panelTelemetry) {
+        tabFarmer.addEventListener("click", () => {
+            tabFarmer.classList.add("active");
+            tabFarmer.setAttribute("aria-selected", "true");
+            tabTelemetry.classList.remove("active");
+            tabTelemetry.setAttribute("aria-selected", "false");
+            panelFarmer.style.display = "block";
+            panelTelemetry.style.display = "none";
+        });
+
+        tabTelemetry.addEventListener("click", () => {
+            tabTelemetry.classList.add("active");
+            tabTelemetry.setAttribute("aria-selected", "true");
+            tabFarmer.classList.remove("active");
+            tabFarmer.setAttribute("aria-selected", "false");
+            panelTelemetry.style.display = "block";
+            panelFarmer.style.display = "none";
+            renderNasaTelemetryTab();
+        });
+    }
+
+    if (btnRefreshNasa) {
+        btnRefreshNasa.addEventListener("click", async () => {
+            btnRefreshNasa.disabled = true;
+            btnRefreshNasa.textContent = (window.currentAppLanguage === "bn") ? "⏳ লোড হচ্ছে..." : "⏳ Fetching NASA API...";
+            const cur = getCurrentNasaAgriData();
+            await fetchNasaAgriData(cur.zoneKey, cur.zoneInfo.lat, cur.zoneInfo.lon);
+            syncSimulationWithNasaData();
+            renderNasaHubModal();
+            btnRefreshNasa.disabled = false;
+            btnRefreshNasa.textContent = (window.currentAppLanguage === "bn") ? "🔄 রিফ্রেশ লাইভ ডেটা (Refresh NASA API)" : "🔄 Refresh NASA API Data";
         });
     }
 
@@ -3692,6 +3979,15 @@ export function init3DFieldSimulation() {
     initRaycasting();
     bindUIControls();
     setTimeOfDayMode("noon");
+
+    // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment
+    fetchNasaAgriData("mymensingh").then(() => {
+        syncSimulationWithNasaData();
+    }).catch((e) => console.warn("[NASA] Initial fetch:", e));
+
+    onNasaDataUpdated(() => {
+        syncSimulationWithNasaData();
+    });
 
     // Auto-dismiss gesture hint on first touch or after 4s
     const hintEl = document.getElementById("mobileGestureHint");

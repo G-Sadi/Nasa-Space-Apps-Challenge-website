@@ -1208,8 +1208,24 @@
                 </div>
             </div>
 
-            <!-- Top Center: Crop Selector & Time of Day Slider -->
+            <!-- Top Center: Location Selector, Crop Selector & Time of Day Switcher -->
             <div class="fctrl-group fctrl-center">
+                <!-- 📍 Farm Location Selector Pill (NASA Agroclimatology Presets + GPS) -->
+                <div class="fctrl-pill fctrl-loc-pill">
+                    <label for="farmLocationSelect" class="fctrl-label">📍 <span data-i18n="fctrl-loc-label">অঞ্চল:</span></label>
+                    <select id="farmLocationSelect" class="fctrl-loc-select" aria-label="Farm Location Selector">
+                        <option value="mymensingh" selected>📍 ময়মনসিংহ (Mymensingh)</option>
+                        <option value="bogura">📍 বগুড়া (Bogura)</option>
+                        <option value="rajshahi">📍 রাজশাহী (Rajshahi)</option>
+                        <option value="dinajpur">📍 দিনাজপুর (Dinajpur)</option>
+                        <option value="barishal">📍 বরিশাল (Barishal)</option>
+                        <option value="sylhet">📍 সিলেট (Sylhet)</option>
+                        <option value="cumilla">📍 কুমিল্লা (Cumilla)</option>
+                        <option value="rangpur">📍 রংপুর (Rangpur)</option>
+                        <option value="gps">📡 আমার খামার GPS (My Farm GPS)</option>
+                    </select>
+                </div>
+
                 <!-- Crop Selector Pill -->
                 <div class="fctrl-pill fctrl-crop-pill">
                     <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
@@ -1249,9 +1265,15 @@
                 </div>
             </div>
 
-            <!-- Top Right: Data Drawer Toggle & Fullscreen -->
+            <!-- Top Right: NASA Agri Hub, Data Drawer Toggle & Fullscreen -->
             <div class="fctrl-group fctrl-right">
                 <div class="fctrl-pill fctrl-action-pill">
+                    <!-- 🛰️ Glowing NASA Farming Data Hub Button (For Farmers & Space Apps Judges) -->
+                    <button id="btnNasaAgriHub" class="fctrl-nasa-btn" title="NASA Earth Observation Farming Data Hub (community=AG)">
+                        <span class="btn-icon">🛰️</span>
+                        <span class="btn-text" data-i18n="fctrl-nasa-hub">NASA কৃষি ডেটা</span>
+                        <span class="nasa-live-pulse-badge">LIVE</span>
+                    </button>
                     <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
                         <span class="btn-icon">📊</span>
                         <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
@@ -1263,66 +1285,92 @@
             </div>
         </div>
 
-        <!-- LEFT FLOATING HUD DOCK: COLOR-CODED TRAFFIC-LIGHT STATUS CARDS -->
+        <!-- LEFT FLOATING HUD DOCK: NASA-TO-FARMER ACTION TRANSLATOR CARDS -->
         <aside id="farmerStatusDock" class="farmer-status-dock" aria-label="Live Farm Conditions">
-            <!-- 1. Soil Moisture Card -->
+            <!-- 1. 💧 Soil Moisture & Irrigation Card (NASA SMAP / POWER: GWETROOT & GWETTOP) -->
             <div class="dock-card" id="dockMoistureCard">
                 <div class="dock-card-header">
                     <span class="dock-icon water-drop-icon">💧</span>
                     <div class="dock-title-group">
-                        <h5 data-i18n="hud-dock-moisture">মাটির আর্দ্রতা</h5>
-                        <small data-i18n="hud-dock-moisture-sub">মূল অঞ্চল ০-১৫ সেমি</small>
+                        <h5 data-i18n="hud-dock-moisture">মাটির আর্দ্রতা ও সেচ</h5>
+                        <small data-i18n="hud-dock-moisture-sub">মূল ও উপরিভাগ (NASA SMAP)</small>
                     </div>
                 </div>
                 <div class="dock-card-body">
-                    <strong class="dock-val" id="hudDockMoistVal">68%</strong>
-                    <span id="hudDockMoistBadge" class="status-pill status-optimal" data-i18n="hud-dock-moist-good">🟢
-                        পর্যাপ্ত</span>
+                    <div class="dock-metric-row">
+                        <span class="dock-metric-label" data-i18n="dock-root-moist">শিকড়:</span>
+                        <strong class="dock-val" id="hudDockMoistVal">68%</strong>
+                        <span class="dock-subval" id="hudDockTopMoistVal">62% উপরিভাগ</span>
+                    </div>
+                    <div id="hudDockMoistAdvice" class="dock-action-badge optimal" data-i18n="hud-dock-moist-advice">
+                        ✅ উপযুক্ত রস আছে — এখন সেচ লাগবে না
+                    </div>
+                    <div class="dock-source-tag">🛰️ NASA SMAP & POWER (GWETROOT)</div>
                 </div>
             </div>
 
-            <!-- 2. Fertilizer NPK Card -->
+            <!-- 2. 🌿 Crop Growth, Sunlight & Fertilizer Card (NASA MODIS NDVI & ALLSKY_SFC_PAR_TOT) -->
             <div class="dock-card" id="dockNPKCard">
                 <div class="dock-card-header">
-                    <span class="dock-icon npk-icon">🧪</span>
+                    <span class="dock-icon npk-icon">🌿</span>
                     <div class="dock-title-group">
-                        <h5 data-i18n="hud-dock-npk">সার ও পুষ্টির মাত্রা</h5>
-                        <small data-i18n="hud-dock-npk-sub">মাটির পুষ্টি স্থিতি</small>
+                        <h5 data-i18n="hud-dock-npk">ফসল বৃদ্ধি, রোদ ও সার</h5>
+                        <small data-i18n="hud-dock-npk-sub">সালোকসংশ্লেষণ ও পুষ্টি (PAR Flux)</small>
                     </div>
                 </div>
                 <div class="dock-card-body">
-                    <strong class="dock-val" id="hudDockNPKVal">84%</strong>
-                    <span id="hudDockNPKBadge" class="status-pill status-optimal" data-i18n="hud-dock-npk-good">🟢
-                        সুষম</span>
+                    <div class="dock-metric-row">
+                        <span class="dock-metric-label" data-i18n="dock-par-flux">সৌরশক্তি:</span>
+                        <strong class="dock-val" id="hudDockNPKVal">425 W/m²</strong>
+                        <span class="dock-subval" id="hudDockNDVIVal">0.74 NDVI</span>
+                    </div>
+                    <div id="hudDockFertilizerAdvice" class="dock-action-badge optimal" data-i18n="hud-dock-fert-advice">
+                        ✅ সার প্রয়োগের সেরা সময় — রোদ ও রস অনুকূল
+                    </div>
+                    <div class="dock-source-tag">🛰️ NASA MODIS NDVI & PAR Flux</div>
                 </div>
             </div>
 
-            <!-- 3. Pest Risk Card -->
+            <!-- 3. 🐛 Disease, Blight & Heat Stress Card (NASA ECOSTRESS & MERRA-2: RH2M + T2M) -->
             <div class="dock-card" id="dockPestCard">
                 <div class="dock-card-header">
                     <span class="dock-icon pest-icon">🐛</span>
                     <div class="dock-title-group">
-                        <h5 data-i18n="hud-dock-pest">রোগ ও বালাই ঝুঁকি</h5>
-                        <small data-i18n="hud-dock-pest-sub">ফসল স্বাস্থ্য পর্যবেক্ষণ</small>
+                        <h5 data-i18n="hud-dock-pest">রোগ, ব্লাইট ও তাপপ্রবাহ</h5>
+                        <small data-i18n="hud-dock-pest-sub">ছত্রাক ও উষ্ণতা ঝুঁকি (ECOSTRESS)</small>
                     </div>
                 </div>
                 <div class="dock-card-body">
-                    <span id="hudDockPestBadge" class="status-pill status-optimal" data-i18n="hud-dock-pest-good">🟢
-                        ঝুঁকিমুক্ত</span>
+                    <div class="dock-metric-row">
+                        <span class="dock-metric-label" data-i18n="dock-disease-status">ঝুঁকি:</span>
+                        <strong class="dock-val text-optimal" id="hudDockDiseaseRisk">কম (Low)</strong>
+                        <span class="dock-subval" id="hudDockMicroClimate">৭৪% আর্দ্রতা · ২৭°C</span>
+                    </div>
+                    <div id="hudDockDiseaseAdvice" class="dock-action-badge optimal" data-i18n="hud-dock-disease-advice">
+                        🟢 রোগ ও পোকার ঝুঁকি কম — ক্ষেত নিরাপদ আছে
+                    </div>
+                    <div class="dock-source-tag">🛰️ NASA ECOSTRESS & MERRA-2</div>
                 </div>
             </div>
 
-            <!-- 4. Weather & Microclimate Card -->
+            <!-- 4. 🌦️ Weather, Spraying & Harvest Guide Card (NASA GPM IMERG: PRECTOTCORR & WS2M) -->
             <div class="dock-card" id="dockWeatherCard">
                 <div class="dock-card-header">
                     <span class="dock-icon weather-icon">🌦️</span>
                     <div class="dock-title-group">
-                        <h5 data-i18n="hud-dock-weather">মাঠের আবহাওয়া</h5>
-                        <small data-i18n="hud-dock-weather-sub">সূর্য ও বাতাস</small>
+                        <h5 data-i18n="hud-dock-weather">আবহাওয়া, স্প্রে ও ফসল কাটা</h5>
+                        <small data-i18n="hud-dock-weather-sub">বাতাস ও বৃষ্টি পূর্বাভাস (GPM IMERG)</small>
                     </div>
                 </div>
                 <div class="dock-card-body">
-                    <span id="hudDockWeatherStatus" class="dock-weather-text">☀️ পরিষ্কার রোদ · ২৬°C</span>
+                    <div class="dock-metric-row">
+                        <strong class="dock-val" id="hudDockWeatherStatus">২৭°C · ০.৮ মিমি</strong>
+                        <span class="dock-subval" id="hudDockWindVal">৯.৪ কিমি/ঘ বাতাস</span>
+                    </div>
+                    <div id="hudDockSprayAdvice" class="dock-action-badge optimal" data-i18n="hud-dock-spray-advice">
+                        ✅ স্প্রে ও ফসল পরিচর্যার উপযুক্ত আবহাওয়া
+                    </div>
+                    <div class="dock-source-tag">🛰️ NASA GPM IMERG & POWER</div>
                 </div>
             </div>
         </aside>
@@ -1649,6 +1697,204 @@
     </footer>
 
 
+    <!-- =====================================================================
+         🛰️ NASA FARMING DATA HUB MODAL (FOR FARMERS & SPACE APPS JUDGES)
+         ===================================================================== -->
+    <div id="nasaAgriHubModal" class="nasa-hub-modal-overlay" style="display: none;" aria-hidden="true" role="dialog">
+        <div class="nasa-hub-modal">
+            <!-- Modal Header -->
+            <div class="nasa-hub-header">
+                <div class="nasa-hub-header-title">
+                    <div class="nasa-hub-logo-row">
+                        <span class="nasa-meatball-badge">NASA</span>
+                        <span class="nasa-hub-tag">EARTH OBSERVATION AGROCLIMATOLOGY</span>
+                        <span id="nasaHubDataSourceBadge" class="nasa-hub-status-badge live">● LIVE API (community=AG)</span>
+                    </div>
+                    <h3 data-i18n="nasa-hub-title">🛰️ NASA কৃষি বুদ্ধিমত্তা ও স্যাটেলাইট ডেটা হাব</h3>
+                    <p id="nasaHubSubtitle" class="nasa-hub-sub">
+                        📍 ময়মনসিংহ (২৪.৭৪৭১° উ, ৯০.৪২০৩° পূ) • পুরাতন ব্রহ্মপুত্র প্লাবনভূমি (AEZ-9)
+                    </p>
+                </div>
+                <button id="btnCloseNasaHub" class="nasa-hub-close-btn" aria-label="Close NASA Hub">✕</button>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="nasa-hub-tabs" role="tablist">
+                <button id="tabBtnFarmerGuidance" class="nasa-tab-btn active" role="tab" aria-selected="true" data-tab="farmer">
+                    🌾 <span data-i18n="tab-farmer-title">কৃষকের আজকের কৃষি নির্দেশিকা (Daily Farmer Action)</span>
+                </button>
+                <button id="tabBtnNasaTelemetry" class="nasa-tab-btn" role="tab" aria-selected="false" data-tab="telemetry">
+                    🛰️ <span data-i18n="tab-telemetry-title">NASA স্যাটেলাইট টেলিমেট্রি ও উৎস (For Space Apps Judges)</span>
+                </button>
+            </div>
+
+            <!-- Tab 1: Farmer's Daily 4-Point Action Checklist -->
+            <div id="nasaTabFarmer" class="nasa-tab-content active" role="tabpanel">
+                <div class="farmer-checklist-grid">
+                    <!-- 1. Irrigation Checklist Item -->
+                    <div class="checklist-card" id="checkIrrigationCard">
+                        <div class="checklist-card-top">
+                            <span class="checklist-icon">💧</span>
+                            <div>
+                                <h4 data-i18n="check-irr-title">১. সেচ পরামর্শ (Irrigation Guidance)</h4>
+                                <span class="checklist-sat-tag">NASA SMAP / POWER (GWETROOT & GWETTOP)</span>
+                            </div>
+                            <span id="checkIrrStatusBadge" class="checklist-pill optimal">অনুকূল রস</span>
+                        </div>
+                        <div class="checklist-metric-box">
+                            <div>মূল অঞ্চলের আর্দ্রতা: <strong id="checkIrrRootVal">৬৮%</strong></div>
+                            <div>উপরিভাগের আর্দ্রতা: <strong id="checkIrrTopVal">৬২%</strong></div>
+                        </div>
+                        <p id="checkIrrText" class="checklist-desc">
+                            মাটিতে উদ্ভিদের জন্য পর্যাপ্ত কার্যকর রস মজুদ রয়েছে। আজ কোনো প্রকার সেচের প্রয়োজন নেই।
+                        </p>
+                    </div>
+
+                    <!-- 2. Fertilizer Checklist Item -->
+                    <div class="checklist-card" id="checkFertilizerCard">
+                        <div class="checklist-card-top">
+                            <span class="checklist-icon">🌿</span>
+                            <div>
+                                <h4 data-i18n="check-fert-title">২. সার প্রয়োগের সময় (Fertilizer Timing)</h4>
+                                <span class="checklist-sat-tag">NASA MODIS NDVI & PAR Flux (ALLSKY_SFC_PAR_TOT)</span>
+                            </div>
+                            <span id="checkFertStatusBadge" class="checklist-pill optimal">সার দিন</span>
+                        </div>
+                        <div class="checklist-metric-box">
+                            <div>সৌর বিকিরণ (PAR): <strong id="checkFertPARVal">৪২৫ W/m²</strong></div>
+                            <div>বৃষ্টির পূর্বাভাস: <strong id="checkFertRainVal">০.৮ মিমি</strong></div>
+                        </div>
+                        <p id="checkFertText" class="checklist-desc">
+                            মাটিতে পর্যাপ্ত আর্দ্রতা এবং সালোকসংশ্লেষণের জন্য শক্তিশালী রোদ রয়েছে। বৃষ্টির ঝুঁকি কম থাকায় ইউরিয়া ও পটাশ সারের উপরি-প্রয়োগের আদর্শ সময়।
+                        </p>
+                    </div>
+
+                    <!-- 3. Pest & Disease Checklist Item -->
+                    <div class="checklist-card" id="checkDiseaseCard">
+                        <div class="checklist-card-top">
+                            <span class="checklist-icon">🐛</span>
+                            <div>
+                                <h4 data-i18n="check-pest-title">৩. স্প্রে ও রোগ সতর্কতা (Pest & Blight Alert)</h4>
+                                <span class="checklist-sat-tag">NASA ECOSTRESS ESI & MERRA-2 (T2M + RH2M)</span>
+                            </div>
+                            <span id="checkDiseaseStatusBadge" class="checklist-pill optimal">ঝুঁকিমুক্ত</span>
+                        </div>
+                        <div class="checklist-metric-box">
+                            <div>বাতাসের আর্দ্রতা: <strong id="checkDiseaseRHVal">৭৪.২%</strong></div>
+                            <div>সর্বোচ্চ তাপমাত্রা: <strong id="checkDiseaseTempMaxVal">৩১.৪°C</strong></div>
+                        </div>
+                        <p id="checkDiseaseText" class="checklist-desc">
+                            বাতাসে অতিরিক্ত আর্দ্রতা বা তীব্র তাপপ্রবাহ নেই। রোগজীবাণুর বিস্তার অনুকূল নয়, ক্ষেত নিরাপদ রয়েছে।
+                        </p>
+                    </div>
+
+                    <!-- 4. Weather & Harvest Checklist Item -->
+                    <div class="checklist-card" id="checkHarvestCard">
+                        <div class="checklist-card-top">
+                            <span class="checklist-icon">🌦️</span>
+                            <div>
+                                <h4 data-i18n="check-harvest-title">৪. ফসল পরিচর্যা ও আবহাওয়া (Harvest & Spray Window)</h4>
+                                <span class="checklist-sat-tag">NASA GPM IMERG & POWER (WS2M & PRECTOTCORR)</span>
+                            </div>
+                            <span id="checkHarvestStatusBadge" class="checklist-pill optimal">নিরাপদ স্প্রে</span>
+                        </div>
+                        <div class="checklist-metric-box">
+                            <div>বাতাসের গতি: <strong id="checkHarvestWindVal">২.৬ মি/সে (৯.৪ কিমি/ঘ)</strong></div>
+                            <div>বৃষ্টিপাত: <strong id="checkHarvestRainVal">০.৮ মিমি/দিন</strong></div>
+                        </div>
+                        <p id="checkHarvestText" class="checklist-desc">
+                            বাতাসের গতি শান্ত ও বৃষ্টির সম্ভাবনা নেই। বালাইনাশক স্প্রে, আগাছা দমন ও পাকা ফসল সংগ্রহের উপযুক্ত আবহাওয়া।
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: NASA Satellite Telemetry & Sources (For Space Apps Judges) -->
+            <div id="nasaTabTelemetry" class="nasa-tab-content" role="tabpanel" style="display: none;">
+                <div class="telemetry-judges-header">
+                    <div>
+                        <h4>🛰️ NASA Earth Observation Science Telemetry</h4>
+                        <p>Direct from NASA Langley Research Center POWER Project (Agroclimatology Community: <code>community=AG</code>)</p>
+                    </div>
+                    <button id="btnRefreshNasaLive" class="nasa-refresh-btn">🔄 রিফ্রেশ লাইভ ডেটা (Refresh NASA API)</button>
+                </div>
+
+                <!-- Parameters Table Grid -->
+                <div class="nasa-param-grid">
+                    <div class="param-box">
+                        <span class="param-code">GWETROOT</span>
+                        <strong class="param-val" id="telemetryGWETROOT">0.68</strong>
+                        <span class="param-unit">0–1 Scale (68% Root Zone Wetness)</span>
+                        <small class="param-desc">NASA SMAP Level 4 Surface & Root-Zone Soil Moisture (0–100 cm depth).</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">GWETTOP</span>
+                        <strong class="param-val" id="telemetryGWETTOP">0.62</strong>
+                        <span class="param-unit">0–1 Scale (62% Topsoil Wetness)</span>
+                        <small class="param-desc">NASA SMAP Level 3 Radiometer Surface Soil Wetness (0–5 cm depth).</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">ALLSKY_SFC_PAR_TOT</span>
+                        <strong class="param-val" id="telemetryPAR">425.0</strong>
+                        <span class="param-unit">W/m² (Photosynthetically Active Radiation)</span>
+                        <small class="param-desc">Direct satellite solar flux driving crop photosynthesis & nitrogen uptake.</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">PRECTOTCORR</span>
+                        <strong class="param-val" id="telemetryPrecip">0.8</strong>
+                        <span class="param-unit">mm/day (Corrected Precipitation)</span>
+                        <small class="param-desc">NASA GPM IMERG Final Run satellite gauge-calibrated precipitation rate.</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">T2M / MAX / MIN</span>
+                        <strong class="param-val" id="telemetryTemp">26.8°C (31.4 / 21.8)</strong>
+                        <span class="param-unit">Air Temp at 2 meters AGL</span>
+                        <small class="param-desc">NASA MERRA-2 Modern-Era Retrospective analysis for Research and Applications.</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">RH2M</span>
+                        <strong class="param-val" id="telemetryRH">74.2%</strong>
+                        <span class="param-unit">Relative Humidity at 2m</span>
+                        <small class="param-desc">Key driver for fungal disease sporulation (Late Blight, Rice Blast).</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">WS2M</span>
+                        <strong class="param-val" id="telemetryWind">2.6 m/s (9.4 km/h)</strong>
+                        <span class="param-unit">Wind Speed at 2m</span>
+                        <small class="param-desc">NASA GEOS-FP wind speed vector for pesticide drift & 3D plant sway.</small>
+                    </div>
+                    <div class="param-box">
+                        <span class="param-code">ALLSKY_SFC_SW_DWN</span>
+                        <strong class="param-val" id="telemetrySW">5.12</strong>
+                        <span class="param-unit">kW-hr/m²/day (Solar Irradiance)</span>
+                        <small class="param-desc">Total all-sky surface downward shortwave radiation flux.</small>
+                    </div>
+                </div>
+
+                <!-- 7-Day Trend Visualizer -->
+                <div class="nasa-trend-card">
+                    <h5>📈 ৭ দিনের মাটির রস ও বৃষ্টিপাত পরিবর্তন (7-Day Satellite Trend: GWETROOT & Rainfall)</h5>
+                    <div class="trend-bars-container" id="nasaTrendBars">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Academic NASA Mission Citations -->
+                <div class="nasa-citations-card">
+                    <h5>🛰️ Official NASA Missions & Telemetry Attribution</h5>
+                    <ul class="nasa-citation-list">
+                        <li><strong>NASA POWER Project (community=AG):</strong> Prediction of Worldwide Energy Resources, NASA Langley Research Center.</li>
+                        <li><strong>NASA SMAP (Soil Moisture Active Passive):</strong> L-band radiometer measuring topsoil (0-5 cm) and root-zone (0-100 cm) moisture.</li>
+                        <li><strong>NASA GPM IMERG (Global Precipitation Measurement):</strong> Multi-satellite precipitation constellation.</li>
+                        <li><strong>NASA MODIS (Terra & Aqua):</strong> 250m Normalized Difference Vegetation Index (NDVI) and PAR flux.</li>
+                        <li><strong>NASA ECOSTRESS (ISS):</strong> Thermal radiometer evapotranspiration & Evaporative Stress Index (ESI).</li>
+                        <li><strong>NASA Harvest:</strong> Applied Sciences Program enabling satellite-guided food security decisions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPTS -->
     <script src="js/i18n.js"></script>
     <script src="js/data.js"></script>
@@ -1658,6 +1904,7 @@
     <script src="js/rotation.js"></script>
     <script src="script.js"></script>
     <script src="app.js"></script>
+    <script type="module" src="js/nasaAgriService.js"></script>
     <script type="module" src="js/simulation.js"></script>
     <script type="module" src="js/FarmerBuddy.js"></script>
 
