@@ -502,9 +502,9 @@ export function translateNasaDataToFarmerActions(data = currentNasaData, lang = 
     const windKmh = Math.round(wind * 3.6);
 
     // 1. 💧 Soil Moisture & Irrigation Action (NASA SMAP / POWER GWETROOT & GWETTOP)
-    let moistAction = {};
+    let moistureAction = {};
     if (rootMoist < 40) {
-        moistAction = {
+        moistureAction = {
             status: "urgent",
             level: isBn ? "মাটিতে রস কম" : "Low Moisture",
             badge: isBn ? "⚠️ সেচ দিন" : "⚠️ Needs Irrigation",
@@ -515,7 +515,7 @@ export function translateNasaDataToFarmerActions(data = currentNasaData, lang = 
             sourceTag: "🛰️ NASA SMAP & POWER (GWETROOT)"
         };
     } else if (rootMoist <= 80) {
-        moistAction = {
+        moistureAction = {
             status: "optimal",
             level: isBn ? "অনুকূল আর্দ্রতা" : "Optimal Moisture",
             badge: isBn ? "✅ সেচ লাগবে না" : "✅ No Irrigation",
@@ -526,7 +526,7 @@ export function translateNasaDataToFarmerActions(data = currentNasaData, lang = 
             sourceTag: "🛰️ NASA SMAP & POWER (GWETROOT)"
         };
     } else {
-        moistAction = {
+        moistureAction = {
             status: "warning",
             level: isBn ? "অতিরিক্ত আর্দ্রতা" : "Excess Moisture",
             badge: isBn ? "🌧️ নালা পরিষ্কার রাখুন" : "🌧️ Drain Field",
@@ -696,3 +696,4 @@ if (typeof window !== "undefined") {
         onNasaDataUpdated
     };
 }
+
