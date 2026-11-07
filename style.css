@@ -5298,12 +5298,14 @@ body.lang-bn strong {
     opacity: 0;
     pointer-events: none;
     transform: scale(0.85) translateY(20px);
+    display: none !important;
 }
 
 .farmer-buddy-window.expanded {
     opacity: 1;
     pointer-events: auto;
     transform: scale(1) translateY(0);
+    display: flex !important;
 }
 
 /* Header */
@@ -5402,6 +5404,42 @@ body.lang-bn strong {
     color: #43ef8c;
     border-color: #43ef8c;
     box-shadow: 0 0 10px rgba(67, 239, 140, 0.35);
+}
+
+/* Touch-friendly Close/Cancel button (×) at top-right corner of header */
+.fb-close-btn, #fbCloseBtn {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    border-radius: 50% !important;
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    border: 1px solid rgba(239, 68, 68, 0.4) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    transition: all 0.2s ease !important;
+    flex-shrink: 0 !important;
+    user-select: none !important;
+}
+
+.fb-close-btn:hover, #fbCloseBtn:hover {
+    background: rgba(239, 68, 68, 0.35) !important;
+    color: #ffffff !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
+    transform: scale(1.08) !important;
+}
+
+.fb-close-btn:active, #fbCloseBtn:active {
+    transform: scale(0.92) !important;
 }
 
 /* AI Model Selector Toolbar & Dynamic Indicator */
@@ -6084,6 +6122,7 @@ body.lang-bn strong {
         opacity: 1 !important;
         pointer-events: auto !important;
         visibility: visible !important;
+        display: flex !important;
         transform: none !important; /* Critical: Disables WebKit transform matrix so viewport never shrinks */
     }
 
@@ -6091,6 +6130,7 @@ body.lang-bn strong {
         opacity: 0 !important;
         pointer-events: none !important;
         visibility: hidden !important;
+        display: none !important;
         transform: translateY(20px) !important;
     }
 

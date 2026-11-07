@@ -172,7 +172,17 @@ const translations = {
         cta_h2_1: "Build a smarter",
         cta_h2_2: "farm plan.",
         cta_btn: "Start analysis →",
-        footer_text: "Smart farming intelligence platform."
+        footer_text: "Smart farming intelligence platform.",
+
+        // 3D Simulation Time of Day & Toolbar
+        "tod-morning": "Morning",
+        "tod-noon": "Noon",
+        "tod-night": "Night",
+        "sim-data-view": "Soil & Crop Data",
+        tod_morning: "Morning",
+        tod_noon: "Noon",
+        tod_night: "Night",
+        sim_data_view: "Soil & Crop Data"
     },
 
     bn: {
@@ -342,7 +352,17 @@ const translations = {
         cta_h2_1: "গড়ে তুলুন আধুনিক",
         cta_h2_2: "খামার পরিকল্পনা।",
         cta_btn: "বিশ্লেষণ শুরু করুন →",
-        footer_text: "স্মার্ট কৃষি বুদ্ধিমত্তা প্ল্যাটফর্ম।"
+        footer_text: "স্মার্ট কৃষি বুদ্ধিমত্তা প্ল্যাটফর্ম।",
+
+        // 3D Simulation Time of Day & Toolbar
+        "tod-morning": "সকাল",
+        "tod-noon": "দুপুর",
+        "tod-night": "রাত",
+        "sim-data-view": "মাটি ও ফসলের তথ্য",
+        tod_morning: "সকাল",
+        tod_noon: "দুপুর",
+        tod_night: "রাত",
+        sim_data_view: "মাটি ও ফসলের তথ্য"
     }
 };
 
@@ -352,8 +372,12 @@ function setLanguage(lang) {
     
     elements.forEach(el => {
         const key = el.getAttribute("data-i18n");
-        if (translations[lang] && translations[lang][key] !== undefined) {
-            el.textContent = translations[lang][key];
+        if (!key) return;
+        const lookupKey = (translations[lang] && translations[lang][key] !== undefined)
+            ? key
+            : key.replace(/-/g, "_");
+        if (translations[lang] && translations[lang][lookupKey] !== undefined) {
+            el.textContent = translations[lang][lookupKey];
         }
     });
 
@@ -376,6 +400,13 @@ function setLanguage(lang) {
     }
 
     localStorage.setItem("preferred_lang", lang);
+
+    // Broadcast languageChanged custom event so components (like FarmerBuddy & 3D Simulation) sync
+    try {
+        window.dispatchEvent(new CustomEvent("languageChanged", { detail: { lang } }));
+    } catch (e) {
+        console.warn("[translation] Could not dispatch languageChanged event:", e);
+    }
 }
 
 // পেজ লোড হলে সংরক্ষিত ভাষা লোড করা ও ইভেন্ট লিসেনার সেট করা

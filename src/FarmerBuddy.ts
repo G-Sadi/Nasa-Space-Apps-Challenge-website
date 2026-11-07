@@ -710,6 +710,7 @@ export class FarmerBuddy {
     private statusEl!: HTMLElement;
     private resetBtnEl!: HTMLButtonElement;
     private minimizeBtnEl!: HTMLButtonElement;
+    private closeBtnEl!: HTMLButtonElement;
     private footerNoteEl!: HTMLElement;
     private fabLabelEl!: HTMLElement;
 
@@ -1094,6 +1095,7 @@ STRICT RULES FOR EVERY RESPONSE:
         this.chatWindow = document.createElement("div");
         this.chatWindow.id = "farmerBuddyChatWindow";
         this.chatWindow.className = "farmer-buddy-window collapsed";
+        this.chatWindow.style.display = "none";
 
         const header = document.createElement("div");
         header.className = "fb-header";
@@ -1116,7 +1118,7 @@ STRICT RULES FOR EVERY RESPONSE:
             </div>
             <div class="fb-header-actions">
                 <button id="fbResetBtn" class="fb-hdr-btn" title="${texts.resetTitle}">🔄</button>
-                <button id="fbMinimizeBtn" class="fb-hdr-btn" title="${texts.minimizeTitle}">✕</button>
+                <button id="fbCloseBtn" class="fb-close-btn" aria-label="Close Chat" title="${texts.minimizeTitle}">✕</button>
             </div>
         `;
 
@@ -1124,7 +1126,8 @@ STRICT RULES FOR EVERY RESPONSE:
         this.badgeEl = header.querySelector("#fbBadgeText") as HTMLElement;
         this.statusEl = header.querySelector("#fbStatusText") as HTMLElement;
         this.resetBtnEl = header.querySelector("#fbResetBtn") as HTMLButtonElement;
-        this.minimizeBtnEl = header.querySelector("#fbMinimizeBtn") as HTMLButtonElement;
+        this.closeBtnEl = (header.querySelector("#fbCloseBtn") || header.querySelector("#fbMinimizeBtn")) as HTMLButtonElement;
+        this.minimizeBtnEl = this.closeBtnEl;
         this.liveSyncBadgeEl = header.querySelector("#fbLiveSyncBadge") as HTMLElement;
 
         // Model Selector Toolbar (No manual API Key input!)
@@ -1271,6 +1274,7 @@ STRICT RULES FOR EVERY RESPONSE:
         if (this.titleEl) this.titleEl.textContent = texts.title;
         if (this.statusEl) this.statusEl.textContent = texts.status;
         if (this.resetBtnEl) this.resetBtnEl.title = texts.resetTitle;
+        if (this.closeBtnEl) this.closeBtnEl.title = texts.minimizeTitle;
         if (this.minimizeBtnEl) this.minimizeBtnEl.title = texts.minimizeTitle;
         if (this.inputField) this.inputField.placeholder = texts.inputPlaceholder;
         if (this.sendButton) this.sendButton.setAttribute("aria-label", texts.sendAria);
@@ -1320,14 +1324,42 @@ STRICT RULES FOR EVERY RESPONSE:
     }
 
     private bindEvents(): void {
-        this.fabButton.addEventListener("click", () => this.toggleWindow());
+        this.fabButton.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.toggleWindow();
+        });
 
-        if (this.minimizeBtnEl) {
-            this.minimizeBtnEl.addEventListener("click", () => this.toggleWindow(false));
+        if (this.closeBtnEl) {
+            this.closeBtnEl.addEventListener("click", (e: MouseEvent) => {
+                e.stopPropagation();
+                this.toggleWindow(false);
+            });
+        }
+        if (this.minimizeBtnEl && this.minimizeBtnEl !== this.closeBtnEl) {
+            this.minimizeBtnEl.addEventListener("click", (e: MouseEvent) => {
+                e.stopPropagation();
+                this.toggleWindow(false);
+            });
         }
         if (this.resetBtnEl) {
             this.resetBtnEl.addEventListener("click", () => this.resetConversation());
         }
+
+        // Global outside-click dismiss listener
+        document.addEventListener("click", (event: MouseEvent) => {
+            if (!this.isOpen) return;
+            const target = event.target as Node | null;
+            if (
+                target &&
+                this.chatWindow &&
+                this.fabButton &&
+                !this.chatWindow.contains(target) &&
+                !this.fabButton.contains(target) &&
+                !(this.cameraInput && this.cameraInput.contains(target))
+            ) {
+                this.toggleWindow(false);
+            }
+        });
 
         const modelSelect = this.chatWindow.querySelector("#fbModelSelect") as HTMLSelectElement | null;
         if (modelSelect) {
@@ -1416,6 +1448,7 @@ STRICT RULES FOR EVERY RESPONSE:
         this.isOpen = (forceState !== undefined) ? forceState : !this.isOpen;
 
         if (this.isOpen) {
+            this.chatWindow.style.display = "flex";
             this.chatWindow.classList.remove("collapsed");
             this.chatWindow.classList.add("expanded");
             this.fabButton.classList.add("active");
@@ -1425,6 +1458,7 @@ STRICT RULES FOR EVERY RESPONSE:
         } else {
             this.chatWindow.classList.remove("expanded");
             this.chatWindow.classList.add("collapsed");
+            this.chatWindow.style.display = "none";
             this.fabButton.classList.remove("active");
             if (typeof window !== "undefined" && ('speechSynthesis' in window)) {
                 try { window.speechSynthesis.cancel(); } catch (e) {}
