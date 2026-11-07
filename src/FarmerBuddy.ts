@@ -2085,7 +2085,7 @@ STRICT RULES FOR EVERY RESPONSE:
         }
 
         if (this.isRecording) {
-            try { this.recognition?.stop(); } catch (e) {}
+            try { this.recognition?.stop(); } catch (e) { }
             this.stopVoiceInput();
         } else {
             try {
@@ -2207,13 +2207,13 @@ STRICT RULES FOR EVERY RESPONSE:
         if (voices && voices.length > 0) {
             if (isBn) {
                 const bnVoice = voices.find(v => v.lang === "bn-BD") ||
-                                voices.find(v => v.lang === "bn-IN") ||
-                                voices.find(v => v.lang.startsWith("bn"));
+                    voices.find(v => v.lang === "bn-IN") ||
+                    voices.find(v => v.lang.startsWith("bn"));
                 if (bnVoice) utterance.voice = bnVoice;
             } else {
                 const enVoice = voices.find(v => v.lang === "en-US") ||
-                                voices.find(v => v.lang === "en-GB") ||
-                                voices.find(v => v.lang.startsWith("en"));
+                    voices.find(v => v.lang === "en-GB") ||
+                    voices.find(v => v.lang.startsWith("en"));
                 if (enVoice) utterance.voice = enVoice;
             }
         }
@@ -2336,7 +2336,7 @@ STRICT RULES FOR EVERY RESPONSE:
             awaitingSlot: null
         };
         if (typeof window !== "undefined" && ('speechSynthesis' in window)) {
-            try { window.speechSynthesis.cancel(); } catch (e) {}
+            try { window.speechSynthesis.cancel(); } catch (e) { }
         }
         this.stopVoiceInput();
         this.clearAttachedImage();
