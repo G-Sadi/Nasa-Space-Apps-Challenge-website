@@ -22,22 +22,25 @@ export interface ChatMessage {
     id: string;
     sender: "user" | "buddy";
     text: string;
+    image?: string;
     timestamp: number;
 }
 
 export interface ChatMessageTurn {
     role: "user" | "model";
-    parts: Array<{ text: string }>;
+    parts: Array<{ text?: string; inlineData?: { mimeType: string; data: string } }>;
 }
 
 export interface FarmContext {
     language: string;
     crop: string;
     growthStage: string;
+    growthDay?: number | string;
     soilMoisture: string;
     soilNPK: string;
     pestRisk: string;
     weather: string;
+    timeOfDay?: string;
 }
 
 export interface ConversationContext {
@@ -465,6 +468,41 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
             : `Friend! Instant protective measures against pests in **${label}**:\n\n• **Organic Neem Application:** Spray 5ml Neem oil per liter of water with a surfactant for aphids, thrips, and caterpillars.\n• **Bird Perches (Biological Control):** Erect bamboo T-perches so insectivorous birds feed on stem borers and caterpillars.\n• **Targeted Intervention:** Use group-specific bio-pesticides (e.g., Bacillus thuringiensis or Spinosad) during late afternoon.\n\nWhat specific symptoms or insect damage are you observing on the leaves?`;
     }
 
+    public generateImageDiagnosisChecklist(crop: string, isBn: boolean): string {
+        const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
+        const label = isBn ? cropNames.bn : cropNames.en;
+
+        return isBn
+            ? `ভাই! আপনার আপলোড করা **${label}** ফসলের পাতার ছবিটি বিশ্লেষণ করার জন্য মাঠপর্যায়ের লক্ষণভিত্তিক স্মার্ট চেকলিস্ট নিচে দেওয়া হলো:
+
+• **১. আগাম বা নাবি ধসা রোগ (Early/Late Blight):** পাতায় গাঢ় বাদামি বা কালচে বৃত্তাকার বলয় (concentric rings) এবং চারপাশে হালকা হলুদ বলয় (halo) দেখা দিলে:
+  - **তাত্ক্ষণিক প্রতিকার:** তীব্র আক্রান্ত পাতা ছাঁটাই করে পুড়িয়ে ফেলুন। ম্যানকোজেব (ডাইথেন এম-৪৫) প্রতি লিটার পানিতে ২ গ্রাম অথবা ডাইফেনোকোনাজোল (স্কোর) ০.৫ মিলি স্প্রে করুন।
+
+• **২. পাতা কোঁকড়ানো ভাইরাস (Leaf Curl Virus / পোকার আক্রমণ):** পাতা যদি উপরের বা নিচের দিকে কুঁকড়ে যায় ও গাছ খর্বাকৃতি হয় (থ্রিপস বা সাদা মাছি বাহিত):
+  - **তাত্ক্ষণিক প্রতিকার:** হলুদ আঠালো ফাঁদ ব্যবহার করুন। ইমিডাক্লোপ্রিড (টিডো/অ্যাডমায়ার) প্রতি লিটার পানিতে ০.৫ মিলি অথবা নিম তেল ৫ মিলি বিকেলের দিকে স্প্রে করুন।
+
+• **৩. সাদা গুঁড়া বা পাউডারি মিলডিউ (Powdery Mildew):** পাতার ওপর যদি সাদা পাউডারের মতো আস্তরণ দেখা যায়:
+  - **তাত্ক্ষণিক প্রতিকার:** কার্বেনডাজিম (অটোস্টিন) ১ গ্রাম/লিটার স্প্রে করুন।
+
+• **৪. পুষ্টির ঘাটতি (পটাশ বা ম্যাগনেসিয়াম):** পাতার কিনারা তামাটে বা শিরা বাদে মধ্যভাগ হলুদ হয়ে এলে সুষম পটাশ (MoP) ও ম্যাগনেসিয়াম স্প্রে করুন।
+
+ভাই, আপনার ফসলের পাতায় এই চারটির মধ্যে কোন লক্ষণটি সবচেয়ে স্পষ্ট দেখা যাচ্ছে?`
+            : `Friend! Based on your uploaded leaf photo for **${label}**, here is an agronomic field symptom checklist:
+
+• **1. Early or Late Blight (Fungal):** Dark brown/black concentric target-like rings with a pale yellow halo:
+  - **Remedy:** Prune infected lower leaves immediately. Spray Mancozeb (Dithane M-45) @ 2g/L or Difenoconazole (Score) @ 0.5ml/L.
+
+• **2. Leaf Curl Virus / Sucking Pests:** Foliage curled upward/downward, crinkled, with stunted growth (spread by Thrips or Whiteflies):
+  - **Remedy:** Install yellow sticky traps. Spray Imidacloprid (Admire) @ 0.5ml/L or cold-pressed Neem Oil (5ml/L) in late afternoon.
+
+• **3. Powdery Mildew:** Superficial white/gray talcum-like fungal powder on upper leaf surface:
+  - **Remedy:** Apply Carbendazim (1g/L) or sulfur-based organic wash.
+
+• **4. Nutrient Deficiency (Potassium/Magnesium):** Marginal leaf scorching or interveinal chlorosis: Apply balanced MoP and foliar micronutrient blend.
+
+Which of these visible symptoms matches your crop leaf closest?`;
+    }
+
     public generateIrrigationAdvice(crop: string, age: number | null, isBn: boolean): string {
         return isBn
             ? `ভাই! সুষম ও সাশ্রয়ী সেচ ব্যবস্থাপনায় আপনার ফসলের জন্য গুরুত্বপূর্ণ পরামর্শ:\n\n• **পরিমিত সেচ:** গোড়ায় অতিরিক্ত পানি জমিয়ে রাখবেন না; শিকড় পচন রোধ করতে জো (রস) অবস্থা বজায় রাখুন।\n• **খরচ সাশ্রয়ী AWD পদ্ধতি:** ধান ও শাকসবজিতে পর্যায়ক্রমে শুকানো ও ভেজানোর নিয়ম মানলে সেচের জ্বালানি খরচ ৩০% বাঁচে।\n• **সেচ দেওয়ার সঠিক সময়:** সবসময় সকালের দিকে অথবা শেষ বিকেলে সেচ দিন।\n\nজমির মাটি হাত দিয়ে চাপ দিলে কি লাড্ডুর মতো গোল হয় নাকি বালির মতো ঝরে যায়?`
@@ -675,6 +713,20 @@ export class FarmerBuddy {
     private footerNoteEl!: HTMLElement;
     private fabLabelEl!: HTMLElement;
 
+    // Multimedia, Voice & Live Telemetry Elements
+    private attachedImage: string | null = null;
+    private cameraInput!: HTMLInputElement;
+    private camBtn!: HTMLButtonElement;
+    private micBtn!: HTMLButtonElement;
+    private recognition: any = null;
+    private isRecording: boolean = false;
+    private activeTtsBtn: HTMLButtonElement | null = null;
+    private liveSyncBadgeEl!: HTMLElement;
+    private imagePreviewBar!: HTMLElement;
+    private previewThumb!: HTMLImageElement;
+    private previewInfo!: HTMLElement;
+    private previewRemoveBtn!: HTMLButtonElement;
+
     private i18nDict: Record<AppLanguage, TranslationDict> = {
         en: {
             fabAria: "Open Farmer Buddy AI Chat",
@@ -853,37 +905,117 @@ export class FarmerBuddy {
         return this.chatHistory.slice(-count);
     }
 
-    public getActiveFarmContext(): FarmContext {
+    public getLiveFieldContext(): FarmContext {
         const isBn = (typeof window !== "undefined" && (window as any).currentAppLanguage === "bn") || (this.currentLang === "bn");
 
-        const cropSelect = document.getElementById("cropSelect") as HTMLSelectElement | null;
-        let selectedCrop = isBn ? "টমেটো (Tomato)" : "Tomato";
-        if (cropSelect && cropSelect.selectedIndex >= 0) {
-            selectedCrop = cropSelect.options[cropSelect.selectedIndex]?.text?.trim() || cropSelect.value;
+        // 1. Check window global state first (future-proof decoupled bridge)
+        const globalState = (typeof window !== "undefined")
+            ? ((window as any).FieldShiftState || (window as any).FieldShift3D || (window as any).fieldShiftInstance)
+            : null;
+
+        let selectedCrop = "";
+        let growthStage = "";
+        let growthDay: number | string = "";
+        let soilMoisture = "";
+        let soilNPK = "";
+        let pestRisk = "";
+        let weather = "";
+        let timeOfDay = "";
+
+        if (globalState) {
+            if (globalState.crop) selectedCrop = globalState.crop;
+            if (globalState.growthStage) growthStage = globalState.growthStage;
+            if (globalState.growthDay) growthDay = globalState.growthDay;
+            if (globalState.soilMoisture) soilMoisture = globalState.soilMoisture;
+            if (globalState.soilNPK) soilNPK = globalState.soilNPK;
+            if (globalState.pestRisk) pestRisk = globalState.pestRisk;
+            if (globalState.weather) weather = globalState.weather;
+            if (globalState.timeOfDay) timeOfDay = globalState.timeOfDay;
         }
 
-        const soilMoisture = document.getElementById("hudDockMoistVal")?.textContent?.trim() || "68%";
-        const soilNPK = document.getElementById("hudDockNPKVal")?.textContent?.trim() || "84%";
-        const pestRisk = document.getElementById("hudDockPestBadge")?.textContent?.trim() || (isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk");
-        const weather = document.getElementById("hudDockWeatherStatus")?.textContent?.trim() || (isBn ? "☀️ রোদ · ২৬°C" : "☀️ Sunny · 26°C");
-        const growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
-            document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
-            (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
+        // 2. Safe DOM fallbacks
+        if (!selectedCrop && typeof document !== "undefined") {
+            const cropSelect = document.getElementById("cropSelect") as HTMLSelectElement | null;
+            if (cropSelect && cropSelect.selectedIndex >= 0) {
+                selectedCrop = cropSelect.options[cropSelect.selectedIndex]?.text?.trim() || cropSelect.value;
+            }
+        }
+        if (!selectedCrop) selectedCrop = isBn ? "টমেটো (Tomato)" : "Tomato";
+
+        if (!growthStage && typeof document !== "undefined") {
+            growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
+                document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
+                (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
+        }
+
+        if (!growthDay && typeof document !== "undefined") {
+            const slider = document.getElementById("growthTimelineSlider") as HTMLInputElement | null;
+            if (slider && slider.value) {
+                growthDay = slider.value + (isBn ? " দিন" : " Days");
+            } else {
+                growthDay = isBn ? "৪০ দিন" : "40 Days";
+            }
+        }
+
+        if (!soilMoisture && typeof document !== "undefined") {
+            soilMoisture = document.getElementById("hudDockMoistVal")?.textContent?.trim() ||
+                document.getElementById("hudSoilMoistVal")?.textContent?.trim() || "68%";
+        }
+
+        if (!soilNPK && typeof document !== "undefined") {
+            soilNPK = document.getElementById("hudDockNPKVal")?.textContent?.trim() || "84%";
+        }
+
+        if (!pestRisk && typeof document !== "undefined") {
+            pestRisk = document.getElementById("hudDockPestBadge")?.textContent?.trim() || (isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk");
+        }
+
+        if (!weather && typeof document !== "undefined") {
+            weather = document.getElementById("hudDockWeatherStatus")?.textContent?.trim() || (isBn ? "☀️ রোদ · ২৬°C" : "☀️ Sunny · 26°C");
+        }
+
+        if (!timeOfDay && typeof document !== "undefined") {
+            const activeTod = document.querySelector(".tod-segment-btn.active") as HTMLElement | null;
+            if (activeTod) {
+                timeOfDay = activeTod.dataset.time || activeTod.textContent?.trim() || "Noon";
+            } else {
+                timeOfDay = "Noon";
+            }
+        }
 
         return {
             language: isBn ? "বাং" : "EN",
             crop: selectedCrop,
             growthStage: growthStage,
+            growthDay: growthDay,
             soilMoisture: soilMoisture,
             soilNPK: soilNPK,
             pestRisk: pestRisk,
-            weather: weather
+            weather: weather,
+            timeOfDay: timeOfDay
         };
+    }
+
+    public getActiveFarmContext(): FarmContext {
+        return this.getLiveFieldContext();
+    }
+
+    public updateLiveSyncBadge(): void {
+        const farmContext = this.getLiveFieldContext();
+        if (this.liveSyncBadgeEl) {
+            const cropShort = farmContext.crop.split(" ")[0].split("(")[0].replace(/[^\u0980-\u09FFa-zA-Z]/g, "").trim() || farmContext.crop;
+            this.liveSyncBadgeEl.innerHTML = `🌱 Live Sync: <strong>${cropShort}</strong> • <strong>${farmContext.soilMoisture}</strong> • <strong>${farmContext.weather}</strong>`;
+        }
     }
 
     private buildDynamicSystemInstruction(farmContext: FarmContext): string {
         const isBn = (this.currentLang === "bn");
-        let instruction = `You are "Farmer Buddy" (কৃষি বন্ধু), an elite Senior Agronomist, Agricultural Economist, and trusted field friend to farmers in Bangladesh and South Asia.
+        let instruction = `[LIVE 3D FIELD TELEMETRY: Active Crop=${farmContext.crop || 'Tomato'}, Growth Stage/Day=${farmContext.growthStage || 'Vegetative'} (${farmContext.growthDay || '40 Days'}), Soil Moisture=${farmContext.soilMoisture || '68%'}, NPK Balance=${farmContext.soilNPK || '84%'}, Weather=${farmContext.weather || 'Sunny · 26°C'}, TimeOfDay=${farmContext.timeOfDay || 'Noon'}]
+
+You are "Farmer Buddy" (কৃষি বন্ধু), an elite Senior Agronomist, Agricultural Economist, and trusted field friend to farmers in Bangladesh and South Asia.
+
+CRITICAL INSTRUCTION FOR ACTIVE FIELD CONTEXT:
+When the farmer asks stage-specific or action questions (e.g. "এখন কী সার দেব?", "আজকে কি সেচ দেওয়া লাগবে?", "কী রোগ হতে পারে?", "কী পরিচর্যা লাগবে?"), IMMEDIATELY use the [LIVE 3D FIELD TELEMETRY] data provided above (crop, growth stage, soil moisture, and weather) to answer directly and authoritatively. NEVER ask "Which crop are you cultivating?" or "What is the crop age?" if it is present in the telemetry!
 
 STRICT RULES FOR EVERY RESPONSE:
 1. ZERO REPETITION & 100% RELEVANCE:
@@ -891,34 +1023,29 @@ STRICT RULES FOR EVERY RESPONSE:
    - If the farmer already named the crop (e.g., "fertilizer for potato"), NEVER ask "Which crop are you fertilizing?". Give the exact Potato fertilizer schedule immediately.
    - If the farmer replies with a short answer like "Rice", "Potato", "20", or "40", connect it directly to your previous question and provide the exact stage-specific solution.
 
-2. LAND, LOCATION & PROFIT/ROTATION PLANNING:
+2. MULTIMODAL LEAF & SOIL IMAGE ANALYSIS:
+   - If the user provides an image or asks about leaf symptoms/spots/yellowing/blight/curl:
+     a) Carefully inspect the visual symptoms (lesions, concentric rings, halo, mildew, curled margins, mosaic pattern, chlorosis).
+     b) Provide the exact diagnosis (disease name, insect pest vector, or nutrient deficiency).
+     c) Give immediate cultural/organic remedies (pruning, neem oil, ash, Trichoderma, biocontrol) AND specific approved chemical active ingredients with dosage per liter (BARI/BRRI standard).
+     d) Ask 1 clarifying question to confirm spread or severity.
+
+3. LAND, LOCATION & PROFIT/ROTATION PLANNING:
    - Whenever a farmer mentions their location/region (e.g., Mymensingh, Bogura, Barishal, Dinajpur, haor, char, high/medium/low land), soil type (loamy/দোআঁশ, clay/এঁটেল, sandy/বেলে), or asks what to cultivate for maximum profit:
      a) **Best Crop & Sowing Window (সেরা ফসল ও বপনের সময়):** Recommend the highest-margin crops suited to that land and exact planting months to catch early market high prices.
      b) **Cost Minimization Strategy (খরচ কমানোর কৌশল):** Show how to cut input costs by 20–30% using vermicompost/organic manure, split Urea application, LCC (Leaf Color Chart), and AWD (Alternate Wetting & Drying) irrigation.
      c) **Estimated Cost vs. Profit (খরচ ও সম্ভাব্য লাভের হিসাব):** Provide a realistic cost, yield, and net profit estimate per decimal (শতাংশ) or bigha (৩৩ শতাংশ).
      d) **Year-Round 3-Season Crop Rotation (শস্য আবর্তন চক্র):** Provide a Rabi -> Kharif-1 -> Kharif-2 cycle (e.g., Potato/Mustard -> Mungbean/Jute -> T. Aman Rice) that naturally fixes soil nitrogen and breaks pest cycles.
 
-3. EXACT TECHNICAL ACCURACY (BARI / BRRI STANDARDS):
+4. EXACT TECHNICAL ACCURACY (BARI / BRRI STANDARDS):
    - Give exact dosages per decimal (শতাংশ) or bigha for Urea, TSP, DAP, MoP, Gypsum, Zinc, and Boron.
    - For pests/diseases, give both immediate organic/cultural controls (neem extract, light traps, perching, water draining) and specific chemical active ingredient names with dosage per liter of water.
 
-4. TONE, STRUCTURE & LANGUAGE:
+5. TONE, STRUCTURE & LANGUAGE:
    - Address the farmer warmly ("ভাই/বন্ধু" in Bangla, "Friend" in English).
    - Format with short, mobile-scannable bold bullet points.
    - End with 1 smart, context-aware follow-up question that helps them take the next step.
    - Strictly respond in natural Bangla if the UI language is Bangla (বাং) or the user writes in Bangla/Banglish; respond in clear English if the UI/query is in English.`;
-
-        // DYNAMIC ACTIVE 3D DASHBOARD STATE INJECTION
-        if (farmContext) {
-            instruction += `\n\nACTIVE 3D FARM DASHBOARD STATE:
-• Selected Crop: ${farmContext.crop || 'Tomato'}
-• Current Weather Forecast: ${farmContext.weather || 'Sunny'}
-• Active Language Toggle: ${farmContext.language || (isBn ? 'বাং' : 'EN')}
-• Current Growth Stage: ${farmContext.growthStage || 'Vegetative'}
-• Soil Moisture Telemetry: ${farmContext.soilMoisture || 'Normal'}
-• Soil NPK Level: ${farmContext.soilNPK || 'Balanced'}
-• Pest Sentinel Status: ${farmContext.pestRisk || 'Low Risk'}`;
-        }
 
         if (this.context) {
             instruction += `\n\nPERSISTENT CONVERSATION CONTEXT:
@@ -937,6 +1064,7 @@ STRICT RULES FOR EVERY RESPONSE:
     private initDOM(): void {
         const texts = this.i18nDict[this.currentLang];
         const isBn = (this.currentLang === "bn");
+        const initialContext = this.getLiveFieldContext();
 
         this.widgetContainer = document.createElement("div");
         this.widgetContainer.id = "farmerBuddyWidget";
@@ -973,6 +1101,9 @@ STRICT RULES FOR EVERY RESPONSE:
                         <span id="fbBadgeText" class="fb-badge">${texts.badge}</span>
                     </h3>
                     <p id="fbStatusText" class="fb-status">${texts.status}</p>
+                    <div id="fbLiveSyncBadge" class="fb-live-sync-badge" title="Live 3D Farm Telemetry Synchronized">
+                        🌱 Live Sync: <strong>${initialContext.crop.split(" ")[0]}</strong> • <strong>${initialContext.soilMoisture}</strong> • <strong>${initialContext.weather}</strong>
+                    </div>
                 </div>
             </div>
             <div class="fb-header-actions">
@@ -986,6 +1117,7 @@ STRICT RULES FOR EVERY RESPONSE:
         this.statusEl = header.querySelector("#fbStatusText") as HTMLElement;
         this.resetBtnEl = header.querySelector("#fbResetBtn") as HTMLButtonElement;
         this.minimizeBtnEl = header.querySelector("#fbMinimizeBtn") as HTMLButtonElement;
+        this.liveSyncBadgeEl = header.querySelector("#fbLiveSyncBadge") as HTMLElement;
 
         // Model Selector Toolbar (No manual API Key input!)
         this.modelToolbar = document.createElement("div");
@@ -1023,7 +1155,15 @@ STRICT RULES FOR EVERY RESPONSE:
         const inputArea = document.createElement("div");
         inputArea.className = "fb-input-area";
         inputArea.innerHTML = `
+            <div id="fbImagePreviewBar" class="fb-image-preview-bar" style="display: none;">
+                <img id="fbPreviewThumb" class="fb-preview-thumb" alt="Leaf thumbnail" />
+                <span id="fbPreviewInfo" class="fb-preview-info">${isBn ? "🌿 পাতার ছবি যুক্ত হয়েছে" : "🌿 Leaf image attached"}</span>
+                <button type="button" id="fbPreviewRemoveBtn" class="fb-preview-remove" title="Remove image">✕</button>
+            </div>
             <form id="fbChatForm" class="fb-form" onsubmit="return false;">
+                <input type="file" id="fbCameraInput" accept="image/*" capture="environment" style="display: none;" />
+                <button type="button" id="fbCamBtn" class="fb-cam-btn" aria-label="Upload Leaf/Soil Photo (পাতার ছবি)" title="${isBn ? 'পাতার ছবি তুলুন বা আপলোড করুন' : 'Take or upload leaf/soil photo'}">📷</button>
+                <button type="button" id="fbMicBtn" class="fb-mic-btn" aria-label="Voice Input (ভয়েস টাইপিং)" title="${isBn ? 'ভয়েস টাইপিং (Speech-to-Text)' : 'Voice Input (Speech-to-Text)'}">🎙️</button>
                 <input
                     type="text"
                     id="fbInput"
@@ -1042,9 +1182,16 @@ STRICT RULES FOR EVERY RESPONSE:
             </div>
         `;
 
+        this.cameraInput = inputArea.querySelector("#fbCameraInput") as HTMLInputElement;
+        this.camBtn = inputArea.querySelector("#fbCamBtn") as HTMLButtonElement;
+        this.micBtn = inputArea.querySelector("#fbMicBtn") as HTMLButtonElement;
         this.inputField = inputArea.querySelector("#fbInput") as HTMLInputElement;
         this.sendButton = inputArea.querySelector("#fbSendBtn") as HTMLButtonElement;
         this.footerNoteEl = inputArea.querySelector("#fbFooterNote") as HTMLElement;
+        this.imagePreviewBar = inputArea.querySelector("#fbImagePreviewBar") as HTMLElement;
+        this.previewThumb = inputArea.querySelector("#fbPreviewThumb") as HTMLImageElement;
+        this.previewInfo = inputArea.querySelector("#fbPreviewInfo") as HTMLElement;
+        this.previewRemoveBtn = inputArea.querySelector("#fbPreviewRemoveBtn") as HTMLButtonElement;
 
         this.chatWindow.appendChild(header);
         this.chatWindow.appendChild(this.modelToolbar);
@@ -1055,6 +1202,9 @@ STRICT RULES FOR EVERY RESPONSE:
         this.widgetContainer.appendChild(this.fabButton);
         this.widgetContainer.appendChild(this.chatWindow);
         document.body.appendChild(this.widgetContainer);
+
+        this.initSpeechRecognition();
+        this.updateLiveSyncBadge();
     }
 
     public getModelPillClass(): string {
@@ -1102,6 +1252,12 @@ STRICT RULES FOR EVERY RESPONSE:
         const texts = this.i18nDict[lang];
         const isBn = (lang === "bn");
 
+        // Cancel active TTS and stop speech recognition
+        if (typeof window !== "undefined" && ('speechSynthesis' in window)) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+        this.stopVoiceInput();
+
         if (this.fabButton) this.fabButton.setAttribute("aria-label", texts.fabAria);
         if (this.fabLabelEl) this.fabLabelEl.textContent = texts.fabLabel;
         if (this.titleEl) this.titleEl.textContent = texts.title;
@@ -1111,6 +1267,12 @@ STRICT RULES FOR EVERY RESPONSE:
         if (this.inputField) this.inputField.placeholder = texts.inputPlaceholder;
         if (this.sendButton) this.sendButton.setAttribute("aria-label", texts.sendAria);
         if (this.footerNoteEl) this.footerNoteEl.innerHTML = texts.footerNote;
+
+        if (this.camBtn) this.camBtn.title = isBn ? "পাতার ছবি তুলুন বা আপলোড করুন" : "Take or upload leaf/soil photo";
+        if (this.micBtn) this.micBtn.title = isBn ? "ভয়েস টাইপিং (Speech-to-Text)" : "Voice Input (Speech-to-Text)";
+        if (this.previewInfo) {
+            this.previewInfo.textContent = isBn ? "🌿 পাতার ছবি যুক্ত হয়েছে" : "🌿 Leaf image attached";
+        }
 
         const modelSelect = this.chatWindow ? this.chatWindow.querySelector("#fbModelSelect") as HTMLSelectElement | null : null;
         if (modelSelect) {
@@ -1131,6 +1293,7 @@ STRICT RULES FOR EVERY RESPONSE:
         this.loadSessionMessages();
         this.renderHistory();
         this.updateModelUI();
+        this.updateLiveSyncBadge();
     }
 
     private renderQuickChips(): void {
@@ -1168,15 +1331,62 @@ STRICT RULES FOR EVERY RESPONSE:
             });
         }
 
+        // 📷 Camera / Gallery leaf photo upload
+        if (this.camBtn && this.cameraInput) {
+            this.camBtn.addEventListener("click", () => {
+                this.cameraInput.click();
+            });
+            this.cameraInput.addEventListener("change", (e) => {
+                this.handleImageSelect(e);
+            });
+        }
+
+        // Preview remove button
+        if (this.previewRemoveBtn) {
+            this.previewRemoveBtn.addEventListener("click", () => {
+                this.clearAttachedImage();
+            });
+        }
+
+        // 🎤 Voice Input (Speech-to-Text)
+        if (this.micBtn) {
+            this.micBtn.addEventListener("click", () => {
+                this.toggleVoiceInput();
+            });
+        }
+
         const form = this.chatWindow.querySelector("#fbChatForm");
         if (form) {
             form.addEventListener("submit", (e) => {
                 e.preventDefault();
                 const val = this.inputField.value.trim();
-                if (val && !this.isStreaming) {
+                if ((val || this.attachedImage) && !this.isStreaming) {
+                    const isBn = (this.currentLang === "bn");
+                    const defaultPrompt = isBn
+                        ? "এই ফসলের পাতা বা মাটির ছবিটি মনোযোগ দিয়ে দেখুন। এতে কী রোগ, পোকা বা পুষ্টির ঘাটতি হয়েছে, তার লক্ষণ এবং জৈব ও রাসায়নিক প্রতিকার বিস্তারিত বলুন।"
+                        : "Analyze this crop leaf/soil image carefully. Identify any disease, pest attack, or nutrient deficiency, explain the visible symptoms, and provide exact organic and chemical remedies.";
+                    const textToSend = val || defaultPrompt;
+                    const imageToSend = this.attachedImage;
+
                     this.inputField.value = "";
-                    this.handleUserSubmit(val);
+                    this.clearAttachedImage();
+                    this.handleUserSubmit(textToSend, imageToSend);
                 }
+            });
+        }
+
+        // 3D Dashboard Live Sync Listeners
+        const cropSelect = document.getElementById("cropSelect");
+        if (cropSelect) {
+            cropSelect.addEventListener("change", () => {
+                this.updateLiveSyncBadge();
+            });
+        }
+
+        const timelineSlider = document.getElementById("growthTimelineSlider");
+        if (timelineSlider) {
+            timelineSlider.addEventListener("input", () => {
+                this.updateLiveSyncBadge();
             });
         }
 
@@ -1201,12 +1411,17 @@ STRICT RULES FOR EVERY RESPONSE:
             this.chatWindow.classList.remove("collapsed");
             this.chatWindow.classList.add("expanded");
             this.fabButton.classList.add("active");
+            this.updateLiveSyncBadge();
             this.scrollToBottom();
             setTimeout(() => this.inputField && this.inputField.focus(), 250);
         } else {
             this.chatWindow.classList.remove("expanded");
             this.chatWindow.classList.add("collapsed");
             this.fabButton.classList.remove("active");
+            if (typeof window !== "undefined" && ('speechSynthesis' in window)) {
+                try { window.speechSynthesis.cancel(); } catch (e) {}
+            }
+            this.stopVoiceInput();
         }
     }
 
@@ -1225,28 +1440,49 @@ STRICT RULES FOR EVERY RESPONSE:
 
         const timeStr = new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
         const senderTag = this.i18nDict[this.currentLang].senderTag;
+        const isBn = (this.currentLang === "bn");
+
+        const imageHtml = msg.image ? `<img src="${msg.image}" class="msg-attached-img" alt="Attached Leaf/Soil Image" />` : '';
+        const ttsBtnHtml = (msg.sender === "buddy" && msg.text && msg.text.trim())
+            ? `<button type="button" class="fb-tts-btn" data-msg-id="${msg.id}" title="${isBn ? 'ভয়েসে শুনুন' : 'Listen with Voice'}"><span class="tts-icon">🔊</span> <span class="tts-text">${isBn ? 'শুনুন' : 'Listen'}</span></button>`
+            : '';
 
         bubble.innerHTML = `
             <div class="msg-bubble-wrap">
                 ${msg.sender === "buddy" ? `<span class="msg-sender-tag">${senderTag}</span>` : ''}
+                ${imageHtml}
                 <div class="msg-text">${this.formatMarkdown(msg.text)}</div>
-                <span class="msg-time">${timeStr}</span>
+                <div class="msg-footer-row" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%;">
+                    <span class="msg-time">${timeStr}</span>
+                    ${ttsBtnHtml}
+                </div>
             </div>
         `;
+
+        if (msg.sender === "buddy" && msg.text && msg.text.trim()) {
+            const ttsBtn = bubble.querySelector(".fb-tts-btn") as HTMLButtonElement | null;
+            if (ttsBtn) {
+                ttsBtn.addEventListener("click", () => {
+                    this.toggleMessageTTS(msg.text, ttsBtn);
+                });
+            }
+        }
 
         this.messagesContainer.appendChild(bubble);
         this.scrollToBottom();
         return bubble;
     }
 
-    public async handleUserSubmit(text: string): Promise<void> {
-        if (!text || !text.trim() || this.isStreaming) return;
+    public async handleUserSubmit(text: string, attachedImage?: string | null): Promise<void> {
+        if ((!text || !text.trim()) && !attachedImage) return;
+        if (this.isStreaming) return;
         const cleanText = text.trim();
 
         const userMsg: ChatMessage = {
             id: "u-" + Date.now(),
             sender: "user",
             text: cleanText,
+            image: attachedImage || undefined,
             timestamp: Date.now()
         };
         this.messages.push(userMsg);
@@ -1266,7 +1502,9 @@ STRICT RULES FOR EVERY RESPONSE:
 
         const isBn = (this.currentLang === "bn");
         let thinkingLabel: string;
-        if (this.selectedModel === "gemini-2.5-pro") {
+        if (attachedImage) {
+            thinkingLabel = isBn ? "📷 পাতার ছবির লক্ষণ ও রোগ বিশ্লেষণ করছি..." : "📷 Analyzing Leaf Symptoms & Pathology Vision...";
+        } else if (this.selectedModel === "gemini-2.5-pro") {
             thinkingLabel = isBn ? "শস্য পরিক্রমা ও লাভ পরিকল্পনা হিসাব করছি..." : "Calculating Crop Rotation & Profit Plan...";
         } else if (this.selectedModel === "gemini-2.5-flash") {
             thinkingLabel = isBn ? "হালকা ব্যান্ডউইথে কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing in Low-Bandwidth Mode...";
@@ -1280,7 +1518,7 @@ STRICT RULES FOR EVERY RESPONSE:
         this.setInputsDisabled(true);
 
         const recentHistory = this.getRecentChatHistory(10);
-        const farmContext = this.getActiveFarmContext();
+        const farmContext = this.getLiveFieldContext();
 
         // 2. Multi-turn context extraction and persistent tracking
         const detectedCrop = this.localEngine.extractCrop(cleanText);
@@ -1309,7 +1547,7 @@ STRICT RULES FOR EVERY RESPONSE:
             this.context.lastIntent = detectedIntent;
         }
 
-        // Automatic prompt context enrichment for short follow-ups (e.g., "20", "40", "Rice", "১০ শতক")
+        // Automatic prompt context enrichment for short follow-ups
         const isNumberOnly = /^\d+$/.test(this.localEngine.normalizeDigits(cleanText).trim());
         const isShortFollowUp = (cleanText.split(/\s+/).length <= 4) && (
             isNumberOnly ||
@@ -1330,10 +1568,10 @@ STRICT RULES FOR EVERY RESPONSE:
         let replyText: string | null = null;
 
         try {
-            // LAYER 1: DIRECT GEMINI REST API
+            // LAYER 1: DIRECT GEMINI REST API (Multimodal with inlineData if attachedImage)
             if (this.geminiApiKey && navigator.onLine) {
                 try {
-                    replyText = await this.callDirectGemini(promptForAi, recentHistory, farmContext);
+                    replyText = await this.callDirectGemini(promptForAi, attachedImage || null, recentHistory, farmContext);
                 } catch (directErr: any) {
                     console.warn("[FarmerBuddy] Direct Gemini API failed:", directErr.message);
                 }
@@ -1350,13 +1588,18 @@ STRICT RULES FOR EVERY RESPONSE:
 
             // LAYER 2: STATEFUL LOCAL AGRICULTURAL EXPERT & ROTATION ENGINE
             if (!replyText) {
-                console.log(`[FarmerBuddy] Generating response via Layer 2 Stateful Agricultural Engine [${this.selectedModel}]...`);
-                replyText = this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
+                if (attachedImage) {
+                    const activeCrop = this.context.crop || this.localEngine.extractCrop(farmContext.crop) || "tomato";
+                    replyText = this.localEngine.generateImageDiagnosisChecklist(activeCrop, isBn);
+                } else {
+                    replyText = this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
+                }
             }
 
-            await this.streamReply(replyText, textTarget, buddyMsg);
+            await this.streamReply(replyText, textTarget, buddyMsg, buddyBubble);
 
-            this.chatHistory.push({ role: "user", parts: [{ text: promptForAi }] });
+            const userParts: any[] = [{ text: promptForAi }];
+            this.chatHistory.push({ role: "user", parts: userParts });
             this.chatHistory.push({ role: "model", parts: [{ text: buddyMsg.text }] });
 
             const lastQ = this.extractLastQuestion(buddyMsg.text);
@@ -1366,8 +1609,10 @@ STRICT RULES FOR EVERY RESPONSE:
             this.saveSessionMessages();
         } catch (err: any) {
             console.error("[FarmerBuddy Critical Error]:", err);
-            const safeText = this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
-            await this.streamReply(safeText, textTarget, buddyMsg);
+            const safeText = attachedImage
+                ? this.localEngine.generateImageDiagnosisChecklist(this.context.crop || "tomato", isBn)
+                : this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
+            await this.streamReply(safeText, textTarget, buddyMsg, buddyBubble);
             const lastQ = this.extractLastQuestion(buddyMsg.text);
             if (lastQ) {
                 this.context.lastBotQuestion = lastQ;
@@ -1380,7 +1625,12 @@ STRICT RULES FOR EVERY RESPONSE:
         }
     }
 
-    private async callDirectGemini(message: string, recentHistory: ChatMessageTurn[], farmContext: FarmContext): Promise<string> {
+    private async callDirectGemini(
+        message: string,
+        attachedImage: string | null,
+        recentHistory: ChatMessageTurn[],
+        farmContext: FarmContext
+    ): Promise<string> {
         const apiKey = this.geminiApiKey;
         if (!apiKey) throw new Error("NO_API_KEY");
 
@@ -1401,15 +1651,26 @@ STRICT RULES FOR EVERY RESPONSE:
             }
         }
 
-        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
-            contents[contents.length - 1].parts[0].text += `\n${message}`;
-        } else {
-            contents.push({ role: 'user', parts: [{ text: message }] });
+        const userParts: any[] = [{ text: message }];
+        if (attachedImage) {
+            const pureBase64 = attachedImage.includes(",") ? attachedImage.split(",")[1] : attachedImage;
+            userParts.push({
+                inlineData: {
+                    mimeType: "image/jpeg",
+                    data: pureBase64
+                }
+            });
         }
 
-        // FIX 1: Map UI model names to valid Gemini API endpoints (prevents 404 invalid model crashes)
+        if (contents.length > 0 && contents[contents.length - 1].role === 'user') {
+            contents[contents.length - 1].parts.push(...userParts);
+        } else {
+            contents.push({ role: 'user', parts: userParts });
+        }
+
+        // Map UI model names to valid Gemini API endpoints (prevents 404 invalid model crashes)
         const MODEL_MAP: Record<string, string> = {
-            'gemini-3.5-flash': 'gemini-2.5-flash', // Maps to valid 2.5-flash endpoint so it NEVER 404s
+            'gemini-3.5-flash': 'gemini-2.5-flash',
             'gemini-2.5-pro': 'gemini-2.5-pro',
             'gemini-2.5-flash': 'gemini-2.5-flash'
         };
@@ -1417,10 +1678,10 @@ STRICT RULES FOR EVERY RESPONSE:
 
         // Candidate models list prioritizing active, high-availability endpoints
         const candidateModels: string[] = [
-            activeApiModel,          // User mapped target model ('gemini-2.5-flash')
-            'gemini-3.5-flash-lite', // Active production model (zero 404, instant <500ms reply)
-            'gemini-3.8-flash',
-            'gemini-flash-latest'    // Google dynamic fallback alias
+            activeApiModel,
+            'gemini-2.5-flash',
+            'gemini-3.5-flash-lite',
+            'gemini-flash-latest'
         ];
 
         let lastError: any = null;
@@ -1429,7 +1690,7 @@ STRICT RULES FOR EVERY RESPONSE:
             try {
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
                 const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 9500);
+                const timeoutId = setTimeout(() => controller.abort(), 12000);
 
                 const response = await fetch(url, {
                     method: "POST",
@@ -1494,7 +1755,7 @@ STRICT RULES FOR EVERY RESPONSE:
         throw new Error("EMPTY_PROXY_REPLY");
     }
 
-    private async streamReply(fullText: string, textTarget: HTMLElement, buddyMsg: ChatMessage): Promise<void> {
+    private async streamReply(fullText: string, textTarget: HTMLElement, buddyMsg: ChatMessage, buddyBubble?: HTMLElement): Promise<void> {
         const words = fullText.split(" ");
         let streamed = "";
 
@@ -1508,6 +1769,302 @@ STRICT RULES FOR EVERY RESPONSE:
                 await new Promise(r => setTimeout(r, 12));
             }
         }
+
+        // Attach TTS button on completed response
+        if (buddyBubble) {
+            const footerRow = buddyBubble.querySelector(".msg-footer-row");
+            if (footerRow && !footerRow.querySelector(".fb-tts-btn")) {
+                const isBn = (this.currentLang === "bn");
+                const ttsBtn = document.createElement("button");
+                ttsBtn.type = "button";
+                ttsBtn.className = "fb-tts-btn";
+                ttsBtn.title = isBn ? "ভয়েসে শুনুন" : "Listen with Voice";
+                ttsBtn.innerHTML = `<span class="tts-icon">🔊</span> <span class="tts-text">${isBn ? "শুনুন" : "Listen"}</span>`;
+                ttsBtn.addEventListener("click", () => {
+                    this.toggleMessageTTS(buddyMsg.text, ttsBtn);
+                });
+                footerRow.appendChild(ttsBtn);
+            }
+        }
+    }
+
+    // =========================================================================
+    // 🎤 VOICE INPUT (SPEECH-TO-TEXT) & 🔊 OUTPUT (CLEAN TEXT-TO-SPEECH)
+    // =========================================================================
+    private initSpeechRecognition(): void {
+        if (typeof window === "undefined") return;
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            this.recognition = null;
+            return;
+        }
+
+        try {
+            this.recognition = new SpeechRecognition();
+            this.recognition.continuous = false;
+            this.recognition.interimResults = false;
+            this.recognition.maxAlternatives = 1;
+
+            this.recognition.onstart = () => {
+                this.isRecording = true;
+                if (this.micBtn) {
+                    this.micBtn.classList.add("recording");
+                    this.micBtn.textContent = "🔴";
+                }
+                if (this.inputField) {
+                    this.inputField.placeholder = (this.currentLang === "bn")
+                        ? "🎙️ শুনছি... আপনার সমস্যার কথা বলুন..."
+                        : "🎙️ Listening... Speak now...";
+                }
+            };
+
+            this.recognition.onresult = (event: any) => {
+                const transcript = event.results?.[0]?.[0]?.transcript;
+                if (transcript && this.inputField) {
+                    const currentVal = this.inputField.value.trim();
+                    this.inputField.value = currentVal ? `${currentVal} ${transcript}` : transcript;
+                    this.inputField.focus();
+                }
+                this.stopVoiceInput();
+            };
+
+            this.recognition.onerror = (event: any) => {
+                console.warn("[FarmerBuddy SpeechRecognition error]:", event.error);
+                this.stopVoiceInput();
+                if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+                    this.showNonBlockingNotice(
+                        (this.currentLang === "bn")
+                            ? "⚠️ মাইক্রোফোন পারমিশন পাওয়া যায়নি। অনুগ্রহ করে ব্রাউজার সেটিংসে পারমিশন দিন।"
+                            : "⚠️ Microphone access was denied. Please allow microphone permission in browser settings."
+                    );
+                }
+            };
+
+            this.recognition.onend = () => {
+                this.stopVoiceInput();
+            };
+        } catch (e) {
+            console.warn("[FarmerBuddy SpeechRecognition init error]:", e);
+            this.recognition = null;
+        }
+    }
+
+    private toggleVoiceInput(): void {
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            this.showNonBlockingNotice(
+                (this.currentLang === "bn")
+                    ? "ℹ️ আপনার ব্রাউজারে সরাসরি ভয়েস টাইপিং (Speech Recognition) সমর্থিত নয়।"
+                    : "ℹ️ Speech recognition is not supported in this browser."
+            );
+            return;
+        }
+
+        if (this.isRecording) {
+            try { this.recognition?.stop(); } catch (e) {}
+            this.stopVoiceInput();
+        } else {
+            try {
+                if (!this.recognition) this.initSpeechRecognition();
+                this.recognition.lang = (this.currentLang === "bn") ? "bn-BD" : "en-US";
+                this.recognition.start();
+            } catch (err: any) {
+                console.warn("[FarmerBuddy Mic start failed]:", err);
+                this.stopVoiceInput();
+            }
+        }
+    }
+
+    private stopVoiceInput(): void {
+        this.isRecording = false;
+        if (this.micBtn) {
+            this.micBtn.classList.remove("recording");
+            this.micBtn.textContent = "🎙️";
+        }
+        if (this.inputField) {
+            this.inputField.placeholder = this.i18nDict[this.currentLang].inputPlaceholder;
+        }
+    }
+
+    public cleanTextForTTS(raw: string): string {
+        if (!raw) return "";
+        let clean = raw;
+        // Strip HTML tags
+        clean = clean.replace(/<[^>]*>/g, " ");
+        // Strip markdown links [text](url) -> text
+        clean = clean.replace(/\[([^\]]+)\]\([^)]+\)/g, "$1");
+        // Strip bold, italics, code: **, *, _, `
+        clean = clean.replace(/[*_`#]/g, "");
+        // Strip list bullets and symbols: •, -, +, etc.
+        clean = clean.replace(/^[•\-\*+]\s*/gm, "");
+        clean = clean.replace(/[•\-\*+]/g, " ");
+        // Replace dashes / colons with commas for natural voice pauses
+        clean = clean.replace(/[—–]/g, ", ");
+        // Strip emojis
+        clean = clean.replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, "");
+        // Normalize whitespace
+        clean = clean.replace(/\s+/g, " ").trim();
+        return clean;
+    }
+
+    private toggleMessageTTS(text: string, buttonEl: HTMLButtonElement): void {
+        if (typeof window === "undefined" || !('speechSynthesis' in window)) {
+            this.showNonBlockingNotice(
+                (this.currentLang === "bn")
+                    ? "ℹ️ আপনার ব্রাউজারে টেক্সট-টু-স্পিচ (TTS) সমর্থিত নয়।"
+                    : "ℹ️ Text-to-speech is not supported in this browser."
+            );
+            return;
+        }
+
+        const isCurrentlySpeakingThis = buttonEl.classList.contains("speaking");
+
+        window.speechSynthesis.cancel();
+
+        if (this.activeTtsBtn && this.activeTtsBtn !== buttonEl) {
+            this.activeTtsBtn.classList.remove("speaking");
+            const oldIcon = this.activeTtsBtn.querySelector(".tts-icon");
+            const oldText = this.activeTtsBtn.querySelector(".tts-text");
+            if (oldIcon) oldIcon.textContent = "🔊";
+            if (oldText) oldText.textContent = (this.currentLang === "bn") ? "শুনুন" : "Listen";
+        }
+
+        if (isCurrentlySpeakingThis) {
+            buttonEl.classList.remove("speaking");
+            const iconSpan = buttonEl.querySelector(".tts-icon");
+            const textSpan = buttonEl.querySelector(".tts-text");
+            if (iconSpan) iconSpan.textContent = "🔊";
+            if (textSpan) textSpan.textContent = (this.currentLang === "bn") ? "শুনুন" : "Listen";
+            this.activeTtsBtn = null;
+            return;
+        }
+
+        const cleanText = this.cleanTextForTTS(text);
+        if (!cleanText) return;
+
+        const isBn = (this.currentLang === "bn");
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = isBn ? "bn-BD" : "en-US";
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+
+        // Search for regional voices: bn-BD, bn-IN, bn (or en-US, en-GB, en)
+        const voices = window.speechSynthesis.getVoices();
+        if (voices && voices.length > 0) {
+            if (isBn) {
+                const bnVoice = voices.find(v => v.lang === "bn-BD") ||
+                                voices.find(v => v.lang === "bn-IN") ||
+                                voices.find(v => v.lang.startsWith("bn"));
+                if (bnVoice) utterance.voice = bnVoice;
+            } else {
+                const enVoice = voices.find(v => v.lang === "en-US") ||
+                                voices.find(v => v.lang === "en-GB") ||
+                                voices.find(v => v.lang.startsWith("en"));
+                if (enVoice) utterance.voice = enVoice;
+            }
+        }
+
+        const iconSpan = buttonEl.querySelector(".tts-icon");
+        const textSpan = buttonEl.querySelector(".tts-text");
+
+        buttonEl.classList.add("speaking");
+        if (iconSpan) iconSpan.textContent = "⏹️";
+        if (textSpan) textSpan.textContent = isBn ? "থামুন" : "Stop";
+        this.activeTtsBtn = buttonEl;
+
+        utterance.onend = () => {
+            buttonEl.classList.remove("speaking");
+            if (iconSpan) iconSpan.textContent = "🔊";
+            if (textSpan) textSpan.textContent = isBn ? "শুনুন" : "Listen";
+            this.activeTtsBtn = null;
+        };
+
+        utterance.onerror = (e) => {
+            console.warn("[FarmerBuddy TTS error]:", e);
+            buttonEl.classList.remove("speaking");
+            if (iconSpan) iconSpan.textContent = "🔊";
+            if (textSpan) textSpan.textContent = isBn ? "শুনুন" : "Listen";
+            this.activeTtsBtn = null;
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // =========================================================================
+    // 📷 CLIENT-SIDE COMPRESSED IMAGE DIAGNOSIS HELPERS
+    // =========================================================================
+    private handleImageSelect(e: Event): void {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (readerEvent: ProgressEvent<FileReader>) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                if (!ctx) return;
+
+                let width = img.width;
+                let height = img.height;
+                const maxDim = 800;
+
+                if (width > maxDim || height > maxDim) {
+                    if (width > height) {
+                        height = Math.round((height * maxDim) / width);
+                        width = maxDim;
+                    } else {
+                        width = Math.round((width * maxDim) / height);
+                        height = maxDim;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Low-bandwidth high-clarity JPEG compression (0.72 quality)
+                const compressedBase64 = canvas.toDataURL("image/jpeg", 0.72);
+                this.setAttachedImage(compressedBase64);
+            };
+            img.src = readerEvent.target?.result as string;
+        };
+        reader.readAsDataURL(file);
+        (e.target as HTMLInputElement).value = "";
+    }
+
+    private setAttachedImage(dataUrl: string): void {
+        this.attachedImage = dataUrl;
+        if (this.imagePreviewBar && this.previewThumb) {
+            this.previewThumb.src = dataUrl;
+            if (this.previewInfo) {
+                this.previewInfo.textContent = (this.currentLang === "bn")
+                    ? "🌿 পাতার ছবি যুক্ত হয়েছে"
+                    : "🌿 Leaf image attached";
+            }
+            this.imagePreviewBar.style.display = "flex";
+        }
+        this.scrollToBottom();
+    }
+
+    private clearAttachedImage(): void {
+        this.attachedImage = null;
+        if (this.imagePreviewBar) {
+            this.imagePreviewBar.style.display = "none";
+        }
+    }
+
+    private showNonBlockingNotice(text: string): void {
+        const noticeBubble = document.createElement("div");
+        noticeBubble.className = "fb-message msg-system-notice";
+        noticeBubble.innerHTML = `<div class="msg-bubble-wrap"><div class="msg-notice-text">${text}</div></div>`;
+        this.messagesContainer.appendChild(noticeBubble);
+        this.scrollToBottom();
+        setTimeout(() => {
+            noticeBubble.style.transition = "opacity 0.4s ease";
+            noticeBubble.style.opacity = "0";
+            setTimeout(() => noticeBubble.remove(), 400);
+        }, 5000);
     }
 
     public resetConversation(): void {
@@ -1524,10 +2081,16 @@ STRICT RULES FOR EVERY RESPONSE:
             lastBotQuestion: null,
             awaitingSlot: null
         };
+        if (typeof window !== "undefined" && ('speechSynthesis' in window)) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+        this.stopVoiceInput();
+        this.clearAttachedImage();
         sessionStorage.removeItem(this.getStorageKey());
         sessionStorage.removeItem(`${this.storageKeyPrefix}ctx_${this.currentLang}`);
         this.loadSessionMessages();
         this.renderHistory();
+        this.updateLiveSyncBadge();
         console.log("[FarmerBuddy] Conversation context and memory reset.");
     }
 
