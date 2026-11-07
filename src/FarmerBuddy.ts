@@ -275,9 +275,9 @@ export class AgriculturalExpertEngine {
 
             context.awaitingSlot = "age";
             if (isBn) {
-                return `ভাই, আপনার **${cropLabel}** ক্ষেতের জন্য আমি প্রস্তুত!\n\n• **সুষম সার ও সেচ:** চারা রোপণের পর দিন অনুযায়ী সঠিক সার ও সেচের নিয়ম জেনে নিন।\n• **খরচ কমানোর কৌশল:** ট্রাইকো-কম্পোস্ট ও জৈব সারের মাধ্যমে রাসায়নিক সারের খরচ ৩০% কমান।\n• **শস্য পরিক্রমা:** এই ফসলের পর জমিতে কী বুনলে সবচেয়ে বেশি লাভ হবে তা জানুন。\n\nআপনার **${cropLabel}** গাছটির বর্তমান বয়স কত দিন বলুন তো (যেমন ২০ দিন বা ৪০ দিন)?`;
+                return `আসসালামু আলাইকুম ভাই! আপনার **${cropLabel}** ক্ষেতের জন্য আমি প্রস্তুত!\n\n• **সুষম সার ও সেচ:** চারা রোপণের পর দিন অনুযায়ী সঠিক সার ও সেচের নিয়ম জেনে নিন।\n• **খরচ কমানোর কৌশল:** ট্রাইকো-কম্পোস্ট ও জৈব সারের মাধ্যমে রাসায়নিক সারের খরচ ৩০% কমান।\n• **শস্য পরিক্রমা:** এই ফসলের পর জমিতে কী বুনলে সবচেয়ে বেশি লাভ হবে তা জানুন。\n\nআপনার **${cropLabel}** গাছটির বর্তমান বয়স কত দিন বলুন তো (যেমন ২০ দিন বা ৪০ দিন)?`;
             } else {
-                return `Friend, I have locked onto your **${cropLabel}** field!\n\n• **Targeted Fertilization:** Get the exact split dosages of Urea, TSP, and Potash per decimal for this crop.\n• **Cost Reduction:** Cut chemical fertilizer bills by 20-30% using compost and bio-inoculants.\n• **Crop Rotation:** Discover what follow-up crop maximizes annual net returns on this soil.\n\nHow many days old is your **${cropLabel}** crop right now (e.g., 20 or 40 days)?`;
+                return `Hello friend! I have locked onto your **${cropLabel}** field!\n\n• **Targeted Fertilization:** Get the exact split dosages of Urea, TSP, and Potash per decimal for this crop.\n• **Cost Reduction:** Cut chemical fertilizer bills by 20-30% using compost and bio-inoculants.\n• **Crop Rotation:** Discover what follow-up crop maximizes annual net returns on this soil.\n\nHow many days old is your **${cropLabel}** crop right now (e.g., 20 or 40 days)?`;
             }
         }
 
@@ -386,45 +386,45 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
         if (crop === "tomato") {
             if (age <= 25) {
                 return isBn
-                    ? `ভাই! **২০-২৫ দিন** বয়সে টমেটো গাছ দ্রুত শিকড় ও ডালপালা ছড়ায় (চারা বৃদ্ধি পর্যায়)। এই সময় করণীয়:\n\n• **প্রথম কিস্তির উপরি-প্রয়োগ:** প্রতি শতাংশে (Decimal) ১৫০ গ্রাম ইউরিয়া এবং ১৫০ গ্রাম এমওপি (পটাশ) সার গাছের গোড়া থেকে ৫-৬ ইঞ্চি দূরে মাটিতে আলতো নিড়ানি দিয়ে মিশিয়ে দিন।\n• **খুঁটি বা সাপোর্ট (Staking):** গাছ যাতে বাতাসে হেলে না পড়ে বা মাটিতে হেলে না যায়, সেজন্য বাঁশের কঞ্চি দিয়ে আলতো করে বেঁধে দিন।\n• **কাটুই পোকা ও গোড়া পচা নজরদারি:** সকালে কোনো চারা কাটা দেখলে মাটি খুঁড়ে কাটুই পোকা নিধন করুন এবং গোড়ায় যেন পানি জমে না থাকে তা নিশ্চিত করুন।\n\nসার প্রয়োগের পর মাটিতে রস না থাকলে হালকা সেচ দিন। আপনার জমিতে মাটি কি যথেষ্ট ভেজা আছে?`
-                    : `Friend! At **${age} days**, your tomato plants are in their active vegetative branching stage. Here is your targeted plan:\n\n• **First Top Dressing:** Apply 150g Urea and 150g MoP (Potash) per decimal in a ring 5-6 inches away from stems; gently incorporate into soil.\n• **Staking & Support:** Install bamboo stakes or twine supports now to prevent lodging and keep foliage off wet soil.\n• **Cutworm Vigilance:** Inspect soil around any severed seedlings at dawn to remove cutworms manually.\n\nEnsure light soil moisture after fertilizing. Does your field have adequate moisture right now?`;
+                    ? `আসসালামু আলাইকুম ভাই! **২০-২৫ দিন** বয়সে টমেটো গাছ দ্রুত শিকড় ও ডালপালা ছড়ায় (চারা বৃদ্ধি পর্যায়)। এই সময় করণীয়:\n\n• **প্রথম কিস্তির উপরি-প্রয়োগ:** প্রতি শতাংশে (Decimal) ১৫০ গ্রাম ইউরিয়া এবং ১৫০ গ্রাম এমওপি (পটাশ) সার গাছের গোড়া থেকে ৫-৬ ইঞ্চি দূরে মাটিতে আলতো নিড়ানি দিয়ে মিশিয়ে দিন।\n• **খুঁটি বা সাপোর্ট (Staking):** গাছ যাতে বাতাসে হেলে না পড়ে বা মাটিতে হেলে না যায়, সেজন্য বাঁশের কঞ্চি দিয়ে আলতো করে বেঁধে দিন।\n• **কাটুই পোকা ও গোড়া পচা নজরদারি:** সকালে কোনো চারা কাটা দেখলে মাটি খুঁড়ে কাটুই পোকা নিধন করুন এবং গোড়ায় যেন পানি জমে না থাকে তা নিশ্চিত করুন।\n\nসার প্রয়োগের পর মাটিতে রস না থাকলে হালকা সেচ দিন। আপনার জমিতে মাটি কি যথেষ্ট ভেজা আছে?`
+                    : `Hello friend! At **${age} days**, your tomato plants are in their active vegetative branching stage. Here is your targeted plan:\n\n• **First Top Dressing:** Apply 150g Urea and 150g MoP (Potash) per decimal in a ring 5-6 inches away from stems; gently incorporate into soil.\n• **Staking & Support:** Install bamboo stakes or twine supports now to prevent lodging and keep foliage off wet soil.\n• **Cutworm Vigilance:** Inspect soil around any severed seedlings at dawn to remove cutworms manually.\n\nEnsure light soil moisture after fertilizing. Does your field have adequate moisture right now?`;
             } else if (age <= 50) {
                 return isBn
-                    ? `আরে ভাই! **${age} দিন** বয়সে টমেটো গাছে ফুল ফোটা এবং ফল ধরার সবচেয়ে গুরুত্বপূর্ণ পর্যায় শুরু হয়! এই সময় সঠিক খাদ্য নিশ্চিত না করলে ফুল ঝরে যেতে পারে:\n\n• **দ্বিতীয় কিস্তির সার:** প্রতি শতাংশে ২০০ গ্রাম ইউরিয়া এবং ২৫০ গ্রাম এমওপি (পটাশ) গাছের গোড়ার চারধারে ছড়িয়ে হালকা নিড়ানি দিন।\n• **বোরন ও জিংক স্প্রে (ফুল ঝরা রোধে):** ফুল ঝরে পড়া ঠেকাতে এবং ফলের তলা পচা রোধে প্রতি লিটার পানিতে ২ গ্রাম 'সলুবর বোরন' ও ১ গ্রাম চিলেটেড জিংক মিশিয়ে বিকেলে পাতার নিচে ও উপরে স্প্রে করুন।\n• **কুশি ছাঁটাই (Pruning):** গাছের গোড়ার দিকের পুরনো হলুদ পাতা ও অতিরিক্ত ডালপালা (suckers) কেটে দিন যাতে ফল বড় হওয়ার পর্যাপ্ত খাদ্য পায়।\n• **নিয়মিত হালকা সেচ:** মাটিতে যেন সব সময় জো (রস) থাকে; হঠাৎ শুকিয়ে অতিরিক্ত পানি দিলে টমেটো ফেটে যায়।\n\nগাছের পাতায় কি কোনো কুঁকড়ে যাওয়া বা পোকার আক্রমণ দেখতে পাচ্ছেন?`
-                    : `Friend! At **${age} days**, your tomato plants are in their golden flowering and early fruit-setting stage! Proper nutrition is vital to prevent blossom drop:\n\n• **Second Top Dressing:** Apply 200g Urea and 250g MoP (Potash) per decimal around plant driplines and lightly incorporate.\n• **Solubor Boron Spray:** Spray Solubor Boron at 2g/liter of water in late afternoon to stop blossom abortion and prevent Blossom End Rot.\n• **Sucker Pruning:** Prune bottom suckers and yellowing foliage to enhance sunlight penetration and redirect sugars into developing fruit clusters.\n• **Steady Irrigation:** Maintain uniform soil moisture; avoid fluctuating between dry periods and flooding, which causes fruit cracking.\n\nAre you noticing any curled leaves or spotted fruit clusters on your tomato plants?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে টমেটো গাছে ফুল ফোটা এবং ফল ধরার সবচেয়ে গুরুত্বপূর্ণ পর্যায় শুরু হয়! এই সময় সঠিক খাদ্য নিশ্চিত না করলে ফুল ঝরে যেতে পারে:\n\n• **দ্বিতীয় কিস্তির সার:** প্রতি শতাংশে ২০০ গ্রাম ইউরিয়া এবং ২৫০ গ্রাম এমওপি (পটাশ) গাছের গোড়ার চারধারে ছড়িয়ে হালকা নিড়ানি দিন।\n• **বোরন ও জিংক স্প্রে (ফুল ঝরা রোধে):** ফুল ঝরে পড়া ঠেকাতে এবং ফলের তলা পচা রোধে প্রতি লিটার পানিতে ২ গ্রাম 'সলুবর বোরন' ও ১ গ্রাম চিলেটেড জিংক মিশিয়ে বিকেলে পাতার নিচে ও উপরে স্প্রে করুন।\n• **কুশি ছাঁটাই (Pruning):** গাছের গোড়ার দিকের পুরনো হলুদ পাতা ও অতিরিক্ত ডালপালা (suckers) কেটে দিন যাতে ফল বড় হওয়ার পর্যাপ্ত খাদ্য পায়।\n• **নিয়মিত হালকা সেচ:** মাটিতে যেন সব সময় জো (রস) থাকে; হঠাৎ শুকিয়ে অতিরিক্ত পানি দিলে টমেটো ফেটে যায়।\n\nগাছের পাতায় কি কোনো কুঁকড়ে যাওয়া বা পোকার আক্রমণ দেখতে পাচ্ছেন?`
+                    : `Hello friend! At **${age} days**, your tomato plants are in their golden flowering and early fruit-setting stage! Proper nutrition is vital to prevent blossom drop:\n\n• **Second Top Dressing:** Apply 200g Urea and 250g MoP (Potash) per decimal around plant driplines and lightly incorporate.\n• **Solubor Boron Spray:** Spray Solubor Boron at 2g/liter of water in late afternoon to stop blossom abortion and prevent Blossom End Rot.\n• **Sucker Pruning:** Prune bottom suckers and yellowing foliage to enhance sunlight penetration and redirect sugars into developing fruit clusters.\n• **Steady Irrigation:** Maintain uniform soil moisture; avoid fluctuating between dry periods and flooding, which causes fruit cracking.\n\nAre you noticing any curled leaves or spotted fruit clusters on your tomato plants?`;
             } else {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে টমেটো ফল পরিপক্ক ও পাকা শুরু করে:\n\n• **পটাশ সার প্রয়োগ:** ফলের আকার বড়, চকচকে ও মিষ্টি করতে প্রতি শতাংশে ১৫০ গ্রাম পটাশ সার দিন।\n• **ফল ছিদ্রকারী পোকা দমন:** টমেটোতে ছিদ্র করা পোকা দমনে জমিতে সেক্স ফেরোমোন ফাঁদ (প্রতি বিঘাতে ১০-১২টি) পাতুন এবং প্রয়োজনে জৈব স্পিনোসাড স্প্রে করুন।\n• **তুলে নেওয়ার নিয়ম:** আড়তে বা বাজারে পাঠাতে চাইলে লাল হওয়ার ঠিক আগের দিন (ব্রেক স্টেজ) বোঁটা সহ সাবধানে তুলুন।\n\nআপনি কি পাকা টমেটো স্থানীয় বাজারে নাকি পাইকারি আড়তে বিক্রির পরিকল্পনা করছেন?`
-                    : `Friend! At **${age} days**, your tomatoes are in their heavy fruit bulking and ripening phase:\n\n• **Potash Application:** Apply 150g Potash per decimal to maximize fruit size, firmness, and shelf-life.\n• **Fruit Borer Control:** Erect sex pheromone traps (10-12 per bigha) for Helicoverpa armigera. Spray Spinosad (0.4 ml/L) if larvae are spotted.\n• **Harvest Timing:** Pick fruit at the mature green/breaker stage for long-distance wholesale transport to avoid transit bruising.\n\nAre you planning to sell your harvest locally or send it to regional wholesale markets?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে টমেটো ফল পরিপক্ক ও পাকা শুরু করে:\n\n• **পটাশ সার প্রয়োগ:** ফলের আকার বড়, চকচকে ও মিষ্টি করতে প্রতি শতাংশে ১৫০ গ্রাম পটাশ সার দিন।\n• **ফল ছিদ্রকারী পোকা দমন:** টমেটোতে ছিদ্র করা পোকা দমনে জমিতে সেক্স ফেরোমোন ফাঁদ (প্রতি বিঘাতে ১০-১২টি) পাতুন এবং প্রয়োজনে জৈব স্পিনোসাড স্প্রে করুন।\n• **তুলে নেওয়ার নিয়ম:** আড়তে বা বাজারে পাঠাতে চাইলে লাল হওয়ার ঠিক আগের দিন (ব্রেক স্টেজ) বোঁটা সহ সাবধানে তুলুন।\n\nআপনি কি পাকা টমেটো স্থানীয় বাজারে নাকি পাইকারি আড়তে বিক্রির পরিকল্পনা করছেন?`
+                    : `Hello friend! At **${age} days**, your tomatoes are in their heavy fruit bulking and ripening phase:\n\n• **Potash Application:** Apply 150g Potash per decimal to maximize fruit size, firmness, and shelf-life.\n• **Fruit Borer Control:** Erect sex pheromone traps (10-12 per bigha) for Helicoverpa armigera. Spray Spinosad (0.4 ml/L) if larvae are spotted.\n• **Harvest Timing:** Pick fruit at the mature green/breaker stage for long-distance wholesale transport to avoid transit bruising.\n\nAre you planning to sell your harvest locally or send it to regional wholesale markets?`;
             }
         } else if (crop === "rice") {
             if (age <= 25) {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে ধান গাছের কুশি আসার (Tillering) অত্যন্ত গুরুত্বপূর্ণ সময়। এই সময় যত বেশি কুশি গজাবে, ফলন তত বেশি হবে!\n\n• **প্রথম কিস্তির ইউরিয়া ও পটাশ:** প্রতি শতাংশে ২০০-২৫০ গ্রাম ইউরিয়া এবং ১০০ গ্রাম এমওপি (পটাশ) সার জমিতে সমানভাবে ছিটান।\n• **পানির মাত্রা:** জমিতে ১ থেকে ২ ইঞ্চি ছিপছিপে পানি রাখুন; অতিরিক্ত পানি জমিয়ে রাখলে কুশির সংখ্যা কমে যায়।\n• **মাজরা পোকা নজরদারি:** ধানের পাতার মাঝে মরা কুশি দেখলে বাঁশের ডাল পুঁতে দিন (পাখি বসার জন্য) অথবা আলোর ফাঁদ ব্যবহার করুন।\n• **আগাছা নিড়ানো:** সার দেওয়ার আগে জমি থেকে আগাছা সম্পূর্ণ পরিষ্কার করে নিন।\n\nআপনার ধানক্ষেতে কি বর্তমানে আগাছা বা মরা কুশির লক্ষণ দেখতে পাচ্ছেন?`
-                    : `Friend! At **${age} days**, your rice crop is in its critical active tillering phase. Every healthy tiller means an extra grain panicle!\n\n• **First Top Dressing:** Broadcast 200-250g Urea and 100g MoP (Potash) per decimal evenly across the field.\n• **Water Depth Control:** Maintain shallow water depth (1-2 inches); deep standing water suppresses tiller emergence.\n• **Stem Borer Defense:** Watch for "dead hearts". Install bamboo perches for predatory birds and light traps for borer moths.\n• **Weeding:** Thoroughly weed the paddies before broadcasting fertilizer.\n\nAre your drainage and shallow water levels properly balanced in the field?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে ধান গাছের কুশি আসার (Tillering) অত্যন্ত গুরুত্বপূর্ণ সময়। এই সময় যত বেশি কুশি গজাবে, ফলন তত বেশি হবে!\n\n• **প্রথম কিস্তির ইউরিয়া ও পটাশ:** প্রতি শতাংশে ২০০-২৫০ গ্রাম ইউরিয়া এবং ১০০ গ্রাম এমওপি (পটাশ) সার জমিতে সমানভাবে ছিটান।\n• **পানির মাত্রা:** জমিতে ১ থেকে ২ ইঞ্চি ছিপছিপে পানি রাখুন; অতিরিক্ত পানি জমিয়ে রাখলে কুশির সংখ্যা কমে যায়।\n• **মাজরা পোকা নজরদারি:** ধানের পাতার মাঝে মরা কুশি দেখলে বাঁশের ডাল পুঁতে দিন (পাখি বসার জন্য) অথবা আলোর ফাঁদ ব্যবহার করুন।\n• **আগাছা নিড়ানো:** সার দেওয়ার আগে জমি থেকে আগাছা সম্পূর্ণ পরিষ্কার করে নিন।\n\nআপনার ধানক্ষেতে কি বর্তমানে আগাছা বা মরা কুশির লক্ষণ দেখতে পাচ্ছেন?`
+                    : `Hello friend! At **${age} days**, your rice crop is in its critical active tillering phase. Every healthy tiller means an extra grain panicle!\n\n• **First Top Dressing:** Broadcast 200-250g Urea and 100g MoP (Potash) per decimal evenly across the field.\n• **Water Depth Control:** Maintain shallow water depth (1-2 inches); deep standing water suppresses tiller emergence.\n• **Stem Borer Defense:** Watch for "dead hearts". Install bamboo perches for predatory birds and light traps for borer moths.\n• **Weeding:** Thoroughly weed the paddies before broadcasting fertilizer.\n\nAre your drainage and shallow water levels properly balanced in the field?`;
             } else if (age <= 55) {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে ধান গাছ থোড় বা গর্ভধারণ (Panicle Initiation) অবস্থায় প্রবেশ করে। শীষ পরিপুষ্ট করতে করণীয়:\n\n• **শেষ কিস্তির ইউরিয়া:** প্রতি শতাংশে ১৫০ গ্রাম ইউরিয়া প্রয়োগ করুন। তবে পাতার রঙ যদি আগেই গাঢ় সবুজ থাকে তবে ইউরিয়া বাদ দিন।\n• **পটাশ ও সালফার স্প্রে:** দানা পুষ্ট ও চিটা রোধে প্রতি শতাংশে ১০০ গ্রাম পটাশ সার দিন অথবা ১% পটাশিয়াম সালফেট স্প্রে করুন।\n• **পানির স্তর বজায় রাখা:** এই সময় জমিতে অবশ্যই ২-৩ ইঞ্চি পানি ধরে রাখতে হবে; কোনোভাবেই এই দশায় জমি শুকানো যাবে না।\n• **বাদামি ঘাসফড়িং (কারেন্ট পোকা) পরীক্ষা:** ধানের গোড়া ফাঁক করে দেখুন কোনো পোকা আছে কিনা।\n\nজমিতে কি পানি পর্যাপ্ত ধরে রাখা সম্ভব হচ্ছে?`
-                    : `Friend! At **${age} days**, your paddy is entering the panicle initiation and booting stage:\n\n• **Final Urea Split:** Apply 150g Urea per decimal only if foliage is pale green; omit if already deep emerald.\n• **Potash for Grain Filling:** Apply 100g Potash per decimal to prevent unfilled empty grains (chita) and strengthen straw.\n• **Critical Moisture Level:** Maintain continuous 2-3 inches of standing water; water stress at this stage severely reduces yield.\n• **Brown Planthopper (BPH) Scout:** Part the bottom tillers to inspect for planthoppers near the water surface.\n\nAre your paddy bunds holding standing water securely?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে ধান গাছ থোড় বা গর্ভধারণ (Panicle Initiation) অবস্থায় প্রবেশ করে। শীষ পরিপুষ্ট করতে করণীয়:\n\n• **শেষ কিস্তির ইউরিয়া:** প্রতি শতাংশে ১৫০ গ্রাম ইউরিয়া প্রয়োগ করুন। তবে পাতার রঙ যদি আগেই গাঢ় সবুজ থাকে তবে ইউরিয়া বাদ দিন।\n• **পটাশ ও সালফার স্প্রে:** দানা পুষ্ট ও চিটা রোধে প্রতি শতাংশে ১০০ গ্রাম পটাশ সার দিন অথবা ১% পটাশিয়াম সালফেট স্প্রে করুন।\n• **পানির স্তর বজায় রাখা:** এই সময় জমিতে অবশ্যই ২-৩ ইঞ্চি পানি ধরে রাখতে হবে; কোনোভাবেই এই দশায় জমি শুকানো যাবে না।\n• **বাদামি ঘাসফড়িং (কারেন্ট পোকা) পরীক্ষা:** ধানের গোড়া ফাঁক করে দেখুন কোনো পোকা আছে কিনা।\n\nজমিতে কি পানি পর্যাপ্ত ধরে রাখা সম্ভব হচ্ছে?`
+                    : `Hello friend! At **${age} days**, your paddy is entering the panicle initiation and booting stage:\n\n• **Final Urea Split:** Apply 150g Urea per decimal only if foliage is pale green; omit if already deep emerald.\n• **Potash for Grain Filling:** Apply 100g Potash per decimal to prevent unfilled empty grains (chita) and strengthen straw.\n• **Critical Moisture Level:** Maintain continuous 2-3 inches of standing water; water stress at this stage severely reduces yield.\n• **Brown Planthopper (BPH) Scout:** Part the bottom tillers to inspect for planthoppers near the water surface.\n\nAre your paddy bunds holding standing water securely?`;
             } else {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে ধান পাকা শুরু করেছে (দানা শক্ত হওয়ার পর্যায়):\n\n• **পানি নিষ্কাশন:** ফসল কাটার ১০-১২ দিন আগে জমির সম্পূর্ণ পানি বের করে জমি শুকিয়ে দিন। এতে ধান সহজে পাকবে ও কাটার সুবিধা হবে।\n• **শীষ কাটার পোকা ও ইঁদুর দমন:** ধান হেলে পড়া রোধ করুন এবং জমির চারধারে পরিষ্কার পরিচ্ছন্ন রাখুন।\n• **সঠিক সময়ে কর্তন:** শীষের শতকরা ৮০ ভাগ ধান সোনালী রঙ ধারণ করলে আর দেরি না করে ধান কেটে ফেলুন।\n\nফসল মাড়াই ও শুকানোর জন্য কি চাতাল বা ত্রিপল প্রস্তুত আছে?`
-                    : `Friend! At **${age} days**, your rice is ripening towards full golden grain maturity:\n\n• **Field Drainage:** Drain all standing water from paddies 10-12 days before anticipated harvest to harden the soil.\n• **Harvest Threshold:** Harvest promptly when 80% of panicle grains have turned golden-straw color to prevent shattering loss.\n• **Post-Harvest Drying:** Dry threshed paddy for 2-3 full sunny days until seed moisture reaches 12-14%.\n\nDo you have drying tarps or storage drums ready for the upcoming harvest?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে ধান পাকা শুরু করেছে (দানা শক্ত হওয়ার পর্যায়):\n\n• **পানি নিষ্কাশন:** ফসল কাটার ১০-১২ দিন আগে জমির সম্পূর্ণ পানি বের করে জমি শুকিয়ে দিন। এতে ধান সহজে পাকবে ও কাটার সুবিধা হবে।\n• **শীষ কাটার পোকা ও ইঁদুর দমন:** ধান হেলে পড়া রোধ করুন এবং জমির চারধারে পরিষ্কার পরিচ্ছন্ন রাখুন।\n• **সঠিক সময়ে কর্তন:** শীষের শতকরা ৮০ ভাগ ধান সোনালী রঙ ধারণ করলে আর দেরি না করে ধান কেটে ফেলুন।\n\nফসল মাড়াই ও শুকানোর জন্য কি চাতাল বা ত্রিপল প্রস্তুত আছে?`
+                    : `Hello friend! At **${age} days**, your rice is ripening towards full golden grain maturity:\n\n• **Field Drainage:** Drain all standing water from paddies 10-12 days before anticipated harvest to harden the soil.\n• **Harvest Threshold:** Harvest promptly when 80% of panicle grains have turned golden-straw color to prevent shattering loss.\n• **Post-Harvest Drying:** Dry threshed paddy for 2-3 full sunny days until seed moisture reaches 12-14%.\n\nDo you have drying tarps or storage drums ready for the upcoming harvest?`;
             }
         } else if (crop === "potato") {
             if (age <= 30) {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে আলু গাছের গোড়ায় মাটি তোলা (Earthing up) এবং প্রথম উপরি-প্রয়োগের আসল সময়:\n\n• **প্রথম উপরি-প্রয়োগ:** প্রতি শতাংশে ২৫০ গ্রাম ইউরিয়া এবং ২০০ গ্রাম পটাশ দুই সারির মাঝে ছড়িয়ে নিড়ানি দিয়ে গোড়ায় মাটি তুলে ঢিবি বানিয়ে দিন।\n• **হালকা সেচ:** মাটি তোলার পর আলতো সেচ দিন যাতে ঢিবির দুই-তৃতীয়াংশ ভেজে, কিন্তু উপরে পানি না ওঠে।\n• **কাটুই পোকা দমন:** মাটি খুঁড়ে চারা কেটে দেওয়া পোকা দেখলে সকালে হাত দিয়ে সংগ্রহ করুন বা ক্লোরপাইরিফস গ্রুপের অনুমোদিত ব্যবস্থা নিন।\n\nআপনার আলু ক্ষেতে মাটি কি শুকিয়ে শক্ত হয়ে গেছে?`
-                    : `Friend! At **${age} days**, it is time for the crucial first earthing-up and top dressing on your potato rows:\n\n• **Top Dressing:** Apply 250g Urea and 200g Potash per decimal between plant rows, then mound loose soil up around the stems.\n• **Furrow Irrigation:** Irrigate gently so water fills two-thirds of the furrow depth without submerging ridge tops.\n• **Cutworm Check:** Dig gently near severed shoots at dawn to capture and destroy cutworm larvae.\n\nIs your soil soft and ridge-ready for mounding?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে আলু গাছের গোড়ায় মাটি তোলা (Earthing up) এবং প্রথম উপরি-প্রয়োগের আসল সময়:\n\n• **প্রথম উপরি-প্রয়োগ:** প্রতি শতাংশে ২৫০ গ্রাম ইউরিয়া এবং ২০০ গ্রাম পটাশ দুই সারির মাঝে ছড়িয়ে নিড়ানি দিয়ে গোড়ায় মাটি তুলে ঢিবি বানিয়ে দিন।\n• **হালকা সেচ:** মাটি তোলার পর আলতো সেচ দিন যাতে ঢিবির দুই-তৃতীয়াংশ ভেজে, কিন্তু উপরে পানি না ওঠে।\n• **কাটুই পোকা দমন:** মাটি খুঁড়ে চারা কেটে দেওয়া পোকা দেখলে সকালে হাত দিয়ে সংগ্রহ করুন বা ক্লোরপাইরিফস গ্রুপের অনুমোদিত ব্যবস্থা নিন।\n\nআপনার আলু ক্ষেতে মাটি কি শুকিয়ে শক্ত হয়ে গেছে?`
+                    : `Hello friend! At **${age} days**, it is time for the crucial first earthing-up and top dressing on your potato rows:\n\n• **Top Dressing:** Apply 250g Urea and 200g Potash per decimal between plant rows, then mound loose soil up around the stems.\n• **Furrow Irrigation:** Irrigate gently so water fills two-thirds of the furrow depth without submerging ridge tops.\n• **Cutworm Check:** Dig gently near severed shoots at dawn to capture and destroy cutworm larvae.\n\nIs your soil soft and ridge-ready for mounding?`;
             } else {
                 return isBn
-                    ? `ভাই! **${age} দিন** বয়সে আলুর টিউবার বা আলু মাটির নিচে দ্রুত বড় হতে থাকে (Tuber Bulking Stage)। এ সময় সর্বোচ্চ সতর্কতার সাথে করণীয়:\n\n• **নাবি ধসা (Late Blight) আগাম স্প্রে:** কুয়াশা বা মেঘলা আবহাওয়া থাকলে নাবি ধসা রোধে প্রতি লিটার পানিতে ২ গ্রাম ম্যানকোজেব (যেমন ডাইথেন এম-৪৫) অথবা রিডোমিল গোল্ড স্প্রে করে পুরো পাতা ভিজিয়ে দিন।\n• **দ্বিতীয় কিস্তির পটাশ:** আলুর আকার বড় ও খোসা শক্ত করতে প্রতি শতাংশে ১৫০ গ্রাম পটাশ সার দিয়ে হালকা সেচ দিন।\n• **আলু ঢেকে রাখা:** কোনো আলু মাটির বাইরে এসে সবুজ হয়ে গেলে দ্রুত মাটি দিয়ে ঢেকে দিন।\n\nসকালে কি আপনার এলাকায় কুয়াশা বা গুঁড়ি গুঁড়ি বৃষ্টি হচ্ছে?`
-                    : `Friend! At **${age} days**, your potatoes are in their rapid tuber expansion phase:\n\n• **Late Blight Preventive Spray:** Foggy, overcast weather triggers devastating Late Blight. Spray Mancozeb (2g/L) or Ridomil Gold to coat foliage thoroughly.\n• **Potash for Tuber Weight:** Apply 150g Potash per decimal to maximize tuber grade size and skin firmness.\n• **Cover Green Tubers:** Mound soil over any tubers exposed to sunlight to prevent toxic solanine greening.\n\nIs your area experiencing persistent heavy fog or cool damp mornings?`;
+                    ? `আসসালামু আলাইকুম ভাই! **${age} দিন** বয়সে আলুর টিউবার বা আলু মাটির নিচে দ্রুত বড় হতে থাকে (Tuber Bulking Stage)। এ সময় সর্বোচ্চ সতর্কতার সাথে করণীয়:\n\n• **নাবি ধসা (Late Blight) আগাম স্প্রে:** কুয়াশা বা মেঘলা আবহাওয়া থাকলে নাবি ধসা রোধে প্রতি লিটার পানিতে ২ গ্রাম ম্যানকোজেব (যেমন ডাইথেন এম-৪৫) অথবা রিডোমিল গোল্ড স্প্রে করে পুরো পাতা ভিজিয়ে দিন।\n• **দ্বিতীয় কিস্তির পটাশ:** আলুর আকার বড় ও খোসা শক্ত করতে প্রতি শতাংশে ১৫০ গ্রাম পটাশ সার দিয়ে হালকা সেচ দিন।\n• **আলু ঢেকে রাখা:** কোনো আলু মাটির বাইরে এসে সবুজ হয়ে গেলে দ্রুত মাটি দিয়ে ঢেকে দিন।\n\nসকালে কি আপনার এলাকায় কুয়াশা বা গুঁড়ি গুঁড়ি বৃষ্টি হচ্ছে?`
+                    : `Hello friend! At **${age} days**, your potatoes are in their rapid tuber expansion phase:\n\n• **Late Blight Preventive Spray:** Foggy, overcast weather triggers devastating Late Blight. Spray Mancozeb (2g/L) or Ridomil Gold to coat foliage thoroughly.\n• **Potash for Tuber Weight:** Apply 150g Potash per decimal to maximize tuber grade size and skin firmness.\n• **Cover Green Tubers:** Mound soil over any tubers exposed to sunlight to prevent toxic solanine greening.\n\nIs your area experiencing persistent heavy fog or cool damp mornings?`;
             }
         } else {
             return isBn
-                ? `ভাই! আপনার **${crop}** ফসলের **${age} দিন** বয়সের জন্য পরামর্শ:\n\n• **সুষম সার উপরি-প্রয়োগ:** এই বয়সে গাছের বর্ধনশীল শাখার জন্য প্রতি শতাংশে ১৫০-২০০ গ্রাম ইউরিয়া এবং ১৫০ গ্রাম পটাশ গাছের গোড়া থেকে কিছুটা দূরে দিন।\n• **মাটির রস ও সেচ:** সার দেওয়ার পর হালকা সেচ দিন, যেন মাটি ভেজা থাকে কিন্তু গোড়ায় পানি না জমে।\n• **বালাই নজরদারি:** ডালপালা ও পাতার নিচে কোনো পোকা বা দাগ আছে কিনা নিবিড়ভাবে পরীক্ষা করুন।\n\nআপনার ফসলের পাতায় কি কোনো অস্বাভাবিক দাগ বা পোকা চোখে পড়েছে?`
-                : `Friend! For your **${crop}** at **${age} days**:\n\n• **Top Dressing:** Apply 150-200g Urea and 150g Potash per decimal away from root crowns.\n• **Moisture Management:** Provide light irrigation after fertilizing; ensure no standing water suffocates roots.\n• **Foliage Inspection:** Check undersides of leaves for sucking pests or fungal lesions.\n\nAre you noticing any signs of stress or discolored leaves on your crop?`;
+                ? `আসসালামু আলাইকুম ভাই! আপনার **${crop}** ফসলের **${age} দিন** বয়সের জন্য পরামর্শ:\n\n• **সুষম সার উপরি-প্রয়োগ:** এই বয়সে গাছের বর্ধনশীল শাখার জন্য প্রতি শতাংশে ১৫০-২০০ গ্রাম ইউরিয়া এবং ১৫০ গ্রাম পটাশ গাছের গোড়া থেকে কিছুটা দূরে দিন।\n• **মাটির রস ও সেচ:** সার দেওয়ার পর হালকা সেচ দিন, যেন মাটি ভেজা থাকে কিন্তু গোড়ায় পানি না জমে।\n• **বালাই নজরদারি:** ডালপালা ও পাতার নিচে কোনো পোকা বা দাগ আছে কিনা নিবিড়ভাবে পরীক্ষা করুন।\n\nআপনার ফসলের পাতায় কি কোনো অস্বাভাবিক দাগ বা পোকা চোখে পড়েছে?`
+                : `Hello friend! For your **${crop}** at **${age} days**:\n\n• **Top Dressing:** Apply 150-200g Urea and 150g Potash per decimal away from root crowns.\n• **Moisture Management:** Provide light irrigation after fertilizing; ensure no standing water suffocates roots.\n• **Foliage Inspection:** Check undersides of leaves for sucking pests or fungal lesions.\n\nAre you noticing any signs of stress or discolored leaves on your crop?`;
         }
     }
 
@@ -433,8 +433,8 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
         const label = isBn ? cropNames.bn : cropNames.en;
 
         return isBn
-            ? `ভাই, **${label}** ফসলে সর্বোচ্চ ফলন পেতে ও খরচ কমাতে সুষম সারের সাশ্রয়ী নিয়মাবলী:\n\n• **জমি তৈরির সময় (Basal Dose প্রতি শতাংশে):**\n  - গোবর বা ট্রাইকো-কম্পোস্ট: ১৫-২০ কেজি (এটি রাসায়নিক সারের খরচ ৩০% কমায়)\n  - টিএসপি (TSP) বা ডিএপি: ৪০০ গ্রাম\n  - এমওপি (পটাশ): ২৫০ গ্রাম\n  - জিপসাম: ২০০ গ্রাম ও জিংক সালফেট: ৫০ গ্রাম\n• **প্রথম উপরি-প্রয়োগ (রোপণের ২০-২৫ দিন পর):**\n  - ইউরিয়া: ২০০ গ্রাম ও পটাশ: ১০০ গ্রাম (গোড়া থেকে দূরে দিয়ে মাটি আলগা করুন)\n• **দ্বিতীয় উপরি-প্রয়োগ (ফুল/কুশি আসার সময় - ৪০-৪৫ দিন):**\n  - ইউরিয়া: ১৫০ গ্রাম ও পটাশ: ১৫০ গ্রাম + ফুল ঝরা রোধে বোরন স্প্রে\n\nভাই, আপনার **${label}** গাছটির বয়স বর্তমানে কত দিন বলুন তো?`
-            : `Friend, here is the balanced, cost-minimized fertilizer plan for **${label}**:\n\n• **Basal Application (Per Decimal during final plowing):**\n  - Decomposed Manure/Trichoderma Compost: 15-20 kg (Reduces chemical fertilizer costs by 20-30%)\n  - TSP / DAP: 400g\n  - MoP (Potash): 250g\n  - Gypsum: 200g & Zinc Sulphate: 50g\n• **1st Top Dressing (20-25 days after transplant):**\n  - Urea: 200g & Potash: 100g incorporated away from root crowns.\n• **2nd Top Dressing (Flowering/Booting stage - 40-45 days):**\n  - Urea: 150g & Potash: 150g + Solubor Boron foliar spray (2g/L).\n\nCould you share how many days old your **${label}** crop currently is?`;
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলে সর্বোচ্চ ফলন পেতে ও খরচ কমাতে সুষম সারের সাশ্রয়ী নিয়মাবলী:\n\n• **জমি তৈরির সময় (Basal Dose প্রতি শতাংশে):**\n  - গোবর বা ট্রাইকো-কম্পোস্ট: ১৫-২০ কেজি (এটি রাসায়নিক সারের খরচ ৩০% কমায়)\n  - টিএসপি (TSP) বা ডিএপি: ৪০০ গ্রাম\n  - এমওপি (পটাশ): ২৫০ গ্রাম\n  - জিপসাম: ২০০ গ্রাম ও জিংক সালফেট: ৫০ গ্রাম\n• **প্রথম উপরি-প্রয়োগ (রোপণের ২০-২৫ দিন পর):**\n  - ইউরিয়া: ২০০ গ্রাম ও পটাশ: ১০০ গ্রাম (গোড়া থেকে দূরে দিয়ে মাটি আলগা করুন)\n• **দ্বিতীয় উপরি-প্রয়োগ (ফুল/কুশি আসার সময় - ৪০-৪৫ দিন):**\n  - ইউরিয়া: ১৫০ গ্রাম ও পটাশ: ১৫০ গ্রাম + ফুল ঝরা রোধে বোরন স্প্রে\n\nভাই, আপনার **${label}** গাছটির বয়স বর্তমানে কত দিন বলুন তো?`
+            : `Hello friend! Here is the balanced, cost-minimized fertilizer plan for **${label}**:\n\n• **Basal Application (Per Decimal during final plowing):**\n  - Decomposed Manure/Trichoderma Compost: 15-20 kg (Reduces chemical fertilizer costs by 20-30%)\n  - TSP / DAP: 400g\n  - MoP (Potash): 250g\n  - Gypsum: 200g & Zinc Sulphate: 50g\n• **1st Top Dressing (20-25 days after transplant):**\n  - Urea: 200g & Potash: 100g incorporated away from root crowns.\n• **2nd Top Dressing (Flowering/Booting stage - 40-45 days):**\n  - Urea: 150g & Potash: 150g + Solubor Boron foliar spray (2g/L).\n\nCould you share how many days old your **${label}** crop currently is?`;
     }
 
     public generateCropPestGuidance(crop: string, isBn: boolean): string {
@@ -442,8 +442,8 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
         const label = isBn ? cropNames.bn : cropNames.en;
 
         return isBn
-            ? `ভাই! **${label}** ফসলে প্রধান ক্ষতিকর পোকা ও রোগ দমনে সাশ্রয়ী পদক্ষেপ:\n\n• **চোষক পোকা ও সাদা মাছি:** প্রতি লিটার পানিতে ৫ মিলি নিমতেল মিশিয়ে পাতার নিচে স্প্রে করুন।\n• **মাজরা বা ফল ছিদ্রকারী পোকা:** জমিতে সেক্স ফেরোমোন ফাঁদ টানিয়ে দিন বা জৈব স্পিনোসাড স্প্রে করুন।\n• **পাতার দাগ ও ধসা রোগ:** ম্যানকোজেব গ্রুপের ছত্রাকনাশক (২ গ্রাম প্রতি লিটার পানিতে) দিয়ে পুরো গাছ ভিজিয়ে স্প্রে করুন।\n\nআপনার **${label}** গাছে কি কোনো নির্দিষ্ট পোকা বা দাগ দেখেছেন?`
-            : `Friend! Cost-effective pest and disease management for **${label}**:\n\n• **Sucking Pests & Whiteflies:** Spray 5ml Neem oil per liter of water under leaves.\n• **Fruit/Stem Borers:** Install pheromone lure traps or spray bio-rational Spinosad.\n• **Fungal Blights & Spots:** Spray Mancozeb (2g/L) to prevent fungal expansion.\n\nAre you seeing any specific symptoms on your **${label}** leaves?`;
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলে প্রধান ক্ষতিকর পোকা ও রোগ দমনে সাশ্রয়ী পদক্ষেপ:\n\n• **চোষক পোকা ও সাদা মাছি:** প্রতি লিটার পানিতে ৫ মিলি নিমতেল মিশিয়ে পাতার নিচে স্প্রে করুন।\n• **মাজরা বা ফল ছিদ্রকারী পোকা:** জমিতে সেক্স ফেরোমোন ফাঁদ টানিয়ে দিন বা জৈব স্পিনোসাড স্প্রে করুন।\n• **পাতার দাগ ও ধসা রোগ:** ম্যানকোজেব গ্রুপের ছত্রাকনাশক (২ গ্রাম প্রতি লিটার পানিতে) দিয়ে পুরো গাছ ভিজিয়ে স্প্রে করুন।\n\nআপনার **${label}** গাছে কি কোনো নির্দিষ্ট পোকা বা দাগ দেখেছেন?`
+            : `Hello friend! Cost-effective pest and disease management for **${label}**:\n\n• **Sucking Pests & Whiteflies:** Spray 5ml Neem oil per liter of water under leaves.\n• **Fruit/Stem Borers:** Install pheromone lure traps or spray bio-rational Spinosad.\n• **Fungal Blights & Spots:** Spray Mancozeb (2g/L) to prevent fungal expansion.\n\nAre you seeing any specific symptoms on your **${label}** leaves?`;
     }
 
     public generatePestDiagnosis(crop: string, query: string, isBn: boolean): string {
@@ -453,19 +453,19 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
 
         if (q.includes("হলুদ") || q.includes("yellow")) {
             return isBn
-                ? `ভাই! **${label}** গাছের পাতা হলুদ হওয়ার মূল কারণ ও ঘরোয়া সাশ্রয়ী সমাধান:\n\n• **নাইট্রোজেনের ঘাটতি (নিচের পুরনো পাতা হলুদ হলে):** ইউরিয়া সারের অভাব। প্রতি শতাংশে ১৫০ গ্রাম ইউরিয়া দিন অথবা প্রতি লিটার পানিতে ১০ গ্রাম ইউরিয়া গুলে পাতায় স্প্রে করুন।\n• **গোড়ায় অতিরিক্ত পানি বা শিকড় পচা:** মাটিতে বাতাস না থাকলে পাতা হলুদ হয়। অবিলম্বে ড্রেন কেটে পানি বের করে দিন।\n• **মাকড় বা চোষক পোকা:** পাতার নিচে মাকড় থাকলে নিমতেল (৫ মিলি/লিটার পানিতে সামান্য শ্যাম্পু সহ) স্প্রে করুন।\n\nপাতা কি নিচের দিক থেকে হলুদ হচ্ছে নাকি কচি ডগা হলুদ হচ্ছে?`
-                : `Friend! Causes and remedies for yellowing leaves in **${label}**:\n\n• **Nitrogen Deficiency (Older bottom leaves yellowing first):** Apply 150g Urea per decimal or spray a 1% dissolved Urea solution onto foliage.\n• **Waterlogging / Root Asphyxiation:** Excess root moisture chokes oxygen. Clear drainage furrows immediately.\n• **Mite / Sucking Pest Infestation:** Mites under leaf surfaces cause mottled yellow stippling. Spray Neem oil (5ml/L) or Abamectin.\n\nAre the bottom older leaves turning yellow, or is it appearing on young new tips?`;
+                ? `আসসালামু আলাইকুম ভাই! **${label}** গাছের পাতা হলুদ হওয়ার মূল কারণ ও ঘরোয়া সাশ্রয়ী সমাধান:\n\n• **নাইট্রোজেনের ঘাটতি (নিচের পুরনো পাতা হলুদ হলে):** ইউরিয়া সারের অভাব। প্রতি শতাংশে ১৫০ গ্রাম ইউরিয়া দিন অথবা প্রতি লিটার পানিতে ১০ গ্রাম ইউরিয়া গুলে পাতায় স্প্রে করুন।\n• **গোড়ায় অতিরিক্ত পানি বা শিকড় পচা:** মাটিতে বাতাস না থাকলে পাতা হলুদ হয়। অবিলম্বে ড্রেন কেটে পানি বের করে দিন।\n• **মাকড় বা চোষক পোকা:** পাতার নিচে মাকড় থাকলে নিমতেল (৫ মিলি/লিটার পানিতে সামান্য শ্যাম্পু সহ) স্প্রে করুন।\n\nপাতা কি নিচের দিক থেকে হলুদ হচ্ছে নাকি কচি ডগা হলুদ হচ্ছে?`
+                : `Hello friend! Causes and remedies for yellowing leaves in **${label}**:\n\n• **Nitrogen Deficiency (Older bottom leaves yellowing first):** Apply 150g Urea per decimal or spray a 1% dissolved Urea solution onto foliage.\n• **Waterlogging / Root Asphyxiation:** Excess root moisture chokes oxygen. Clear drainage furrows immediately.\n• **Mite / Sucking Pest Infestation:** Mites under leaf surfaces cause mottled yellow stippling. Spray Neem oil (5ml/L) or Abamectin.\n\nAre the bottom older leaves turning yellow, or is it appearing on young new tips?`;
         }
 
         if (q.includes("কোঁকড়া") || q.includes("কোকড়া") || q.includes("curl")) {
             return isBn
-                ? `ভাই! **${label}** গাছের পাতা কোঁকড়ানো (Leaf Curl) দমনে পরামর্শ:\n\n• **ঘরোয়া নিম স্প্রে:** ১ লিটার পানিতে ৫ মিলি নিমতেল ও ১ ফোঁটা সাবান মিশিয়ে পাতার উল্টো পিঠে স্প্রে করুন।\n• **হলুদ আঠালো ফাঁদ:** জমিতে হলুদ স্টিকি ট্র্যাপ টানিয়ে দিলে ক্ষতিকর সাদা মাছি ও পোকা আটকে যাবে।\n• **তীব্র আক্রমণে ওষুধ:** ইমিডাক্লোপ্রিড গ্রুপের কীটনাশক (যেমন টিডো বা এডমায়ার ০.৫ মিলি/লিটার পানিতে) বিকেলে স্প্রে করুন।\n\nভাই, আপনার গাছে কি সাদা রঙের ছোট মাছি উড়তে দেখেছেন?`
-                : `Friend! Leaf curling in **${label}** control plan:\n\n• **Organic Neem Wash:** Spray 5ml cold-pressed Neem oil with a drop of liquid soap per liter of water under leaves.\n• **Yellow Sticky Traps:** Hang yellow sticky cards across the canopy to capture adult whiteflies naturally.\n• **Targeted Chemical Option:** For severe pressure, apply Imidacloprid (0.5 ml/L) in late afternoon.\n\nDo you see tiny white flies fluttering when you shake the foliage?`;
+                ? `আসসালামু আলাইকুম ভাই! **${label}** গাছের পাতা কোঁকড়ানো (Leaf Curl) দমনে পরামর্শ:\n\n• **ঘরোয়া নিম স্প্রে:** ১ লিটার পানিতে ৫ মিলি নিমতেল ও ১ ফোঁটা সাবান মিশিয়ে পাতার উল্টো পিঠে স্প্রে করুন।\n• **হলুদ আঠালো ফাঁদ:** জমিতে হলুদ স্টিকি ট্র্যাপ টানিয়ে দিলে ক্ষতিকর সাদা মাছি ও পোকা আটকে যাবে।\n• **তীব্র আক্রমণে ওষুধ:** ইমিডাক্লোপ্রিড গ্রুপের কীটনাশক (যেমন টিডো বা এডমায়ার ০.৫ মিলি/লিটার পানিতে) বিকেলে স্প্রে করুন।\n\nভাই, আপনার গাছে কি সাদা রঙের ছোট মাছি উড়তে দেখেছেন?`
+                : `Hello friend! Leaf curling in **${label}** control plan:\n\n• **Organic Neem Wash:** Spray 5ml cold-pressed Neem oil with a drop of liquid soap per liter of water under leaves.\n• **Yellow Sticky Traps:** Hang yellow sticky cards across the canopy to capture adult whiteflies naturally.\n• **Targeted Chemical Option:** For severe pressure, apply Imidacloprid (0.5 ml/L) in late afternoon.\n\nDo you see tiny white flies fluttering when you shake the foliage?`;
         }
 
         return isBn
-            ? `ভাই! **${label}** ফসলের বালাই দমনে তাৎক্ষণিক কার্যকর পদক্ষেপ:\n\n• **জৈব বালাইনাশক স্প্রে:** ৫ মিলি নিমতেল ১ লিটার পানিতে মিশিয়ে স্প্রে করলে জাবপোকা ও শুঁয়োপোকা দূর হয়।\n• **পার্চিং পদ্ধতি (পাখি বসার ডাল):** জমিতে বাঁশের কঞ্চি পুঁতে দিলে ফিঙে বা শালিক পাখি ক্ষতিকর মাজরা পোকা খেয়ে ফেলে।\n• **আক্রমণ বেশি হলে:** স্থানীয় কৃষি কর্মকর্তার পরামর্শে অনুমোদিত বালাইনাশক সঠিক মাত্রায় বিকেলে স্প্রে করুন।\n\nআপনার ফসলের পাতায় ঠিক কী ধরণের লক্ষণ বা পোকা দেখা যাচ্ছে বলুন তো?`
-            : `Friend! Instant protective measures against pests in **${label}**:\n\n• **Organic Neem Application:** Spray 5ml Neem oil per liter of water with a surfactant for aphids, thrips, and caterpillars.\n• **Bird Perches (Biological Control):** Erect bamboo T-perches so insectivorous birds feed on stem borers and caterpillars.\n• **Targeted Intervention:** Use group-specific bio-pesticides (e.g., Bacillus thuringiensis or Spinosad) during late afternoon.\n\nWhat specific symptoms or insect damage are you observing on the leaves?`;
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলের বালাই দমনে তাৎক্ষণিক কার্যকর পদক্ষেপ:\n\n• **জৈব বালাইনাশক স্প্রে:** ৫ মিলি নিমতেল ১ লিটার পানিতে মিশিয়ে স্প্রে করলে জাবপোকা ও শুঁয়োপোকা দূর হয়।\n• **পার্চিং পদ্ধতি (পাখি বসার ডাল):** জমিতে বাঁশের কঞ্চি পুঁতে দিলে ফিঙে বা শালিক পাখি ক্ষতিকর মাজরা পোকা খেয়ে ফেলে।\n• **আক্রমণ বেশি হলে:** স্থানীয় কৃষি কর্মকর্তার পরামর্শে অনুমোদিত বালাইনাশক সঠিক মাত্রায় বিকেলে স্প্রে করুন।\n\nআপনার ফসলের পাতায় ঠিক কী ধরণের লক্ষণ বা পোকা দেখা যাচ্ছে বলুন তো?`
+            : `Hello friend! Instant protective measures against pests in **${label}**:\n\n• **Organic Neem Application:** Spray 5ml Neem oil per liter of water with a surfactant for aphids, thrips, and caterpillars.\n• **Bird Perches (Biological Control):** Erect bamboo T-perches so insectivorous birds feed on stem borers and caterpillars.\n• **Targeted Intervention:** Use group-specific bio-pesticides (e.g., Bacillus thuringiensis or Spinosad) during late afternoon.\n\nWhat specific symptoms or insect damage are you observing on the leaves?`;
     }
 
     public generateImageDiagnosisChecklist(crop: string, isBn: boolean): string {
@@ -473,7 +473,7 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
         const label = isBn ? cropNames.bn : cropNames.en;
 
         return isBn
-            ? `ভাই! আপনার আপলোড করা **${label}** ফসলের পাতার ছবিটি বিশ্লেষণ করার জন্য মাঠপর্যায়ের লক্ষণভিত্তিক স্মার্ট চেকলিস্ট নিচে দেওয়া হলো:
+            ? `আসসালামু আলাইকুম ভাই! আপনার আপলোড করা **${label}** ফসলের পাতার ছবিটি বিশ্লেষণ করার জন্য মাঠপর্যায়ের লক্ষণভিত্তিক স্মার্ট চেকলিস্ট নিচে দেওয়া হলো:
 
 • **১. আগাম বা নাবি ধসা রোগ (Early/Late Blight):** পাতায় গাঢ় বাদামি বা কালচে বৃত্তাকার বলয় (concentric rings) এবং চারপাশে হালকা হলুদ বলয় (halo) দেখা দিলে:
   - **তাত্ক্ষণিক প্রতিকার:** তীব্র আক্রান্ত পাতা ছাঁটাই করে পুড়িয়ে ফেলুন। ম্যানকোজেব (ডাইথেন এম-৪৫) প্রতি লিটার পানিতে ২ গ্রাম অথবা ডাইফেনোকোনাজোল (স্কোর) ০.৫ মিলি স্প্রে করুন।
@@ -487,7 +487,7 @@ Friend, do you have deep tube-well electricity access for furrow irrigation, or 
 • **৪. পুষ্টির ঘাটতি (পটাশ বা ম্যাগনেসিয়াম):** পাতার কিনারা তামাটে বা শিরা বাদে মধ্যভাগ হলুদ হয়ে এলে সুষম পটাশ (MoP) ও ম্যাগনেসিয়াম স্প্রে করুন।
 
 ভাই, আপনার ফসলের পাতায় এই চারটির মধ্যে কোন লক্ষণটি সবচেয়ে স্পষ্ট দেখা যাচ্ছে?`
-            : `Friend! Based on your uploaded leaf photo for **${label}**, here is an agronomic field symptom checklist:
+            : `Hello friend! Based on your uploaded leaf photo for **${label}**, here is an agronomic field symptom checklist:
 
 • **1. Early or Late Blight (Fungal):** Dark brown/black concentric target-like rings with a pale yellow halo:
   - **Remedy:** Prune infected lower leaves immediately. Spray Mancozeb (Dithane M-45) @ 2g/L or Difenoconazole (Score) @ 0.5ml/L.
@@ -505,8 +505,8 @@ Which of these visible symptoms matches your crop leaf closest?`;
 
     public generateIrrigationAdvice(crop: string, age: number | null, isBn: boolean): string {
         return isBn
-            ? `ভাই! সুষম ও সাশ্রয়ী সেচ ব্যবস্থাপনায় আপনার ফসলের জন্য গুরুত্বপূর্ণ পরামর্শ:\n\n• **পরিমিত সেচ:** গোড়ায় অতিরিক্ত পানি জমিয়ে রাখবেন না; শিকড় পচন রোধ করতে জো (রস) অবস্থা বজায় রাখুন।\n• **খরচ সাশ্রয়ী AWD পদ্ধতি:** ধান ও শাকসবজিতে পর্যায়ক্রমে শুকানো ও ভেজানোর নিয়ম মানলে সেচের জ্বালানি খরচ ৩০% বাঁচে।\n• **সেচ দেওয়ার সঠিক সময়:** সবসময় সকালের দিকে অথবা শেষ বিকেলে সেচ দিন।\n\nজমির মাটি হাত দিয়ে চাপ দিলে কি লাড্ডুর মতো গোল হয় নাকি বালির মতো ঝরে যায়?`
-            : `Friend! Soil moisture and water-saving irrigation guidance:
+            ? `আসসালামু আলাইকুম ভাই! সুষম ও সাশ্রয়ী সেচ ব্যবস্থাপনায় আপনার ফসলের জন্য গুরুত্বপূর্ণ পরামর্শ:\n\n• **পরিমিত সেচ:** গোড়ায় অতিরিক্ত পানি জমিয়ে রাখবেন না; শিকড় পচন রোধ করতে জো (রস) অবস্থা বজায় রাখুন।\n• **খরচ সাশ্রয়ী AWD পদ্ধতি:** ধান ও শাকসবজিতে পর্যায়ক্রমে শুকানো ও ভেজানোর নিয়ম মানলে সেচের জ্বালানি খরচ ৩০% বাঁচে।\n• **সেচ দেওয়ার সঠিক সময়:** সবসময় সকালের দিকে অথবা শেষ বিকেলে সেচ দিন।\n\nজমির মাটি হাত দিয়ে চাপ দিলে কি লাড্ডুর মতো গোল হয় নাকি বালির মতো ঝরে যায়?`
+            : `Hello friend! Soil moisture and water-saving irrigation guidance:
 
 • **Shallow Consistent Moisture:** Avoid waterlogged root zones; roots require soil oxygen as much as water.
 • **AWD Cost-Saving Technique:** Use Alternate Wetting and Drying to reduce diesel/electric pump expenditures by 30%.
@@ -517,14 +517,14 @@ When you squeeze a handful of field soil, does it form a firm clump or crumble l
 
     public generateWeatherAdvice(crop: string, isBn: boolean): string {
         return isBn
-            ? `ভাই! বৈরী আবহাওয়া ও ঝড়ের পূর্বাভাসে মাঠের সুরক্ষা:
+            ? `আসসালামু আলাইকুম ভাই! বৈরী আবহাওয়া ও ঝড়ের পূর্বাভাসে মাঠের সুরক্ষা:
 
 • **পানি নিষ্কাশন ড্রেন:** জমির চারধারে দ্রুত ১ ফুট গভীর ড্রেন কেটে দিন যাতে বৃষ্টির পানি এক মুহূর্তও জমে না থাকে।
 • **সেচ ও কীটনাশক বন্ধ:** আগামী ৪৮ ঘণ্টার মধ্যে বৃষ্টির পূর্বাভাস থাকলে সব ধরণের সার প্রয়োগ ও স্প্রে অবিলম্বে বন্ধ রাখুন।
 • **লম্বা গাছে সাপোর্ট:** টমেটো, ভুট্টা বা বেগুনের মতো গাছে বাঁশের কঞ্চি দিয়ে শক্ত সাপোর্ট দিন যাতে বাতাসে হেলে না পড়ে।
 
 আপনার জমির পানি নামার প্রধান নালাটি কি পরিষ্কার আছে?`
-            : `Friend! Emergency storm and heavy rainfall preparedness:
+            : `Hello friend! Emergency storm and heavy rainfall preparedness:
 
 • **Clear Perimeter Trenches:** Dig out 1-foot drainage furrows immediately so heavy deluge flows off fields freely.
 • **Halt Spraying & Fertilizing:** Immediately suspend all foliar sprays and top dressings 48 hours before predicted storms.
@@ -535,14 +535,14 @@ Are your main water runoff outlets completely free of weeds and silt?`;
 
     public generateMarketAdvice(crop: string, isBn: boolean): string {
         return isBn
-            ? `ভাই! ফসলের সর্বোচ্চ মুনাফা ও ন্যায্য দর পেতে করণীয়:
+            ? `আসসালামু আলাইকুম ভাই! ফসলের সর্বোচ্চ মুনাফা ও ন্যায্য দর পেতে করণীয়:
 
 • **গ্রেডিং বা বাছাই:** ফসলকে আকার ও মান অনুযায়ী ৩টি গ্রেডে (A, B, C) আলাদা করুন। ভালো গ্রেডে ২০-৩০% বেশি দাম মেলে।
 • **আড়তে সরাসরি বিক্রয়:** গ্রামের ফড়িয়াদের বদলে পার্শ্ববর্তী উপজেলা মোকাম বা পাইকারি বাজারে সমবায়ের মাধ্যমে সরাসরি পণ্য পাঠান।
 • **বায়ুরোধী বীজ সংরক্ষণ:** বীজ কড়া রোদে ৩ দিন শুকিয়ে আর্দ্রতা ১২%-এর নিচে এনে শুকনো নিমপাতা দিয়ে এয়ারটাইট ড্রামে রাখুন।
 
 আপনি কি এই ফসল এখনই বিক্রি করবেন নাকি গুদামে সংরক্ষণ করার কথা ভাবছেন?`
-            : `Friend! Practical wholesale market realization and grain storage advice:
+            : `Hello friend! Practical wholesale market realization and grain storage advice:
 
 • **Produce Grading:** Sort harvest into 3 quality tiers by size and color. Graded produce commands a 20-30% price premium.
 • **Direct Mandi Transport:** Bypass village gate middlemen; transport bundled produce directly to the regional wholesale hub.
@@ -556,14 +556,14 @@ Are you intending to sell your harvest immediately or store seeds for next seaso
         const label = isBn ? cropNames.bn : cropNames.en;
 
         return isBn
-            ? `ভাই! **${label}** ফসলের ভালো জাত ও বীজ শোধন নির্দেশিকা:
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলের ভালো জাত ও বীজ শোধন নির্দেশিকা:
 
 • **উচ্চফলনশীল প্রত্যায়িত বীজ:** স্থানীয় খোলা বীজের বদলে বিএডিসি (BADC), বারি (BARI) বা ব্রি (BRRI) অনুমোদিত সার্টিফাইড বীজ সংগ্রহ করুন।
 • **বীজ শোধন (Seed Treatment):** বীজ বপনের আগে প্রতি কেজি বীজে ২-৩ গ্রাম কার্বেনডাজিম (যেমন অটোস্টিন বা ব্যাভিস্টিন) অথবা ট্রাইকোডার্মা মিশিয়ে শোধন করুন। এতে বীজবাহিত ছত্রাক রোগ শতভাগ দমন হয়।
 • **অঙ্কুরোদ্গম পরীক্ষা (Germination Test):** ভেজা কাপড়ে ১০০টি বীজ রেখে ৭২ ঘণ্টা পর গুনুন; যদি অন্তত ৮০টি গজায় তবেই জমিতে বপন করুন।
 
 আপনি কি হাইব্রিড নাকি দেশি উফশী জাত চাষের কথা ভাবছেন?`
-            : `Friend! Certified Seed Variety & Treatment Guide for **${label}**:
+            : `Hello friend! Certified Seed Variety & Treatment Guide for **${label}**:
 
 • **Certified Seed Selection:** Source certified high-yielding seeds from official agricultural agencies (e.g. BADC/BRRI/BARI certified lots) rather than unverified local markets.
 • **Seed Inoculation/Treatment:** Treat seeds with Carbendazim (Bavistin) at 2.5g/kg or Trichoderma viride powder before sowing to eradicate damping-off and seed-borne blight.
@@ -578,14 +578,14 @@ Are you looking to sow high-yield hybrid seeds or climate-resilient local open-p
         const soilText = soilType ? (isBn ? ` (${soilType})` : ` (${soilType})`) : "";
 
         return isBn
-            ? `ভাই! **${label}** ফসলে${soilText} সর্বোচ্চ শিকড় বৃদ্ধি ও ফলনের জন্য জমি প্রস্তুত করার সাশ্রয়ী নিয়ম:
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলে${soilText} সর্বোচ্চ শিকড় বৃদ্ধি ও ফলনের জন্য জমি প্রস্তুত করার সাশ্রয়ী নিয়ম:
 
 • **গভীর চাষ ও মই:** জমি তৈরির সময় ৩-৪ বার আড়াআড়ি চাষ দিয়ে মাটি ঝুরঝুরে করুন এবং মই দিয়ে জমি সম্পূর্ণ সমতল করুন।
 • **জৈব সার প্রয়োগ (Basal Manure):** শেষ চাষের ১০-১২ দিন আগে প্রতি শতাংশে ১৫-২০ কেজি পচা গোবর বা ট্রাইকো-কম্পোস্ট মাটির সাথে ভালো করে মিশিয়ে দিন।
 • **উঁচু বেড ও ড্রেন:** জলাবদ্ধতা ঠেকাতে শাকসবজির ক্ষেত্রে ৬ ইঞ্চি উঁচু এবং ৩ ফুট চওড়া বেড তৈরি করুন। মাঝে ১ ফুট নালা রাখুন।
 
 আপনার জমির মাটি কি দোআঁশ নাকি এঁটেল ধরনের?`
-            : `Friend! Soil tillage and bed preparation protocol for **${label}**${soilText}:
+            : `Hello friend! Soil tillage and bed preparation protocol for **${label}**${soilText}:
 
 • **Deep Cross-Plowing:** Plow 3-4 times with a moldboard plow or power tiller to break hard pans; harrow and level to pulverize clods.
 • **Organic Basal Enrichment:** Incorporate 15-20 kg of well-rotted cow dung or Trichoderma compost per decimal 10-12 days before planting.
@@ -598,14 +598,14 @@ Is your parcel primarily sandy loam or dense clay soil?`;
         const soilText = soilType ? (isBn ? ` [${soilType}]` : ` [${soilType}]`) : "";
 
         return isBn
-            ? `ভাই! মাটির উর্বরতা ও স্বাস্থ্য সুরক্ষায় সাশ্রয়ী বৈজ্ঞানিক পরামর্শ${soilText}:
+            ? `আসসালামু আলাইকুম ভাই! মাটির উর্বরতা ও স্বাস্থ্য সুরক্ষায় সাশ্রয়ী বৈজ্ঞানিক পরামর্শ${soilText}:
 
 • **মাটির পিএইচ (pH) নিয়ন্ত্রণ:** মাটি অতিরিক্ত অ্যাসিডিক বা টক হলে (pH < 6.0) প্রতি শতাংশে ১-১.৫ কেজি ডলোমাইট বা কৃষি চুন প্রয়োগ করে মাটির অম্লতা দূর করুন।
 • **সবুজ সার (Green Manure):** বর্ষা বা রবি মৌসুমের আগে জমিতে ধৈঞ্চা বুনে ৪৫ দিন পর চাষ দিয়ে মাটির সাথে মিশিয়ে দিন; এতে হেক্টরপ্রতি ৬০-৮০ কেজি প্রাকৃতিক নাইট্রোজেন জমা হয়।
 • **লবণাক্ততা ও রস সুরক্ষা:** উপকূল বা লবণাক্ত মাটিতে ধানের খড় দিয়ে মালচিং (Mulching) করুন যাতে মাটির নিচের লবণ ওপরে উঠতে না পারে।
 
 আপনার জমিতে কি কখনো মাটি পরীক্ষা (Soil Test) করা হয়েছিল?`
-            : `Friend! Soil health and fertility regeneration protocol${soilText}:
+            : `Hello friend! Soil health and fertility regeneration protocol${soilText}:
 
 • **Soil pH Amendment:** If soil is excessively acidic (pH < 6.0), broadcast agricultural lime (dolomite) at 1-1.5 kg per decimal during summer fallow.
 • **Green Manuring (Sesbania/Dhaincha):** Cultivate Sesbania for 45 days and incorporate before flowering; this fixes 60-80 kg/ha of organic nitrogen for free.
@@ -619,14 +619,14 @@ Have you conducted a laboratory soil test for your field recently?`;
         const label = isBn ? cropNames.bn : cropNames.en;
 
         return isBn
-            ? `ভাই! **${label}** ফসলে ফলন না কমিয়ে রাসায়নিক সারের খরচ ২০-৩০% কমানোর ব্যবহারিক কৌশল:
+            ? `আসসালামু আলাইকুম ভাই! **${label}** ফসলে ফলন না কমিয়ে রাসায়নিক সারের খরচ ২০-৩০% কমানোর ব্যবহারিক কৌশল:
 
 • **ট্রাইকো-কম্পোস্ট ও জৈব সার:** রাসায়নিক সারের সাথে ট্রাইকোডার্মা সমৃদ্ধ জৈব সার দিলে ইউরিয়া ও টিএসপির খরচ সরাসরি ৩০% কমে এবং মাটির স্বাস্থ্য ভালো থাকে।
 • **সেচের জ্বালানি খরচ হ্রাস (AWD পদ্ধতি):** সবসময় পানি জমিয়ে না রেখে জমিতে ছিদ্রযুক্ত প্লাস্টিক পাইপ বসিয়ে AWD নিয়মে সেচ দিন; এতে বিদ্যুৎ বা ডিজেল খরচ ৩০% সাশ্রয় হয়।
 • **ফেরোমোন ফাঁদ দিয়ে বালাই দমন:** দামি রাসায়নিক কীটনাশক প্রতিদিন স্প্রে না করে প্রতি বিঘায় ১০-১২টি সেক্স ফেরোমোন ফাঁদ ও হলুদ আঠালো কার্ড ঝুলিয়ে পোকা দমন করুন।
 
 আপনি কি বর্তমানে জমিতে নিয়মিত জৈব সার ব্যবহার করেন?`
-            : `Friend! Actionable 20-30% input cost reduction strategies for **${label}**:
+            : `Hello friend! Actionable 20-30% input cost reduction strategies for **${label}**:
 
 • **Trichoderma Bio-Organic Fertilizer:** Supplement soil with Trichoderma compost to reduce synthetic Urea and TSP requirements by 25-30%.
 • **AWD Irrigation Fuel Savings:** Install Alternate Wetting and Drying perforated pipes in fields; saves 30% diesel pump electricity with zero yield loss.
@@ -651,14 +651,14 @@ Do you currently integrate on-farm compost or crop residues into your fertilizat
         const cleanQ = query.trim();
 
         return isBn
-            ? `ভাই! আপনার সুনির্দিষ্ট প্রশ্ন: **"${cleanQ}"** বিবেচনা করে **${label}** ফসলের জন্য পরামর্শ:
+            ? `আসসালামু আলাইকুম ভাই! আপনার সুনির্দিষ্ট প্রশ্ন: **"${cleanQ}"** বিবেচনা করে **${label}** ফসলের জন্য পরামর্শ:
 
 • **মাঠপর্যায়ের তাত্ক্ষণিক সমাধান:** ${ageInfo}${landInfo}${locInfo}গাছের শিকড় অঞ্চলে পর্যাপ্ত বাতাস চলাচল ও পরিমিত জো (রস) বজায় রাখুন। অতিরিক্ত নাইট্রোজেন (ইউরিয়া) এড়িয়ে জৈব উপাদান ও পটাশ সার সুষম অনুপাতে দিন।
 • **২০-৩০% খরচ কমানোর কৌশল:** ট্রাইকো-কম্পোস্ট ও অনুমোদিত জৈব উপাদান প্রয়োগ করলে রাসায়নিক সারের খরচ সরাসরি সাশ্রয় হয় এবং মাটিতে উপকারী অণুজীব দ্রুত বৃদ্ধি পায়।
 • **বালাই ও ক্ষতি প্রতিরোধ:** আক্রান্ত বা হলুদ পাতা দেখা মাত্রই তা ছাঁটাই করে ক্ষেতের বাইরে নষ্ট করুন। প্রয়োজনবোধে বিকেলে ৫ মিলি নিম তেল বা ট্রাইকোডার্মা স্প্রে করুন।
 
 ভাই, আপনার **${label}** ফসলে এই মুহূর্তে কি আর কোনো নির্দিষ্ট লক্ষণ বা পরিবর্তন দেখা যাচ্ছে?`
-            : `Friend! Regarding your specific inquiry: **"${cleanQ}"** for **${label}**:
+            : `Hello friend! Regarding your specific inquiry: **"${cleanQ}"** for **${label}**:
 
 • **Immediate Field Action:** ${ageInfo}${landInfo}${locInfo}Maintain steady root aeration and uniform soil moisture. Avoid excess unbalanced synthetic nitrogen; balance with potassium and compost.
 • **20-30% Cost Reduction Strategy:** Incorporate Trichoderma-enriched compost to reduce chemical fertilizer expenditure while preserving long-term soil microbiome vitality.
@@ -1018,30 +1018,38 @@ CRITICAL INSTRUCTION FOR ACTIVE FIELD CONTEXT:
 When the farmer asks stage-specific or action questions (e.g. "এখন কী সার দেব?", "আজকে কি সেচ দেওয়া লাগবে?", "কী রোগ হতে পারে?", "কী পরিচর্যা লাগবে?"), IMMEDIATELY use the [LIVE 3D FIELD TELEMETRY] data provided above (crop, growth stage, soil moisture, and weather) to answer directly and authoritatively. NEVER ask "Which crop are you cultivating?" or "What is the crop age?" if it is present in the telemetry!
 
 STRICT RULES FOR EVERY RESPONSE:
-1. ZERO REPETITION & 100% RELEVANCE:
+1. ABSOLUTE GREETING RESTRICTION (NO "NOMOSKAR"):
+   - NEVER use the word "নমস্কার" (Nomoskar) or any equivalent variant under any circumstances.
+
+2. STRICT LANGUAGE-BASED GREETING RULE:
+   - When the user communicates in English (or the UI toggle is set to EN), ALWAYS start your response with "Hello" or "Hi" (e.g., "Hello friend! I am reviewing your...").
+   - When the user communicates in Bangla/Banglish (or the UI toggle is set to বাং), ALWAYS start your response with "আসসালামু আলাইকুম" or "আসসালামু আলাইকুম ভাই/বন্ধু!" (e.g., "আসসালামু আলাইকুম ভাই! আপনার দেওয়া টমেটো ক্ষেতের...").
+
+3. ZERO REPETITION & 100% RELEVANCE:
    - Never give generic template replies. Every answer must directly address the exact crop, plant age, symptom, district/location, soil type, or custom question the farmer just asked.
    - If the farmer already named the crop (e.g., "fertilizer for potato"), NEVER ask "Which crop are you fertilizing?". Give the exact Potato fertilizer schedule immediately.
    - If the farmer replies with a short answer like "Rice", "Potato", "20", or "40", connect it directly to your previous question and provide the exact stage-specific solution.
 
-2. MULTIMODAL LEAF & SOIL IMAGE ANALYSIS:
+4. MULTIMODAL LEAF & SOIL IMAGE ANALYSIS:
    - If the user provides an image or asks about leaf symptoms/spots/yellowing/blight/curl:
      a) Carefully inspect the visual symptoms (lesions, concentric rings, halo, mildew, curled margins, mosaic pattern, chlorosis).
      b) Provide the exact diagnosis (disease name, insect pest vector, or nutrient deficiency).
      c) Give immediate cultural/organic remedies (pruning, neem oil, ash, Trichoderma, biocontrol) AND specific approved chemical active ingredients with dosage per liter (BARI/BRRI standard).
      d) Ask 1 clarifying question to confirm spread or severity.
 
-3. LAND, LOCATION & PROFIT/ROTATION PLANNING:
+5. LAND, LOCATION & PROFIT/ROTATION PLANNING:
    - Whenever a farmer mentions their location/region (e.g., Mymensingh, Bogura, Barishal, Dinajpur, haor, char, high/medium/low land), soil type (loamy/দোআঁশ, clay/এঁটেল, sandy/বেলে), or asks what to cultivate for maximum profit:
      a) **Best Crop & Sowing Window (সেরা ফসল ও বপনের সময়):** Recommend the highest-margin crops suited to that land and exact planting months to catch early market high prices.
      b) **Cost Minimization Strategy (খরচ কমানোর কৌশল):** Show how to cut input costs by 20–30% using vermicompost/organic manure, split Urea application, LCC (Leaf Color Chart), and AWD (Alternate Wetting & Drying) irrigation.
      c) **Estimated Cost vs. Profit (খরচ ও সম্ভাব্য লাভের হিসাব):** Provide a realistic cost, yield, and net profit estimate per decimal (শতাংশ) or bigha (৩৩ শতাংশ).
      d) **Year-Round 3-Season Crop Rotation (শস্য আবর্তন চক্র):** Provide a Rabi -> Kharif-1 -> Kharif-2 cycle (e.g., Potato/Mustard -> Mungbean/Jute -> T. Aman Rice) that naturally fixes soil nitrogen and breaks pest cycles.
 
-4. EXACT TECHNICAL ACCURACY (BARI / BRRI STANDARDS):
+6. EXACT TECHNICAL ACCURACY (BARI / BRRI STANDARDS):
    - Give exact dosages per decimal (শতাংশ) or bigha for Urea, TSP, DAP, MoP, Gypsum, Zinc, and Boron.
    - For pests/diseases, give both immediate organic/cultural controls (neem extract, light traps, perching, water draining) and specific chemical active ingredient names with dosage per liter of water.
 
-5. TONE, STRUCTURE & LANGUAGE:
+7. TONE, STRUCTURE & LANGUAGE:
+   - Always open with the mandatory greeting ("আসসালামু আলাইকুম ভাই/বন্ধু!" in Bangla, "Hello friend!" in English). Under NO circumstances say "নমস্কার".
    - Address the farmer warmly ("ভাই/বন্ধু" in Bangla, "Friend" in English).
    - Format with short, mobile-scannable bold bullet points.
    - End with 1 smart, context-aware follow-up question that helps them take the next step.
@@ -1596,6 +1604,7 @@ STRICT RULES FOR EVERY RESPONSE:
                 }
             }
 
+            replyText = this.enforceGreetingRules(replyText, isBn);
             await this.streamReply(replyText, textTarget, buddyMsg, buddyBubble);
 
             const userParts: any[] = [{ text: promptForAi }];
@@ -1612,7 +1621,8 @@ STRICT RULES FOR EVERY RESPONSE:
             const safeText = attachedImage
                 ? this.localEngine.generateImageDiagnosisChecklist(this.context.crop || "tomato", isBn)
                 : this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
-            await this.streamReply(safeText, textTarget, buddyMsg, buddyBubble);
+            const enforcedSafeText = this.enforceGreetingRules(safeText, isBn);
+            await this.streamReply(enforcedSafeText, textTarget, buddyMsg, buddyBubble);
             const lastQ = this.extractLastQuestion(buddyMsg.text);
             if (lastQ) {
                 this.context.lastBotQuestion = lastQ;
@@ -1714,7 +1724,7 @@ STRICT RULES FOR EVERY RESPONSE:
                 const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (reply && reply.trim()) {
                     console.log(`[FarmerBuddy] Direct Gemini responded successfully via [${model}]`);
-                    return reply.trim();
+                    return this.enforceGreetingRules(reply.trim(), (this.currentLang === "bn"));
                 }
             } catch (err) {
                 console.warn(`[FarmerBuddy] Direct Gemini model [${model}] failed: ${(err as any).message}. Trying next...`);
@@ -1749,7 +1759,7 @@ STRICT RULES FOR EVERY RESPONSE:
         const data = await response.json();
         if (data && typeof data.reply === "string" && data.reply.trim()) {
             console.log(`[FarmerBuddy] Backend proxy responded successfully [Model: ${this.selectedModel}].`);
-            return data.reply.trim();
+            return this.enforceGreetingRules(data.reply.trim(), (this.currentLang === "bn"));
         }
 
         throw new Error("EMPTY_PROXY_REPLY");
@@ -1884,6 +1894,36 @@ STRICT RULES FOR EVERY RESPONSE:
         if (this.inputField) {
             this.inputField.placeholder = this.i18nDict[this.currentLang].inputPlaceholder;
         }
+    }
+
+    public enforceGreetingRules(reply: string, isBn: boolean): string {
+        if (!reply) return reply;
+        let cleaned = reply;
+        // 1. ABSOLUTE GREETING RESTRICTION: NEVER allow "নমস্কার" (Nomoskar) or variants
+        cleaned = cleaned.replace(/নমস্কার[^\s,.!?।]*\s*/gi, isBn ? "আসসালামু আলাইকুম " : "Hello ");
+        cleaned = cleaned.replace(/\bnomoskar\b[^\s,.!?]*\s*/gi, isBn ? "Assalamu Alaikum " : "Hello ");
+        cleaned = cleaned.replace(/\bnamaskar\b[^\s,.!?]*\s*/gi, isBn ? "Assalamu Alaikum " : "Hello ");
+
+        // 2. STRICT LANGUAGE-BASED GREETING RULE
+        const trimmed = cleaned.trim();
+        if (isBn) {
+            if (!trimmed.startsWith("আসসালামু আলাইকুম")) {
+                if (/^(হ্যালো|হাই|নমস্কার|ভাই[,!]|বন্ধু[,!]|আরে ভাই[,!])/i.test(trimmed)) {
+                    cleaned = trimmed.replace(/^(হ্যালো|হাই|নমস্কার|ভাই[,!]|বন্ধু[,!]|আরে ভাই[,!])\s*/i, "আসসালামু আলাইকুম ভাই! ");
+                } else {
+                    cleaned = `আসসালামু আলাইকুম ভাই! ${trimmed}`;
+                }
+            }
+        } else {
+            if (!trimmed.toLowerCase().startsWith("hello") && !trimmed.toLowerCase().startsWith("hi")) {
+                if (/^(assalamu alaikum|salam|namaskar|nomoskar|hey|friend[,!])/i.test(trimmed)) {
+                    cleaned = trimmed.replace(/^(assalamu alaikum|salam|namaskar|nomoskar|hey|friend[,!])\s*/i, "Hello friend! ");
+                } else {
+                    cleaned = `Hello friend! ${trimmed}`;
+                }
+            }
+        }
+        return cleaned;
     }
 
     public cleanTextForTTS(raw: string): string {
