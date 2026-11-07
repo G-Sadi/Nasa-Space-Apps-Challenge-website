@@ -1399,22 +1399,22 @@ STRICT RULES FOR EVERY RESPONSE:
         this.minimizeBtnEl = this.closeBtnEl;
         this.liveSyncBadgeEl = header.querySelector("#fbLiveSyncBadge");
 
-        // Model Selector Toolbar (Replaces Manual API Key Input Box!)
+        // Model Selector Toolbar (Compact & Sleek AI Segment)
         this.modelToolbar = document.createElement("div");
         this.modelToolbar.id = "fbModelToolbar";
         this.modelToolbar.className = "fb-model-toolbar";
         this.modelToolbar.innerHTML = `
             <div class="fb-model-selector-group">
-                <span class="fb-model-icon">🤖</span>
+                <span class="fb-model-icon">✨</span>
                 <select id="fbModelSelect" class="fb-model-select" aria-label="Select AI Model">
                     <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "⚡ Gemini 3.5 Flash (Ultra Fast / নতুন ও দ্রুততম)" : "⚡ Gemini 3.5 Flash (Ultra Fast)"}
+                        ${isBn ? "⚡ Gemini 3.5 Flash (দ্রুত)" : "⚡ Gemini 3.5 Flash"}
                     </option>
                     <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                        ${isBn ? "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner)"}
+                        ${isBn ? "🎯 Gemini 3.5 Pro (প্ল্যানার)" : "🎯 Gemini 3.5 Pro"}
                     </option>
                     <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
+                        ${isBn ? "🌱 Gemini 3.5 Lite (সাশ্রয়ী)" : "🌱 Gemini 3.5 Lite"}
                     </option>
                 </select>
             </div>
@@ -1500,12 +1500,12 @@ STRICT RULES FOR EVERY RESPONSE:
 
     getModelPillLabel(isBn) {
         if (this.selectedModel === "gemini-2.5-pro") {
-            return isBn ? "Pro · প্ল্যানার" : "Pro · Planner";
+            return isBn ? "Pro প্ল্যানার" : "Pro";
         }
         if (this.selectedModel === "gemini-2.5-flash") {
-            return isBn ? "2.5 · হালকা" : "2.5 · Lite";
+            return isBn ? "Lite সাশ্রয়ী" : "Lite";
         }
-        return isBn ? "3.5 · দ্রুততম" : "3.5 · Ultra";
+        return isBn ? "3.5 দ্রুত" : "3.5 Ultra";
     }
 
     updateModelUI() {
@@ -1565,13 +1565,13 @@ STRICT RULES FOR EVERY RESPONSE:
         if (modelSelect) {
             modelSelect.innerHTML = `
                 <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "⚡ Gemini 3.5 Flash (Ultra Fast / নতুন ও দ্রুততম)" : "⚡ Gemini 3.5 Flash (Ultra Fast)"}
+                    ${isBn ? "⚡ Gemini 3.5 Flash (দ্রুত)" : "⚡ Gemini 3.5 Flash"}
                 </option>
                 <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                    ${isBn ? "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner)"}
+                    ${isBn ? "🎯 Gemini 3.5 Pro (প্ল্যানার)" : "🎯 Gemini 3.5 Pro"}
                 </option>
                 <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
+                    ${isBn ? "🌱 Gemini 3.5 Lite (সাশ্রয়ী)" : "🌱 Gemini 3.5 Lite"}
                 </option>
             `;
         }
@@ -2022,20 +2022,19 @@ STRICT RULES FOR EVERY RESPONSE:
             contents.push({ role: 'user', parts: userParts });
         }
 
-        // Map UI model names to valid Gemini API endpoints (prevents 404 invalid model crashes)
+        // Map UI model names to valid Gemini API endpoints (verified ultra-fast models)
         const MODEL_MAP = {
-            'gemini-3.5-flash': 'gemini-2.5-flash',
-            'gemini-2.5-pro': 'gemini-2.5-pro',
-            'gemini-2.5-flash': 'gemini-2.5-flash'
+            'gemini-3.5-flash': 'gemini-3.5-flash',
+            'gemini-2.5-pro': 'gemini-3.5-flash',
+            'gemini-2.5-flash': 'gemini-3.5-flash-lite'
         };
-        const activeApiModel = MODEL_MAP[this.selectedModel] || 'gemini-2.5-flash';
+        const activeApiModel = MODEL_MAP[this.selectedModel] || 'gemini-3.5-flash';
 
         // Candidate models list prioritizing active, high-availability endpoints
         const candidateModels = [
             activeApiModel,
-            'gemini-2.5-flash',
-            'gemini-3.5-flash-lite',
-            'gemini-flash-latest'
+            'gemini-3.5-flash',
+            'gemini-3.5-flash-lite'
         ];
 
         let lastError = null;
@@ -2065,10 +2064,11 @@ STRICT RULES FOR EVERY RESPONSE:
                 }
 
                 const data = await response.json();
-                const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (reply && reply.trim()) {
+                const parts = data?.candidates?.[0]?.content?.parts || [];
+                const reply = parts.map(p => p.text || '').join('').trim();
+                if (reply) {
                     console.log(`[FarmerBuddy] Direct Gemini responded successfully via [${model}]`);
-                    return this.enforceGreetingRules(reply.trim(), (this.currentLang === "bn"));
+                    return this.enforceGreetingRules(reply, (this.currentLang === "bn"));
                 }
             } catch (err) {
                 console.warn(`[FarmerBuddy] Direct Gemini model [${model}] failed: ${err.message}. Trying next...`);

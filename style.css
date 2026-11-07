@@ -5533,15 +5533,16 @@ body.lang-bn strong {
     transform: scale(0.92) !important;
 }
 
-/* AI Model Selector Toolbar & Dynamic Indicator */
+/* AI Model Selector Toolbar & Dynamic Indicator - Sleek, Compact & Unobtrusive */
 .fb-model-toolbar {
-    background: #091c14;
-    border-bottom: 1px solid rgba(67, 239, 140, 0.2);
-    padding: 8px 14px;
+    background: rgba(6, 20, 14, 0.75);
+    border-bottom: 1px solid rgba(67, 239, 140, 0.12);
+    padding: 3px 12px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 8px;
     font-size: 11px;
     color: #cbd5e1;
     z-index: 5;
@@ -5549,13 +5550,13 @@ body.lang-bn strong {
     width: 100%;
     flex-shrink: 0;
     min-width: 0;
-    overflow-x: hidden;
+    overflow: hidden;
 }
 
 .fb-model-selector-group {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
     min-width: 0;
     flex-shrink: 1;
@@ -5563,58 +5564,70 @@ body.lang-bn strong {
 }
 
 .fb-model-icon {
-    font-size: 14px;
+    font-size: 11px;
     flex-shrink: 0;
+    opacity: 0.85;
+    line-height: 1;
 }
 
 .fb-model-select {
     width: 100%;
     min-width: 0;
     max-width: 100%;
+    height: 22px;
     box-sizing: border-box;
     flex-shrink: 1;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid rgba(67, 239, 140, 0.3);
-    border-radius: 6px;
-    color: #43ef8c;
-    font-size: 11px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(67, 239, 140, 0.22);
+    border-radius: 999px;
+    color: #4ade80;
+    font-size: 11px !important;
     font-weight: 600;
-    padding: 5px 8px;
+    padding: 1px 8px;
     outline: none;
     cursor: pointer;
     transition: all 0.2s ease;
     text-overflow: ellipsis;
+    line-height: 20px;
 }
 
 .fb-model-select:focus {
-    border-color: #43ef8c;
-    box-shadow: 0 0 10px rgba(67, 239, 140, 0.35);
+    border-color: #4ade80;
+    box-shadow: 0 0 6px rgba(74, 222, 128, 0.3);
 }
 
 .fb-model-select option {
     background: #06150f;
     color: #f1f5f9;
+    padding: 4px;
 }
 
 .fb-model-pill {
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 10px;
+    gap: 4px;
+    padding: 1px 7px;
+    height: 18px;
+    border-radius: 999px;
+    font-size: 9.5px !important;
     font-weight: 700;
     white-space: nowrap;
     flex-shrink: 0;
     box-sizing: border-box;
     transition: all 0.2s ease;
+    line-height: 16px;
+}
+
+.fb-model-pill .fb-pulse-dot {
+    width: 5px;
+    height: 5px;
 }
 
 .fb-model-pill.ultra {
     background: rgba(56, 189, 248, 0.16);
     color: #38bdf8;
     border: 1px solid rgba(56, 189, 248, 0.45);
-    box-shadow: 0 0 8px rgba(56, 189, 248, 0.25);
+    box-shadow: 0 0 6px rgba(56, 189, 248, 0.2);
 }
 
 .fb-model-pill.flash {
@@ -5633,7 +5646,7 @@ body.lang-bn strong {
     background: rgba(168, 85, 247, 0.18);
     color: #c084fc;
     border: 1px solid rgba(168, 85, 247, 0.45);
-    box-shadow: 0 0 8px rgba(168, 85, 247, 0.3);
+    box-shadow: 0 0 6px rgba(168, 85, 247, 0.25);
 }
 
 .fb-pulse-dot {
@@ -6226,12 +6239,10 @@ body.lang-bn strong {
         transform: translateY(20px) !important;
     }
 
-    /* Prevent mobile auto-zoom distortion (especially on iOS & in-app browsers) */
-    .farmer-buddy-window input,
+    /* Prevent mobile auto-zoom distortion on text inputs */
+    .farmer-buddy-window input:not([type="checkbox"]):not([type="radio"]),
     .farmer-buddy-window textarea,
-    .farmer-buddy-window select,
-    .fb-input-field,
-    .fb-model-select {
+    .fb-input-field {
         font-size: 16px !important;
     }
 
@@ -6263,7 +6274,8 @@ body.lang-bn strong {
         max-width: 100% !important;
         flex-shrink: 0 !important;
         overflow: hidden !important;
-        padding: 6px 10px !important;
+        padding: 3px 10px !important;
+        height: 28px !important;
         gap: 6px !important;
     }
 
@@ -6279,14 +6291,20 @@ body.lang-bn strong {
         max-width: 100% !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        padding: 6px 8px !important;
-        font-size: 16px !important;
+        padding: 1px 6px !important;
+        font-size: 11px !important;
+        height: 22px !important;
+        line-height: 20px !important;
+        border-radius: 999px !important;
     }
 
     .fb-model-pill {
-        font-size: 10px !important;
-        padding: 2px 6px !important;
+        font-size: 9.5px !important;
+        padding: 1px 6px !important;
+        height: 18px !important;
+        line-height: 16px !important;
         flex-shrink: 0 !important;
+        border-radius: 999px !important;
     }
 
     .fb-header {
