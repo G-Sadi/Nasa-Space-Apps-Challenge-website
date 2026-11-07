@@ -28,7 +28,7 @@ let scene, camera, renderer, controls;
 let containerEl, canvasEl;
 let sky = null, sun = null;
 let sunLight = null, hemiLight = null, ambientLight = null;
-let terrainMesh = null, waterMesh = null, grassTuftsMesh = null;
+let terrainMesh = null, waterMesh = null, grassTuftsMesh = null, soilVolumeMesh = null;
 
 // Device Detection for Mobile Responsiveness & 60 FPS Optimization
 export function isMobileDevice() {
@@ -45,13 +45,65 @@ let TOTAL_PLANTS = ROWS * COLS;
 let ROW_SPACING = 0.88;
 let PLANT_SPACING = 0.88;
 
+/**
+ * Normalizes incoming crop IDs from UI dropdowns, API, or Bangla labels
+ */
+export function normalizeCropId(rawId) {
+    if (!rawId) return "tomato";
+    const str = String(rawId).toLowerCase().trim();
+    if (str.includes("rice") || str.includes("ধান")) return "rice";
+    if (str.includes("wheat") || str.includes("গম")) return "wheat";
+    if (str.includes("maize") || str.includes("corn") || str.includes("ভুট্টা")) return "maize";
+    if (str.includes("jute") || str.includes("পাট")) return "jute";
+    if (str.includes("potato") || str.includes("আলু")) return "potato";
+    if (str.includes("mustard") || str.includes("সরিষা")) return "mustard";
+    if (str.includes("tomato") || str.includes("টমেটো")) return "tomato";
+    if (str.includes("eggplant") || str.includes("brinjal") || str.includes("বেগুন")) return "eggplant";
+    if (str.includes("chili") || str.includes("chilli") || str.includes("pepper") || str.includes("মরিচ")) return "chili";
+    if (str.includes("lentil") || str.includes("মসুর")) return "lentil";
+    if (str.includes("cucumber") || str.includes("শসা")) return "cucumber";
+    if (str.includes("cauliflower") || str.includes("ফুলকপি")) return "cauliflower";
+    if (str.includes("onion") || str.includes("পেঁয়াজ") || str.includes("পিয়াজ")) return "onion";
+    if (str.includes("carrot") || str.includes("গাজর")) return "carrot";
+    if (str.includes("papaya") || str.includes("পেঁপে")) return "papaya";
+    return str;
+}
+window.normalizeCropId = normalizeCropId;
+
+/**
+ * Returns exact terrain surface height at (x, z)
+ */
+export function getTerrainHeightAt(x, z) {
+    const furrowFreq = Math.PI / ROW_SPACING;
+    let y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.22;
+    y += Math.sin(x * 24.0 + z * 18.0) * 0.014;
+    y += Math.sin(x * 48.0) * Math.cos(z * 36.0) * 0.007;
+
+    const dist = Math.max(Math.abs(x), Math.abs(z));
+    if (dist > 5.8) {
+        const bundFactor = Math.min((dist - 5.8) / 1.6, 1.0);
+        y += Math.sin(bundFactor * Math.PI * 0.5) * 0.38;
+    }
+    return y;
+}
+window.getTerrainHeightAt = getTerrainHeightAt;
+
 function updateFieldGridDimensions() {
     const mobile = isMobileDevice();
-    ROWS = mobile ? 8 : 16;
-    COLS = mobile ? 8 : 16;
-    TOTAL_PLANTS = ROWS * COLS;
-    ROW_SPACING = mobile ? 1.05 : 0.88;
-    PLANT_SPACING = mobile ? 1.05 : 0.88;
+    if (activeCropId === "papaya") {
+        // Orchard spacing for large tropical papaya trees
+        ROWS = mobile ? 5 : 7;
+        COLS = mobile ? 5 : 7;
+        TOTAL_PLANTS = ROWS * COLS;
+        ROW_SPACING = mobile ? 1.95 : 1.70;
+        PLANT_SPACING = mobile ? 1.95 : 1.70;
+    } else {
+        ROWS = mobile ? 8 : 16;
+        COLS = mobile ? 8 : 16;
+        TOTAL_PLANTS = ROWS * COLS;
+        ROW_SPACING = mobile ? 1.05 : 0.88;
+        PLANT_SPACING = mobile ? 1.05 : 0.88;
+    }
 }
 
 let instanceData = [];
@@ -1027,7 +1079,7 @@ function createChiliMorphologyGeometry() {
             fruits.push(chili);
         } else {
             const flower = createTomatoBlossomGeometry();
-            flower.scale.set(0.6, 0.6, 0.6);
+            flower.scale(0.6, 0.6, 0.6);
             flower.translate(Math.cos(ang) * 0.16, 0.42, Math.sin(ang) * 0.16);
             flowers.push(flower);
         }
@@ -1138,6 +1190,18 @@ function createOnionMorphologyGeometry() {
 }
 
 /**
+ * Ensures geometry base sits firmly at local y = 0
+ */
+function ensureBaseAtYZero(geometry) {
+    if (!geometry || !geometry.attributes || !geometry.attributes.position) return geometry;
+    geometry.computeBoundingBox();
+    if (geometry.boundingBox && geometry.boundingBox.min.y < -0.005) {
+        geometry.translate(0, -geometry.boundingBox.min.y, 0);
+    }
+    return geometry;
+}
+
+/**
  * Jute Morphology Generator (Tall Straight Fibrous Green Stalk & Upper Canopy Leaves)
  */
 function createJuteMorphologyGeometry() {
@@ -1145,39 +1209,297 @@ function createJuteMorphologyGeometry() {
     const leaves = [];
     const flowers = [];
 
-    const height = 2.15;
-    const stalk = new THREE.CylinderGeometry(0.012, 0.026, height, 8);
+    const height = 2.55;
+    // Tall slender upright fibrous green stalk, base at local y = 0
+    const stalk = new THREE.CylinderGeometry(0.016, 0.030, height, 8);
     stalk.translate(0, height * 0.5, 0);
     stems.push(stalk);
 
-    const leafCount = 12;
+    // Lush lance-shaped serrated leaves clustered along upper 40% of stalk
+    const leafCount = 16;
     for (let i = 0; i < leafCount; i++) {
         const ang = (i * 137.5) * (Math.PI / 180);
-        const ly = height * 0.60 + (i / leafCount) * (height * 0.38);
+        const ly = height * 0.58 + (i / leafCount) * (height * 0.40);
 
         const leaf = createBotanicalBladeGeometry({
-            length: 0.32,
-            baseWidth: 0.012,
-            midWidth: 0.055,
+            length: 0.36,
+            baseWidth: 0.014,
+            midWidth: 0.062,
             tipWidth: 0.004,
             archX: 0.02,
-            archY: 0.08,
+            archY: 0.07,
             midribFold: 0.008,
-            wavyEdge: 0.004,
+            wavyEdge: 0.005,
             segments: 12
         });
-        leaf.rotateX(0.45);
+        leaf.rotateX(0.42);
         leaf.rotateY(ang);
         leaf.translate(0, ly, 0);
         leaves.push(leaf);
     }
 
-    for (let f = 0; f < 4; f++) {
-        const fang = f * 1.5;
+    // Small yellow axillary blossoms
+    for (let f = 0; f < 5; f++) {
+        const fang = f * 1.4;
         const fl = createTomatoBlossomGeometry();
-        fl.scale.set(0.5, 0.5, 0.5);
-        fl.translate(0.04 * Math.cos(fang), height * 0.82 + f * 0.04, 0.04 * Math.sin(fang));
+        fl.scale(0.5, 0.5, 0.5); // BufferGeometry scale fix
+        fl.translate(0.04 * Math.cos(fang), height * 0.75 + f * 0.05, 0.04 * Math.sin(fang));
         flowers.push(fl);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Deeply Dissected 7-Lobed Palmate Papaya Leaf
+ */
+function createPalmatePapayaLeafGeometry(petioleLen = 0.85) {
+    const parts = [];
+
+    // Long hollow green petiole (leaf stalk) extending outward
+    const petioleCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0.05, petioleLen * 0.35),
+        new THREE.Vector3(0, 0.06, petioleLen * 0.70),
+        new THREE.Vector3(0, -0.04, petioleLen)
+    ]);
+    const petiole = new THREE.TubeGeometry(petioleCurve, 10, 0.012, 6, false);
+    parts.push(petiole);
+
+    // 7-lobed deeply dissected palmate leaf blade at petiole tip
+    const tipZ = petioleLen;
+    const lobeDefs = [
+        { angle: 0, length: 0.45, width: 0.11, archY: 0.06 },       // Central primary lobe
+        { angle: -0.45, length: 0.38, width: 0.09, archY: 0.05 },  // Left upper lobe
+        { angle: 0.45, length: 0.38, width: 0.09, archY: 0.05 },   // Right upper lobe
+        { angle: -0.95, length: 0.30, width: 0.08, archY: 0.04 },  // Left middle lobe
+        { angle: 0.95, length: 0.30, width: 0.08, archY: 0.04 },   // Right middle lobe
+        { angle: -1.50, length: 0.20, width: 0.06, archY: 0.03 },  // Left basal lobe
+        { angle: 1.50, length: 0.20, width: 0.06, archY: 0.03 }    // Right basal lobe
+    ];
+
+    lobeDefs.forEach(l => {
+        const blade = createBotanicalBladeGeometry({
+            length: l.length,
+            baseWidth: 0.015,
+            midWidth: l.width,
+            tipWidth: 0.003,
+            archX: 0,
+            archY: l.archY,
+            midribFold: 0.009,
+            wavyEdge: 0.006,
+            segments: 10
+        });
+        blade.rotateZ(l.angle);
+        blade.rotateX(0.15);
+        blade.translate(0, -0.04, tipZ);
+        parts.push(blade);
+    });
+
+    return mergeBufferGeometries(parts);
+}
+
+/**
+ * Papaya Tree Morphology Generator (পেঁপে গাছ)
+ * Unbranched trunk with ring scars, cluster of 12 papayas at crown, and radiating 16-leaf umbrella canopy
+ */
+function createPapayaMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+
+    const height = 2.30;
+
+    // 1. Trunk: Tall, unbranched, slightly tapered cylindrical trunk
+    const trunk = new THREE.CylinderGeometry(0.07, 0.12, height, 10);
+    trunk.translate(0, height * 0.5, 0); // Base at local y = 0
+    stems.push(trunk);
+
+    // Horizontal ring scar markings along trunk
+    for (let r = 2; r < 12; r++) {
+        const ry = (r / 12) * height * 0.85;
+        const currentRadius = THREE.MathUtils.lerp(0.12, 0.07, ry / height);
+        const ring = new THREE.TorusGeometry(currentRadius * 1.03, 0.005, 4, 12);
+        ring.rotateX(Math.PI * 0.5);
+        ring.translate(0, ry, 0);
+        stems.push(ring);
+    }
+
+    // 2. Fruit Cluster at Crown: Directly attached around upper trunk (y = 1.45 to 1.80)
+    const fruitCount = 11;
+    for (let i = 0; i < fruitCount; i++) {
+        const ang = (i / fruitCount) * Math.PI * 2 + (i % 2) * 0.3;
+        const fy = 1.45 + (i / fruitCount) * 0.35;
+        const dist = 0.13;
+        const fx = Math.cos(ang) * dist;
+        const fz = Math.sin(ang) * dist;
+
+        const papaya = new THREE.SphereGeometry(0.075, 12, 10);
+        papaya.scale(1.1, 1.7, 1.1);
+        papaya.rotateX(0.25);
+        papaya.rotateY(ang);
+        papaya.translate(fx, fy, fz);
+        fruits.push(papaya);
+    }
+
+    // 3. Umbrella Canopy of Palmate Leaves: Radiating from top apex (y = 2.05 to 2.30)
+    const leafCount = 16;
+    for (let i = 0; i < leafCount; i++) {
+        const ang = (i / leafCount) * Math.PI * 2 + (Math.random() - 0.5) * 0.15;
+        const ly = 2.05 + (i / leafCount) * 0.25;
+        const droopAngle = THREE.MathUtils.lerp(0.55, 1.15, i / leafCount);
+
+        const palmateLeaf = createPalmatePapayaLeafGeometry(0.85);
+        palmateLeaf.rotateX(droopAngle);
+        palmateLeaf.rotateY(ang);
+        palmateLeaf.translate(0, ly, 0);
+        leaves.push(palmateLeaf);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits)
+    };
+}
+
+/**
+ * Cucumber Morphology Generator (Trailing Vine along Ridge)
+ */
+function createCucumberMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const flowers = [];
+
+    const vineCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0.05, 0),
+        new THREE.Vector3(0.15, 0.12, 0.25),
+        new THREE.Vector3(-0.10, 0.08, 0.55),
+        new THREE.Vector3(0.18, 0.06, 0.85)
+    ]);
+    const vine = new THREE.TubeGeometry(vineCurve, 12, 0.012, 6, false);
+    stems.push(vine);
+
+    for (let i = 0; i < 6; i++) {
+        const t = (i + 1) / 7;
+        const pt = vineCurve.getPoint(t);
+        const leaf = createBroadWavyLeafGeometry(0.28, 0.22, 5);
+        leaf.rotateX(0.3);
+        leaf.rotateY(i * 1.2);
+        leaf.translate(pt.x, pt.y + 0.05, pt.z);
+        leaves.push(leaf);
+    }
+
+    for (let c = 0; c < 2; c++) {
+        const ct = 0.35 + c * 0.40;
+        const pt = vineCurve.getPoint(ct);
+        const cuc = new THREE.CylinderGeometry(0.024, 0.022, 0.22, 8);
+        cuc.rotateZ(Math.PI * 0.48);
+        cuc.translate(pt.x + 0.08, pt.y + 0.02, pt.z);
+        fruits.push(cuc);
+    }
+
+    for (let f = 0; f < 3; f++) {
+        const ft = 0.25 + f * 0.30;
+        const pt = vineCurve.getPoint(ft);
+        const flower = createTomatoBlossomGeometry();
+        flower.translate(pt.x - 0.05, pt.y + 0.06, pt.z);
+        flowers.push(flower);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Carrot Morphology Generator (Crowned Root Shoulder & Lacy Foliage)
+ */
+function createCarrotMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+
+    const rootShoulder = new THREE.ConeGeometry(0.045, 0.16, 8);
+    rootShoulder.rotateX(Math.PI);
+    rootShoulder.translate(0, 0.06, 0);
+    fruits.push(rootShoulder);
+
+    for (let i = 0; i < 9; i++) {
+        const ang = (i / 9) * Math.PI * 2;
+        const leaf = createBotanicalBladeGeometry({
+            length: 0.38,
+            baseWidth: 0.008,
+            midWidth: 0.055,
+            tipWidth: 0.003,
+            archX: 0.015,
+            archY: 0.08,
+            midribFold: 0.006,
+            wavyEdge: 0.008,
+            segments: 12
+        });
+        leaf.rotateX(0.40);
+        leaf.rotateY(ang);
+        leaf.translate(0, 0.12, 0);
+        leaves.push(leaf);
+    }
+
+    const crown = new THREE.CylinderGeometry(0.015, 0.025, 0.04, 6);
+    crown.translate(0, 0.12, 0);
+    stems.push(crown);
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits)
+    };
+}
+
+/**
+ * Lentil Morphology Generator (Delicate Legume Cluster)
+ */
+function createLentilMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const flowers = [];
+
+    for (let i = 0; i < 6; i++) {
+        const ang = (i / 6) * Math.PI * 2;
+        const stem = createOrganicMainStem(0.40, 0.010, 0.004, 0.03, 0.02, 8);
+        stem.rotateZ(0.35);
+        stem.rotateY(ang);
+        stems.push(stem);
+
+        for (let l = 0; l < 4; l++) {
+            const ly = 0.10 + l * 0.07;
+            const leaf = createBotanicalBladeGeometry({
+                length: 0.16,
+                baseWidth: 0.004,
+                midWidth: 0.022,
+                tipWidth: 0.002,
+                archX: 0.01,
+                archY: 0.025,
+                midribFold: 0.004,
+                segments: 8
+            });
+            leaf.rotateX(0.35);
+            leaf.rotateY(ang + (l - 1.5) * 0.4);
+            leaf.translate(Math.cos(ang) * 0.06, ly, Math.sin(ang) * 0.06);
+            leaves.push(leaf);
+        }
+
+        const flower = createTomatoBlossomGeometry();
+        flower.scale(0.4, 0.4, 0.4);
+        flower.translate(Math.cos(ang) * 0.10, 0.32, Math.sin(ang) * 0.10);
+        flowers.push(flower);
     }
 
     return {
@@ -1191,6 +1513,8 @@ function createJuteMorphologyGeometry() {
  * Universal Crop Morphology Dispatcher
  */
 export function createCropMesh(cropType, baseChlorophyll) {
+    const crop = normalizeCropId(cropType);
+
     let stemGeom = null, stemMat = null;
     let leafGeom = null, leafMat = null;
     let fruitGeom = null, fruitMat = null;
@@ -1199,7 +1523,7 @@ export function createCropMesh(cropType, baseChlorophyll) {
 
     let isMonocot = false;
 
-    switch (cropType) {
+    switch (crop) {
         case "rice": {
             isMonocot = true;
             const res = createCerealTillerClusterGeometry(true);
@@ -1291,6 +1615,7 @@ export function createCropMesh(cropType, baseChlorophyll) {
             stemGeom = res.stemGeom;
             leafGeom = res.leafGeom;
             fruitGeom = res.fruitGeom;
+            calyxGeom = res.calyxGeom;
             flowerGeom = res.flowerGeom;
             stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6822, roughness: 0.55 });
             fruitMat = new THREE.MeshPhysicalMaterial({
@@ -1341,6 +1666,21 @@ export function createCropMesh(cropType, baseChlorophyll) {
             break;
         }
 
+        case "papaya": {
+            const res = createPapayaMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x6e7852, roughness: 0.85 }); // Greyish-green bark
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                color: 0x3b7a1e, // Glossy emerald green & ripening orange
+                roughness: 0.22,
+                clearcoat: 0.75,
+                clearcoatRoughness: 0.15
+            });
+            break;
+        }
+
         case "cauliflower": {
             const leaves = [];
             for (let i = 0; i < 7; i++) {
@@ -1358,15 +1698,47 @@ export function createCropMesh(cropType, baseChlorophyll) {
             curd.translate(0, 0.14, 0);
             fruitGeom = curd;
 
-            stemGeom = new THREE.CylinderGeometry(0.02, 0.03, 0.12, 6);
-            stemGeom.translate(0, 0.06, 0);
+            stemGeom = new THREE.CylinderGeometry(0.02, 0.035, 0.14, 6);
+            stemGeom.translate(0, 0.07, 0);
             stemMat = new THREE.MeshStandardMaterial({ color: 0x3f722a, roughness: 0.60 });
             fruitMat = new THREE.MeshStandardMaterial({ color: 0xfefce8, roughness: 0.75 });
             break;
         }
 
+        case "cucumber": {
+            const res = createCucumberMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x386d26, roughness: 0.58 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x225828, roughness: 0.50 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+            break;
+        }
+
+        case "carrot": {
+            const res = createCarrotMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6522, roughness: 0.60 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xea580c, roughness: 0.45 });
+            break;
+        }
+
+        case "lentil": {
+            const res = createLentilMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x386a28, roughness: 0.58 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xa78bfa, roughness: 0.35 });
+            break;
+        }
+
         default: {
-            // General botanical architecture for remaining crops (Lentil, Cucumber, Carrot, Papaya)
+            // General robust botanical architecture for any unlisted crop
             const stems = [];
             const leaves = [];
             for (let i = 0; i < 5; i++) {
@@ -1393,17 +1765,34 @@ export function createCropMesh(cropType, baseChlorophyll) {
         }
     }
 
-    // Hyper-Realistic PBR Subsurface Scattering Material for Leaves
+    // Mathematical guarantee: Plant stem sits firmly at local y = 0
+    if (stemGeom && stemGeom.attributes && stemGeom.attributes.position) {
+        stemGeom.computeBoundingBox();
+        if (stemGeom.boundingBox && stemGeom.boundingBox.min.y < -0.002) {
+            const shiftY = -stemGeom.boundingBox.min.y;
+            [stemGeom, leafGeom, fruitGeom, calyxGeom, flowerGeom].forEach(g => {
+                if (g) g.translate(0, shiftY, 0);
+            });
+        }
+    }
+    if (leafGeom && leafGeom.attributes && leafGeom.attributes.position) {
+        leafGeom.computeBoundingBox();
+        if (leafGeom.boundingBox && leafGeom.boundingBox.min.y < -0.002) {
+            leafGeom.translate(0, -leafGeom.boundingBox.min.y, 0);
+        }
+    }
+
+    // Hyper-Realistic PBR Subsurface Scattering Material for Leaves (Sunlit & Vibrant)
     leafMat = new THREE.MeshPhysicalMaterial({
         map: isMonocot ? monocotTexture : dicotTexture,
-        color: baseChlorophyll,
-        roughness: 0.45,
+        color: baseChlorophyll || 0x489a28,
+        roughness: 0.40,
         metalness: 0.02,
-        clearcoat: 0.15,
-        clearcoatRoughness: 0.4,
-        transmission: 0.15,
-        emissive: new THREE.Color(0x1a3810),
-        emissiveIntensity: 0.22,
+        clearcoat: 0.20,
+        clearcoatRoughness: 0.35,
+        transmission: 0.16,
+        emissive: new THREE.Color(0x225514),
+        emissiveIntensity: 0.28,
         side: THREE.DoubleSide
     });
 
@@ -1419,7 +1808,9 @@ export function createCropMesh(cropType, baseChlorophyll) {
 // =============================================================================
 // 4. HYPER-DETAILED PHOTOREALISTIC PBR CROP FIELD BUILDER
 // =============================================================================
-export function createCropField(cropId = "tomato") {
+export function createCropField(rawCropId = "tomato") {
+    const cropId = normalizeCropId(rawCropId);
+    activeCropId = cropId;
     updateFieldGridDimensions();
     if (currentCropGroup) {
         scene.remove(currentCropGroup);
@@ -1428,7 +1819,6 @@ export function createCropField(cropId = "tomato") {
 
     currentCropGroup = new THREE.Group();
     currentCropGroup.name = `CropField_${cropId}`;
-    activeCropId = cropId;
 
     const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === cropId) : null;
     maxCropDays = dbCrop ? dbCrop.total_duration_days : 105;
@@ -1499,8 +1889,9 @@ export function createCropField(cropId = "tomato") {
             const x = (c - (COLS - 1) * 0.5) * ROW_SPACING;
             const z = (r - (ROWS - 1) * 0.5) * PLANT_SPACING;
 
-            // Soil ridge height profile
-            const y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.22;
+            // Exact terrain ridge crest height
+            const terrainY = getTerrainHeightAt(x, z);
+            const y = terrainY - 0.02; // slight 2cm embed for natural root tuck
             const rotY = Math.random() * Math.PI * 2;
             const s = 0.94 + Math.random() * 0.14;
 
@@ -1721,20 +2112,11 @@ function initTerrain() {
         const x = posAttr.getX(i);
         const z = posAttr.getZ(i);
 
-        // Raised ridge bed profile beneath each crop row
-        let y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.22;
-        // Real-world soil aggregate clods and natural bump displacement
-        y += Math.sin(x * 24.0 + z * 18.0) * 0.014;
-        y += Math.sin(x * 48.0) * Math.cos(z * 36.0) * 0.007;
-
-        const dist = Math.max(Math.abs(x), Math.abs(z));
-        if (dist > 5.8) {
-            const bundFactor = Math.min((dist - 5.8) / 1.6, 1.0);
-            y += Math.sin(bundFactor * Math.PI * 0.5) * 0.38;
-        }
-
+        // Exact terrain height from shared elevation function
+        const y = getTerrainHeightAt(x, z);
         posAttr.setY(i, y);
 
+        const dist = Math.max(Math.abs(x), Math.abs(z));
         const tempCol = new THREE.Color();
         if (dist > 5.8) {
             tempCol.lerpColors(colRidge, colBund, 0.75);
@@ -1761,6 +2143,18 @@ function initTerrain() {
     terrainMesh = new THREE.Mesh(geometry, soilMaterial);
     terrainMesh.receiveShadow = true;
     scene.add(terrainMesh);
+
+    // Solid dark-earth skirt/volume block sealing the terrain down to y = -3.0
+    const soilBoxGeo = new THREE.BoxGeometry(size, 3.0, size);
+    const soilBoxMat = new THREE.MeshStandardMaterial({
+        color: 0x231709,
+        roughness: 0.96,
+        metalness: 0.02
+    });
+    soilVolumeMesh = new THREE.Mesh(soilBoxGeo, soilBoxMat);
+    soilVolumeMesh.position.set(0, -1.5, 0);
+    soilVolumeMesh.receiveShadow = true;
+    scene.add(soilVolumeMesh);
 
     // Reflective Furrow Water layer
     const waterGeo = new THREE.PlaneGeometry(12.0, 12.0, 1, 1);
@@ -2015,10 +2409,10 @@ window.setWeatherMode = setWeatherMode;
 // 9. PHOTOREALISTIC LIGHTING & SKY (RICH CONTRAST, ZERO WASHOUT)
 // =============================================================================
 function initEnvironmentLighting() {
-    ambientLight = new THREE.AmbientLight(0xd4e9d7, 0.7);
+    ambientLight = new THREE.AmbientLight(0xdff6ff, 0.85);
     scene.add(ambientLight);
 
-    hemiLight = new THREE.HemisphereLight(0x7bc676, 0x2d1e12, 0.85);
+    hemiLight = new THREE.HemisphereLight(0xdff6ff, 0x5c4328, 1.2);
     scene.add(hemiLight);
 
     const mobile = isMobileDevice();
@@ -2043,13 +2437,13 @@ function initEnvironmentLighting() {
     sun = new THREE.Vector3();
 
     const skyUniforms = sky.material.uniforms;
-    skyUniforms["turbidity"].value = 4.0;
-    skyUniforms["rayleigh"].value = 1.8;
-    skyUniforms["mieCoefficient"].value = 0.005;
+    skyUniforms["turbidity"].value = 3.0;
+    skyUniforms["rayleigh"].value = 1.4;
+    skyUniforms["mieCoefficient"].value = 0.004;
     skyUniforms["mieDirectionalG"].value = 0.85;
 
-    // Rich dark emerald atmospheric fog
-    scene.fog = new THREE.FogExp2(0x11271d, 0.015);
+    // Soft daylight atmospheric fog (replaces dark 0x11271d)
+    scene.fog = new THREE.FogExp2(0xcdebf9, 0.007);
 
     updateSkyTimeOfDay(45);
 }
@@ -2068,19 +2462,19 @@ export function updateSkyTimeOfDay(sliderVal) {
         if (t < 0.25) {
             sunLight.color.setHex(0xffaa6e);
             sunLight.intensity = 1.8;
-            if (scene.fog) scene.fog.color.setHex(0x52362b);
+            if (scene.fog) scene.fog.color.setHex(0xfae1ce);
         } else if (t < 0.75) {
             sunLight.color.setHex(0xfffaed);
             sunLight.intensity = 3.2;
-            if (scene.fog) scene.fog.color.setHex(0x11271d);
+            if (scene.fog) scene.fog.color.setHex(0xcdebf9);
         } else if (t < 0.90) {
             sunLight.color.setHex(0xff8c42);
             sunLight.intensity = 2.4;
-            if (scene.fog) scene.fog.color.setHex(0x542b1a);
+            if (scene.fog) scene.fog.color.setHex(0xfdd3b0);
         } else {
             sunLight.color.setHex(0x60a5fa);
             sunLight.intensity = 0.8;
-            if (scene.fog) scene.fog.color.setHex(0x0a141e);
+            if (scene.fog) scene.fog.color.setHex(0x121c29);
         }
     }
 
@@ -2483,6 +2877,10 @@ export function switchCameraMode(mode) {
 
     [btnDrone, btnField, btnRoot].forEach(b => b?.classList.remove("active"));
 
+    if (controls) {
+        controls.maxPolarAngle = (mode === "root") ? (Math.PI * 0.85) : (Math.PI * 0.5 - 0.04);
+    }
+
     if (mode === "drone") {
         targetCameraPos.set(0, 11.0, 13.0);
         targetLookAt.set(0, 0.2, 0);
@@ -2502,8 +2900,9 @@ export function switchCameraMode(mode) {
 }
 window.switchCameraMode = switchCameraMode;
 
-export function updateCropSimulation(cropId) {
-    if (!cropId) return;
+export function updateCropSimulation(rawCropId) {
+    if (!rawCropId) return;
+    const cropId = normalizeCropId(rawCropId);
     activeCropId = cropId;
 
     const cropSelect = document.getElementById("cropSelect");
@@ -2760,7 +3159,23 @@ export function init3DFieldSimulation() {
     const height = containerEl.clientHeight || (mobile ? 560 : 680);
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0e241b);
+
+    // Daylight sky background gradient (#cdebf9 horizon to #7ec0ee zenith)
+    const skyCanvas = document.createElement("canvas");
+    skyCanvas.width = 16;
+    skyCanvas.height = 256;
+    const skyCtx = skyCanvas.getContext("2d");
+    if (skyCtx) {
+        const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
+        skyGrad.addColorStop(0, "#7ec0ee");
+        skyGrad.addColorStop(0.65, "#aee0f9");
+        skyGrad.addColorStop(1, "#cdebf9");
+        skyCtx.fillStyle = skyGrad;
+        skyCtx.fillRect(0, 0, 16, 256);
+        scene.background = new THREE.CanvasTexture(skyCanvas);
+    } else {
+        scene.background = new THREE.Color(0xcdebf9);
+    }
 
     camera = new THREE.PerspectiveCamera(mobile ? 52 : 45, width / height, 0.1, 1000);
     if (mobile) {
@@ -2776,7 +3191,7 @@ export function init3DFieldSimulation() {
     });
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2.0));
-    renderer.setClearColor(0x0e241b, 1.0);
+    renderer.setClearColor(0xcdebf9, 1.0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = true;
@@ -2790,7 +3205,7 @@ export function init3DFieldSimulation() {
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.08;
-    controls.maxPolarAngle = Math.PI * 0.495;
+    controls.maxPolarAngle = Math.PI * 0.5 - 0.04;
     controls.minDistance = 0.8;
     controls.maxDistance = 24.0;
     controls.target.set(0, 0.65, 0);
