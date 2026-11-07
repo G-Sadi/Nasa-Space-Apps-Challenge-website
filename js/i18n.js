@@ -223,6 +223,11 @@ const i18nData = {
     "cam-field":             { en: "🌾 Crop Close-up",             bn: "🌾 কাছ থেকে দেখুন" },
     "cam-root":              { en: "🌱 Root & Soil View",          bn: "🌱 মাটির গভীরে" },
 
+    // ===== TIME OF DAY SEGMENTS =====
+    "tod-morning":           { en: "Morning",                      bn: "সকাল" },
+    "tod-noon":              { en: "Noon",                         bn: "দুপুর" },
+    "tod-night":             { en: "Night",                        bn: "রাত" },
+
     // ===== 5 GROWTH STAGES =====
     "stage-1-name":          { en: "1. Sprout / Seedling",         bn: "১. অঙ্কুরোদগম ও চারা" },
     "stage-2-name":          { en: "2. Vegetative Growth",         bn: "২. অঙ্গজ বৃদ্ধি" },

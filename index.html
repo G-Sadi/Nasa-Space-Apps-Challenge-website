@@ -1210,7 +1210,7 @@
 
             <!-- Top Center: Crop Selector & Time of Day Slider -->
             <div class="fctrl-group fctrl-center">
-                <!-- Crop Selector Pill with Sketchfab 3D Badge -->
+                <!-- Crop Selector Pill -->
                 <div class="fctrl-pill fctrl-crop-pill">
                     <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
                     <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
@@ -1232,12 +1232,20 @@
                     </select>
                 </div>
 
-                <!-- ☀️ Time of Day Slider -->
-                <div class="fctrl-pill fctrl-tod-pill" title="সূর্যের অবস্থান ও আলো পরিবর্তন (Time of Day)">
-                    <span class="tod-label">☀️</span>
-                    <input type="range" id="timeOfDaySlider" class="tod-slider" min="0" max="100" value="45" step="1"
-                        aria-label="Time of Day">
-                    <span id="timeOfDayLabel" class="tod-val-text">দুপুর (Noon)</span>
+                <!-- 🌅 1-Click Time of Day Segmented Control (Morning | Noon | Night) -->
+                <div class="tod-segmented-control" id="todSegmentedControl" role="group" aria-label="Time of Day Control">
+                    <button type="button" class="tod-segment-btn" data-time="morning" id="todBtnMorning" title="Morning (সকাল)">
+                        <span class="tod-btn-icon">🌅</span>
+                        <span class="tod-btn-text" data-i18n="tod-morning">সকাল</span>
+                    </button>
+                    <button type="button" class="tod-segment-btn active" data-time="noon" id="todBtnNoon" title="Noon (দুপুর)">
+                        <span class="tod-btn-icon">☀️</span>
+                        <span class="tod-btn-text" data-i18n="tod-noon">দুপুর</span>
+                    </button>
+                    <button type="button" class="tod-segment-btn" data-time="night" id="todBtnNight" title="Night (রাত)">
+                        <span class="tod-btn-icon">🌙</span>
+                        <span class="tod-btn-text" data-i18n="tod-night">রাত</span>
+                    </button>
                 </div>
             </div>
 
@@ -1336,16 +1344,12 @@
             </div>
 
             <div class="action-card-body">
-                <!-- AR Macro Close-Up & 3D Inspector Launcher -->
+                <!-- AR Macro Close-Up Launcher -->
                 <div class="action-interactive-controls">
                     <button id="btnToggleMacroView" class="ar-macro-btn" title="উদ্ভিদের অতি নিকটতম ৩ডি দৃশ্য দেখুন">
                         <span class="btn-ar-icon">🔬</span>
                         <span class="btn-ar-text" data-i18n="action-macro-btn">3D Crop Macro View / AR X-Ray</span>
                         <span class="ar-live-pulse">LIVE</span>
-                    </button>
-                    <button id="btnActInspect3D" class="btn-inspect-3d-compact" title="Sketchfab 3D Inspector">
-                        <span>🎨</span>
-                        <span data-i18n="action-inspect-3d">Sketchfab 3D Asset</span>
                     </button>
                 </div>
 
