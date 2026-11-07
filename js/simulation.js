@@ -2,8 +2,8 @@
 |--------------------------------------------------------------------------
 | AGRIVISION / FIELD SHIFT — PHOTOREALISTIC 3D & SPATIAL AR CROP ENGINE
 |--------------------------------------------------------------------------
-| - Hyper-Detailed PBR Botanical Generator (Plump Oblate Tomatoes with
-|   5-Pointed Calyx Stars, Bamboo Support Stakes, Curved Vines & Serrated Leaves)
+| - Hyper-Detailed PBR Botanical Morphology (Distinct Leaf Shapes, Organic
+|   Tapered Stems, Zero Wooden Stakes, Calyx Stars, PBR Subsurface Translucency)
 | - Crop-Accurate Phenological Growth Stages from window.CROPS_DATABASE
 | - True In-Scene 3D Spatial AR Anchors (World-to-Screen Projected Pins)
 | - 3D Crop Macro View / AR Holographic Inspection Callout Ring
@@ -59,7 +59,6 @@ let stemInstancedMesh = null;
 let leafInstancedMesh = null;
 let fruitInstancedMesh = null;
 let calyxInstancedMesh = null;
-let stakeInstancedMesh = null;
 let flowerInstancedMesh = null;
 let currentCropGroup = null;
 
@@ -68,7 +67,6 @@ let currentStemMat = null;
 let currentLeafMat = null;
 let currentFruitMat = null;
 let currentCalyxMat = null;
-let currentStakeMat = null;
 let currentFlowerMat = null;
 let soilMaterial = null;
 
@@ -307,10 +305,26 @@ function mergeBufferGeometries(geometries) {
 }
 
 // =============================================================================
-// 3. BOTANICAL PROCEDURAL GENERATORS (RIBBONS, CATENARY LEAFLETS, CALYCES)
+// 3. BOTANICAL PROCEDURAL GENERATORS (DISTINCT CROP MORPHOLOGIES & PBR SHADING)
 // =============================================================================
-function createCurvedBladeGeometry(length, baseWidth, midWidth, archX, archY, segments = 18) {
-    const geo = new THREE.BufferGeometry();
+
+/**
+ * Procedural Botanical Blade Geometry with 3D Midrib Groove, Parabolic Gravity Droop & Downward Curvature
+ * Used for Rice, Wheat, Maize, Jute, Onion and custom leaflets
+ */
+function createBotanicalBladeGeometry(options = {}) {
+    const {
+        length = 0.8,
+        baseWidth = 0.015,
+        midWidth = 0.035,
+        tipWidth = 0.002,
+        archX = 0.03,
+        archY = 0.22,
+        midribFold = 0.010, // 3D V-fold along central midrib
+        wavyEdge = 0.0,     // Edge undulation
+        segments = 16
+    } = options;
+
     const vertices = [];
     const normals = [];
     const uvs = [];
@@ -318,29 +332,135 @@ function createCurvedBladeGeometry(length, baseWidth, midWidth, archX, archY, se
 
     for (let i = 0; i <= segments; i++) {
         const t = i / segments;
+        // Natural parabolic gravity droop
         const y = Math.sin(t * Math.PI * 0.5) * length;
         const z = -Math.pow(t, 2.0) * archY;
         const xOffset = Math.sin(t * Math.PI) * archX;
 
         let w;
-        if (t < 0.22) w = THREE.MathUtils.lerp(baseWidth, midWidth, t / 0.22);
-        else w = THREE.MathUtils.lerp(midWidth, 0.002, (t - 0.22) / 0.78);
+        if (t < 0.25) {
+            w = THREE.MathUtils.lerp(baseWidth, midWidth, t / 0.25);
+        } else {
+            w = THREE.MathUtils.lerp(midWidth, tipWidth, (t - 0.25) / 0.75);
+        }
 
-        vertices.push(xOffset - w, y, z);
-        vertices.push(xOffset + w, y, z);
-        normals.push(0, 1, 0, 0, 1, 0);
-        uvs.push(0, t, 1, t);
+        if (wavyEdge > 0.0) {
+            w += Math.sin(t * Math.PI * 8.0) * wavyEdge;
+        }
+
+        // 3-point cross section: Left Margin, Central Midrib (groove), Right Margin
+        const foldDepth = Math.sin(t * Math.PI) * midribFold;
+
+        // Left vertex
+        vertices.push(xOffset - w, y, z + foldDepth);
+        uvs.push(0.0, t);
+
+        // Center midrib vertex (sunken groove for venation)
+        vertices.push(xOffset, y, z - foldDepth * 0.4);
+        uvs.push(0.5, t);
+
+        // Right vertex
+        vertices.push(xOffset + w, y, z + foldDepth);
+        uvs.push(1.0, t);
+
+        normals.push(0, 1, 0, 0, 1, 0, 0, 1, 0);
 
         if (i < segments) {
-            const a = i * 2;
-            const b = i * 2 + 1;
-            const c = (i + 1) * 2;
-            const d = (i + 1) * 2 + 1;
-            indices.push(a, b, c);
-            indices.push(b, d, c);
+            const rowA = i * 3;
+            const rowB = (i + 1) * 3;
+
+            indices.push(rowA, rowA + 1, rowB + 1);
+            indices.push(rowA, rowB + 1, rowB);
+
+            indices.push(rowA + 1, rowA + 2, rowB + 2);
+            indices.push(rowA + 1, rowB + 2, rowB + 1);
         }
     }
 
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
+    geo.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+    geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    geo.setIndex(indices);
+    geo.computeVertexNormals();
+    return geo;
+}
+
+// Backward-compatible blade helper
+function createCurvedBladeGeometry(length, baseWidth, midWidth, archX, archY, segments = 16) {
+    return createBotanicalBladeGeometry({
+        length,
+        baseWidth,
+        midWidth,
+        tipWidth: 0.002,
+        archX,
+        archY,
+        midribFold: 0.008,
+        segments
+    });
+}
+
+/**
+ * Organic Tapered Main Stem with Natural Bend
+ * Completely replaces all wooden stakes / brown poles!
+ */
+function createOrganicMainStem(height = 0.85, baseRadius = 0.024, topRadius = 0.008, bendX = 0.03, bendZ = 0.02, segments = 14) {
+    const points = [];
+    const stepCount = 5;
+    for (let i = 0; i <= stepCount; i++) {
+        const t = i / stepCount;
+        const y = t * height;
+        const x = Math.sin(t * Math.PI) * bendX + Math.sin(t * Math.PI * 2.0) * (bendX * 0.35);
+        const z = Math.cos(t * Math.PI * 0.8) * bendZ - bendZ;
+        points.push(new THREE.Vector3(x, y, z));
+    }
+    const curve = new THREE.CatmullRomCurve3(points);
+
+    const radialSegments = 7;
+    const vertices = [];
+    const normals = [];
+    const uvs = [];
+    const indices = [];
+
+    const curvePoints = curve.getPoints(segments);
+    const frenetFrames = curve.computeFrenetFrames(segments, false);
+
+    for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const currentRadius = THREE.MathUtils.lerp(baseRadius, topRadius, t);
+        const center = curvePoints[i];
+        const normal = frenetFrames.normals[i];
+        const binormal = frenetFrames.binormals[i];
+
+        for (let j = 0; j <= radialSegments; j++) {
+            const theta = (j / radialSegments) * Math.PI * 2;
+            const sinT = Math.sin(theta);
+            const cosT = Math.cos(theta);
+
+            const vx = center.x + currentRadius * (cosT * normal.x + sinT * binormal.x);
+            const vy = center.y + currentRadius * (cosT * normal.y + sinT * binormal.y);
+            const vz = center.z + currentRadius * (cosT * normal.z + sinT * binormal.z);
+
+            vertices.push(vx, vy, vz);
+            normals.push(cosT * normal.x + sinT * binormal.x, cosT * normal.y + sinT * binormal.y, cosT * normal.z + sinT * binormal.z);
+            uvs.push(j / radialSegments, t);
+        }
+    }
+
+    const ring = radialSegments + 1;
+    for (let i = 0; i < segments; i++) {
+        for (let j = 0; j < radialSegments; j++) {
+            const a = i * ring + j;
+            const b = (i + 1) * ring + j;
+            const c = (i + 1) * ring + (j + 1);
+            const d = i * ring + (j + 1);
+
+            indices.push(a, b, d);
+            indices.push(b, c, d);
+        }
+    }
+
+    const geo = new THREE.BufferGeometry();
     geo.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3));
     geo.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
     geo.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
@@ -350,13 +470,22 @@ function createCurvedBladeGeometry(length, baseWidth, midWidth, archX, archY, se
 }
 
 /**
- * 5-Pointed Green Calyx Star (Sepals) on top of each tomato
+ * 5-Pointed Green Calyx Star (Sepals) on top of each tomato & eggplant
  */
 function create5PointedCalyxGeometry(radius = 0.045) {
     const sepals = [];
     for (let i = 0; i < 5; i++) {
         const angle = (i / 5) * Math.PI * 2;
-        const s = createCurvedBladeGeometry(radius, 0.006, 0.012, 0.003, 0.008, 8);
+        const s = createBotanicalBladeGeometry({
+            length: radius,
+            baseWidth: 0.006,
+            midWidth: 0.012,
+            tipWidth: 0.002,
+            archX: 0.003,
+            archY: 0.008,
+            midribFold: 0.003,
+            segments: 8
+        });
         s.rotateX(Math.PI * 0.5);
         s.rotateZ(angle);
         sepals.push(s);
@@ -365,18 +494,26 @@ function create5PointedCalyxGeometry(radius = 0.045) {
 }
 
 /**
- * Yellow 5-Petal Star Tomato Flower
+ * Yellow 5-Petal Star Flower (Blossom)
  */
 function createTomatoBlossomGeometry() {
     const petals = [];
     for (let i = 0; i < 5; i++) {
         const angle = (i / 5) * Math.PI * 2;
-        const p = createCurvedBladeGeometry(0.024, 0.004, 0.008, 0.002, 0.006, 6);
+        const p = createBotanicalBladeGeometry({
+            length: 0.024,
+            baseWidth: 0.004,
+            midWidth: 0.008,
+            tipWidth: 0.002,
+            archX: 0.002,
+            archY: 0.006,
+            midribFold: 0.002,
+            segments: 6
+        });
         p.rotateX(Math.PI * 0.5);
         p.rotateZ(angle);
         petals.push(p);
     }
-    // Center yellow stamen cone
     const cone = new THREE.ConeGeometry(0.005, 0.016, 6);
     cone.rotateX(-Math.PI * 0.5);
     petals.push(cone);
@@ -384,36 +521,899 @@ function createTomatoBlossomGeometry() {
 }
 
 /**
- * Compound Serrated Tomato Leaf
+ * Compound Odd-Pinnate Leaf with Serrated/Crinkled Leaflets (Tomato & Potato)
  */
-function createCompoundTomatoLeafGeometry(length = 0.45, spread = 0.22) {
+function createCompoundOddPinnateLeafGeometry(length = 0.42, spread = 0.22, isSerrated = true, isCrinkled = false) {
     const parts = [];
-    const rachis = new THREE.CylinderGeometry(0.004, 0.009, length, 5);
-    rachis.translate(0, length * 0.5, 0);
+
+    const rachisCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, length * 0.35, -0.015),
+        new THREE.Vector3(0, length * 0.70, -0.045),
+        new THREE.Vector3(0, length, -0.080)
+    ]);
+    const rachis = new THREE.TubeGeometry(rachisCurve, 10, 0.005, 5, false);
     parts.push(rachis);
 
-    const leafletPairs = 3;
-    for (let i = 0; i < leafletPairs; i++) {
-        const t = (i + 1) / (leafletPairs + 1);
+    const pairs = 3;
+    for (let i = 0; i < pairs; i++) {
+        const t = (i + 1) / (pairs + 1);
         const yPos = t * length;
-        const size = THREE.MathUtils.lerp(0.18, 0.26, t);
+        const zPos = -Math.pow(t, 1.8) * 0.07;
+        const size = THREE.MathUtils.lerp(0.16, 0.24, t);
+        const width = THREE.MathUtils.lerp(0.045, 0.075, t);
 
-        const leftLeaflet = createCurvedBladeGeometry(size, 0.012, spread * 0.35, 0.03, 0.04, 12);
-        leftLeaflet.rotateZ(0.65);
-        leftLeaflet.translate(-0.015, yPos, 0);
-        parts.push(leftLeaflet);
+        const left = createBotanicalBladeGeometry({
+            length: size,
+            baseWidth: 0.008,
+            midWidth: width,
+            tipWidth: 0.002,
+            archX: -0.02,
+            archY: 0.035,
+            midribFold: 0.006,
+            wavyEdge: isSerrated ? 0.005 : (isCrinkled ? 0.004 : 0.0),
+            segments: 10
+        });
+        left.rotateZ(0.75);
+        left.rotateX(-0.15);
+        left.translate(-0.012, yPos, zPos);
+        parts.push(left);
 
-        const rightLeaflet = createCurvedBladeGeometry(size, 0.012, spread * 0.35, -0.03, 0.04, 12);
-        rightLeaflet.rotateZ(-0.65);
-        rightLeaflet.translate(0.015, yPos, 0);
-        parts.push(rightLeaflet);
+        const right = createBotanicalBladeGeometry({
+            length: size,
+            baseWidth: 0.008,
+            midWidth: width,
+            tipWidth: 0.002,
+            archX: 0.02,
+            archY: 0.035,
+            midribFold: 0.006,
+            wavyEdge: isSerrated ? 0.005 : (isCrinkled ? 0.004 : 0.0),
+            segments: 10
+        });
+        right.rotateZ(-0.75);
+        right.rotateX(-0.15);
+        right.translate(0.012, yPos, zPos);
+        parts.push(right);
     }
 
-    const terminalLeaflet = createCurvedBladeGeometry(0.24, 0.012, spread * 0.38, 0, 0.05, 12);
-    terminalLeaflet.translate(0, length, 0);
-    parts.push(terminalLeaflet);
+    const terminal = createBotanicalBladeGeometry({
+        length: 0.22,
+        baseWidth: 0.009,
+        midWidth: 0.078,
+        tipWidth: 0.002,
+        archX: 0,
+        archY: 0.045,
+        midribFold: 0.007,
+        wavyEdge: isSerrated ? 0.005 : 0.0,
+        segments: 10
+    });
+    terminal.rotateX(-0.25);
+    terminal.translate(0, length, -0.08);
+    parts.push(terminal);
 
     return mergeBufferGeometries(parts);
+}
+
+// Backward-compatible tomato leaf generator
+function createCompoundTomatoLeafGeometry(length = 0.45, spread = 0.22) {
+    return createCompoundOddPinnateLeafGeometry(length, spread, true, false);
+}
+
+/**
+ * Broad Wavy-Lobed Leaf Geometry (Eggplant, Cucumber, Papaya)
+ */
+function createBroadWavyLeafGeometry(length = 0.35, width = 0.22, lobeCount = 5) {
+    const parts = [];
+    const petiole = new THREE.CylinderGeometry(0.006, 0.010, length * 0.35, 5);
+    petiole.translate(0, length * 0.175, 0);
+    petiole.rotateX(0.2);
+    parts.push(petiole);
+
+    const blade = createBotanicalBladeGeometry({
+        length: length * 0.85,
+        baseWidth: 0.02,
+        midWidth: width * 0.5,
+        tipWidth: 0.01,
+        archX: 0.02,
+        archY: 0.07,
+        midribFold: 0.012,
+        wavyEdge: 0.016, // Pronounced undulating lobes
+        segments: 14
+    });
+    blade.translate(0, length * 0.30, 0);
+    parts.push(blade);
+
+    return mergeBufferGeometries(parts);
+}
+
+/**
+ * Rice & Wheat Basal Tillering Clump Generator (গুছি)
+ */
+function createCerealTillerClusterGeometry(isRice = true) {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+
+    const tillerCount = isRice ? 12 : 9;
+    const height = isRice ? 0.90 : 0.85;
+
+    for (let i = 0; i < tillerCount; i++) {
+        const angle = (i / tillerCount) * Math.PI * 2 + (Math.random() * 0.3);
+        const radius = 0.02 + Math.random() * 0.03;
+        const bx = Math.cos(angle) * radius;
+        const bz = Math.sin(angle) * radius;
+
+        // Slender culm/stem curving slightly outward
+        const stemCurve = new THREE.CatmullRomCurve3([
+            new THREE.Vector3(bx, 0, bz),
+            new THREE.Vector3(bx * 1.5, height * 0.4, bz * 1.5),
+            new THREE.Vector3(bx * 2.0, height * 0.8, bz * 2.0),
+            new THREE.Vector3(bx * 2.2, height, bz * 2.2)
+        ]);
+        const culm = new THREE.TubeGeometry(stemCurve, 8, 0.006, 5, false);
+        stems.push(culm);
+
+        // Arching grass blades with 3D central midrib
+        const bladeCount = 2;
+        for (let b = 0; b < bladeCount; b++) {
+            const bladeLen = height * (0.75 + Math.random() * 0.35);
+            const archY = isRice ? (0.24 + Math.random() * 0.12) : (0.16 + Math.random() * 0.08);
+            const blade = createBotanicalBladeGeometry({
+                length: bladeLen,
+                baseWidth: 0.010,
+                midWidth: isRice ? 0.024 : 0.018,
+                tipWidth: 0.002,
+                archX: (Math.random() - 0.5) * 0.04,
+                archY: archY,
+                midribFold: 0.007,
+                segments: 16
+            });
+            const leafAngle = angle + (b - 0.5) * 0.8;
+            blade.rotateY(leafAngle);
+            blade.rotateX(0.35 + Math.random() * 0.25);
+            blade.translate(bx, height * 0.25 + b * 0.22, bz);
+            leaves.push(blade);
+        }
+
+        // Terminal Panicle (Rice) or Bearded Spike (Wheat)
+        if (isRice) {
+            // Drooping golden rice panicle
+            const panicleCurve = new THREE.CatmullRomCurve3([
+                new THREE.Vector3(bx * 2.2, height, bz * 2.2),
+                new THREE.Vector3(bx * 2.5, height + 0.10, bz * 2.5),
+                new THREE.Vector3(bx * 2.8, height + 0.06, bz * 2.8),
+                new THREE.Vector3(bx * 3.1, height - 0.06, bz * 3.1)
+            ]);
+            const rachis = new THREE.TubeGeometry(panicleCurve, 8, 0.004, 4, false);
+            fruits.push(rachis);
+
+            for (let g = 0; g < 7; g++) {
+                const gt = 0.3 + (g / 7) * 0.7;
+                const pt = panicleCurve.getPoint(gt);
+                const grain = new THREE.SphereGeometry(0.014, 5, 4);
+                grain.scale(0.8, 1.8, 0.8);
+                grain.translate(pt.x + (Math.random() - 0.5) * 0.02, pt.y - 0.02, pt.z + (Math.random() - 0.5) * 0.02);
+                fruits.push(grain);
+            }
+        } else {
+            // Bearded wheat spike with fine awns
+            const spikeY = height + 0.08;
+            const spike = new THREE.CylinderGeometry(0.016, 0.018, 0.16, 6);
+            spike.translate(bx * 2.2, spikeY, bz * 2.2);
+            fruits.push(spike);
+
+            for (let a = 0; a < 6; a++) {
+                const awn = new THREE.CylinderGeometry(0.001, 0.002, 0.14, 3);
+                awn.rotateZ((a - 2.5) * 0.15);
+                awn.translate(bx * 2.2 + (a - 2.5) * 0.005, spikeY + 0.12, bz * 2.2);
+                fruits.push(awn);
+            }
+        }
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits)
+    };
+}
+
+/**
+ * Maize / Corn Morphology Generator
+ */
+function createMaizeMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const flowers = [];
+
+    const height = 1.95;
+
+    // Segmented stalk with ringed nodes
+    const nodeCount = 8;
+    for (let i = 0; i < nodeCount; i++) {
+        const segH = height / nodeCount;
+        const yBase = i * segH;
+        const t = i / nodeCount;
+        const rBot = THREE.MathUtils.lerp(0.032, 0.016, t);
+        const rTop = THREE.MathUtils.lerp(0.030, 0.014, (i + 1) / nodeCount);
+
+        const internode = new THREE.CylinderGeometry(rTop, rBot, segH, 8);
+        internode.translate(0, yBase + segH * 0.5, 0);
+        stems.push(internode);
+
+        const ring = new THREE.TorusGeometry(rTop * 1.15, 0.005, 4, 12);
+        ring.rotateX(Math.PI * 0.5);
+        ring.translate(0, yBase + segH, 0);
+        stems.push(ring);
+    }
+
+    // Alternating broad wavy ribbon leaves
+    for (let i = 1; i < nodeCount - 1; i++) {
+        const angle = i % 2 === 0 ? 0 : Math.PI;
+        const yPos = (i / nodeCount) * height;
+        const leafLen = 0.95 + Math.random() * 0.20;
+
+        const blade = createBotanicalBladeGeometry({
+            length: leafLen,
+            baseWidth: 0.040,
+            midWidth: 0.095,
+            tipWidth: 0.005,
+            archX: 0.02,
+            archY: 0.38,
+            midribFold: 0.015,
+            wavyEdge: 0.008,
+            segments: 18
+        });
+        blade.rotateY(angle + (Math.random() - 0.5) * 0.2);
+        blade.rotateX(0.40);
+        blade.translate(0, yPos, 0);
+        leaves.push(blade);
+    }
+
+    // Corn cobs wrapped in green husks with golden silk in leaf axils
+    const cobHeights = [height * 0.42, height * 0.58];
+    cobHeights.forEach((cy, idx) => {
+        const cobAng = (idx * Math.PI) + 0.4;
+
+        const husk = new THREE.CylinderGeometry(0.035, 0.042, 0.24, 7);
+        husk.rotateZ(0.35);
+        husk.rotateY(cobAng);
+        husk.translate(Math.cos(cobAng) * 0.06, cy, Math.sin(cobAng) * 0.06);
+        fruits.push(husk);
+
+        for (let s = 0; s < 5; s++) {
+            const silk = new THREE.CylinderGeometry(0.001, 0.003, 0.12, 3);
+            silk.rotateZ(0.5 + (s * 0.05));
+            silk.rotateY(cobAng + (s - 2) * 0.1);
+            silk.translate(Math.cos(cobAng) * 0.14, cy + 0.11, Math.sin(cobAng) * 0.14);
+            fruits.push(silk);
+        }
+    });
+
+    // Terminal feathery tassel at apex
+    for (let t = 0; t < 7; t++) {
+        const tang = (t / 7) * Math.PI * 2;
+        const branch = new THREE.CylinderGeometry(0.002, 0.005, 0.35, 4);
+        branch.rotateZ(0.45);
+        branch.rotateY(tang);
+        branch.translate(Math.cos(tang) * 0.05, height + 0.15, Math.sin(tang) * 0.05);
+        flowers.push(branch);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Tomato Morphology Generator (Organic Vine, Serrated Foliage, Star Flowers & Glossy Tomatoes)
+ * ABSOLUTELY ZERO BROWN WOODEN STAKES!
+ */
+function createTomatoMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const calyces = [];
+    const flowers = [];
+
+    // Organic tapered main vine (NO brown stake!)
+    const mainStem = createOrganicMainStem(1.05, 0.024, 0.009, 0.04, 0.03, 16);
+    stems.push(mainStem);
+
+    // Lateral green branches
+    const branchHeights = [0.28, 0.45, 0.62, 0.78, 0.92];
+    branchHeights.forEach((by, idx) => {
+        const ang = (idx * 137.5) * (Math.PI / 180);
+        const branchStem = createOrganicMainStem(0.38, 0.012, 0.005, 0.02, 0.015, 8);
+        branchStem.rotateZ(0.65);
+        branchStem.rotateY(ang);
+        branchStem.translate(0, by, 0);
+        stems.push(branchStem);
+
+        const leaf = createCompoundOddPinnateLeafGeometry(0.42, 0.22, true, false);
+        leaf.rotateX(0.40);
+        leaf.rotateY(ang);
+        leaf.translate(Math.cos(ang) * 0.15, by + 0.08, Math.sin(ang) * 0.15);
+        leaves.push(leaf);
+    });
+
+    // Clusters of oblate tomatoes with 5-pointed calyces
+    const clusters = [
+        { y: 0.38, count: 4, radius: 0.062 },
+        { y: 0.58, count: 4, radius: 0.056 },
+        { y: 0.76, count: 3, radius: 0.048 }
+    ];
+
+    clusters.forEach((c, cIdx) => {
+        for (let i = 0; i < c.count; i++) {
+            const ang = (i / c.count) * Math.PI * 1.5 + (cIdx * 1.2);
+            const dist = 0.14 + (i * 0.02);
+            const fx = Math.cos(ang) * dist;
+            const fz = Math.sin(ang) * dist;
+            const fy = c.y + (Math.random() - 0.5) * 0.04;
+
+            const fg = new THREE.SphereGeometry(c.radius, 14, 12);
+            fg.scale(1.08, 0.92, 1.08);
+            fg.translate(fx, fy, fz);
+            fruits.push(fg);
+
+            const cg = create5PointedCalyxGeometry(c.radius * 0.65);
+            cg.translate(fx, fy + c.radius * 0.90, fz);
+            calyces.push(cg);
+        }
+    });
+
+    for (let i = 0; i < 4; i++) {
+        const b = createTomatoBlossomGeometry();
+        b.translate(0.12 * Math.cos(i * 1.8), 0.82 + i * 0.04, 0.12 * Math.sin(i * 1.8));
+        flowers.push(b);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        calyxGeom: mergeBufferGeometries(calyces),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Potato Morphology Generator (Spreading Bushy Ridge Canopy & Blossoms)
+ */
+function createPotatoMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const flowers = [];
+
+    const stemCount = 5;
+    for (let i = 0; i < stemCount; i++) {
+        const ang = (i / stemCount) * Math.PI * 2 + 0.2;
+        const stem = createOrganicMainStem(0.52, 0.016, 0.007, 0.05, 0.04, 10);
+        stem.rotateZ(0.35);
+        stem.rotateY(ang);
+        stems.push(stem);
+
+        for (let l = 0; l < 4; l++) {
+            const ly = 0.15 + l * 0.10;
+            const pLeaf = createCompoundOddPinnateLeafGeometry(0.36, 0.24, false, true);
+            pLeaf.rotateX(0.55);
+            pLeaf.rotateY(ang + (l - 1.5) * 0.6);
+            pLeaf.translate(Math.cos(ang) * 0.12, ly, Math.sin(ang) * 0.12);
+            leaves.push(pLeaf);
+        }
+    }
+
+    for (let f = 0; f < 5; f++) {
+        const fang = (f / 5) * Math.PI * 2;
+        const flower = createTomatoBlossomGeometry();
+        flower.translate(Math.cos(fang) * 0.12, 0.54, Math.sin(fang) * 0.12);
+        flowers.push(flower);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Eggplant / Brinjal Morphology Generator (Wavy Velvety Leaves & Glossy Purple Fruits)
+ */
+function createEggplantMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const calyces = [];
+    const flowers = [];
+
+    const height = 0.78;
+    const mainStem = createOrganicMainStem(height, 0.026, 0.012, 0.03, 0.02, 12);
+    stems.push(mainStem);
+
+    for (let i = 0; i < 4; i++) {
+        const ang = (i / 4) * Math.PI * 2;
+        const by = 0.25 + i * 0.12;
+        const branch = createOrganicMainStem(0.35, 0.014, 0.007, 0.03, 0.02, 8);
+        branch.rotateZ(0.55);
+        branch.rotateY(ang);
+        branch.translate(0, by, 0);
+        stems.push(branch);
+
+        const leaf = createBroadWavyLeafGeometry(0.38, 0.26, 5);
+        leaf.rotateX(0.35);
+        leaf.rotateY(ang);
+        leaf.translate(Math.cos(ang) * 0.18, by + 0.08, Math.sin(ang) * 0.18);
+        leaves.push(leaf);
+    }
+
+    for (let i = 0; i < 3; i++) {
+        const fang = (i / 3) * Math.PI * 2 + 0.5;
+        const fx = Math.cos(fang) * 0.20;
+        const fz = Math.sin(fang) * 0.20;
+        const fy = 0.32 + (i * 0.08);
+
+        const brinjal = new THREE.SphereGeometry(0.052, 12, 12);
+        brinjal.scale(1.0, 2.2, 1.0);
+        brinjal.translate(fx, fy - 0.08, fz);
+        fruits.push(brinjal);
+
+        const calyx = create5PointedCalyxGeometry(0.048);
+        calyx.translate(fx, fy, fz);
+        calyces.push(calyx);
+    }
+
+    const flower = createTomatoBlossomGeometry();
+    flower.translate(0.10, 0.65, 0.10);
+    flowers.push(flower);
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        calyxGeom: mergeBufferGeometries(calyces),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Chili Morphology Generator (Compact Bush, Lanceolate Leaves & Hanging Chilies)
+ */
+function createChiliMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const flowers = [];
+
+    const baseStem = createOrganicMainStem(0.22, 0.018, 0.012, 0.01, 0.01, 6);
+    stems.push(baseStem);
+
+    const forkCount = 6;
+    for (let i = 0; i < forkCount; i++) {
+        const ang = (i / forkCount) * Math.PI * 2;
+        const fork = createOrganicMainStem(0.34, 0.010, 0.004, 0.04, 0.03, 8);
+        fork.rotateZ(0.45);
+        fork.rotateY(ang);
+        fork.translate(0, 0.22, 0);
+        stems.push(fork);
+
+        for (let l = 0; l < 4; l++) {
+            const ly = 0.25 + l * 0.08;
+            const leaf = createBotanicalBladeGeometry({
+                length: 0.14,
+                baseWidth: 0.005,
+                midWidth: 0.032,
+                tipWidth: 0.002,
+                archX: 0.01,
+                archY: 0.025,
+                midribFold: 0.004,
+                segments: 10
+            });
+            leaf.rotateX(0.4);
+            leaf.rotateY(ang + (l - 1.5) * 0.4);
+            leaf.translate(Math.cos(ang) * (0.08 + l * 0.04), ly, Math.sin(ang) * (0.08 + l * 0.04));
+            leaves.push(leaf);
+        }
+
+        if (i % 2 === 0) {
+            const chili = new THREE.ConeGeometry(0.014, 0.11, 7);
+            chili.rotateX(Math.PI);
+            chili.translate(Math.cos(ang) * 0.18, 0.35, Math.sin(ang) * 0.18);
+            fruits.push(chili);
+        } else {
+            const flower = createTomatoBlossomGeometry();
+            flower.scale.set(0.6, 0.6, 0.6);
+            flower.translate(Math.cos(ang) * 0.16, 0.42, Math.sin(ang) * 0.16);
+            flowers.push(flower);
+        }
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Mustard Morphology Generator (Golden Canopy of 4-Petal Flowers & Siliques)
+ */
+function createMustardMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const flowers = [];
+
+    const height = 0.98;
+    const mainStem = createOrganicMainStem(height, 0.016, 0.005, 0.02, 0.02, 12);
+    stems.push(mainStem);
+
+    for (let i = 0; i < 4; i++) {
+        const ang = (i / 4) * Math.PI * 2;
+        const ly = 0.15 + i * 0.08;
+        const leaf = createBotanicalBladeGeometry({
+            length: 0.28,
+            baseWidth: 0.015,
+            midWidth: 0.065,
+            tipWidth: 0.010,
+            archX: 0.02,
+            archY: 0.06,
+            midribFold: 0.008,
+            wavyEdge: 0.008,
+            segments: 12
+        });
+        leaf.rotateX(0.5);
+        leaf.rotateY(ang);
+        leaf.translate(0, ly, 0);
+        leaves.push(leaf);
+    }
+
+    // Dense vibrant yellow 4-petal flower clusters at apex (সরিষা ফুল)
+    for (let f = 0; f < 18; f++) {
+        const ang = f * 1.6;
+        const dist = 0.03 + (f % 4) * 0.04;
+        const fy = height - 0.22 + (f / 18) * 0.28;
+
+        for (let p = 0; p < 4; p++) {
+            const petal = new THREE.PlaneGeometry(0.024, 0.018);
+            petal.rotateZ(p * (Math.PI * 0.5));
+            petal.translate(Math.cos(ang) * dist, fy, Math.sin(ang) * dist);
+            flowers.push(petal);
+        }
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Onion Morphology Generator (Tubular Bluish-Green Leaves, Surface Bulb & Umbel)
+ */
+function createOnionMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const fruits = [];
+    const flowers = [];
+
+    // Visible bulb at soil crest
+    const bulb = new THREE.SphereGeometry(0.048, 12, 10);
+    bulb.scale(1.15, 0.90, 1.15);
+    bulb.translate(0, 0.035, 0);
+    fruits.push(bulb);
+
+    // Hollow tubular upright cylindrical leaves tapering to points
+    const leafCount = 8;
+    for (let i = 0; i < leafCount; i++) {
+        const ang = (i / leafCount) * Math.PI * 2 + (Math.random() * 0.3);
+        const tubeLen = 0.45 + Math.random() * 0.15;
+        const tube = new THREE.CylinderGeometry(0.002, 0.012, tubeLen, 6);
+        tube.rotateZ(0.18 + Math.random() * 0.12);
+        tube.rotateY(ang);
+        tube.translate(Math.cos(ang) * 0.02, tubeLen * 0.48, Math.sin(ang) * 0.02);
+        leaves.push(tube);
+    }
+
+    const scape = new THREE.CylinderGeometry(0.006, 0.010, 0.65, 6);
+    scape.translate(0, 0.32, 0);
+    stems.push(scape);
+
+    const umbel = new THREE.SphereGeometry(0.042, 10, 8);
+    umbel.translate(0, 0.65, 0);
+    flowers.push(umbel);
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        fruitGeom: mergeBufferGeometries(fruits),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Jute Morphology Generator (Tall Straight Fibrous Green Stalk & Upper Canopy Leaves)
+ */
+function createJuteMorphologyGeometry() {
+    const stems = [];
+    const leaves = [];
+    const flowers = [];
+
+    const height = 2.15;
+    const stalk = new THREE.CylinderGeometry(0.012, 0.026, height, 8);
+    stalk.translate(0, height * 0.5, 0);
+    stems.push(stalk);
+
+    const leafCount = 12;
+    for (let i = 0; i < leafCount; i++) {
+        const ang = (i * 137.5) * (Math.PI / 180);
+        const ly = height * 0.60 + (i / leafCount) * (height * 0.38);
+
+        const leaf = createBotanicalBladeGeometry({
+            length: 0.32,
+            baseWidth: 0.012,
+            midWidth: 0.055,
+            tipWidth: 0.004,
+            archX: 0.02,
+            archY: 0.08,
+            midribFold: 0.008,
+            wavyEdge: 0.004,
+            segments: 12
+        });
+        leaf.rotateX(0.45);
+        leaf.rotateY(ang);
+        leaf.translate(0, ly, 0);
+        leaves.push(leaf);
+    }
+
+    for (let f = 0; f < 4; f++) {
+        const fang = f * 1.5;
+        const fl = createTomatoBlossomGeometry();
+        fl.scale.set(0.5, 0.5, 0.5);
+        fl.translate(0.04 * Math.cos(fang), height * 0.82 + f * 0.04, 0.04 * Math.sin(fang));
+        flowers.push(fl);
+    }
+
+    return {
+        stemGeom: mergeBufferGeometries(stems),
+        leafGeom: mergeBufferGeometries(leaves),
+        flowerGeom: mergeBufferGeometries(flowers)
+    };
+}
+
+/**
+ * Universal Crop Morphology Dispatcher
+ */
+export function createCropMesh(cropType, baseChlorophyll) {
+    let stemGeom = null, stemMat = null;
+    let leafGeom = null, leafMat = null;
+    let fruitGeom = null, fruitMat = null;
+    let calyxGeom = null, calyxMat = null;
+    let flowerGeom = null, flowerMat = null;
+
+    let isMonocot = false;
+
+    switch (cropType) {
+        case "rice": {
+            isMonocot = true;
+            const res = createCerealTillerClusterGeometry(true);
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3e7529, roughness: 0.60 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xd4b238, roughness: 0.38 });
+            break;
+        }
+
+        case "wheat": {
+            isMonocot = true;
+            const res = createCerealTillerClusterGeometry(false);
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x4a7e30, roughness: 0.60 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xc89f46, roughness: 0.42 });
+            break;
+        }
+
+        case "maize": {
+            isMonocot = true;
+            const res = createMaizeMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x478c2e, roughness: 0.55 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xd97706, roughness: 0.35 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xeab308, roughness: 0.40 });
+            break;
+        }
+
+        case "tomato": {
+            const res = createTomatoMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            calyxGeom = res.calyxGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3d7426, roughness: 0.58 });
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                color: getTomatoRipeningColor(currentGrowthDay, maxCropDays),
+                roughness: 0.15,
+                clearcoat: 0.85,
+                clearcoatRoughness: 0.12,
+                metalness: 0.02,
+                transmission: 0.03
+            });
+            calyxMat = new THREE.MeshStandardMaterial({ color: 0x2e6f28, roughness: 0.6, side: THREE.DoubleSide });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35, emissive: 0x332600 });
+            break;
+        }
+
+        case "potato": {
+            const res = createPotatoMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x356920, roughness: 0.60 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xf3e8ff, roughness: 0.30, emissive: 0x2a1b40 });
+            break;
+        }
+
+        case "eggplant":
+        case "brinjal": {
+            const res = createEggplantMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            calyxGeom = res.calyxGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x345424, roughness: 0.62 });
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                color: 0x24103a,
+                roughness: 0.18,
+                clearcoat: 0.80,
+                clearcoatRoughness: 0.15
+            });
+            calyxMat = new THREE.MeshStandardMaterial({ color: 0x2d5f26, roughness: 0.6, side: THREE.DoubleSide });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0x9333ea, roughness: 0.35, emissive: 0x2e1065 });
+            break;
+        }
+
+        case "chili": {
+            const res = createChiliMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6822, roughness: 0.55 });
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                color: 0xef4444,
+                roughness: 0.20,
+                clearcoat: 0.75
+            });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 });
+            break;
+        }
+
+        case "mustard": {
+            const res = createMustardMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x487f2e, roughness: 0.58 });
+            flowerMat = new THREE.MeshStandardMaterial({
+                color: 0xffea00,
+                roughness: 0.30,
+                emissive: 0x554400,
+                emissiveIntensity: 0.35,
+                side: THREE.DoubleSide
+            });
+            break;
+        }
+
+        case "onion": {
+            isMonocot = true;
+            const res = createOnionMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            fruitGeom = res.fruitGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2a5a4e, roughness: 0.50 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.40 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.35 });
+            break;
+        }
+
+        case "jute": {
+            const res = createJuteMorphologyGeometry();
+            stemGeom = res.stemGeom;
+            leafGeom = res.leafGeom;
+            flowerGeom = res.flowerGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3f7f2b, roughness: 0.55 });
+            flowerMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+            break;
+        }
+
+        case "cauliflower": {
+            const leaves = [];
+            for (let i = 0; i < 7; i++) {
+                const ang = (i / 7) * Math.PI * 2;
+                const wl = createBroadWavyLeafGeometry(0.35, 0.22, 3);
+                wl.rotateX(0.4);
+                wl.rotateY(ang);
+                wl.translate(0, 0.08, 0);
+                leaves.push(wl);
+            }
+            leafGeom = mergeBufferGeometries(leaves);
+
+            const curd = new THREE.SphereGeometry(0.12, 14, 10);
+            curd.scale(1.2, 0.8, 1.2);
+            curd.translate(0, 0.14, 0);
+            fruitGeom = curd;
+
+            stemGeom = new THREE.CylinderGeometry(0.02, 0.03, 0.12, 6);
+            stemGeom.translate(0, 0.06, 0);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3f722a, roughness: 0.60 });
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0xfefce8, roughness: 0.75 });
+            break;
+        }
+
+        default: {
+            // General botanical architecture for remaining crops (Lentil, Cucumber, Carrot, Papaya)
+            const stems = [];
+            const leaves = [];
+            for (let i = 0; i < 5; i++) {
+                const angle = (i / 5) * Math.PI * 2;
+                const s = createOrganicMainStem(0.65, 0.016, 0.008, 0.03, 0.02, 8);
+                s.rotateZ(0.25);
+                s.rotateY(angle);
+                stems.push(s);
+
+                const l = createCompoundOddPinnateLeafGeometry(0.38, 0.20, true, false);
+                l.rotateZ(0.35);
+                l.rotateY(angle);
+                l.translate(Math.cos(angle) * 0.10, 0.28, Math.sin(angle) * 0.10);
+                leaves.push(l);
+            }
+            stemGeom = mergeBufferGeometries(stems);
+            leafGeom = mergeBufferGeometries(leaves);
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x3d7528, roughness: 0.60 });
+
+            fruitGeom = new THREE.SphereGeometry(0.045, 10, 8);
+            fruitGeom.translate(0, 0.58, 0);
+            fruitMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.4 });
+            break;
+        }
+    }
+
+    // Hyper-Realistic PBR Subsurface Scattering Material for Leaves
+    leafMat = new THREE.MeshPhysicalMaterial({
+        map: isMonocot ? monocotTexture : dicotTexture,
+        color: baseChlorophyll,
+        roughness: 0.45,
+        metalness: 0.02,
+        clearcoat: 0.15,
+        clearcoatRoughness: 0.4,
+        transmission: 0.15,
+        emissive: new THREE.Color(0x1a3810),
+        emissiveIntensity: 0.22,
+        side: THREE.DoubleSide
+    });
+
+    return {
+        stemGeom, stemMat,
+        leafGeom, leafMat,
+        fruitGeom, fruitMat,
+        calyxGeom, calyxMat,
+        flowerGeom, flowerMat
+    };
 }
 
 // =============================================================================
@@ -430,230 +1430,27 @@ export function createCropField(cropId = "tomato") {
     currentCropGroup.name = `CropField_${cropId}`;
     activeCropId = cropId;
 
-    // Retrieve crop metadata from crops database
     const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === cropId) : null;
     maxCropDays = dbCrop ? dbCrop.total_duration_days : 105;
 
-    let stemGeom = null, stemMat = null;
-    let leafGeom = null, leafMat = null;
-    let fruitGeom = null, fruitMat = null;
-    let calyxGeom = null, calyxMat = null;
-    let stakeGeom = null, stakeMat = null;
-    let flowerGeom = null, flowerMat = null;
-
     const baseChlorophyll = getHealthColor(cropHealthState);
 
-    switch (cropId) {
-        case "tomato": {
-            // 1. Weathered Bamboo Stake
-            const stakeParts = [];
-            const stakePole = new THREE.CylinderGeometry(0.015, 0.018, 1.25, 7);
-            stakePole.translate(-0.04, 0.62, -0.03);
-            stakeParts.push(stakePole);
-
-            // Bamboo tie cords tying stem to stake
-            const tie1 = new THREE.TorusGeometry(0.024, 0.003, 4, 10);
-            tie1.rotateX(Math.PI * 0.5);
-            tie1.translate(-0.02, 0.38, -0.015);
-            stakeParts.push(tie1);
-
-            const tie2 = new THREE.TorusGeometry(0.024, 0.003, 4, 10);
-            tie2.rotateX(Math.PI * 0.5);
-            tie2.translate(-0.01, 0.76, -0.01);
-            stakeParts.push(tie2);
-
-            stakeGeom = mergeBufferGeometries(stakeParts);
-            stakeMat = new THREE.MeshStandardMaterial({
-                color: 0x8a633a,
-                roughness: 0.85,
-                metalness: 0.05
-            });
-
-            // 2. Climbing Curved Main Vine
-            const vineCurve = new THREE.CatmullRomCurve3([
-                new THREE.Vector3(0, 0, 0),
-                new THREE.Vector3(0.02, 0.22, 0.01),
-                new THREE.Vector3(-0.02, 0.48, 0.02),
-                new THREE.Vector3(0.01, 0.74, -0.01),
-                new THREE.Vector3(0.03, 1.05, 0.01)
-            ]);
-            stemGeom = new THREE.TubeGeometry(vineCurve, 20, 0.015, 7, false);
-            stemMat = new THREE.MeshStandardMaterial({
-                color: baseChlorophyll,
-                roughness: 0.65,
-                metalness: 0.05
-            });
-
-            // 3. Compound Serrated Foliage
-            const leaves = [];
-            for (let i = 0; i < 7; i++) {
-                const angle = (i * 137.5) * (Math.PI / 180);
-                const l = createCompoundTomatoLeafGeometry(0.42, 0.22);
-                l.rotateX(0.45);
-                l.rotateY(angle);
-                l.translate(0, 0.25 + i * 0.11, 0);
-                leaves.push(l);
-            }
-            leafGeom = mergeBufferGeometries(leaves);
-            leafMat = new THREE.MeshPhysicalMaterial({
-                map: dicotTexture,
-                color: baseChlorophyll,
-                roughness: 0.35,
-                clearcoat: 0.28,
-                clearcoatRoughness: 0.22,
-                side: THREE.DoubleSide
-            });
-
-            // 4. Glossy Oblate Spheroid Tomatoes with 5-Pointed Calyx Stars
-            const fruits = [];
-            const calyces = [];
-            const clusters = [
-                { y: 0.36, count: 4, radius: 0.062 },
-                { y: 0.56, count: 4, radius: 0.056 },
-                { y: 0.74, count: 3, radius: 0.048 }
-            ];
-
-            clusters.forEach((c, cIdx) => {
-                for (let i = 0; i < c.count; i++) {
-                    const ang = (i / c.count) * Math.PI * 1.5 + (cIdx * 1.1);
-                    const dist = 0.12 + Math.random() * 0.04;
-                    const fx = Math.cos(ang) * dist;
-                    const fz = Math.sin(ang) * dist;
-                    const fy = c.y + (Math.random() - 0.5) * 0.05;
-
-                    // Oblate Spheroid Fruit
-                    const fg = new THREE.SphereGeometry(c.radius, 14, 12);
-                    fg.scale(1.08, 0.92, 1.08); // Oblate shape
-                    fg.translate(fx, fy, fz);
-                    fruits.push(fg);
-
-                    // 5-Pointed Calyx Star
-                    const cg = create5PointedCalyxGeometry(c.radius * 0.65);
-                    cg.translate(fx, fy + c.radius * 0.90, fz);
-                    calyces.push(cg);
-                }
-            });
-
-            fruitGeom = mergeBufferGeometries(fruits);
-            // High-End Clearcoat Physical Material for Photorealistic Tomatoes
-            fruitMat = new THREE.MeshPhysicalMaterial({
-                color: getTomatoRipeningColor(currentGrowthDay, maxCropDays),
-                roughness: 0.15,
-                clearcoat: 0.85,
-                clearcoatRoughness: 0.12,
-                metalness: 0.02,
-                transmission: 0.03
-            });
-
-            calyxGeom = mergeBufferGeometries(calyces);
-            calyxMat = new THREE.MeshStandardMaterial({
-                color: 0x2e6f28,
-                roughness: 0.6,
-                side: THREE.DoubleSide
-            });
-
-            // 5. Yellow Star Flowers (Stage 3)
-            const blossoms = [];
-            for (let i = 0; i < 4; i++) {
-                const b = createTomatoBlossomGeometry();
-                b.translate(0.12 * Math.cos(i * 1.8), 0.78 + i * 0.05, 0.12 * Math.sin(i * 1.8));
-                blossoms.push(b);
-            }
-            flowerGeom = mergeBufferGeometries(blossoms);
-            flowerMat = new THREE.MeshStandardMaterial({
-                color: 0xfacc15,
-                roughness: 0.35,
-                emissive: 0x332600
-            });
-            break;
-        }
-
-        case "rice": {
-            const stems = [];
-            for (let i = 0; i < 10; i++) {
-                const s = new THREE.CylinderGeometry(0.007, 0.016, 0.95, 5);
-                s.rotateZ((i - 4.5) * 0.05);
-                s.translate((i - 4.5) * 0.02, 0.47, 0);
-                stems.push(s);
-            }
-            stemGeom = mergeBufferGeometries(stems);
-            stemMat = new THREE.MeshStandardMaterial({ color: baseChlorophyll, roughness: 0.65 });
-
-            const leaves = [];
-            for (let i = 0; i < 16; i++) {
-                const angle = (i / 16) * Math.PI * 2;
-                const b = createCurvedBladeGeometry(0.85, 0.022, 0.042, 0.08, 0.26, 20);
-                b.rotateY(angle);
-                b.translate(0, 0.18 + (i % 4) * 0.08, 0);
-                leaves.push(b);
-            }
-            leafGeom = mergeBufferGeometries(leaves);
-            leafMat = new THREE.MeshPhysicalMaterial({
-                map: monocotTexture,
-                color: baseChlorophyll,
-                roughness: 0.42,
-                clearcoat: 0.2,
-                side: THREE.DoubleSide
-            });
-
-            // Drooping golden panicles
-            const panicles = [];
-            for (let i = 0; i < 8; i++) {
-                const p = createCurvedBladeGeometry(0.35, 0.018, 0.038, 0.06, 0.18, 14);
-                p.rotateY((i / 8) * Math.PI * 2);
-                p.translate(0, 0.88, 0);
-                panicles.push(p);
-            }
-            fruitGeom = mergeBufferGeometries(panicles);
-            fruitMat = new THREE.MeshStandardMaterial({ color: 0xd4b238, roughness: 0.38 });
-            break;
-        }
-
-        default: {
-            // General Botanical Architecture (Wheat, Corn, Potato, Chili)
-            const stems = [];
-            const leaves = [];
-            for (let i = 0; i < 5; i++) {
-                const angle = (i / 5) * Math.PI * 2;
-                const s = new THREE.CylinderGeometry(0.015, 0.028, 0.65, 5);
-                s.rotateZ(0.2);
-                s.rotateY(angle);
-                s.translate(0, 0.32, 0);
-                stems.push(s);
-
-                const l = createCompoundTomatoLeafGeometry(0.38, 0.18);
-                l.rotateZ(0.3);
-                l.rotateY(angle);
-                l.translate(0, 0.28, 0);
-                leaves.push(l);
-            }
-            stemGeom = mergeBufferGeometries(stems);
-            stemMat = new THREE.MeshStandardMaterial({ color: baseChlorophyll, roughness: 0.65 });
-            leafGeom = mergeBufferGeometries(leaves);
-            leafMat = new THREE.MeshPhysicalMaterial({
-                map: dicotTexture,
-                color: baseChlorophyll,
-                roughness: 0.45,
-                side: THREE.DoubleSide
-            });
-
-            fruitGeom = new THREE.SphereGeometry(0.05, 10, 10);
-            fruitGeom.translate(0, 0.65, 0);
-            fruitMat = new THREE.MeshStandardMaterial({ color: 0x84cc16, roughness: 0.4 });
-            break;
-        }
-    }
+    // Build crop morphology with botanically accurate geometries (NO wooden stakes!)
+    const morphology = createCropMesh(cropId, baseChlorophyll);
+    const { stemGeom, stemMat, leafGeom, leafMat, fruitGeom, fruitMat, calyxGeom, calyxMat, flowerGeom, flowerMat } = morphology;
 
     currentStemMat = stemMat;
     currentLeafMat = leafMat;
     currentFruitMat = fruitMat;
     currentCalyxMat = calyxMat;
-    currentStakeMat = stakeMat;
     currentFlowerMat = flowerMat;
 
-    // Inject GPU wind shader movement
+    // Inject GPU wind shader movement into all plant materials
     injectWindShader(stemMat);
     injectWindShader(leafMat);
+    if (fruitMat) injectWindShader(fruitMat);
+    if (calyxMat) injectWindShader(calyxMat);
+    if (flowerMat) injectWindShader(flowerMat);
 
     // Instanced Rendering for 60 FPS Field
     stemInstancedMesh = new THREE.InstancedMesh(stemGeom, stemMat, TOTAL_PLANTS);
@@ -664,21 +1461,34 @@ export function createCropField(cropId = "tomato") {
     leafInstancedMesh.castShadow = true;
     leafInstancedMesh.receiveShadow = true;
 
-    if (fruitGeom) {
+    if (fruitGeom && fruitMat) {
         fruitInstancedMesh = new THREE.InstancedMesh(fruitGeom, fruitMat, TOTAL_PLANTS);
         fruitInstancedMesh.castShadow = true;
+    } else {
+        fruitInstancedMesh = null;
     }
+
     if (calyxGeom && calyxMat) {
         calyxInstancedMesh = new THREE.InstancedMesh(calyxGeom, calyxMat, TOTAL_PLANTS);
         calyxInstancedMesh.castShadow = true;
+    } else {
+        calyxInstancedMesh = null;
     }
-    if (stakeGeom && stakeMat) {
-        stakeInstancedMesh = new THREE.InstancedMesh(stakeGeom, stakeMat, TOTAL_PLANTS);
-        stakeInstancedMesh.castShadow = true;
-    }
+
     if (flowerGeom && flowerMat) {
         flowerInstancedMesh = new THREE.InstancedMesh(flowerGeom, flowerMat, TOTAL_PLANTS);
+    } else {
+        flowerInstancedMesh = null;
     }
+
+    // Healthy chlorophyll palette for natural instance color variation
+    const chlorophyllPalette = [
+        new THREE.Color(0x2d5a18),
+        new THREE.Color(0x3f7a24),
+        new THREE.Color(0x529430),
+        new THREE.Color(0x386d20),
+        new THREE.Color(0x47852a)
+    ];
 
     instanceData = [];
     let idx = 0;
@@ -689,7 +1499,8 @@ export function createCropField(cropId = "tomato") {
             const x = (c - (COLS - 1) * 0.5) * ROW_SPACING;
             const z = (r - (ROWS - 1) * 0.5) * PLANT_SPACING;
 
-            const y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.19;
+            // Soil ridge height profile
+            const y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.22;
             const rotY = Math.random() * Math.PI * 2;
             const s = 0.94 + Math.random() * 0.14;
 
@@ -712,8 +1523,12 @@ export function createCropField(cropId = "tomato") {
             leafInstancedMesh.setMatrixAt(idx, dummy.matrix);
             if (fruitInstancedMesh) fruitInstancedMesh.setMatrixAt(idx, dummy.matrix);
             if (calyxInstancedMesh) calyxInstancedMesh.setMatrixAt(idx, dummy.matrix);
-            if (stakeInstancedMesh) stakeInstancedMesh.setMatrixAt(idx, dummy.matrix);
             if (flowerInstancedMesh) flowerInstancedMesh.setMatrixAt(idx, dummy.matrix);
+
+            // Subtle color variation per instance so the field looks like a living ecosystem
+            const leafCol = chlorophyllPalette[idx % chlorophyllPalette.length].clone();
+            leafCol.offsetHSL((Math.random() - 0.5) * 0.04, (Math.random() - 0.5) * 0.06, (Math.random() - 0.5) * 0.04);
+            leafInstancedMesh.setColorAt(idx, leafCol);
 
             idx++;
         }
@@ -721,16 +1536,15 @@ export function createCropField(cropId = "tomato") {
 
     stemInstancedMesh.instanceMatrix.needsUpdate = true;
     leafInstancedMesh.instanceMatrix.needsUpdate = true;
+    if (leafInstancedMesh.instanceColor) leafInstancedMesh.instanceColor.needsUpdate = true;
     if (fruitInstancedMesh) fruitInstancedMesh.instanceMatrix.needsUpdate = true;
     if (calyxInstancedMesh) calyxInstancedMesh.instanceMatrix.needsUpdate = true;
-    if (stakeInstancedMesh) stakeInstancedMesh.instanceMatrix.needsUpdate = true;
     if (flowerInstancedMesh) flowerInstancedMesh.instanceMatrix.needsUpdate = true;
 
     currentCropGroup.add(stemInstancedMesh);
     currentCropGroup.add(leafInstancedMesh);
     if (fruitInstancedMesh) currentCropGroup.add(fruitInstancedMesh);
     if (calyxInstancedMesh) currentCropGroup.add(calyxInstancedMesh);
-    if (stakeInstancedMesh) currentCropGroup.add(stakeInstancedMesh);
     if (flowerInstancedMesh) currentCropGroup.add(flowerInstancedMesh);
 
     scene.add(currentCropGroup);
@@ -793,13 +1607,6 @@ export function applyGrowthStage(day, totalDays = 105) {
             stemInstancedMesh.setMatrixAt(i, dummy.matrix);
             leafInstancedMesh.setMatrixAt(i, dummy.matrix);
 
-            // Bamboo stake remains full height
-            if (stakeInstancedMesh) {
-                dummy.scale.set(d.scale, d.scale, d.scale);
-                dummy.updateMatrix();
-                stakeInstancedMesh.setMatrixAt(i, dummy.matrix);
-            }
-
             // Fruit & Calyx Growth
             if (fruitInstancedMesh) {
                 if (currentGrowthStage < 3) {
@@ -829,7 +1636,6 @@ export function applyGrowthStage(day, totalDays = 105) {
         leafInstancedMesh.instanceMatrix.needsUpdate = true;
         if (fruitInstancedMesh) fruitInstancedMesh.instanceMatrix.needsUpdate = true;
         if (calyxInstancedMesh) calyxInstancedMesh.instanceMatrix.needsUpdate = true;
-        if (stakeInstancedMesh) stakeInstancedMesh.instanceMatrix.needsUpdate = true;
         if (flowerInstancedMesh) flowerInstancedMesh.instanceMatrix.needsUpdate = true;
     }
 
@@ -878,10 +1684,15 @@ function injectWindShader(material) {
             `
             #include <begin_vertex>
             float hFactor = clamp(transformed.y * 1.15, 0.0, 3.2);
-            float gust = sin(uTime * 2.5 + transformed.x * 1.7 + transformed.z * 1.3) * 0.052 * hFactor * uWindStrength;
-            float swayZ = cos(uTime * 1.9 + transformed.z * 2.1) * 0.035 * hFactor * uWindStrength;
-            transformed.x += gust;
+            // Smooth natural wind sway wave: Math.sin(time * 2.0 + x * 0.5 + z * 0.3) * 0.06
+            float wavePhase = uTime * 2.0 + transformed.x * 0.5 + transformed.z * 0.3;
+            float gust = sin(wavePhase) * 0.06 * hFactor * uWindStrength;
+            float flutter = sin(uTime * 4.2 + transformed.y * 5.0) * 0.014 * hFactor * uWindStrength;
+            float swayZ = cos(uTime * 1.7 + transformed.z * 0.6) * 0.042 * hFactor * uWindStrength;
+
+            transformed.x += (gust + flutter);
             transformed.z += swayZ;
+            transformed.y -= (abs(gust) + abs(swayZ)) * 0.08;
             `
         );
     };
@@ -902,16 +1713,19 @@ function initTerrain() {
     const furrowFreq = Math.PI / ROW_SPACING;
 
     const colors = new Float32Array(count * 3);
-    const colRidge = new THREE.Color(0x3d2716);
-    const colTrench = new THREE.Color(0x1a0f07);
-    const colBund = new THREE.Color(0x4a321e);
+    const colRidge = new THREE.Color(0x3a2414); // Rich moist loamy ridge crest (মাটির আইল)
+    const colTrench = new THREE.Color(0x190e06); // Dark wet drainage furrow trench (সেচ নালা)
+    const colBund = new THREE.Color(0x4a301a); // Field border perimeter bund
 
     for (let i = 0; i < count; i++) {
         const x = posAttr.getX(i);
         const z = posAttr.getZ(i);
 
-        let y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.20;
-        y += Math.sin(x * 16.0) * Math.cos(z * 12.0) * 0.018;
+        // Raised ridge bed profile beneath each crop row
+        let y = Math.pow(Math.cos(x * furrowFreq), 2) * 0.22;
+        // Real-world soil aggregate clods and natural bump displacement
+        y += Math.sin(x * 24.0 + z * 18.0) * 0.014;
+        y += Math.sin(x * 48.0) * Math.cos(z * 36.0) * 0.007;
 
         const dist = Math.max(Math.abs(x), Math.abs(z));
         if (dist > 5.8) {
@@ -925,7 +1739,7 @@ function initTerrain() {
         if (dist > 5.8) {
             tempCol.lerpColors(colRidge, colBund, 0.75);
         } else {
-            const factor = (y + 0.02) / 0.22;
+            const factor = (y + 0.02) / 0.24;
             tempCol.lerpColors(colTrench, colRidge, Math.max(0, Math.min(1, factor)));
         }
 
@@ -940,8 +1754,8 @@ function initTerrain() {
     soilMaterial = new THREE.MeshStandardMaterial({
         map: soilTexture,
         vertexColors: true,
-        roughness: 0.82,
-        metalness: 0.05
+        roughness: 0.90, // PBR hyper-realistic matte moist delta soil
+        metalness: 0.02
     });
 
     terrainMesh = new THREE.Mesh(geometry, soilMaterial);
@@ -1733,12 +2547,7 @@ function bindUIControls() {
         });
     }
 
-    const btnSketchfab = document.getElementById("btnSketchfabExplorer");
-    if (btnSketchfab) {
-        btnSketchfab.addEventListener("click", () => {
-            sketchfabService.openSearchExplorer(window.currentAppLanguage || "bn");
-        });
-    }
+
 
     // Macro View Toggle Buttons
     const btnToggleMacro = document.getElementById("btnToggleMacroView");
