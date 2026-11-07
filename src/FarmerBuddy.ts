@@ -43,8 +43,13 @@ export interface FarmContext {
 export interface ConversationContext {
     crop: string | null;
     cropAgeDays: number | null;
-    intent: "fertilizer" | "pest_disease" | "irrigation" | "weather" | "harvest_market" | "rotation_plan" | null;
-    awaitingSlot: "crop" | "age" | "symptom" | null;
+    landSizeDecimals: number | null;
+    location: string | null;
+    soilType: string | null;
+    lastIntent: "fertilizer" | "pest_disease" | "irrigation" | "weather" | "harvest_market" | "rotation_plan" | "seed_variety" | "land_prep" | "soil_health" | "cost_reduction" | "general_farming" | null;
+    intent: "fertilizer" | "pest_disease" | "irrigation" | "weather" | "harvest_market" | "rotation_plan" | "seed_variety" | "land_prep" | "soil_health" | "cost_reduction" | "general_farming" | null;
+    lastBotQuestion: string | null;
+    awaitingSlot: "crop" | "age" | "symptom" | "landSize" | null;
 }
 
 export interface LandDetails {
@@ -171,11 +176,11 @@ export class AgriculturalExpertEngine {
         return { landSize, soilType, location };
     }
 
-    public extractIntent(text: string): ConversationContext["intent"] {
+    public extractIntent(text: string): ConversationContext["lastIntent"] {
         if (!text) return null;
         const t = text.toLowerCase();
 
-        if (["শস্য পরিক্রমা", "শস্য আবর্তন", "ফসল আবর্তন", "পরিকল্পনা", "লাভ", "খরচ কমানো", "বাজেট", "রোটেশন", "rotation", "profit", "plan", "cost reduction", "budget", "land appraisal", "economics"].some(k => t.includes(k))) {
+        if (["শস্য পরিক্রমা", "শস্য আবর্তন", "ফসল আবর্তন", "পরিকল্পনা", "লাভ", "রোটেশন", "rotation", "profit", "plan", "cost reduction", "budget", "land appraisal", "economics"].some(k => t.includes(k))) {
             return "rotation_plan";
         }
         if (["সার", "ইউরিয়া", "ইউরিয়া", "পটাশ", "টিএসপি", "ড্যাপ", "ডিএপি", "সুষম", "মাত্রা", "কতটুকু", "বোরন", "জিংক", "সার হিসাব", "fertilizer", "urea", "potash", "tsp", "dap", "npk", "dosage", "boron", "zinc"].some(k => t.includes(k))) {
@@ -190,11 +195,23 @@ export class AgriculturalExpertEngine {
         if (["বৃষ্টি", "ঝড়", "বন্যা", "আবহাওয়া", "মেঘ", "তুফান", "weather", "rain", "storm", "flood", "cyclone"].some(k => t.includes(k))) {
             return "weather";
         }
-        if (["দাম", "বাজার", "দর", "বিক্রি", "আড়ত", "সংরক্ষণ", "ড্রাম", "বীজ", "market", "price", "sell", "storage", "harvest"].some(k => t.includes(k))) {
+        if (["দাম", "বাজার", "দর", "বিক্রি", "আড়ত", "সংরক্ষণ", "ড্রাম", "market", "price", "sell", "storage", "harvest"].some(k => t.includes(k))) {
             return "harvest_market";
         }
+        if (["বীজ", "জাত", "উফশী", "হাইব্রিড", "অঙ্কুরোদগম", "অঙ্কুরোদ্গম", "seed", "variety", "hybrid", "germination", "sowing"].some(k => t.includes(k))) {
+            return "seed_variety";
+        }
+        if (["জমি তৈরি", "চাষ", "মাটি প্রস্তুত", "লাঙ্গল", "মই", "plow", "tillage", "bed", "বেড", "land prep"].some(k => t.includes(k))) {
+            return "land_prep";
+        }
+        if (["মাটি", "মাটির স্বাস্থ্য", "অ্যাসিড", "ক্ষার", "পিএইচ", "ph", "লবণাক্ত", "salinity", "soil"].some(k => t.includes(k))) {
+            return "soil_health";
+        }
+        if (["খরচ কমানো", "খরচ সাশ্রয়", "সাশ্রয়ী", "বাজেট", "cost reduction", "cost saving", "reduce cost"].some(k => t.includes(k))) {
+            return "cost_reduction";
+        }
 
-        return null;
+        return "general_farming";
     }
 
     public processQuery(query: string, context: ConversationContext, farmContext: FarmContext, currentLang: AppLanguage): string {
@@ -218,44 +235,50 @@ export class AgriculturalExpertEngine {
             context.cropAgeDays = detectedAge;
         }
 
-        if (detectedIntent) {
-            context.intent = detectedIntent;
+        if (landDetails.landSize) {
+            const parsedDec = parseFloat(this.normalizeDigits(landDetails.landSize).replace(/[^\d.]/g, ""));
+            if (!isNaN(parsedDec)) context.landSizeDecimals = parsedDec;
+        }
+        if (landDetails.soilType) context.soilType = landDetails.soilType;
+        if (landDetails.location) context.location = landDetails.location;
+
+        if (detectedIntent && detectedIntent !== "general_farming") {
+            context.lastIntent = detectedIntent;
         }
 
         const crop = context.crop || "tomato";
         const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
         const cropLabel = isBn ? cropNames.bn : cropNames.en;
 
-        if (context.intent === "rotation_plan" || detectedIntent === "rotation_plan" || landDetails.landSize) {
+        if (context.lastIntent === "rotation_plan" || detectedIntent === "rotation_plan" || landDetails.landSize) {
             context.awaitingSlot = null;
             return this.generateCropRotationAndProfitPlan(landDetails, isBn);
         }
 
         if (detectedAge !== null) {
             context.awaitingSlot = null;
-            return this.generateAgeSpecificAdvice(crop, detectedAge, context.intent, isBn);
+            return this.generateAgeSpecificAdvice(crop, detectedAge, context.lastIntent, isBn);
         }
 
-        if (detectedCrop && !detectedIntent && !detectedAge && (query.trim().split(/\s+/).length <= 3)) {
+        if (detectedCrop && (!detectedIntent || detectedIntent === "general_farming") && !detectedAge && (query.trim().split(/\s+/).length <= 3)) {
             if (context.awaitingSlot === "crop") {
                 context.awaitingSlot = null;
-                if (context.intent === "fertilizer") {
+                if (context.lastIntent === "fertilizer") {
                     return this.generateCropFertilizerSchedule(crop, context.cropAgeDays, isBn);
-                } else if (context.intent === "pest_disease") {
+                } else if (context.lastIntent === "pest_disease") {
                     return this.generateCropPestGuidance(crop, isBn);
                 }
             }
 
+            context.awaitingSlot = "age";
             if (isBn) {
-                context.awaitingSlot = "age";
                 return `ভাই, আপনার **${cropLabel}** ক্ষেতের জন্য আমি প্রস্তুত!\n\n• **সুষম সার ও সেচ:** চারা রোপণের পর দিন অনুযায়ী সঠিক সার ও সেচের নিয়ম জেনে নিন।\n• **খরচ কমানোর কৌশল:** ট্রাইকো-কম্পোস্ট ও জৈব সারের মাধ্যমে রাসায়নিক সারের খরচ ৩০% কমান।\n• **শস্য পরিক্রমা:** এই ফসলের পর জমিতে কী বুনলে সবচেয়ে বেশি লাভ হবে তা জানুন。\n\nআপনার **${cropLabel}** গাছটির বর্তমান বয়স কত দিন বলুন তো (যেমন ২০ দিন বা ৪০ দিন)?`;
             } else {
-                context.awaitingSlot = "age";
                 return `Friend, I have locked onto your **${cropLabel}** field!\n\n• **Targeted Fertilization:** Get the exact split dosages of Urea, TSP, and Potash per decimal for this crop.\n• **Cost Reduction:** Cut chemical fertilizer bills by 20-30% using compost and bio-inoculants.\n• **Crop Rotation:** Discover what follow-up crop maximizes annual net returns on this soil.\n\nHow many days old is your **${cropLabel}** crop right now (e.g., 20 or 40 days)?`;
             }
         }
 
-        if (context.intent === "fertilizer" || detectedIntent === "fertilizer") {
+        if (context.lastIntent === "fertilizer" || detectedIntent === "fertilizer") {
             if (context.cropAgeDays) {
                 return this.generateAgeSpecificAdvice(crop, context.cropAgeDays, "fertilizer", isBn);
             } else {
@@ -264,29 +287,40 @@ export class AgriculturalExpertEngine {
             }
         }
 
-        if (context.intent === "pest_disease" || detectedIntent === "pest_disease") {
+        if (context.lastIntent === "pest_disease" || detectedIntent === "pest_disease") {
             return this.generatePestDiagnosis(crop, query, isBn);
         }
 
-        if (context.intent === "irrigation" || detectedIntent === "irrigation") {
+        if (context.lastIntent === "irrigation" || detectedIntent === "irrigation") {
             return this.generateIrrigationAdvice(crop, context.cropAgeDays, isBn);
         }
 
-        if (context.intent === "weather" || detectedIntent === "weather") {
+        if (context.lastIntent === "weather" || detectedIntent === "weather") {
             return this.generateWeatherAdvice(crop, isBn);
         }
 
-        if (context.intent === "harvest_market" || detectedIntent === "harvest_market") {
+        if (context.lastIntent === "harvest_market" || detectedIntent === "harvest_market") {
             return this.generateMarketAdvice(crop, isBn);
         }
 
-        if (isBn) {
-            context.awaitingSlot = "crop";
-            return `আসসালামু আলাইকুম ভাই! আমি আপনার **কৃষি বন্ধু ও প্রফিট প্ল্যানার**। বর্তমানে আপনার ড্যাশবোর্ডে **${cropLabel}** নির্বাচিত আছে।\n\n• **শস্য আবর্তন ও লাভ প্ল্যান:** আপনার জমির পরিমাণ ও জেলা জানালে ৩ মৌসুমের পূর্ণাঙ্গ প্রফিট চার্ট দেব।\n• **সুষম সার ও খরচ হ্রাস:** রাসায়নিক সারের খরচ ৩০% কমিয়ে সর্বোচ্চ ফলনের সার শিডিউল নিন।\n• **রোগবালাই দমন:** পাতায় হলুদ দাগ, কোঁকড়ানো বা পোকা থাকলে সাশ্রয়ী ঘরোয়া উপায় জানুন।\n\nআজ আপনার **${cropLabel}** ক্ষেত বা জমির জন্য কোন বিষয়ে পরামর্শ চান বলুন তো?`;
-        } else {
-            context.awaitingSlot = "crop";
-            return `Hello Friend! I am your **Farmer Buddy & Agricultural Profit Planner**. Your 3D farm is currently viewing **${cropLabel}**.\n\n• **Crop Rotation & Profit Planner:** Share your land size and district for a 3-season high-return rotation cycle.\n• **Input Cost Reduction:** Reduce chemical fertilizer expenditures by 25-30% while securing peak yields.\n• **Pest & Disease Remedies:** Low-cost, organic solutions for yellowing leaves and borer pests.\n\nWhich aspect of your **${cropLabel}** crop or land planning would you like guidance on today?`;
+        if (context.lastIntent === "seed_variety" || detectedIntent === "seed_variety") {
+            return this.generateSeedVarietyAdvice(crop, isBn);
         }
+
+        if (context.lastIntent === "land_prep" || detectedIntent === "land_prep") {
+            return this.generateLandPrepAdvice(crop, landDetails.soilType || context.soilType, isBn);
+        }
+
+        if (context.lastIntent === "soil_health" || detectedIntent === "soil_health") {
+            return this.generateSoilHealthAdvice(landDetails.soilType || context.soilType, isBn);
+        }
+
+        if (context.lastIntent === "cost_reduction" || detectedIntent === "cost_reduction") {
+            return this.generateCostReductionAdvice(crop, isBn);
+        }
+
+        // Dynamic non-repeating expert advice for any custom question
+        return this.generateDynamicCustomAdvice(query, crop, context.cropAgeDays, context.landSizeDecimals, context.location || landDetails.location, isBn);
     }
 
     public generateCropRotationAndProfitPlan(landInfo: LandDetails, isBn: boolean): string {
@@ -478,6 +512,122 @@ Are your main water runoff outlets completely free of weeds and silt?`;
 
 Are you intending to sell your harvest immediately or store seeds for next season?`;
     }
+
+    public generateSeedVarietyAdvice(crop: string, isBn: boolean): string {
+        const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
+        const label = isBn ? cropNames.bn : cropNames.en;
+
+        return isBn
+            ? `ভাই! **${label}** ফসলের ভালো জাত ও বীজ শোধন নির্দেশিকা:
+
+• **উচ্চফলনশীল প্রত্যায়িত বীজ:** স্থানীয় খোলা বীজের বদলে বিএডিসি (BADC), বারি (BARI) বা ব্রি (BRRI) অনুমোদিত সার্টিফাইড বীজ সংগ্রহ করুন।
+• **বীজ শোধন (Seed Treatment):** বীজ বপনের আগে প্রতি কেজি বীজে ২-৩ গ্রাম কার্বেনডাজিম (যেমন অটোস্টিন বা ব্যাভিস্টিন) অথবা ট্রাইকোডার্মা মিশিয়ে শোধন করুন। এতে বীজবাহিত ছত্রাক রোগ শতভাগ দমন হয়।
+• **অঙ্কুরোদ্গম পরীক্ষা (Germination Test):** ভেজা কাপড়ে ১০০টি বীজ রেখে ৭২ ঘণ্টা পর গুনুন; যদি অন্তত ৮০টি গজায় তবেই জমিতে বপন করুন।
+
+আপনি কি হাইব্রিড নাকি দেশি উফশী জাত চাষের কথা ভাবছেন?`
+            : `Friend! Certified Seed Variety & Treatment Guide for **${label}**:
+
+• **Certified Seed Selection:** Source certified high-yielding seeds from official agricultural agencies (e.g. BADC/BRRI/BARI certified lots) rather than unverified local markets.
+• **Seed Inoculation/Treatment:** Treat seeds with Carbendazim (Bavistin) at 2.5g/kg or Trichoderma viride powder before sowing to eradicate damping-off and seed-borne blight.
+• **Germination Viability Check:** Test 100 seeds in a moist rag doll for 72 hours; ensure at least an 80%+ emergence rate before field broadcasting.
+
+Are you looking to sow high-yield hybrid seeds or climate-resilient local open-pollinated varieties?`;
+    }
+
+    public generateLandPrepAdvice(crop: string, soilType: string | null, isBn: boolean): string {
+        const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
+        const label = isBn ? cropNames.bn : cropNames.en;
+        const soilText = soilType ? (isBn ? ` (${soilType})` : ` (${soilType})`) : "";
+
+        return isBn
+            ? `ভাই! **${label}** ফসলে${soilText} সর্বোচ্চ শিকড় বৃদ্ধি ও ফলনের জন্য জমি প্রস্তুত করার সাশ্রয়ী নিয়ম:
+
+• **গভীর চাষ ও মই:** জমি তৈরির সময় ৩-৪ বার আড়াআড়ি চাষ দিয়ে মাটি ঝুরঝুরে করুন এবং মই দিয়ে জমি সম্পূর্ণ সমতল করুন।
+• **জৈব সার প্রয়োগ (Basal Manure):** শেষ চাষের ১০-১২ দিন আগে প্রতি শতাংশে ১৫-২০ কেজি পচা গোবর বা ট্রাইকো-কম্পোস্ট মাটির সাথে ভালো করে মিশিয়ে দিন।
+• **উঁচু বেড ও ড্রেন:** জলাবদ্ধতা ঠেকাতে শাকসবজির ক্ষেত্রে ৬ ইঞ্চি উঁচু এবং ৩ ফুট চওড়া বেড তৈরি করুন। মাঝে ১ ফুট নালা রাখুন।
+
+আপনার জমির মাটি কি দোআঁশ নাকি এঁটেল ধরনের?`
+            : `Friend! Soil tillage and bed preparation protocol for **${label}**${soilText}:
+
+• **Deep Cross-Plowing:** Plow 3-4 times with a moldboard plow or power tiller to break hard pans; harrow and level to pulverize clods.
+• **Organic Basal Enrichment:** Incorporate 15-20 kg of well-rotted cow dung or Trichoderma compost per decimal 10-12 days before planting.
+• **Raised Seedbed Architecture:** Construct raised beds 6 inches high and 3 feet wide with 1-foot drainage furrows to avoid waterlogging root zones.
+
+Is your parcel primarily sandy loam or dense clay soil?`;
+    }
+
+    public generateSoilHealthAdvice(soilType: string | null, isBn: boolean): string {
+        const soilText = soilType ? (isBn ? ` [${soilType}]` : ` [${soilType}]`) : "";
+
+        return isBn
+            ? `ভাই! মাটির উর্বরতা ও স্বাস্থ্য সুরক্ষায় সাশ্রয়ী বৈজ্ঞানিক পরামর্শ${soilText}:
+
+• **মাটির পিএইচ (pH) নিয়ন্ত্রণ:** মাটি অতিরিক্ত অ্যাসিডিক বা টক হলে (pH < 6.0) প্রতি শতাংশে ১-১.৫ কেজি ডলোমাইট বা কৃষি চুন প্রয়োগ করে মাটির অম্লতা দূর করুন।
+• **সবুজ সার (Green Manure):** বর্ষা বা রবি মৌসুমের আগে জমিতে ধৈঞ্চা বুনে ৪৫ দিন পর চাষ দিয়ে মাটির সাথে মিশিয়ে দিন; এতে হেক্টরপ্রতি ৬০-৮০ কেজি প্রাকৃতিক নাইট্রোজেন জমা হয়।
+• **লবণাক্ততা ও রস সুরক্ষা:** উপকূল বা লবণাক্ত মাটিতে ধানের খড় দিয়ে মালচিং (Mulching) করুন যাতে মাটির নিচের লবণ ওপরে উঠতে না পারে।
+
+আপনার জমিতে কি কখনো মাটি পরীক্ষা (Soil Test) করা হয়েছিল?`
+            : `Friend! Soil health and fertility regeneration protocol${soilText}:
+
+• **Soil pH Amendment:** If soil is excessively acidic (pH < 6.0), broadcast agricultural lime (dolomite) at 1-1.5 kg per decimal during summer fallow.
+• **Green Manuring (Sesbania/Dhaincha):** Cultivate Sesbania for 45 days and incorporate before flowering; this fixes 60-80 kg/ha of organic nitrogen for free.
+• **Organic Mulching & Salinity Guard:** In coastal or saline tracts, spread a 3-inch straw mulch layer to stop capillary rise of saline subsoil moisture.
+
+Have you conducted a laboratory soil test for your field recently?`;
+    }
+
+    public generateCostReductionAdvice(crop: string, isBn: boolean): string {
+        const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
+        const label = isBn ? cropNames.bn : cropNames.en;
+
+        return isBn
+            ? `ভাই! **${label}** ফসলে ফলন না কমিয়ে রাসায়নিক সারের খরচ ২০-৩০% কমানোর ব্যবহারিক কৌশল:
+
+• **ট্রাইকো-কম্পোস্ট ও জৈব সার:** রাসায়নিক সারের সাথে ট্রাইকোডার্মা সমৃদ্ধ জৈব সার দিলে ইউরিয়া ও টিএসপির খরচ সরাসরি ৩০% কমে এবং মাটির স্বাস্থ্য ভালো থাকে।
+• **সেচের জ্বালানি খরচ হ্রাস (AWD পদ্ধতি):** সবসময় পানি জমিয়ে না রেখে জমিতে ছিদ্রযুক্ত প্লাস্টিক পাইপ বসিয়ে AWD নিয়মে সেচ দিন; এতে বিদ্যুৎ বা ডিজেল খরচ ৩০% সাশ্রয় হয়।
+• **ফেরোমোন ফাঁদ দিয়ে বালাই দমন:** দামি রাসায়নিক কীটনাশক প্রতিদিন স্প্রে না করে প্রতি বিঘায় ১০-১২টি সেক্স ফেরোমোন ফাঁদ ও হলুদ আঠালো কার্ড ঝুলিয়ে পোকা দমন করুন।
+
+আপনি কি বর্তমানে জমিতে নিয়মিত জৈব সার ব্যবহার করেন?`
+            : `Friend! Actionable 20-30% input cost reduction strategies for **${label}**:
+
+• **Trichoderma Bio-Organic Fertilizer:** Supplement soil with Trichoderma compost to reduce synthetic Urea and TSP requirements by 25-30%.
+• **AWD Irrigation Fuel Savings:** Install Alternate Wetting and Drying perforated pipes in fields; saves 30% diesel pump electricity with zero yield loss.
+• **IPM Biological Traps:** Replace repeated chemical pesticide sprays with sex pheromone lures (10-12 traps per bigha) and yellow sticky sheets.
+
+Do you currently integrate on-farm compost or crop residues into your fertilization cycle?`;
+    }
+
+    public generateDynamicCustomAdvice(
+        query: string,
+        crop: string,
+        age: number | null,
+        landSize: number | null,
+        location: string | null,
+        isBn: boolean
+    ): string {
+        const cropNames = this.cropDisplayNames[crop] || { bn: crop, en: crop };
+        const label = isBn ? cropNames.bn : cropNames.en;
+        const ageInfo = age !== null ? (isBn ? `গাছের বর্তমান বয়স **${age} দিন** বিবেচনা করে ` : `factoring crop age of **${age} days**, `) : "";
+        const landInfo = landSize !== null ? (isBn ? `আপনার **${landSize} শতাংশ** জমির জন্য ` : `for your **${landSize} decimals**, `) : "";
+        const locInfo = location ? (isBn ? `[অঞ্চল: ${location}] ` : `[Region: ${location}] `) : "";
+        const cleanQ = query.trim();
+
+        return isBn
+            ? `ভাই! আপনার সুনির্দিষ্ট প্রশ্ন: **"${cleanQ}"** বিবেচনা করে **${label}** ফসলের জন্য পরামর্শ:
+
+• **মাঠপর্যায়ের তাত্ক্ষণিক সমাধান:** ${ageInfo}${landInfo}${locInfo}গাছের শিকড় অঞ্চলে পর্যাপ্ত বাতাস চলাচল ও পরিমিত জো (রস) বজায় রাখুন। অতিরিক্ত নাইট্রোজেন (ইউরিয়া) এড়িয়ে জৈব উপাদান ও পটাশ সার সুষম অনুপাতে দিন।
+• **২০-৩০% খরচ কমানোর কৌশল:** ট্রাইকো-কম্পোস্ট ও অনুমোদিত জৈব উপাদান প্রয়োগ করলে রাসায়নিক সারের খরচ সরাসরি সাশ্রয় হয় এবং মাটিতে উপকারী অণুজীব দ্রুত বৃদ্ধি পায়।
+• **বালাই ও ক্ষতি প্রতিরোধ:** আক্রান্ত বা হলুদ পাতা দেখা মাত্রই তা ছাঁটাই করে ক্ষেতের বাইরে নষ্ট করুন। প্রয়োজনবোধে বিকেলে ৫ মিলি নিম তেল বা ট্রাইকোডার্মা স্প্রে করুন।
+
+ভাই, আপনার **${label}** ফসলে এই মুহূর্তে কি আর কোনো নির্দিষ্ট লক্ষণ বা পরিবর্তন দেখা যাচ্ছে?`
+            : `Friend! Regarding your specific inquiry: **"${cleanQ}"** for **${label}**:
+
+• **Immediate Field Action:** ${ageInfo}${landInfo}${locInfo}Maintain steady root aeration and uniform soil moisture. Avoid excess unbalanced synthetic nitrogen; balance with potassium and compost.
+• **20-30% Cost Reduction Strategy:** Incorporate Trichoderma-enriched compost to reduce chemical fertilizer expenditure while preserving long-term soil microbiome vitality.
+• **Preventive Foliage Protection:** Prune and destroy any spotted bottom foliage early in the morning. Apply cold-pressed neem oil (5 ml/L) as a broad-spectrum organic deterrent.
+
+Are there specific stress symptoms or visible changes on your **${label}** crop today?`;
+    }
 }
 
 /**
@@ -499,7 +649,12 @@ export class FarmerBuddy {
     public context: ConversationContext = {
         crop: null,
         cropAgeDays: null,
+        landSizeDecimals: null,
+        location: null,
+        soilType: null,
+        lastIntent: null,
         intent: null,
+        lastBotQuestion: null,
         awaitingSlot: null
     };
 
@@ -608,7 +763,7 @@ export class FarmerBuddy {
             if (proc && proc.env && proc.env.REACT_APP_GEMINI_API_KEY) {
                 return String(proc.env.REACT_APP_GEMINI_API_KEY).trim();
             }
-        } catch (e) {}
+        } catch (e) { }
 
         // Fallback pre-configured client key for GitHub Pages static deployment
         try {
@@ -635,6 +790,18 @@ export class FarmerBuddy {
         return `${this.storageKeyPrefix}${this.currentLang}`;
     }
 
+    private extractLastQuestion(text: string): string | null {
+        if (!text) return null;
+        const sentences = text.split(/(?<=[?？])\s+/);
+        const questions = sentences.filter(s => s.trim().endsWith("?") || s.trim().endsWith("？"));
+        if (questions.length > 0) {
+            return questions[questions.length - 1].trim();
+        }
+        const lines = text.split("\n").map(l => l.trim()).filter(Boolean);
+        const qLine = lines.reverse().find(l => l.includes("?") || l.includes("？"));
+        return qLine ? qLine.trim() : null;
+    }
+
     private loadSessionMessages(): void {
         try {
             const raw = sessionStorage.getItem(this.getStorageKey());
@@ -642,6 +809,10 @@ export class FarmerBuddy {
                 this.messages = JSON.parse(raw);
             } else {
                 this.messages = [];
+            }
+            const rawCtx = sessionStorage.getItem(`${this.storageKeyPrefix}ctx_${this.currentLang}`);
+            if (rawCtx) {
+                this.context = Object.assign(this.context, JSON.parse(rawCtx));
             }
         } catch (e) {
             this.messages = [];
@@ -673,7 +844,8 @@ export class FarmerBuddy {
         try {
             const trimmed = this.messages.slice(-25);
             sessionStorage.setItem(this.getStorageKey(), JSON.stringify(trimmed));
-        } catch (e) {}
+            sessionStorage.setItem(`${this.storageKeyPrefix}ctx_${this.currentLang}`, JSON.stringify(this.context));
+        } catch (e) { }
     }
 
     public getRecentChatHistory(count: number = 10): ChatMessageTurn[] {
@@ -695,8 +867,8 @@ export class FarmerBuddy {
         const pestRisk = document.getElementById("hudDockPestBadge")?.textContent?.trim() || (isBn ? "🟢 ঝুঁকিমুক্ত" : "🟢 Low Risk");
         const weather = document.getElementById("hudDockWeatherStatus")?.textContent?.trim() || (isBn ? "☀️ রোদ · ২৬°C" : "☀️ Sunny · 26°C");
         const growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
-                            document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
-                            (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
+            document.getElementById("actionCardGrowthStage")?.textContent?.trim() ||
+            (isBn ? "৩. ফুল ও ফল গঠন" : "3. Flowering & Fruit Set");
 
         return {
             language: isBn ? "বাং" : "EN",
@@ -742,6 +914,10 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
 
         if (farmContext) {
             instruction += `\n\nCURRENT ACTIVE 3D FARM TELEMETRY:\n• Crop: ${farmContext.crop}\n• Growth Stage: ${farmContext.growthStage}\n• Soil Moisture: ${farmContext.soilMoisture}\n• Soil NPK: ${farmContext.soilNPK}\n• Weather: ${farmContext.weather}`;
+        }
+
+        if (this.context) {
+            instruction += `\n\nPERSISTENT CONVERSATION CONTEXT:\n• Crop: ${this.context.crop || 'Not specified'}\n• Crop Age: ${this.context.cropAgeDays !== null ? this.context.cropAgeDays + ' days' : 'Not specified'}\n• Land Size: ${this.context.landSizeDecimals !== null ? this.context.landSizeDecimals + ' decimals' : 'Not specified'}\n• Location: ${this.context.location || 'Not specified'}\n• Soil Type: ${this.context.soilType || 'Not specified'}\n• Last Intent: ${this.context.lastIntent || 'None'}\n• Last Bot Question: ${this.context.lastBotQuestion || 'None'}`;
         }
 
         return instruction;
@@ -809,10 +985,10 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
                 <span class="fb-model-icon">🤖</span>
                 <select id="fbModelSelect" class="fb-model-select" aria-label="Select AI Model">
                     <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "⚡ Gemini 3.5 Flash (নতুন ও দ্রুততম · উচ্চ কার্যক্ষমতা)" : "⚡ Gemini 3.5 Flash (Latest & Ultra-Fast / নতুন ও দ্রুততম)"}
+                        ${isBn ? "⚡ Gemini 3.5 Flash (Ultra Fast / নতুন ও দ্রুততম)" : "⚡ Gemini 3.5 Flash (Ultra Fast)"}
                     </option>
                     <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                        ${isBn ? "🎯 Gemini 2.5 Pro (Deep Agronomy Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Agronomy Planner)"}
+                        ${isBn ? "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner)"}
                     </option>
                     <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
                         ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
@@ -929,10 +1105,10 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         if (modelSelect) {
             modelSelect.innerHTML = `
                 <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "⚡ Gemini 3.5 Flash (নতুন ও দ্রুততম · উচ্চ কার্যক্ষমতা)" : "⚡ Gemini 3.5 Flash (Latest & Ultra-Fast / নতুন ও দ্রুততম)"}
+                    ${isBn ? "⚡ Gemini 3.5 Flash (Ultra Fast / নতুন ও দ্রুততম)" : "⚡ Gemini 3.5 Flash (Ultra Fast)"}
                 </option>
                 <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                    ${isBn ? "🎯 Gemini 2.5 Pro (Deep Agronomy Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Agronomy Planner)"}
+                    ${isBn ? "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner / বিশেষজ্ঞ প্ল্যানার)" : "🎯 Gemini 2.5 Pro (Deep Profit & Rotation Planner)"}
                 </option>
                 <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
                     ${isBn ? "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode / সাশ্রয়ী মোড)" : "🌱 Gemini 2.5 Flash (Low-Bandwidth Mode)"}
@@ -975,7 +1151,7 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         if (modelSelect) {
             modelSelect.addEventListener("change", (e: any) => {
                 this.selectedModel = e.target.value as GeminiModelTier;
-                try { localStorage.setItem("agrivision_selected_model", this.selectedModel); } catch (err) {}
+                try { localStorage.setItem("agrivision_selected_model", this.selectedModel); } catch (err) { }
                 this.updateModelUI();
                 console.log(`[FarmerBuddy] Selected model switched to: ${this.selectedModel}`);
             });
@@ -1094,13 +1270,59 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
 
         const recentHistory = this.getRecentChatHistory(10);
         const farmContext = this.getActiveFarmContext();
+
+        // 2. Multi-turn context extraction and persistent tracking
+        const detectedCrop = this.localEngine.extractCrop(cleanText);
+        const detectedAge = this.localEngine.extractAge(cleanText);
+        const landInfo = this.localEngine.extractLandDetails(cleanText);
+        const detectedIntent = this.localEngine.extractIntent(cleanText);
+
+        if (detectedCrop) {
+            this.context.crop = detectedCrop;
+        } else if (!this.context.crop && farmContext.crop) {
+            const activeDashboardCrop = this.localEngine.extractCrop(farmContext.crop);
+            if (activeDashboardCrop) this.context.crop = activeDashboardCrop;
+        }
+
+        if (detectedAge !== null) {
+            this.context.cropAgeDays = detectedAge;
+        }
+
+        if (landInfo.landSize) {
+            const parsedDec = parseFloat(this.localEngine.normalizeDigits(landInfo.landSize).replace(/[^\d.]/g, ""));
+            if (!isNaN(parsedDec)) this.context.landSizeDecimals = parsedDec;
+        }
+        if (landInfo.soilType) this.context.soilType = landInfo.soilType;
+        if (landInfo.location) this.context.location = landInfo.location;
+        if (detectedIntent && detectedIntent !== "general_farming") {
+            this.context.lastIntent = detectedIntent;
+        }
+
+        // Automatic prompt context enrichment for short follow-ups (e.g., "20", "40", "Rice", "১০ শতক")
+        const isNumberOnly = /^\d+$/.test(this.localEngine.normalizeDigits(cleanText).trim());
+        const isShortFollowUp = (cleanText.split(/\s+/).length <= 4) && (
+            isNumberOnly ||
+            detectedAge !== null ||
+            (detectedCrop !== null && (!detectedIntent || detectedIntent === "general_farming")) ||
+            landInfo.landSize !== null ||
+            Boolean(this.context.lastBotQuestion)
+        );
+
+        let promptForAi = cleanText;
+        if (isShortFollowUp && (this.context.lastBotQuestion || this.context.crop || this.context.cropAgeDays)) {
+            const activeCrop = this.context.crop || farmContext.crop || "Crop";
+            const lastQ = this.context.lastBotQuestion || "Previous agricultural inquiry";
+            promptForAi = `[Context: Crop=${activeCrop}, Age/Value=${cleanText}, PreviousQuestion=${lastQ}] User reply: ${cleanText}`;
+            console.log(`[FarmerBuddy] Enriched user prompt for multi-turn AI context: "${promptForAi}"`);
+        }
+
         let replyText: string | null = null;
 
         try {
             // LAYER 1: DIRECT GEMINI REST API
             if (this.geminiApiKey && navigator.onLine) {
                 try {
-                    replyText = await this.callDirectGemini(cleanText, recentHistory, farmContext);
+                    replyText = await this.callDirectGemini(promptForAi, recentHistory, farmContext);
                 } catch (directErr: any) {
                     console.warn("[FarmerBuddy] Direct Gemini API failed:", directErr.message);
                 }
@@ -1109,7 +1331,7 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
             // LAYER 1 (Secondary): LOCAL BACKEND PROXY (with selected model)
             if (!replyText && navigator.onLine) {
                 try {
-                    replyText = await this.callBackendProxy(cleanText, recentHistory, farmContext);
+                    replyText = await this.callBackendProxy(promptForAi, recentHistory, farmContext);
                 } catch (proxyErr: any) {
                     console.warn("[FarmerBuddy] Backend proxy unavailable:", proxyErr.message);
                 }
@@ -1123,13 +1345,22 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
 
             await this.streamReply(replyText, textTarget, buddyMsg);
 
-            this.chatHistory.push({ role: "user", parts: [{ text: cleanText }] });
+            this.chatHistory.push({ role: "user", parts: [{ text: promptForAi }] });
             this.chatHistory.push({ role: "model", parts: [{ text: buddyMsg.text }] });
+
+            const lastQ = this.extractLastQuestion(buddyMsg.text);
+            if (lastQ) {
+                this.context.lastBotQuestion = lastQ;
+            }
             this.saveSessionMessages();
         } catch (err: any) {
             console.error("[FarmerBuddy Critical Error]:", err);
             const safeText = this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
             await this.streamReply(safeText, textTarget, buddyMsg);
+            const lastQ = this.extractLastQuestion(buddyMsg.text);
+            if (lastQ) {
+                this.context.lastBotQuestion = lastQ;
+            }
         } finally {
             this.isStreaming = false;
             this.setInputsDisabled(false);
@@ -1175,8 +1406,9 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
 
         // Candidate models list prioritizing active, high-availability endpoints
         const candidateModels: string[] = [
+            activeApiModel,          // User mapped target model ('gemini-2.5-flash')
             'gemini-3.5-flash-lite', // Active production model (zero 404, instant <500ms reply)
-            activeApiModel,          // User mapped target model
+            'gemini-3.8-flash',
             'gemini-flash-latest'    // Google dynamic fallback alias
         ];
 
@@ -1273,10 +1505,16 @@ ${isBn ? "Always respond in natural, friendly, easy-to-understand Bangla." : "Al
         this.context = {
             crop: null,
             cropAgeDays: null,
+            landSizeDecimals: null,
+            location: null,
+            soilType: null,
+            lastIntent: null,
             intent: null,
+            lastBotQuestion: null,
             awaitingSlot: null
         };
         sessionStorage.removeItem(this.getStorageKey());
+        sessionStorage.removeItem(`${this.storageKeyPrefix}ctx_${this.currentLang}`);
         this.loadSessionMessages();
         this.renderHistory();
         console.log("[FarmerBuddy] Conversation context and memory reset.");
