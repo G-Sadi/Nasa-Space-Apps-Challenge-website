@@ -20,6 +20,79 @@ const ai = new GoogleGenAI({
     apiKey: apiKey || ''
 });
 
+// =============================================================================
+// FARMER AUTH & PROFILE SQL / HYBRID STORAGE (BACKEND TIER 3)
+// =============================================================================
+const registeredFarmers = new Map();
+
+// Pre-seeded verified demo farmer account
+registeredFarmers.set("01711223344", {
+    id: "demo-rahim-01",
+    phone: "01711223344",
+    pin: "1234",
+    name: "মোঃ রহিম উদ্দিন (Rahim Uddin)",
+    district: "Mymensingh",
+    lat: 24.7471,
+    lon: 90.4203,
+    landSizeDecimals: 35,
+    primaryCrop: "rice",
+    soilType: "loamy",
+    createdAt: "2026-01-01T00:00:00.000Z"
+});
+
+// Auth Routes for Non-Blocking Tier 3 Sync
+app.post('/api/auth/register', (req, res) => {
+    try {
+        const farmer = req.body;
+        if (!farmer || !farmer.phone) {
+            return res.status(400).json({ error: "Phone number is required" });
+        }
+        registeredFarmers.set(farmer.phone, farmer);
+        console.log(`[Auth SQL Sync] ✅ Farmer profile registered/updated: ${farmer.name} (${farmer.phone})`);
+        return res.json({ success: true, farmer });
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/auth/login', (req, res) => {
+    try {
+        const { phone, pin } = req.body;
+        const farmer = registeredFarmers.get(phone);
+        if (!farmer || String(farmer.pin) !== String(pin)) {
+            return res.status(401).json({ error: "Invalid phone number or PIN code" });
+        }
+        return res.json({ success: true, farmer });
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+app.post('/api/auth/sync', (req, res) => {
+    try {
+        const farmer = req.body;
+        if (farmer && farmer.phone) {
+            registeredFarmers.set(farmer.phone, farmer);
+            return res.json({ success: true, farmer });
+        }
+        return res.status(400).json({ error: "Missing farmer data" });
+    } catch (e) {
+        return res.status(500).json({ error: e.message });
+    }
+});
+
+app.get('/api/auth/profile', (req, res) => {
+    const phone = req.query.phone;
+    if (!phone) return res.status(400).json({ error: "Phone required" });
+    const farmer = registeredFarmers.get(phone);
+    if (!farmer) return res.status(404).json({ error: "Farmer not found" });
+    return res.json({ farmer });
+});
+
+app.get('/api/auth/farmers', (req, res) => {
+    return res.json({ farmers: Array.from(registeredFarmers.values()) });
+});
+
 // Master System Instruction for Gemini (Farmer Buddy Expert Mode)
 const BASE_SYSTEM_INSTRUCTION = `You are "Farmer Buddy" (কৃষি বন্ধু), an elite Senior Agronomist, Agricultural Economist, and trusted field friend to farmers in Bangladesh and South Asia.
 
@@ -144,6 +217,17 @@ app.post('/api/ask', async (req, res) => {
         // 1. Build dynamic system instruction with active farm context & NASA satellite data
         let dynamicSystemInstruction = BASE_SYSTEM_INSTRUCTION;
         if (context && typeof context === 'object') {
+            if (context.farmer) {
+                dynamicSystemInstruction += `\n\nLOGGED-IN FARMER PROFILE:
+• Farmer Name: ${context.farmer.name}
+• Phone: ${context.farmer.phone}
+• District: ${context.farmer.district}
+• Land Size: ${context.farmer.landSizeDecimals} decimals (শতাংশ)
+• Primary Crop: ${context.farmer.primaryCrop}
+• Soil Type: ${context.farmer.soilType}
+Always address this farmer warmly and personally by name ("আসসালামু আলাইকুম ${context.farmer.name} ভাই!" in Bangla, "Hello ${context.farmer.name}!" in English). NEVER use the word "নমস্কার".`;
+            }
+
             dynamicSystemInstruction += `\n\nACTIVE 3D FARM DASHBOARD STATE & LIVE NASA SATELLITE TELEMETRY:
 • Agroclimatology Zone: ${context.nasaZone || 'Mymensingh (AEZ-9)'}
 • Selected Crop: ${context.crop || 'Tomato'}

@@ -3546,6 +3546,7 @@ export function updateCropSimulation(rawCropId) {
     createCropField(cropId);
 }
 window.updateCropSimulation = updateCropSimulation;
+window.createCropField = createCropField;
 
 // =============================================================================
 // 16. BIND UI EVENT LISTENERS
@@ -3980,13 +3981,51 @@ export function init3DFieldSimulation() {
     bindUIControls();
     setTimeOfDayMode("noon");
 
-    // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment
-    fetchNasaAgriData("mymensingh").then(() => {
+    // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment with Active Farmer
+    const initialFarmer = (typeof window !== "undefined" && window.authService) ? window.authService.getCurrentFarmer() : null;
+    const initialCrop = (initialFarmer && initialFarmer.primaryCrop) ? initialFarmer.primaryCrop : "tomato";
+    const initialZone = (initialFarmer && initialFarmer.district) ? initialFarmer.district.toLowerCase() : "mymensingh";
+    const initialLat = initialFarmer ? initialFarmer.lat : null;
+    const initialLon = initialFarmer ? initialFarmer.lon : null;
+
+    if (initialCrop !== "tomato") {
+        updateCropSimulation(initialCrop);
+    }
+
+    fetchNasaAgriData(initialZone, initialLat, initialLon).then(() => {
         syncSimulationWithNasaData();
     }).catch((e) => console.warn("[NASA] Initial fetch:", e));
 
     onNasaDataUpdated(() => {
         syncSimulationWithNasaData();
+    });
+
+    // Real-Time Ecosystem Synchronization with Farmer Authentication
+    window.addEventListener("farmer-auth-changed", (e) => {
+        const farmer = e.detail;
+        if (!farmer) return;
+
+        console.log(`[3D Simulation] 🔄 Real-time sync for ${farmer.name}: Crop -> ${farmer.primaryCrop}, District -> ${farmer.district}`);
+
+        // 1. Switch 3D Crop Simulation
+        if (farmer.primaryCrop) {
+            updateCropSimulation(farmer.primaryCrop);
+        }
+
+        // 2. Sync Location Controller Dropdown
+        const distKey = (farmer.district || "").toLowerCase();
+        const locSelect = document.getElementById("fctrlLocSelect");
+        if (locSelect) {
+            const hasOption = Array.from(locSelect.options).some(opt => opt.value === distKey);
+            if (hasOption) {
+                locSelect.value = distKey;
+            }
+        }
+
+        // 3. Fetch Live NASA Agroclimatology for Farmer GPS
+        fetchNasaAgriData(distKey, farmer.lat, farmer.lon).then(() => {
+            syncSimulationWithNasaData();
+        }).catch((err) => console.warn("[NASA] Farmer sync fetch error:", err));
     });
 
     // Auto-dismiss gesture hint on first touch or after 4s

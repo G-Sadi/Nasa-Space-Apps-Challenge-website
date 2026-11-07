@@ -53,6 +53,14 @@
         </nav>
 
         <div class="nav-right">
+            <!-- Farmer Profile Badge / Instant Login Button -->
+            <div id="navFarmerAuthContainer" class="nav-farmer-auth">
+                <button class="nav-farmer-login-btn" id="btnNavFarmerLogin" title="Farmer Login / কৃষক প্রবেশ">
+                    <span class="btn-icon">👨‍🌾</span>
+                    <span class="btn-text">কৃষক প্রবেশ (Login)</span>
+                </button>
+            </div>
+
             <!-- Language Toggle Switch (EN / বাংলা) -->
             <div class="lang-switch-container">
                 <span class="lang-tag" id="tagEN">EN</span>
@@ -1895,6 +1903,170 @@
         </div>
     </div>
 
+    <!-- ===================================================================== -->
+    <!-- SLEEK GLASSMORPHIC FARMER AUTHENTICATION & PROFILE MODAL -->
+    <!-- ===================================================================== -->
+    <div id="farmerAuthModal" class="farmer-auth-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="authModalHeaderTitle">
+        <div class="farmer-auth-card">
+            <!-- Modal Header -->
+            <div class="auth-modal-header">
+                <div class="auth-header-left">
+                    <span class="auth-header-icon">🌾</span>
+                    <h3 id="authModalHeaderTitle">কৃষক অ্যাকাউন্ট (Farmer Account)</h3>
+                </div>
+                <button type="button" id="btnFarmerAuthClose" class="auth-close-btn" aria-label="Close modal">×</button>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="auth-tabs-nav">
+                <button type="button" class="auth-tab-btn active" id="authTabLogin">
+                    <span>🔑</span> লগইন (Login)
+                </button>
+                <button type="button" class="auth-tab-btn" id="authTabRegister">
+                    <span>📝</span> নতুন নিবন্ধন (Register)
+                </button>
+            </div>
+
+            <!-- Tab 1: LOGIN FORM -->
+            <div id="authContentLogin" class="auth-tab-content">
+                <!-- 1-Click Saved Profile Quick Login Chips -->
+                <div id="quickLoginChipsContainer" class="quick-login-chips-wrapper">
+                    <!-- Populated dynamically by authService.js -->
+                </div>
+
+                <form id="farmer-login-form" autocomplete="on">
+                    <div class="auth-field-group">
+                        <label for="login-phone">📱 মোবাইল নম্বর (Phone Number)</label>
+                        <div class="auth-input-wrap">
+                            <input type="tel" name="username" id="login-phone" inputmode="numeric" autocomplete="username tel" placeholder="01XXXXXXXXX" required />
+                            <!-- Floating Dropdown Suggestions -->
+                            <div id="phoneSuggestionsList" class="phone-suggestions-dropdown" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="auth-field-group">
+                        <label for="login-pin">🔒 ৪ সংখ্যার পিন কোড (4-Digit PIN)</label>
+                        <div class="auth-input-wrap auth-pin-wrap">
+                            <input type="password" name="password" id="login-pin" inputmode="numeric" maxlength="4" autocomplete="current-password" placeholder="••••" required />
+                            <button type="button" id="loginPinToggle" class="auth-pin-toggle" title="Show/Hide PIN">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-options-row">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" id="login-remember-me" checked />
+                            <span>☑️ অটো-ফিল ও মনে রাখুন (Remember Me)</span>
+                        </label>
+                    </div>
+
+                    <div id="loginErrorMsg" class="auth-error-box" style="display: none;"></div>
+
+                    <button type="submit" id="btnLoginSubmit" class="auth-submit-btn">
+                        🚀 লগইন করুন (Login Now)
+                    </button>
+                </form>
+            </div>
+
+            <!-- Tab 2: REGISTER FORM -->
+            <div id="authContentRegister" class="auth-tab-content" style="display: none;">
+                <h4 id="authRegTitle" class="reg-form-title">📝 নতুন কৃষক নিবন্ধন (Fast Registration)</h4>
+
+                <form id="farmer-register-form" autocomplete="off">
+                    <div class="auth-field-group">
+                        <label for="reg-phone">📱 মোবাইল নম্বর (Phone Number)</label>
+                        <input type="tel" id="reg-phone" inputmode="numeric" placeholder="01XXXXXXXXX" required />
+                    </div>
+
+                    <div class="auth-field-group">
+                        <label for="reg-name">👤 কৃষকের নাম (Farmer Name)</label>
+                        <input type="text" id="reg-name" placeholder="যেমন: মোঃ রহিম উদ্দিন" required />
+                    </div>
+
+                    <div class="auth-grid-2">
+                        <div class="auth-field-group">
+                            <label for="reg-district">📍 জেলা (District)</label>
+                            <select id="reg-district" required>
+                                <option value="mymensingh">ময়মনসিংহ (Mymensingh)</option>
+                                <option value="bogura">বগুড়া (Bogura)</option>
+                                <option value="rajshahi">রাজশাহী (Rajshahi)</option>
+                                <option value="dinajpur">দিনাজপুর (Dinajpur)</option>
+                                <option value="barishal">বরিশাল (Barishal)</option>
+                                <option value="sylhet">সিলেট (Sylhet)</option>
+                                <option value="cumilla">কুমিল্লা (Cumilla)</option>
+                                <option value="rangpur">রংপুর (Rangpur)</option>
+                                <option value="khulna">খুলনা (Khulna)</option>
+                                <option value="dhaka">ঢাকা (Dhaka)</option>
+                            </select>
+                        </div>
+
+                        <div class="auth-field-group">
+                            <label for="reg-soil">🌾 মাটির ধরন (Soil Type)</label>
+                            <select id="reg-soil" required>
+                                <option value="loamy">দোআঁশ (Loamy Soil)</option>
+                                <option value="clay">এঁটেল (Clay Soil)</option>
+                                <option value="sandy_loam">বেলে-দোআঁশ (Sandy Loam)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="auth-grid-2">
+                        <div class="auth-field-group">
+                            <label for="reg-land">🌱 জমি (শতাংশ / Decimals)</label>
+                            <input type="number" id="reg-land" min="1" max="5000" value="35" required />
+                        </div>
+
+                        <div class="auth-field-group">
+                            <label for="reg-crop">🌾 প্রধান ফসল (Primary Crop)</label>
+                            <select id="reg-crop" required>
+                                <option value="rice">ধান (Rice)</option>
+                                <option value="potato">আলু (Potato)</option>
+                                <option value="tomato">টমেটো (Tomato)</option>
+                                <option value="wheat">গম (Wheat)</option>
+                                <option value="maize">ভুট্টা (Maize)</option>
+                                <option value="jute">পাট (Jute)</option>
+                                <option value="mustard">সরিষা (Mustard)</option>
+                                <option value="eggplant">বেগুন (Eggplant)</option>
+                                <option value="chili">মরিচ (Chili)</option>
+                                <option value="onion">পেঁয়াজ (Onion)</option>
+                                <option value="cabbage">বাঁধাকপি (Cabbage)</option>
+                                <option value="cauliflower">ফুলকপি (Cauliflower)</option>
+                                <option value="sugarcane">আখ (Sugarcane)</option>
+                                <option value="tea">চা (Tea)</option>
+                                <option value="papaya">পেঁপে (Papaya)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="auth-field-group">
+                        <label for="reg-pin">🔒 ৪ সংখ্যার পিন কোড সেট করুন (PIN)</label>
+                        <div class="auth-input-wrap auth-pin-wrap">
+                            <input type="password" id="reg-pin" inputmode="numeric" maxlength="4" placeholder="যেমন: 1234" required />
+                            <button type="button" id="regPinToggle" class="auth-pin-toggle" title="Show/Hide PIN">👁️</button>
+                        </div>
+                    </div>
+
+                    <div class="auth-options-row">
+                        <label class="auth-checkbox-label">
+                            <input type="checkbox" id="reg-remember-me" checked />
+                            <span>☑️ অটো-ফিল ও মনে রাখুন (Auto-Fill & Remember Me)</span>
+                        </label>
+                    </div>
+
+                    <div id="regErrorMsg" class="auth-error-box" style="display: none;"></div>
+
+                    <button type="submit" id="btnRegisterSubmit" class="auth-submit-btn">
+                        ✨ নিবন্ধন সম্পন্ন করুন (Complete Registration)
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Farmer Profile Popover Menu -->
+    <div id="farmerProfilePopover" class="farmer-profile-popover">
+        <!-- Rendered dynamically by authService.js -->
+    </div>
+
     <!-- SCRIPTS -->
     <script src="js/i18n.js"></script>
     <script src="js/data.js"></script>
@@ -1904,6 +2076,7 @@
     <script src="js/rotation.js"></script>
     <script src="script.js"></script>
     <script src="app.js"></script>
+    <script type="module" src="js/authService.js"></script>
     <script type="module" src="js/nasaAgriService.js"></script>
     <script type="module" src="js/simulation.js"></script>
     <script type="module" src="js/FarmerBuddy.js"></script>

@@ -350,6 +350,72 @@ async def chat_stream_endpoint(request: ChatRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+# =============================================================================
+# FARMER AUTH SCHEMAS & HYBRID BACKEND STORAGE
+# =============================================================================
+
+class FarmerAuthPayload(BaseModel):
+    id: str = "farmer-id"
+    phone: str
+    pin: str
+    name: str
+    district: str
+    lat: float = 24.7471
+    lon: float = 90.4203
+    landSizeDecimals: float = 30.0
+    primaryCrop: str = "rice"
+    soilType: str = "loamy"
+    createdAt: str = ""
+
+class LoginPayload(BaseModel):
+    phone: str
+    pin: str
+
+FARMERS_STORE = {
+    "01711223344": {
+        "id": "demo-rahim-01",
+        "phone": "01711223344",
+        "pin": "1234",
+        "name": "মোঃ রহিম উদ্দিন (Rahim Uddin)",
+        "district": "Mymensingh",
+        "lat": 24.7471,
+        "lon": 90.4203,
+        "landSizeDecimals": 35.0,
+        "primaryCrop": "rice",
+        "soilType": "loamy",
+        "createdAt": "2026-01-01T00:00:00Z"
+    }
+}
+
+@app.post("/api/auth/register")
+async def register_farmer(payload: FarmerAuthPayload):
+    FARMERS_STORE[payload.phone] = payload.dict()
+    print(f"[FastAPI Auth Sync] ✅ Registered/Updated farmer: {payload.name} ({payload.phone})")
+    return {"success": True, "farmer": payload.dict()}
+
+@app.post("/api/auth/login")
+async def login_farmer(creds: LoginPayload):
+    farmer = FARMERS_STORE.get(creds.phone)
+    if not farmer or str(farmer.get("pin")) != str(creds.pin):
+        raise HTTPException(status_code=401, detail="Invalid phone number or PIN code")
+    return {"success": True, "farmer": farmer}
+
+@app.post("/api/auth/sync")
+async def sync_farmer(payload: FarmerAuthPayload):
+    FARMERS_STORE[payload.phone] = payload.dict()
+    return {"success": True, "farmer": payload.dict()}
+
+@app.get("/api/auth/profile")
+async def get_profile(phone: str):
+    farmer = FARMERS_STORE.get(phone)
+    if not farmer:
+        raise HTTPException(status_code=404, detail="Farmer not found")
+    return {"farmer": farmer}
+
+@app.get("/api/auth/farmers")
+async def get_all_farmers():
+    return {"farmers": list(FARMERS_STORE.values())}
+
 @app.get("/api/health")
 async def health_check():
     return {

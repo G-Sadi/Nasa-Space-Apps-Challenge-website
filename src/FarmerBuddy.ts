@@ -53,9 +53,11 @@ export interface FarmContext {
     nasaFertilizerAdvice?: string;
     nasaDiseaseAdvice?: string;
     nasaSprayAdvice?: string;
+    farmer?: any;
 }
 
 export interface ConversationContext {
+    farmer?: any;
     crop: string | null;
     cropAgeDays: number | null;
     landSizeDecimals: number | null;
@@ -1053,7 +1055,8 @@ export class FarmerBuddy {
             nasaIrrigationAdvice: nasaIrrigationAdvice,
             nasaFertilizerAdvice: nasaFertilizerAdvice,
             nasaDiseaseAdvice: nasaDiseaseAdvice,
-            nasaSprayAdvice: nasaSprayAdvice
+            nasaSprayAdvice: nasaSprayAdvice,
+            farmer: this.context.farmer || ((typeof window !== "undefined" && (window as any).authService) ? (window as any).authService.getCurrentFarmer() : null)
         };
     }
 
@@ -1070,9 +1073,83 @@ export class FarmerBuddy {
         }
     }
 
+    public updatePersonalizedWelcomeMessage(farmer: any): void {
+        if (!farmer) return;
+        const isBn = (this.currentLang === "bn");
+
+        const cropMap: Record<string, { bn: string; en: string }> = {
+            rice: { bn: "ধান", en: "Rice" },
+            potato: { bn: "আলু", en: "Potato" },
+            tomato: { bn: "টমেটো", en: "Tomato" },
+            wheat: { bn: "গম", en: "Wheat" },
+            maize: { bn: "ভুট্টা", en: "Maize" },
+            jute: { bn: "পাট", en: "Jute" },
+            mustard: { bn: "সরিষা", en: "Mustard" },
+            eggplant: { bn: "বেগুন", en: "Eggplant" },
+            chili: { bn: "মরিচ", en: "Chili" },
+            onion: { bn: "পেঁয়াজ", en: "Onion" },
+            cabbage: { bn: "বাঁধাকপি", en: "Cabbage" },
+            cauliflower: { bn: "ফুলকপি", en: "Cauliflower" },
+            sugarcane: { bn: "আখ", en: "Sugarcane" },
+            tea: { bn: "চা", en: "Tea" },
+            papaya: { bn: "পেঁপে", en: "Papaya" }
+        };
+        const cropLabel = cropMap[farmer.primaryCrop] ? (isBn ? cropMap[farmer.primaryCrop].bn : cropMap[farmer.primaryCrop].en) : farmer.primaryCrop;
+        const cropLabelEn = cropMap[farmer.primaryCrop] ? cropMap[farmer.primaryCrop].en : farmer.primaryCrop;
+
+        const soilMap: Record<string, { bn: string; en: string }> = {
+            loamy: { bn: "দোআঁশ", en: "Loamy" },
+            clay: { bn: "এঁটেল", en: "Clay" },
+            sandy_loam: { bn: "বেলে-দোআঁশ", en: "Sandy Loam" }
+        };
+        const soilLabel = soilMap[farmer.soilType] ? (isBn ? soilMap[farmer.soilType].bn : soilMap[farmer.soilType].en) : farmer.soilType;
+
+        const personalizedMsg = isBn
+            ? `আসসালামু আলাইকুম ${farmer.name} ভাই! আপনার ${farmer.district}-এর ${farmer.landSizeDecimals} শতাংশ ${soilLabel} মাটির ${cropLabel} ক্ষেতের লাইভ NASA স্যাটেলাইট তথ্য এখন চালু আছে। আজ আপনাকে কীভাবে সাহায্য করতে পারি?`
+            : `Hello ${farmer.name}! Your ${farmer.landSizeDecimals} decimal ${cropLabelEn} field in ${farmer.district} (${soilLabel} soil) is synced with live NASA satellite telemetry. How can I help you today?`;
+
+        const welcomeIdx = this.messages.findIndex(m => m.id && m.id.startsWith("welcome-"));
+        if (welcomeIdx !== -1) {
+            this.messages[welcomeIdx].text = personalizedMsg;
+        } else if (this.messages.length === 0) {
+            this.messages.push({
+                id: `welcome-${this.currentLang}`,
+                sender: "buddy",
+                text: personalizedMsg,
+                timestamp: Date.now()
+            });
+        }
+
+        if (this.messagesContainer) {
+            const welcomeBubble = this.messagesContainer.querySelector(`#msg-welcome-${this.currentLang}`);
+            if (welcomeBubble) {
+                const textEl = welcomeBubble.querySelector(".msg-text");
+                if (textEl) textEl.innerHTML = this.formatMarkdown(personalizedMsg);
+            } else if (this.messages.length <= 1) {
+                this.renderHistory();
+            }
+        }
+
+        this.updateLiveSyncBadge();
+    }
+
     private buildDynamicSystemInstruction(farmContext: FarmContext): string {
         const isBn = (this.currentLang === "bn");
-        let instruction = `[LIVE NASA EARTH OBSERVATION & 3D FIELD TELEMETRY:
+
+        let farmerProfileBlock = "";
+        if (farmContext.farmer) {
+            farmerProfileBlock = `[LOGGED-IN FARMER PROFILE:
+• Farmer Name: ${farmContext.farmer.name}
+• Registered Phone: ${farmContext.farmer.phone}
+• District: ${farmContext.farmer.district}
+• Land Size: ${farmContext.farmer.landSizeDecimals} decimals (শতাংশ)
+• Primary Crop: ${farmContext.farmer.primaryCrop}
+• Soil Type: ${farmContext.farmer.soilType}
+MANDATORY GREETING & PERSONALIZATION:
+Address this farmer directly by name. In Bangla, start with: "আসসালামু আলাইকুম ${farmContext.farmer.name} ভাই!" and in English start with: "Hello ${farmContext.farmer.name}!". NEVER use "নমস্কার" under any circumstances.]\n\n`;
+        }
+
+        let instruction = `${farmerProfileBlock}[LIVE NASA EARTH OBSERVATION & 3D FIELD TELEMETRY:
 • Agroclimatology Zone: ${farmContext.nasaZone || 'Mymensingh (AEZ-9)'}
 • Active 3D Crop: ${farmContext.crop || 'Tomato'} (${farmContext.growthStage || 'Vegetative'}, ${farmContext.growthDay || '40 Days'})
 • NASA SMAP Root Zone Soil Moisture (GWETROOT): ${farmContext.nasaRootMoist || farmContext.soilMoisture || '68%'} (Topsoil GWETTOP: ${farmContext.nasaTopMoist || '62%'})
@@ -1515,7 +1592,35 @@ STRICT RULES FOR EVERY RESPONSE:
             langToggle.addEventListener("change", () => {
                 const targetLang = langToggle.checked ? "bn" : "en";
                 this.setLanguage(targetLang);
+                if (this.context.farmer) {
+                    this.updatePersonalizedWelcomeMessage(this.context.farmer);
+                }
             });
+        }
+
+        // Real-Time Farmer Authentication & Personalization Sync
+        window.addEventListener("farmer-auth-changed", (e: any) => {
+            const farmer = e.detail;
+            if (farmer) {
+                this.context.farmer = farmer;
+                this.context.crop = farmer.primaryCrop;
+                this.context.landSizeDecimals = farmer.landSizeDecimals;
+                this.context.soilType = farmer.soilType;
+                this.context.location = farmer.district;
+                this.updatePersonalizedWelcomeMessage(farmer);
+            }
+        });
+
+        if (typeof window !== "undefined" && (window as any).authService) {
+            const active = (window as any).authService.getCurrentFarmer();
+            if (active) {
+                this.context.farmer = active;
+                this.context.crop = active.primaryCrop;
+                this.context.landSizeDecimals = active.landSizeDecimals;
+                this.context.soilType = active.soilType;
+                this.context.location = active.district;
+                this.updatePersonalizedWelcomeMessage(active);
+            }
         }
     }
 

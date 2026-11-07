@@ -8327,3 +8327,640 @@ body.lang-bn strong {
         grid-template-columns: repeat(2, 1fr);
     }
 }
+
+/* =============================================================================
+   ULTRA-FAST FARMER AUTHENTICATION, AUTO-FILL & ECOSYSTEM SYNC STYLES
+   ============================================================================= */
+
+/* 1. Navbar Farmer Auth Pill & Login Button */
+.nav-farmer-auth {
+    display: inline-flex;
+    align-items: center;
+}
+
+.nav-farmer-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(12, 36, 22, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(74, 222, 128, 0.45);
+    border-radius: 999px;
+    padding: 5px 14px 5px 8px;
+    color: #f0fdf4;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+.nav-farmer-badge:hover {
+    background: rgba(16, 50, 30, 0.95);
+    border-color: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.25);
+}
+
+.farmer-avatar {
+    font-size: 18px;
+    line-height: 1;
+    background: rgba(34, 197, 94, 0.2);
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.farmer-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    line-height: 1.2;
+}
+
+.farmer-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #4ade80;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.farmer-meta {
+    font-size: 10.5px;
+    color: #94a3b8;
+}
+
+.farmer-chevron {
+    font-size: 11px;
+    color: #86efac;
+    margin-left: 2px;
+}
+
+.nav-farmer-login-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.15);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    border-radius: 999px;
+    padding: 7px 15px;
+    color: #86efac;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-farmer-login-btn:hover {
+    background: rgba(34, 197, 94, 0.28);
+    color: #ffffff;
+    border-color: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+/* 2. Glassmorphic Modal Overlay */
+.farmer-auth-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 10, 6, 0.82);
+    backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+.farmer-auth-modal-overlay.visible {
+    display: flex;
+    animation: authFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes authFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.farmer-auth-card {
+    width: 94vw;
+    max-width: 430px;
+    border-radius: 20px;
+    background: rgba(8, 22, 14, 0.94);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    padding: 22px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: #f8fafc;
+    box-sizing: border-box;
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Custom scrollbar for modal */
+.farmer-auth-card::-webkit-scrollbar {
+    width: 5px;
+}
+.farmer-auth-card::-webkit-scrollbar-thumb {
+    background: rgba(74, 222, 128, 0.25);
+    border-radius: 4px;
+}
+
+/* Header */
+.auth-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.auth-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auth-header-icon {
+    font-size: 20px;
+}
+
+.auth-modal-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #4ade80;
+    letter-spacing: -0.2px;
+}
+
+.auth-close-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border: none;
+    font-size: 20px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.auth-close-btn:hover {
+    background: rgba(239, 68, 68, 0.38);
+    color: #ffffff;
+    transform: scale(1.05);
+}
+
+/* Tabs */
+.auth-tabs-nav {
+    display: flex;
+    gap: 6px;
+    background: rgba(4, 15, 10, 0.75);
+    padding: 4px;
+    border-radius: 12px;
+    margin: 14px 0 16px 0;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.auth-tab-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.auth-tab-btn.active {
+    background: rgba(34, 197, 94, 0.22);
+    color: #4ade80;
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    box-shadow: 0 2px 8px rgba(34, 197, 94, 0.15);
+}
+
+/* Quick Login Chips */
+.quick-login-chips-wrapper {
+    margin-bottom: 14px;
+}
+
+.quick-chips-header {
+    margin-bottom: 6px;
+}
+
+.quick-chips-title {
+    font-size: 11.5px;
+    color: #fbbf24;
+    font-weight: 700;
+    display: block;
+}
+
+.quick-chips-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.quick-farmer-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 12px;
+    padding: 8px 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    color: #f8fafc;
+}
+
+.quick-farmer-chip:hover {
+    background: rgba(16, 185, 129, 0.22);
+    border-color: #4ade80;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
+}
+
+.chip-avatar {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.chip-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chip-body strong {
+    font-size: 12.5px;
+    color: #86efac;
+}
+
+.chip-body small {
+    font-size: 10.5px;
+    color: #94a3b8;
+}
+
+.chip-arrow {
+    color: #4ade80;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* Form Styles */
+.auth-field-group {
+    margin-bottom: 12px;
+    position: relative;
+}
+
+.auth-field-group label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #86efac;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.auth-field-group input,
+.auth-field-group select {
+    width: 100%;
+    background: rgba(4, 16, 11, 0.9);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #f8fafc;
+    font-size: 16px !important; /* Prevents auto-zoom on iOS */
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.auth-field-group input:focus,
+.auth-field-group select:focus {
+    border-color: #4ade80;
+    box-shadow: 0 0 0 2px rgba(74, 222, 128, 0.2);
+    background: rgba(4, 20, 13, 0.98);
+}
+
+.auth-grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.auth-input-wrap {
+    position: relative;
+    width: 100%;
+}
+
+.auth-pin-wrap input {
+    padding-right: 42px;
+    letter-spacing: 2px;
+}
+
+.auth-pin-toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px;
+    line-height: 1;
+}
+
+.phone-suggestions-dropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    background: rgba(6, 22, 15, 0.98);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    border-radius: 10px;
+    z-index: 50;
+    max-height: 180px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.15s ease;
+}
+
+.suggestion-item:hover {
+    background: rgba(34, 197, 94, 0.2);
+}
+
+.sugg-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4ade80;
+}
+
+.sugg-meta {
+    font-size: 10.5px;
+    color: #94a3b8;
+}
+
+.auth-options-row {
+    margin: 8px 0 14px 0;
+}
+
+.auth-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #cbd5e1;
+    cursor: pointer;
+}
+
+.auth-error-box {
+    background: rgba(239, 68, 68, 0.18);
+    border: 1px solid rgba(239, 68, 68, 0.45);
+    color: #fca5a5;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    margin-bottom: 12px;
+}
+
+.auth-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+}
+
+.auth-submit-btn:hover {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+}
+
+/* Subtle button pulse for pre-filled logins */
+@keyframes loginBtnPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 12px rgba(74, 222, 128, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+    }
+}
+
+.btn-pulse {
+    animation: loginBtnPulse 1.6s infinite;
+}
+
+.reg-form-title {
+    font-size: 13.5px;
+    color: #fbbf24;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+}
+
+/* 3. Farmer Profile Popover Menu */
+.farmer-profile-popover {
+    position: fixed;
+    top: 76px;
+    right: 6%;
+    width: 320px;
+    background: rgba(8, 24, 16, 0.96);
+    backdrop-filter: blur(18px);
+    border: 1px solid rgba(74, 222, 128, 0.4);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.65);
+    z-index: 9999;
+    display: none;
+    box-sizing: border-box;
+    font-family: 'Hind Siliguri', 'Plus Jakarta Sans', sans-serif;
+}
+
+.farmer-profile-popover.visible {
+    display: block;
+    animation: popoverFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.popover-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.popover-avatar {
+    font-size: 24px;
+    background: rgba(34, 197, 94, 0.2);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.popover-title-wrap h4 {
+    margin: 0;
+    font-size: 14.5px;
+    color: #4ade80;
+    font-weight: 700;
+}
+
+.popover-phone {
+    font-size: 11.5px;
+    color: #94a3b8;
+}
+
+.popover-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 14px 0;
+    background: rgba(4, 15, 10, 0.6);
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.popover-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.popover-detail-item span {
+    font-size: 10.5px;
+    color: #94a3b8;
+}
+
+.popover-detail-item strong {
+    font-size: 12px;
+    color: #f1f5f9;
+}
+
+.popover-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.popover-action-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px;
+    border-radius: 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.popover-action-btn.switch-btn {
+    background: rgba(34, 197, 94, 0.15);
+    color: #86efac;
+    border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.popover-action-btn.switch-btn:hover {
+    background: rgba(34, 197, 94, 0.28);
+    color: #ffffff;
+}
+
+.popover-action-btn.edit-btn {
+    background: rgba(56, 189, 248, 0.15);
+    color: #7dd3fc;
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.popover-action-btn.edit-btn:hover {
+    background: rgba(56, 189, 248, 0.28);
+    color: #ffffff;
+}
+
+.popover-action-btn.logout-btn {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.popover-action-btn.logout-btn:hover {
+    background: rgba(239, 68, 68, 0.28);
+    color: #ffffff;
+}
+
+@media (max-width: 768px) {
+    .farmer-auth-card {
+        padding: 18px 14px;
+    }
+    .auth-grid-2 {
+        grid-template-columns: 1fr;
+    }
+    .farmer-profile-popover {
+        right: 4%;
+        width: 92vw;
+    }
+    .farmer-name {
+        max-width: 90px;
+    }
+}
