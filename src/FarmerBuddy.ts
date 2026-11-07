@@ -1,3 +1,4 @@
+declare const process: any;
 /**
  * ============================================================================
  * FARMER BUDDY (কৃষি বন্ধু) - TWO-LAYER HYBRID AGRICULTURAL AI ENGINE (TYPESCRIPT)
@@ -603,8 +604,9 @@ export class FarmerBuddy {
             if (typeof import.meta !== "undefined" && (import.meta as any).env && (import.meta as any).env.VITE_GEMINI_API_KEY) {
                 return (import.meta as any).env.VITE_GEMINI_API_KEY.trim();
             }
-            if (typeof process !== "undefined" && process.env && process.env.REACT_APP_GEMINI_API_KEY) {
-                return process.env.REACT_APP_GEMINI_API_KEY.trim();
+            const proc = (typeof globalThis !== "undefined" && (globalThis as any).process) ? (globalThis as any).process : (typeof process !== "undefined" ? process : null);
+            if (proc && proc.env && proc.env.REACT_APP_GEMINI_API_KEY) {
+                return String(proc.env.REACT_APP_GEMINI_API_KEY).trim();
             }
         } catch (e) {}
 
@@ -613,7 +615,17 @@ export class FarmerBuddy {
             const p1 = "QVEuQWI4Uk42TGZQOGYwLXhBdW9u";
             const p2 = "Y2N5ZzR1ZlJ6cTFoV2JaOFBfcmhZ";
             const p3 = "NWE3RWFzZDdRNlE=";
-            return (typeof atob === "function") ? atob(p1 + p2 + p3) : null;
+            const full = p1 + p2 + p3;
+            if (typeof window !== "undefined" && typeof window.atob === "function") {
+                return window.atob(full);
+            }
+            if (typeof atob === "function") {
+                return atob(full);
+            }
+            if (typeof (globalThis as any).atob === "function") {
+                return (globalThis as any).atob(full);
+            }
+            return null;
         } catch (e) {
             return null;
         }

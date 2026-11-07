@@ -5267,6 +5267,12 @@ body.lang-bn strong {
     color: #06150f;
 }
 
+@media (min-width: 769px) {
+    .fab-hover-label {
+        display: inline-block !important;
+    }
+}
+
 /* Chat Window */
 .farmer-buddy-window {
     position: absolute;
@@ -5669,6 +5675,8 @@ body.lang-bn strong {
     gap: 8px;
     padding: 8px 14px;
     overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
     background: #081d14;
     border-top: 1px solid rgba(67, 239, 140, 0.15);
     box-sizing: border-box;
@@ -5792,11 +5800,20 @@ body.lang-bn strong {
 }
 
 /* Mobile responsive widget (Messenger in-app browser & mobile viewport collapse fix) */
+@keyframes fabPulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(67, 239, 140, 0.5), 0 4px 14px rgba(0, 0, 0, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 22px rgba(67, 239, 140, 0.85), 0 4px 18px rgba(0, 0, 0, 0.7);
+    }
+}
+
 @media (max-width: 768px) {
     .farmer-buddy-widget {
         bottom: 80px !important;
-        right: 10px !important;
-        left: 10px !important;
+        right: 16px !important;
+        left: auto !important;
         width: auto !important;
         max-width: 100vw !important;
         pointer-events: none !important;
@@ -5804,27 +5821,61 @@ body.lang-bn strong {
         z-index: 99999 !important;
     }
 
+    /* 1. Floating Action Button (FAB) on Mobile — Icon Only */
     .farmer-buddy-fab {
-        pointer-events: auto !important;
+        width: 56px !important;
+        height: 56px !important;
+        border-radius: 50% !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         margin-left: auto !important;
-        padding: 8px 12px !important;
+        pointer-events: auto !important;
+        box-shadow: 0 0 15px rgba(67, 239, 140, 0.6), 0 4px 14px rgba(0, 0, 0, 0.6) !important;
+        animation: fabPulseGlow 2s infinite ease-in-out !important;
     }
 
     .fab-hover-label {
         display: none !important;
     }
 
+    .fab-icon-wrap {
+        width: 100% !important;
+        height: 100% !important;
+        border-radius: 50% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: transparent !important;
+        position: relative !important;
+    }
+
+    .fab-main-icon {
+        font-size: 26px !important;
+        line-height: 1 !important;
+    }
+
+    .fab-pulse-badge {
+        top: 2px !important;
+        right: 2px !important;
+    }
+
+    /* 2. Fix Mobile Chat Modal Width & Search/Input Collapse Bug */
     .farmer-buddy-window {
         position: fixed !important;
-        left: 10px !important;
-        right: 10px !important;
-        bottom: 76px !important;
-        width: auto !important;
-        max-width: calc(100vw - 20px) !important;
-        height: min(520px, calc(100dvh - 90px)) !important;
-        max-height: calc(100dvh - 90px) !important;
+        bottom: 10px !important;
+        left: 2.5vw !important;
+        right: 2.5vw !important;
+        width: 95vw !important;
+        max-width: 95vw !important;
+        height: 82vh !important;
+        max-height: 82vh !important;
         box-sizing: border-box !important;
         overflow-x: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        z-index: 9999 !important;
         pointer-events: auto !important;
         transition: opacity 0.25s ease, transform 0.25s ease !important;
     }
@@ -5832,6 +5883,7 @@ body.lang-bn strong {
     .farmer-buddy-window.expanded {
         opacity: 1 !important;
         pointer-events: auto !important;
+        visibility: visible !important;
         transform: none !important; /* Critical: Disables WebKit transform matrix so viewport never shrinks */
     }
 
@@ -5842,40 +5894,73 @@ body.lang-bn strong {
         transform: translateY(20px) !important;
     }
 
-    .fb-header {
-        padding: 10px 14px !important;
+    /* Prevent mobile auto-zoom distortion (especially on iOS & in-app browsers) */
+    .farmer-buddy-window input,
+    .farmer-buddy-window textarea,
+    .farmer-buddy-window select,
+    .fb-input-field,
+    .fb-model-select {
+        font-size: 16px !important;
+    }
+
+    /* 3. Fix Quick-Action Chips & Dropdown Overflow */
+    .fb-chips-row {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        gap: 8px !important;
+        flex-shrink: 0 !important;
+        -webkit-overflow-scrolling: touch !important;
         box-sizing: border-box !important;
         width: 100% !important;
+        max-width: 100% !important;
+        padding: 8px 12px !important;
+    }
+
+    .fb-chip-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
         flex-shrink: 0 !important;
+        white-space: nowrap !important;
     }
 
     .fb-model-toolbar {
-        padding: 6px 10px !important;
-        gap: 6px !important;
         box-sizing: border-box !important;
         width: 100% !important;
+        max-width: 100% !important;
         flex-shrink: 0 !important;
         overflow: hidden !important;
+        padding: 6px 10px !important;
+        gap: 6px !important;
     }
 
     .fb-model-selector-group {
         min-width: 0 !important;
         flex: 1 1 auto !important;
         box-sizing: border-box !important;
+        overflow: hidden !important;
     }
 
     .fb-model-select {
-        font-size: 11px !important;
-        padding: 4px 6px !important;
         min-width: 0 !important;
         max-width: 100% !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        padding: 6px 8px !important;
+        font-size: 16px !important;
     }
 
     .fb-model-pill {
-        font-size: 9.5px !important;
+        font-size: 10px !important;
         padding: 2px 6px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .fb-header {
+        padding: 10px 14px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
         flex-shrink: 0 !important;
     }
 
@@ -5884,12 +5969,7 @@ body.lang-bn strong {
         width: 100% !important;
         flex: 1 1 auto !important;
         overflow-x: hidden !important;
-    }
-
-    .fb-chips-row {
-        box-sizing: border-box !important;
-        width: 100% !important;
-        flex-shrink: 0 !important;
+        padding: 12px !important;
     }
 
     .fb-input-area {
@@ -5909,7 +5989,7 @@ body.lang-bn strong {
         min-width: 0 !important;
         flex: 1 1 auto !important;
         box-sizing: border-box !important;
-        font-size: 13px !important;
+        font-size: 16px !important;
     }
 }
 

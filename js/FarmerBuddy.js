@@ -760,8 +760,9 @@ class FarmerBuddy {
             if (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) {
                 return import.meta.env.VITE_GEMINI_API_KEY.trim();
             }
-            if (typeof process !== "undefined" && process.env && process.env.REACT_APP_GEMINI_API_KEY) {
-                return process.env.REACT_APP_GEMINI_API_KEY.trim();
+            const proc = (typeof globalThis !== "undefined" && globalThis.process) ? globalThis.process : (typeof process !== "undefined" ? process : null);
+            if (proc && proc.env && proc.env.REACT_APP_GEMINI_API_KEY) {
+                return String(proc.env.REACT_APP_GEMINI_API_KEY).trim();
             }
         } catch (e) {}
 
@@ -770,7 +771,17 @@ class FarmerBuddy {
             const p1 = "QVEuQWI4Uk42TGZQOGYwLXhBdW9u";
             const p2 = "Y2N5ZzR1ZlJ6cTFoV2JaOFBfcmhZ";
             const p3 = "NWE3RWFzZDdRNlE=";
-            return (typeof atob === "function") ? atob(p1 + p2 + p3) : null;
+            const full = p1 + p2 + p3;
+            if (typeof window !== "undefined" && typeof window.atob === "function") {
+                return window.atob(full);
+            }
+            if (typeof atob === "function") {
+                return atob(full);
+            }
+            if (typeof globalThis !== "undefined" && typeof globalThis.atob === "function") {
+                return globalThis.atob(full);
+            }
+            return null;
         } catch (e) {
             return null;
         }
