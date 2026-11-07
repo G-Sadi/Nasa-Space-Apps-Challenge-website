@@ -217,102 +217,112 @@ const SPATIAL_ANCHORS = [
 ];
 
 // =============================================================================
-// 1. PROCEDURAL PBR TEXTURES (CANVAS-BASED HIGH RESOLUTION)
+// 1. PROCEDURAL PBR TEXTURES (MOBILE-ACCELERATED & HIGH RESOLUTION)
 // =============================================================================
 function initProceduralTextures() {
+    const mobile = isMobileDevice();
+    const texSize = mobile ? 256 : 512;
+
     // A. Monocot Leaf Texture (Rice, Wheat, Maize)
     const monoCanvas = document.createElement("canvas");
-    monoCanvas.width = 512;
-    monoCanvas.height = 512;
+    monoCanvas.width = texSize;
+    monoCanvas.height = texSize;
     const mCtx = monoCanvas.getContext("2d");
+    if (mCtx) {
+        const mGrad = mCtx.createLinearGradient(0, texSize, 0, 0);
+        mGrad.addColorStop(0.00, "#18421c");
+        mGrad.addColorStop(0.40, "#256f2d");
+        mGrad.addColorStop(0.75, "#3ba83e");
+        mGrad.addColorStop(0.95, "#6ebe48");
+        mGrad.addColorStop(1.00, "#b0c946");
+        mCtx.fillStyle = mGrad;
+        mCtx.fillRect(0, 0, texSize, texSize);
 
-    const mGrad = mCtx.createLinearGradient(0, 512, 0, 0);
-    mGrad.addColorStop(0.00, "#18421c");
-    mGrad.addColorStop(0.40, "#256f2d");
-    mGrad.addColorStop(0.75, "#3ba83e");
-    mGrad.addColorStop(0.95, "#6ebe48");
-    mGrad.addColorStop(1.00, "#b0c946");
-    mCtx.fillStyle = mGrad;
-    mCtx.fillRect(0, 0, 512, 512);
-
-    mCtx.strokeStyle = "rgba(255, 255, 255, 0.12)";
-    mCtx.lineWidth = 1.0;
-    for (let x = 6; x < 512; x += 5) {
+        mCtx.strokeStyle = "rgba(255, 255, 255, 0.12)";
+        mCtx.lineWidth = 1.0;
+        const step = mobile ? 8 : 5;
+        for (let x = 6; x < texSize; x += step) {
+            mCtx.beginPath();
+            mCtx.moveTo(x, 0);
+            mCtx.lineTo(x, texSize);
+            mCtx.stroke();
+        }
+        mCtx.strokeStyle = "rgba(255, 255, 255, 0.28)";
+        mCtx.lineWidth = mobile ? 2.5 : 3.5;
         mCtx.beginPath();
-        mCtx.moveTo(x, 0);
-        mCtx.lineTo(x, 512);
+        mCtx.moveTo(texSize / 2, 0);
+        mCtx.lineTo(texSize / 2, texSize);
         mCtx.stroke();
-    }
-    mCtx.strokeStyle = "rgba(255, 255, 255, 0.28)";
-    mCtx.lineWidth = 3.5;
-    mCtx.beginPath();
-    mCtx.moveTo(256, 0);
-    mCtx.lineTo(256, 512);
-    mCtx.stroke();
 
-    monocotTexture = new THREE.CanvasTexture(monoCanvas);
-    monocotTexture.wrapS = THREE.RepeatWrapping;
-    monocotTexture.wrapT = THREE.RepeatWrapping;
+        monocotTexture = new THREE.CanvasTexture(monoCanvas);
+        monocotTexture.wrapS = THREE.RepeatWrapping;
+        monocotTexture.wrapT = THREE.RepeatWrapping;
+    }
 
     // B. Dicot Leaf Texture (Compound Serrated Tomato & Vegetables)
     const dicotCanvas = document.createElement("canvas");
-    dicotCanvas.width = 512;
-    dicotCanvas.height = 512;
+    dicotCanvas.width = texSize;
+    dicotCanvas.height = texSize;
     const dCtx = dicotCanvas.getContext("2d");
+    if (dCtx) {
+        const dGrad = dCtx.createRadialGradient(texSize / 2, texSize / 2, 30, texSize / 2, texSize / 2, texSize * 0.56);
+        dGrad.addColorStop(0.0, "#3e8a32");
+        dGrad.addColorStop(0.65, "#2a6723");
+        dGrad.addColorStop(1.0, "#194215");
+        dCtx.fillStyle = dGrad;
+        dCtx.fillRect(0, 0, texSize, texSize);
 
-    const dGrad = dCtx.createRadialGradient(256, 256, 30, 256, 256, 290);
-    dGrad.addColorStop(0.0, "#3e8a32");
-    dGrad.addColorStop(0.65, "#2a6723");
-    dGrad.addColorStop(1.0, "#194215");
-    dCtx.fillStyle = dGrad;
-    dCtx.fillRect(0, 0, 512, 512);
-
-    // Primary central midrib
-    dCtx.strokeStyle = "rgba(255, 255, 255, 0.35)";
-    dCtx.lineWidth = 5.0;
-    dCtx.beginPath();
-    dCtx.moveTo(256, 512);
-    dCtx.quadraticCurveTo(256, 256, 256, 20);
-    dCtx.stroke();
-
-    // Lateral pinnate secondary veins
-    dCtx.lineWidth = 2.0;
-    dCtx.strokeStyle = "rgba(255, 255, 255, 0.18)";
-    for (let y = 80; y < 490; y += 40) {
+        // Primary central midrib
+        dCtx.strokeStyle = "rgba(255, 255, 255, 0.35)";
+        dCtx.lineWidth = mobile ? 3.5 : 5.0;
         dCtx.beginPath();
-        dCtx.moveTo(256, y);
-        dCtx.quadraticCurveTo(345, y - 22, 490, y - 58);
+        dCtx.moveTo(texSize / 2, texSize);
+        dCtx.quadraticCurveTo(texSize / 2, texSize / 2, texSize / 2, 20);
         dCtx.stroke();
-        dCtx.beginPath();
-        dCtx.moveTo(256, y);
-        dCtx.quadraticCurveTo(167, y - 22, 22, y - 58);
-        dCtx.stroke();
+
+        // Lateral pinnate secondary veins
+        dCtx.lineWidth = mobile ? 1.5 : 2.0;
+        dCtx.strokeStyle = "rgba(255, 255, 255, 0.18)";
+        const veinStep = mobile ? 60 : 40;
+        for (let y = 80; y < texSize - 20; y += veinStep) {
+            dCtx.beginPath();
+            dCtx.moveTo(texSize / 2, y);
+            dCtx.quadraticCurveTo(texSize * 0.67, y - 22, texSize - 22, y - 58);
+            dCtx.stroke();
+            dCtx.beginPath();
+            dCtx.moveTo(texSize / 2, y);
+            dCtx.quadraticCurveTo(texSize * 0.33, y - 22, 22, y - 58);
+            dCtx.stroke();
+        }
+
+        dicotTexture = new THREE.CanvasTexture(dicotCanvas);
     }
-
-    dicotTexture = new THREE.CanvasTexture(dicotCanvas);
 
     // C. PBR Soil Furrow Bump Texture
     const soilCanvas = document.createElement("canvas");
-    soilCanvas.width = 512;
-    soilCanvas.height = 512;
+    soilCanvas.width = texSize;
+    soilCanvas.height = texSize;
     const sCtx = soilCanvas.getContext("2d");
-    sCtx.fillStyle = "#2c1a0e";
-    sCtx.fillRect(0, 0, 512, 512);
+    if (sCtx) {
+        sCtx.fillStyle = "#2c1a0e";
+        sCtx.fillRect(0, 0, texSize, texSize);
 
-    for (let i = 0; i < 5000; i++) {
-        const x = Math.random() * 512;
-        const y = Math.random() * 512;
-        const r = Math.random() * 2.8 + 0.6;
-        const shade = Math.floor(Math.random() * 60 + 35);
-        sCtx.fillStyle = `rgb(${shade + 20}, ${shade + 8}, ${shade})`;
-        sCtx.beginPath();
-        sCtx.arc(x, y, r, 0, Math.PI * 2);
-        sCtx.fill();
+        const dotCount = mobile ? 1200 : 5000;
+        for (let i = 0; i < dotCount; i++) {
+            const x = Math.random() * texSize;
+            const y = Math.random() * texSize;
+            const r = Math.random() * 2.8 + 0.6;
+            const shade = Math.floor(Math.random() * 60 + 35);
+            sCtx.fillStyle = `rgb(${shade + 20}, ${shade + 8}, ${shade})`;
+            sCtx.beginPath();
+            sCtx.arc(x, y, r, 0, Math.PI * 2);
+            sCtx.fill();
+        }
+        soilTexture = new THREE.CanvasTexture(soilCanvas);
+        soilTexture.wrapS = THREE.RepeatWrapping;
+        soilTexture.wrapT = THREE.RepeatWrapping;
+        soilTexture.repeat.set(8, 8);
     }
-    soilTexture = new THREE.CanvasTexture(soilCanvas);
-    soilTexture.wrapS = THREE.RepeatWrapping;
-    soilTexture.wrapT = THREE.RepeatWrapping;
-    soilTexture.repeat.set(8, 8);
 }
 
 // =============================================================================
@@ -3530,6 +3540,92 @@ export function switchCameraMode(mode) {
 }
 window.switchCameraMode = switchCameraMode;
 
+// =============================================================================
+// 15B. 2D FARM INTERACTIVE FALLBACK ENGINE
+// =============================================================================
+export const CROP_FALLBACK_ICONS = {
+    tomato: "🍅",
+    rice: "🌾",
+    wheat: "🌾",
+    maize: "🌽",
+    jute: "🌿",
+    potato: "🥔",
+    mustard: "🌼",
+    eggplant: "🍆",
+    chili: "🌶️",
+    lentil: "🌱",
+    cucumber: "🥒",
+    cauliflower: "🥦",
+    onion: "🧅",
+    carrot: "🥕",
+    papaya: "🍈"
+};
+
+let is2DFallbackActive = false;
+
+export function show2DFarmFallback() {
+    is2DFallbackActive = true;
+    containerEl = containerEl || document.getElementById("farm3D");
+    if (!containerEl) return;
+
+    let fallbackEl = document.getElementById("farm2DFallback");
+    if (!fallbackEl) {
+        fallbackEl = document.createElement("div");
+        fallbackEl.id = "farm2DFallback";
+        fallbackEl.className = "farm-2d-fallback";
+        containerEl.appendChild(fallbackEl);
+    }
+
+    const currentCrop = activeCropId || "tomato";
+    const icon = CROP_FALLBACK_ICONS[currentCrop] || "🌱";
+    const cropName = currentCrop.charAt(0).toUpperCase() + currentCrop.slice(1);
+
+    fallbackEl.innerHTML = `
+        <div class="fallback-sky">
+            <div class="fallback-sun">☀️</div>
+            <div class="fallback-clouds">☁️ ☁️</div>
+        </div>
+        <div class="fallback-soil-container">
+            <div class="fallback-ridge">
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+            </div>
+            <div class="fallback-ridge">
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+            </div>
+            <div class="fallback-ridge">
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+                <span class="crop-icon">${icon}</span>
+            </div>
+        </div>
+        <div class="fallback-badge">
+            <span class="fallback-dot"></span>
+            <strong>2D Farm Mode (Active: ${cropName})</strong>
+            <small>WebGL Accelerated Fallback</small>
+        </div>
+    `;
+    fallbackEl.style.display = "flex";
+}
+
+export function hide2DFarmFallback() {
+    is2DFallbackActive = false;
+    const fallbackEl = document.getElementById("farm2DFallback");
+    if (fallbackEl) {
+        fallbackEl.style.display = "none";
+    }
+}
+window.show2DFarmFallback = show2DFarmFallback;
+window.hide2DFarmFallback = hide2DFarmFallback;
+
 export function updateCropSimulation(rawCropId) {
     if (!rawCropId) return;
     const cropId = normalizeCropId(rawCropId);
@@ -3543,7 +3639,11 @@ export function updateCropSimulation(rawCropId) {
         window.selectLifecycleCrop(cropId);
     }
 
-    createCropField(cropId);
+    if (is2DFallbackActive) {
+        show2DFarmFallback();
+    } else {
+        createCropField(cropId);
+    }
 }
 window.updateCropSimulation = updateCropSimulation;
 window.createCropField = createCropField;
@@ -3934,98 +4034,145 @@ export function init3DFieldSimulation() {
         camera.position.set(0, 0.90, 5.2);
     }
 
-    renderer = new THREE.WebGLRenderer({
-        antialias: !mobile,
-        powerPreference: "high-performance"
-    });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2.0));
-    renderer.setClearColor(0xcdebf9, 1.0);
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
-    renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = mobile ? THREE.BasicShadowMap : THREE.PCFSoftShadowMap;
+    try {
+        renderer = new THREE.WebGLRenderer({
+            antialias: window.devicePixelRatio < 2,
+            powerPreference: "high-performance",
+            alpha: false,
+            stencil: false,
+            depth: true
+        });
+        renderer.setSize(width, height);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setClearColor(0xcdebf9, 1.0);
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.15;
+        renderer.shadowMap.enabled = !mobile;
+        if (!mobile) {
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        }
+    } catch (webglErr) {
+        console.warn("[3D FieldShift] ⚠️ WebGL initialization failed! Activating 2D farm fallback:", webglErr);
+        show2DFarmFallback();
+        return;
+    }
 
     containerEl.innerHTML = "";
     containerEl.appendChild(renderer.domElement);
     canvasEl = renderer.domElement;
     canvasEl.style.touchAction = "none";
 
+    // Passive touch and wheel listeners for smooth 60fps scrolling & touch response
+    canvasEl.addEventListener("touchstart", () => {}, { passive: true });
+    canvasEl.addEventListener("touchmove", () => {}, { passive: true });
+    canvasEl.addEventListener("wheel", () => {}, { passive: true });
+
+    // WebGL Context Lost & Restored Error Boundary Recovery
+    canvasEl.addEventListener("webglcontextlost", (event) => {
+        event.preventDefault();
+        console.warn("[3D FieldShift] ⚠️ WebGL Context Lost! Switching to 2D Farm canvas fallback.");
+        show2DFarmFallback();
+    }, false);
+
+    canvasEl.addEventListener("webglcontextrestored", () => {
+        console.log("[3D FieldShift] 🔄 WebGL Context Restored! Re-initializing 3D scene.");
+        hide2DFarmFallback();
+        if (activeCropId) {
+            createCropField(activeCropId);
+        }
+    }, false);
+
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.maxPolarAngle = Math.PI * 0.5 - 0.03;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 - 0.03;
     controls.minDistance = 0.8;
     controls.maxDistance = 24.0;
+    controls.rotateSpeed = 0.6;
+    controls.zoomSpeed = 0.8;
+    controls.enablePan = true;
+    controls.panSpeed = 0.6;
     controls.target.set(0, 0.65, 0);
     controls.touches = {
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_PAN
     };
 
-    initProceduralTextures();
-    initEnvironmentLighting();
-    initTerrain();
-    initSmartFarmIoTNodes();
+    try {
+        initProceduralTextures();
+        initEnvironmentLighting();
+        initTerrain();
+        initSmartFarmIoTNodes();
 
-    // Particle Systems
-    initRealisticRainSystem();
-    initSprayMistSystem();
-    initFertilizerGlowSystem();
-    initSprinklerSystem();
+        // Particle Systems
+        initRealisticRainSystem();
+        initSprayMistSystem();
+        initFertilizerGlowSystem();
+        initSprinklerSystem();
 
-    // Build Default Crop (Tomato)
-    createCropField("tomato");
+        // Build Default Crop (Tomato)
+        createCropField("tomato");
 
-    initRaycasting();
-    bindUIControls();
-    setTimeOfDayMode("noon");
-
-    // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment with Active Farmer
-    const initialFarmer = (typeof window !== "undefined" && window.authService) ? window.authService.getCurrentFarmer() : null;
-    const initialCrop = (initialFarmer && initialFarmer.primaryCrop) ? initialFarmer.primaryCrop : "tomato";
-    const initialZone = (initialFarmer && initialFarmer.district) ? initialFarmer.district.toLowerCase() : "mymensingh";
-    const initialLat = initialFarmer ? initialFarmer.lat : null;
-    const initialLon = initialFarmer ? initialFarmer.lon : null;
-
-    if (initialCrop !== "tomato") {
-        updateCropSimulation(initialCrop);
+        initRaycasting();
+        bindUIControls();
+        setTimeOfDayMode("noon");
+    } catch (sysErr) {
+        console.warn("[3D FieldShift] Subsystem initialization warning:", sysErr);
     }
 
-    fetchNasaAgriData(initialZone, initialLat, initialLon).then(() => {
-        syncSimulationWithNasaData();
-    }).catch((e) => console.warn("[NASA] Initial fetch:", e));
+    // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment with Active Farmer
+    try {
+        const initialFarmer = (typeof window !== "undefined" && window.authService) ? window.authService.getCurrentFarmer() : null;
+        const initialCrop = (initialFarmer && initialFarmer.primaryCrop) ? initialFarmer.primaryCrop : "tomato";
+        const initialZone = (initialFarmer && initialFarmer.district) ? initialFarmer.district.toLowerCase() : "mymensingh";
+        const initialLat = initialFarmer ? initialFarmer.lat : null;
+        const initialLon = initialFarmer ? initialFarmer.lon : null;
 
-    onNasaDataUpdated(() => {
-        syncSimulationWithNasaData();
-    });
+        if (initialCrop !== "tomato") {
+            updateCropSimulation(initialCrop);
+        }
+
+        fetchNasaAgriData(initialZone, initialLat, initialLon).then(() => {
+            syncSimulationWithNasaData();
+        }).catch((e) => console.warn("[NASA] Initial fetch fallback:", e));
+
+        onNasaDataUpdated(() => {
+            syncSimulationWithNasaData();
+        });
+    } catch (nasaErr) {
+        console.warn("[3D FieldShift] NASA sync init warning:", nasaErr);
+    }
 
     // Real-Time Ecosystem Synchronization with Farmer Authentication
     window.addEventListener("farmer-auth-changed", (e) => {
-        const farmer = e.detail;
-        if (!farmer) return;
+        try {
+            const farmer = e.detail;
+            if (!farmer) return;
 
-        console.log(`[3D Simulation] 🔄 Real-time sync for ${farmer.name}: Crop -> ${farmer.primaryCrop}, District -> ${farmer.district}`);
+            console.log(`[3D Simulation] 🔄 Real-time sync for ${farmer.name}: Crop -> ${farmer.primaryCrop}, District -> ${farmer.district}`);
 
-        // 1. Switch 3D Crop Simulation
-        if (farmer.primaryCrop) {
-            updateCropSimulation(farmer.primaryCrop);
-        }
-
-        // 2. Sync Location Controller Dropdown
-        const distKey = (farmer.district || "").toLowerCase();
-        const locSelect = document.getElementById("fctrlLocSelect");
-        if (locSelect) {
-            const hasOption = Array.from(locSelect.options).some(opt => opt.value === distKey);
-            if (hasOption) {
-                locSelect.value = distKey;
+            // 1. Switch 3D Crop Simulation
+            if (farmer.primaryCrop) {
+                updateCropSimulation(farmer.primaryCrop);
             }
-        }
 
-        // 3. Fetch Live NASA Agroclimatology for Farmer GPS
-        fetchNasaAgriData(distKey, farmer.lat, farmer.lon).then(() => {
-            syncSimulationWithNasaData();
-        }).catch((err) => console.warn("[NASA] Farmer sync fetch error:", err));
+            // 2. Sync Location Controller Dropdown
+            const distKey = (farmer.district || "").toLowerCase();
+            const locSelect = document.getElementById("fctrlLocSelect");
+            if (locSelect) {
+                const hasOption = Array.from(locSelect.options).some(opt => opt.value === distKey);
+                if (hasOption) {
+                    locSelect.value = distKey;
+                }
+            }
+
+            // 3. Fetch Live NASA Agroclimatology for Farmer GPS
+            fetchNasaAgriData(distKey, farmer.lat, farmer.lon).then(() => {
+                syncSimulationWithNasaData();
+            }).catch((err) => console.warn("[NASA] Farmer sync fetch error:", err));
+        } catch (authSyncErr) {
+            console.warn("[3D FieldShift] Real-time auth sync warning:", authSyncErr);
+        }
     });
 
     // Auto-dismiss gesture hint on first touch or after 4s
@@ -4065,7 +4212,7 @@ function onWindowResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2.0));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 }
 
 if (document.readyState === "loading") {
