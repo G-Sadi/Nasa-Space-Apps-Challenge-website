@@ -6153,8 +6153,8 @@ body.lang-bn strong {
 
 @media (max-width: 768px) {
     .farmer-buddy-widget {
-        bottom: 80px !important;
-        right: 16px !important;
+        bottom: 148px !important;
+        right: 14px !important;
         left: auto !important;
         width: auto !important;
         max-width: 100vw !important;
@@ -6417,18 +6417,94 @@ body.lang-bn strong {
     scroll-margin-top: 88px; /* Safe area below fixed navbar */
 }
 
-/* Floating Controls Bar Enhancements */
-.field-view-controls-bar {
+/* Floating Controls Bar Enhancements & 2-Row Top HUD Dock */
+.sim-top-hud-dock.field-view-controls-bar,
+.sim-top-hud-dock {
     position: absolute;
-    top: 24px;
+    top: 14px;
     left: 50%;
     transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 1200px;
-    z-index: 20;
+    width: calc(100% - 32px);
+    max-width: 1240px;
+    z-index: 45;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.sim-top-hud-row {
+    width: 100%;
+    pointer-events: none;
+}
+
+.sim-hud-row-1 {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 12px;
+}
+
+.sim-hud-row-2 {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) auto;
+    gap: 8px;
+    align-items: center;
+}
+
+.sim-hud-row-1 .fctrl-cam-pill,
+.sim-hud-row-1 .fctrl-action-pill {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(10, 26, 16, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 999px;
+    padding: 3px 6px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(74, 222, 128, 0.15);
+    pointer-events: auto;
+    gap: 4px;
+}
+
+.sim-hud-row-2 .fctrl-loc-pill,
+.sim-hud-row-2 .fctrl-crop-pill {
+    display: flex;
+    align-items: center;
+    background: rgba(10, 26, 16, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    border-radius: 999px;
+    padding: 2px 8px;
+    pointer-events: auto;
+    min-width: 0;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    position: relative;
+}
+
+.sim-hud-row-2 .fctrl-loc-select,
+.sim-hud-row-2 .fctrl-crop-select {
+    width: 100%;
+    height: 36px;
+    padding: 0 12px 0 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+    border-radius: 999px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: transparent;
+    border: none;
+    color: #e2fbe8;
+    cursor: pointer;
+    outline: none;
+}
+
+.sim-hud-row-2 .fctrl-loc-select option,
+.sim-hud-row-2 .fctrl-crop-select option {
+    background: #0a2117;
+    color: #e2fbe8;
 }
 
 .fctrl-sf-btn {
@@ -6461,8 +6537,15 @@ body.lang-bn strong {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 12;
+    z-index: 30;
     overflow: hidden;
+}
+
+.spatial-ar-pins-wrap {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 30;
 }
 
 /* 3D World Space Projected Pins */
@@ -7007,24 +7090,41 @@ body.lang-bn strong {
     transform: translateX(-50%);
     width: calc(100% - 48px);
     max-width: 920px;
-    background: rgba(10, 24, 18, 0.65);
+    background: rgba(10, 24, 18, 0.78);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(74, 222, 128, 0.25);
+    border: 1px solid rgba(74, 222, 128, 0.28);
     border-radius: 18px;
     padding: 12px 20px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
-    z-index: 18;
+    z-index: 25;
     pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.timeline-meta-bar {
+.timeline-meta-bar,
+.timeline-row-a {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 10px;
+    margin-bottom: 4px;
     flex-wrap: wrap;
+}
+
+.timeline-row-b {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.timeline-row-c {
+    width: 100%;
+    position: relative;
 }
 
 .timeline-day-badge {
@@ -7654,79 +7754,156 @@ body.lang-bn strong {
         touch-action: none !important;
     }
 
-    /* Top Controls Bar on Mobile: Ultra-Compact Single Row */
+    /* Top Controls HUD Dock on Mobile: Clean 2-Row Dock */
+    .sim-top-hud-dock.field-view-controls-bar,
     .field-view-controls-bar {
         position: absolute;
-        top: 10px;
+        top: 8px;
         left: 8px;
         right: 8px;
         width: auto;
         transform: none;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: space-between;
+        display: flex !important;
+        flex-direction: column !important;
         gap: 6px;
-        z-index: 25;
+        z-index: 40;
         pointer-events: none;
     }
 
-    .field-view-controls-bar .fctrl-group {
+    .sim-top-hud-row {
+        width: 100%;
+        pointer-events: none;
+    }
+
+    .sim-hud-row-1 {
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 6px;
+    }
+
+    .sim-hud-row-2 {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) auto;
         gap: 5px;
+        width: 100%;
+        align-items: center;
     }
 
-    .fctrl-crop-pill {
-        padding: 4px 8px;
-    }
-    .fctrl-crop-select,
-    .fctrl-loc-select {
-        font-size: 16px !important;
-        max-width: 140px;
-    }
-    .fctrl-crop-pill .fctrl-label {
-        display: none;
-    }
-
-    .fctrl-cam-pill {
-        padding: 3px;
+    .sim-hud-row-1 .fctrl-cam-pill,
+    .sim-hud-row-1 .fctrl-action-pill {
+        padding: 2px 4px;
         gap: 2px;
     }
+
     .fctrl-cam-btn {
         padding: 5px 8px;
+        font-size: 13px;
     }
-    .fctrl-cam-btn .btn-text {
-        display: none;
-    }
-
-    .fctrl-action-pill {
-        padding: 3px;
-        gap: 4px;
-    }
+    .fctrl-cam-btn .btn-text,
     .fctrl-sf-btn .btn-text,
     .fctrl-toggle-btn .btn-text {
-        display: none;
+        display: none !important;
     }
+
     .fctrl-sf-btn, .fctrl-toggle-btn, .fctrl-action-btn {
-        padding: 6px 9px;
+        padding: 5px 8px;
         font-size: 13px;
     }
 
+    .sim-hud-row-2 .fctrl-loc-pill,
+    .sim-hud-row-2 .fctrl-crop-pill {
+        padding: 0 4px;
+        height: 34px;
+        min-width: 0;
+    }
+
+    .fctrl-loc-select,
+    .fctrl-crop-select {
+        font-size: 12px !important;
+        height: 34px !important;
+        padding: 0 4px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
     .tod-segmented-control {
-        padding: 3px;
+        height: 34px;
+        padding: 2px;
         gap: 2px;
     }
+
     .tod-segment-btn {
-        padding: 4px 8px;
+        height: 28px;
+        padding: 0 6px;
         font-size: 11px;
         gap: 3px;
+    }
+
+    @media (max-width: 480px) {
+        .tod-segment-btn .tod-btn-text {
+            display: none !important;
+        }
+        .tod-segment-btn {
+            padding: 0 7px;
+        }
+        .tod-segment-btn .tod-btn-icon {
+            font-size: 13px;
+            margin: 0;
+        }
+    }
+
+    /* 3D Spatial Pins on Mobile: Docked Centered Row under Top HUD */
+    .spatial-ar-pins-wrap {
+        position: absolute;
+        top: 92px; /* Positioned directly below the 2-row Top HUD (~84px tall) */
+        left: 8px;
+        right: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 6px;
+        z-index: 35;
+        pointer-events: none;
+        flex-wrap: nowrap;
+    }
+
+    .spatial-ar-pins-wrap .ar-spatial-pin {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        font-size: 11px !important;
+        padding: 4px 10px !important;
+        border-radius: 999px !important;
+        background: rgba(10, 26, 16, 0.88) !important;
+        backdrop-filter: blur(12px) !important;
+        -webkit-backdrop-filter: blur(12px) !important;
+        border: 1px solid rgba(74, 222, 128, 0.35) !important;
+        color: #f8fafc !important;
+        white-space: nowrap !important;
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4) !important;
+        pointer-events: auto !important;
+        max-width: 49%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .spatial-ar-pins-wrap .ar-spatial-pin .ar-pin-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 10.5px;
     }
 
     /* Left Telemetry Dock: Sleek Horizontal Scrollable Status Bar */
     .farmer-status-dock {
         position: absolute;
-        top: 54px;
+        top: 130px; /* Offset cleanly below Top HUD (0-88px) and AR pins (92-124px) */
         left: 8px;
         right: 8px;
         width: auto;
@@ -7844,27 +8021,33 @@ body.lang-bn strong {
         right: 8px;
         width: auto;
         transform: none;
-        padding: 8px 12px;
+        padding: 8px 10px;
         border-radius: 14px;
-        z-index: 22;
+        background: rgba(8, 22, 14, 0.92);
+        z-index: 25;
+        display: flex;
+        flex-direction: column;
         gap: 6px;
     }
 
-    .timeline-meta-bar {
-        flex-wrap: wrap;
-        gap: 6px;
+    .timeline-row-a {
+        display: flex;
+        align-items: center;
         justify-content: space-between;
+        width: 100%;
+        gap: 4px;
     }
 
     .timeline-day-badge {
         font-size: 11px;
-        padding: 4px 8px;
+        padding: 3px 8px;
+        white-space: nowrap;
     }
 
-    .stage-pill {
-        font-size: 10px;
+    .timeline-stage-indicator .stage-pill {
+        font-size: 10.5px;
         padding: 3px 8px;
-        max-width: 140px;
+        max-width: 130px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -7881,16 +8064,31 @@ body.lang-bn strong {
         display: none;
     }
 
-    .timeline-weather-switcher {
-        gap: 4px;
+    .timeline-row-b {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        width: 100%;
     }
     .timeline-weather-switcher .weather-label {
         display: none;
     }
     .weather-toggle-btn {
-        width: 28px;
-        height: 28px;
-        font-size: 13px;
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        border-radius: 50%;
+    }
+
+    .timeline-row-c {
+        width: 100%;
+        padding: 2px 0;
+    }
+    .timeline-slider {
+        width: 100%;
+        height: 6px;
+        accent-color: #22c55e;
     }
 
     .timeline-milestones {

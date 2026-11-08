@@ -1146,21 +1146,23 @@
 
         <!-- In-Scene 3D Spatial AR HUD Overlay (World-to-Screen Projected Pins & Holographic Rings) -->
         <div id="spatialArContainer" class="spatial-ar-container" aria-hidden="true">
-            <!-- 3D World-Space Zone Pins -->
-            <div id="arPinZoneA" class="ar-spatial-pin pin-zone" title="Zone A Moisture Status">
-                <span class="ar-pin-pulse"></span>
-                <span class="ar-pin-icon">💧</span>
-                <span class="ar-pin-label">Zone A: ৭8% আর্দ্রতা (Optimal)</span>
-            </div>
-            <div id="arPinRow4" class="ar-spatial-pin pin-crop" title="Row 4 Ripening Cluster">
-                <span class="ar-pin-pulse"></span>
-                <span class="ar-pin-icon">🍅</span>
-                <span class="ar-pin-label">Row 4: পাকা ফলন (Ready in 6 Days)</span>
-            </div>
-            <div id="arPinSprinkler" class="ar-spatial-pin pin-device" title="Sprinkler Node #2">
-                <span class="ar-pin-pulse"></span>
-                <span class="ar-pin-icon">💦</span>
-                <span class="ar-pin-label">Node #2: সেচ নোজল (Active)</span>
+            <!-- 3D World-Space Zone Pins Wrapper -->
+            <div class="spatial-ar-pins-wrap" id="spatialArPinsWrap">
+                <div id="arPinZoneA" class="ar-spatial-pin pin-zone" title="Zone A Moisture Status">
+                    <span class="ar-pin-pulse"></span>
+                    <span class="ar-pin-icon">💧</span>
+                    <span class="ar-pin-label" id="arPinZoneALabel">Zone A: ৭৪% আর্দ্রতা (Optimal)</span>
+                </div>
+                <div id="arPinRow4" class="ar-spatial-pin pin-crop" title="Row 4 Ripening Cluster">
+                    <span class="ar-pin-pulse"></span>
+                    <span class="ar-pin-icon" id="arPinCropIcon">🍅</span>
+                    <span class="ar-pin-label" id="arPinCropLabel">Row 4: পাকা ফলন (Ready in 6 Days)</span>
+                </div>
+                <div id="arPinSprinkler" class="ar-spatial-pin pin-device" title="Sprinkler Node #2">
+                    <span class="ar-pin-pulse"></span>
+                    <span class="ar-pin-icon">💦</span>
+                    <span class="ar-pin-label">Node #2: সেচ নোজল (Active)</span>
+                </div>
             </div>
 
             <!-- In-Field Holographic AR Plant Inspection Ring -->
@@ -1196,10 +1198,11 @@
             </div>
         </div>
 
-        <!-- Sleek Floating View Controls Bar (Cinema Mode vs Data Mode) -->
-        <div class="field-view-controls-bar">
-            <!-- Top Left: Camera Presets (Drone / Field / Root) -->
-            <div class="fctrl-group fctrl-left">
+        <!-- Unified Top HUD Dock (Clean 2-Row Non-Overlapping Architecture) -->
+        <header class="sim-top-hud-dock field-view-controls-bar" id="simTopHudDock">
+            <!-- Top Row 1: Utility & Camera Bar -->
+            <div class="hud-dock-row hud-dock-row-1">
+                <!-- Left Pill Group: Camera Presets (Drone, Field, Root) -->
                 <div class="fctrl-pill fctrl-cam-pill">
                     <button id="btnDroneView" class="fctrl-cam-btn" title="ড্রোন ভিউ (Drone Aerial View)">
                         <span class="btn-icon">🚁</span>
@@ -1214,49 +1217,63 @@
                         <span class="btn-text" data-i18n="cam-root">মাটির গভীরে</span>
                     </button>
                 </div>
+
+                <!-- Right Pill Group: NASA LIVE, Telemetry Drawer & Fullscreen -->
+                <div class="fctrl-pill fctrl-action-pill">
+                    <button id="btnNasaAgriHub" class="fctrl-nasa-btn" title="NASA Earth Observation Farming Data Hub (community=AG)">
+                        <span class="btn-icon">🛰️</span>
+                        <span class="btn-text" data-i18n="fctrl-nasa-hub">NASA কৃষি ডেটা</span>
+                        <span class="nasa-live-pulse-badge">LIVE</span>
+                    </button>
+                    <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
+                        <span class="btn-icon">📊</span>
+                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসল</span>
+                    </button>
+                    <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
+                        <span>⛶</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- Top Center: Location Selector, Crop Selector & Time of Day Switcher -->
-            <div class="fctrl-group fctrl-center">
-                <!-- 📍 Farm Location Selector Pill (NASA Agroclimatology Presets + GPS) -->
+            <!-- Top Row 2: Location, Crop & Time-of-Day Bar -->
+            <div class="hud-dock-row hud-dock-row-2">
+                <!-- Location Select Pill -->
                 <div class="fctrl-pill fctrl-loc-pill">
-                    <label for="farmLocationSelect" class="fctrl-label">📍 <span data-i18n="fctrl-loc-label">অঞ্চল:</span></label>
                     <select id="farmLocationSelect" class="fctrl-loc-select" aria-label="Farm Location Selector">
-                        <option value="mymensingh" selected>📍 ময়মনসিংহ (Mymensingh)</option>
-                        <option value="bogura">📍 বগুড়া (Bogura)</option>
-                        <option value="rajshahi">📍 রাজশাহী (Rajshahi)</option>
-                        <option value="dinajpur">📍 দিনাজপুর (Dinajpur)</option>
-                        <option value="barishal">📍 বরিশাল (Barishal)</option>
-                        <option value="sylhet">📍 সিলেট (Sylhet)</option>
-                        <option value="cumilla">📍 কুমিল্লা (Cumilla)</option>
-                        <option value="rangpur">📍 রংপুর (Rangpur)</option>
-                        <option value="gps">📡 আমার খামার GPS (My Farm GPS)</option>
+                        <option value="mymensingh" selected>📍 ময়মনসিংহ</option>
+                        <option value="bogura">📍 বগুড়া</option>
+                        <option value="rajshahi">📍 রাজশাহী</option>
+                        <option value="dinajpur">📍 দিনাজপুর</option>
+                        <option value="barishal">📍 বরিশাল</option>
+                        <option value="sylhet">📍 সিলেট</option>
+                        <option value="cumilla">📍 কুমিল্লা</option>
+                        <option value="rangpur">📍 রংপুর</option>
+                        <option value="gps">📡 আমার খামার GPS</option>
                     </select>
                 </div>
 
-                <!-- Crop Selector Pill -->
+                <!-- Crop Select Pill -->
                 <div class="fctrl-pill fctrl-crop-pill">
-                    <label for="cropSelect" class="fctrl-label">🌾 <span data-i18n="hud-crop-label">ফসল:</span></label>
                     <select id="cropSelect" class="fctrl-crop-select" aria-label="3D Crop Field Selector">
-                        <option value="rice" selected>🌾 ধান (Rice Field)</option>
-                        <option value="wheat">🌾 গম (Wheat Field)</option>
-                        <option value="maize">🌽 ভুট্টা (Maize Field)</option>
-                        <option value="jute">🌿 পাট (Jute Field)</option>
-                        <option value="potato">🥔 আলু (Potato Plot)</option>
-                        <option value="mustard">🌼 সরিষা (Mustard Field)</option>
-                        <option value="tomato">🍅 টমেটো (Tomato Field)</option>
-                        <option value="eggplant">🍆 বেগুন (Eggplant Field)</option>
-                        <option value="chili">🌶️ মরিচ (Chili Plot)</option>
-                        <option value="lentil">🌱 মসুর ডাল (Lentil Field)</option>
-                        <option value="cucumber">🥒 শসা (Cucumber Plot)</option>
-                        <option value="cauliflower">🥦 ফুলকপি (Cauliflower)</option>
-                        <option value="onion">🧅 পেঁয়াজ (Onion Ridge)</option>
-                        <option value="carrot">🥕 গাজর (Carrot Field)</option>
-                        <option value="papaya">🍈 পেঁপে (Papaya Orchard)</option>
+                        <option value="rice" selected>🌾 ধান</option>
+                        <option value="wheat">🌾 গম</option>
+                        <option value="maize">🌽 ভুট্টা</option>
+                        <option value="jute">🌿 পাট</option>
+                        <option value="potato">🥔 আলু</option>
+                        <option value="mustard">🌼 সরিষা</option>
+                        <option value="tomato">🍅 টমেটো</option>
+                        <option value="eggplant">🍆 বেগুন</option>
+                        <option value="chili">🌶️ মরিচ</option>
+                        <option value="lentil">🌱 মসুর ডাল</option>
+                        <option value="cucumber">🥒 শসা</option>
+                        <option value="cauliflower">🥦 ফুলকপি</option>
+                        <option value="onion">🧅 পেঁয়াজ</option>
+                        <option value="carrot">🥕 গাজর</option>
+                        <option value="papaya">🍈 পেঁপে</option>
                     </select>
                 </div>
 
-                <!-- 🌅 1-Click Time of Day Segmented Control (Morning | Noon | Night) -->
+                <!-- Time-of-Day Segmented Toggle (Morning | Noon | Night) -->
                 <div class="tod-segmented-control" id="todSegmentedControl" role="group" aria-label="Time of Day Control">
                     <button type="button" class="tod-segment-btn" data-time="morning" id="todBtnMorning" title="Morning (সকাল)">
                         <span class="tod-btn-icon">🌅</span>
@@ -1272,26 +1289,7 @@
                     </button>
                 </div>
             </div>
-
-            <!-- Top Right: NASA Agri Hub, Data Drawer Toggle & Fullscreen -->
-            <div class="fctrl-group fctrl-right">
-                <div class="fctrl-pill fctrl-action-pill">
-                    <!-- 🛰️ Glowing NASA Farming Data Hub Button (For Farmers & Space Apps Judges) -->
-                    <button id="btnNasaAgriHub" class="fctrl-nasa-btn" title="NASA Earth Observation Farming Data Hub (community=AG)">
-                        <span class="btn-icon">🛰️</span>
-                        <span class="btn-text" data-i18n="fctrl-nasa-hub">NASA কৃষি ডেটা</span>
-                        <span class="nasa-live-pulse-badge">LIVE</span>
-                    </button>
-                    <button id="btnDataToggle" class="fctrl-toggle-btn" title="মাটি ও ফসলের বিস্তারিত তথ্য দেখুন">
-                        <span class="btn-icon">📊</span>
-                        <span class="btn-text" data-i18n="sim-data-view">মাটি ও ফসলের তথ্য</span>
-                    </button>
-                    <button id="btnFullscreen" class="fctrl-action-btn icon-only" title="Toggle Fullscreen">
-                        <span>⛶</span>
-                    </button>
-                </div>
-            </div>
-        </div>
+        </header>
 
         <!-- LEFT FLOATING HUD DOCK: NASA-TO-FARMER ACTION TRANSLATOR CARDS -->
         <aside id="farmerStatusDock" class="farmer-status-dock" aria-label="Live Farm Conditions">
@@ -1444,10 +1442,10 @@
             </div>
         </article>
 
-        <!-- BOTTOM INTERACTIVE TIMELINE & SIMULATION CONTROLS -->
+        <!-- BOTTOM INTERACTIVE TIMELINE & SIMULATION CONTROLS (3-ROW NON-OVERLAPPING ARCHITECTURE) -->
         <div id="farmerBottomTimeline" class="farmer-bottom-timeline">
-            <!-- Top Row: Day Display & Growth Stage Milestone Badge -->
-            <div class="timeline-meta-bar">
+            <!-- Row A: Day Display, Stage Indicator & Playback Controls -->
+            <div class="timeline-row timeline-row-a timeline-meta-bar">
                 <div class="timeline-day-badge">
                     <span class="calendar-icon">📅</span>
                     <strong id="timelineDayLabel">দিন ৪৫ / ১২৫</strong>
@@ -1469,19 +1467,19 @@
                         <button id="btnSpeed5x" class="speed-btn">5x</button>
                     </div>
                 </div>
-
-                <!-- 1-Click Weather Switcher -->
-                <div class="timeline-weather-switcher">
-                    <span class="weather-label" data-i18n="weather-label">আবহাওয়া:</span>
-                    <button id="btnWeatherSunny" class="weather-toggle-btn active" title="☀️ রোদ (Sunny)">☀️</button>
-                    <button id="btnWeatherRain" class="weather-toggle-btn" title="🌧️ বৃষ্টি (Rain)">🌧️</button>
-                    <button id="btnWeatherWind" class="weather-toggle-btn" title="💨 বাতাস (Windy)">💨</button>
-                    <button id="btnWeatherSprinkler" class="weather-toggle-btn" title="💦 সেচ (Sprinkler)">💦</button>
-                </div>
             </div>
 
-            <!-- Bottom Row: Large Touch-Friendly Scrubber Range Track -->
-            <div class="timeline-scrubber-track">
+            <!-- Row B: 1-Click Weather Switcher -->
+            <div class="timeline-row timeline-row-b timeline-weather-switcher">
+                <span class="weather-label" data-i18n="weather-label">আবহাওয়া:</span>
+                <button id="btnWeatherSunny" class="weather-toggle-btn active" title="☀️ রোদ (Sunny)">☀️</button>
+                <button id="btnWeatherRain" class="weather-toggle-btn" title="🌧️ বৃষ্টি (Rain)">🌧️</button>
+                <button id="btnWeatherWind" class="weather-toggle-btn" title="💨 বাতাস (Windy)">💨</button>
+                <button id="btnWeatherSprinkler" class="weather-toggle-btn" title="💦 সেচ (Sprinkler)">💦</button>
+            </div>
+
+            <!-- Row C: Touch-Friendly Scrubber Range Track -->
+            <div class="timeline-row timeline-row-c timeline-scrubber-track">
                 <input type="range" id="growthTimelineSlider" class="growth-timeline-slider" min="1" max="125"
                     value="45" step="1" aria-label="Crop Growth Day Timeline Scrubber">
                 <div class="timeline-milestones">

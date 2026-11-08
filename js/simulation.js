@@ -2329,6 +2329,7 @@ export function createCropField(rawCropId = "tomato") {
 
     updateHUDStatusCards();
     updateActionCardData(cropId);
+    updateFieldSpatialPins(cropId);
     streamCropGlbAsync(cropId);
 }
 
@@ -2433,6 +2434,7 @@ export function applyGrowthStage(day, totalDays = 105) {
     }
 
     updateTimelineUI();
+    updateFieldSpatialPins(activeCropId);
     requestShadowUpdate();
 }
 
@@ -2594,6 +2596,7 @@ export function updateSoilMoisture(percent) {
     }
 
     requestShadowUpdate();
+    updateFieldSpatialPins(activeCropId, percent);
     updateHUDStatusCards();
 }
 window.updateSoilMoisture = updateSoilMoisture;
@@ -2811,33 +2814,37 @@ export function setWeatherMode(mode) {
     }
 
     requestShadowUpdate();
+    updateFieldSpatialPins(activeCropId, percent);
     updateHUDStatusCards();
 }
 window.setWeatherMode = setWeatherMode;
 
 // =============================================================================
-// 9. PHOTOREALISTIC LIGHTING & SKY (RICH CONTRAST, ZERO WASHOUT)
+// 9. PHOTOREALISTIC LIGHTING & SKY (RICH ATMOSPHERIC GRADIENTS, ZERO WASHOUT)
 // =============================================================================
-function createSkyGradientTexture(zenithColor, horizonColor, hasStars = false) {
+function createSkyGradientTexture(zenithColor, midColor, horizonColor, hasStars = false) {
     const canvas = document.createElement("canvas");
-    canvas.width = hasStars ? 512 : 32;
+    canvas.width = hasStars ? 512 : 64;
     canvas.height = 512;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return new THREE.Color(horizonColor);
+    if (!ctx) return new THREE.Color(horizonColor || zenithColor);
 
     const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    grad.addColorStop(0, zenithColor);
-    grad.addColorStop(1, horizonColor);
+    grad.addColorStop(0.0, zenithColor);
+    if (midColor) {
+        grad.addColorStop(0.52, midColor);
+    }
+    grad.addColorStop(1.0, horizonColor || midColor || zenithColor);
     ctx.fillStyle = grad;
     ctx.fillRect(0, 0, canvas.width, 512);
 
     if (hasStars) {
         ctx.fillStyle = "#ffffff";
-        for (let s = 0; s < 140; s++) {
+        for (let s = 0; s < 180; s++) {
             const sx = Math.random() * canvas.width;
             const sy = Math.random() * 340;
-            const sr = 0.6 + Math.random() * 1.3;
-            ctx.globalAlpha = 0.4 + Math.random() * 0.6;
+            const sr = 0.5 + Math.random() * 1.4;
+            ctx.globalAlpha = 0.35 + Math.random() * 0.65;
             ctx.beginPath();
             ctx.arc(sx, sy, sr, 0, Math.PI * 2);
             ctx.fill();
@@ -2966,49 +2973,46 @@ export function setTimeOfDayMode(mode = "noon") {
 
     // 2. Configure Dynamic Atmosphere, Lights & Sky
     if (mode === "morning") {
-        // 🌅 Morning Mode (Golden Sunrise)
-        const skyTexture = createSkyGradientTexture("#8ec5fc", "#ffd8a8", false);
+        // 🌅 Morning Mode (Warm amber-rose sunrise #f6b26b -> soft gold #ffd966 -> morning sky blue #6fa8dc)
+        const skyTexture = createSkyGradientTexture("#6fa8dc", "#ffd966", "#f6b26b", false);
         scene.background = skyTexture;
         if (scene.fog) {
-            scene.fog.color.setHex(0xf3dec3);
-            scene.fog.density = 0.010;
+            scene.fog.color.setHex(0xf6d5b0);
+            scene.fog.density = 0.007;
         }
         if (sunLight) {
             sunLight.position.set(45, 18, 25);
-            sunLight.color.setHex(0xffb86c);
+            sunLight.color.setHex(0xffaa5e);
             sunLight.intensity = 2.2;
             sunLight.castShadow = true;
         }
         if (hemiLight) {
-            hemiLight.color.setHex(0xffe8cc);
+            hemiLight.color.setHex(0xffd966);
             hemiLight.groundColor.setHex(0x4a3520);
             hemiLight.intensity = 1.1;
         }
         if (ambientLight) {
-            ambientLight.color.setHex(0xfff3e0);
+            ambientLight.color.setHex(0xffeedd);
             ambientLight.intensity = 0.65;
         }
         if (renderer) {
             renderer.toneMappingExposure = 1.05;
-            renderer.setClearColor(0xf3dec3, 1.0);
+            renderer.setClearColor(0xf6b26b, 1.0);
         }
         if (sky) {
-            sky.visible = true;
-            sky.material.uniforms["sunPosition"].value.set(45, 18, 25).normalize();
-            sky.material.uniforms["turbidity"].value = 4.5;
-            sky.material.uniforms["rayleigh"].value = 2.5;
+            sky.visible = false;
         }
         // IoT Night Glow OFF
         iotLights.forEach(l => { l.intensity = 0.0; });
         iotLedMaterials.forEach(m => { m.emissiveIntensity = 0.5; });
 
     } else if (mode === "night") {
-        // 🌙 Night Mode (Moonlit Smart Farm & Glowing IoT Nodes)
-        const skyTexture = createSkyGradientTexture("#07111e", "#13263e", true);
+        // 🌙 Night Mode (Deep starry midnight #060d18 -> dark indigo #112238)
+        const skyTexture = createSkyGradientTexture("#060d18", null, "#112238", true);
         scene.background = skyTexture;
         if (scene.fog) {
             scene.fog.color.setHex(0x0b192c);
-            scene.fog.density = 0.012;
+            scene.fog.density = 0.010;
         }
         if (sunLight) {
             // Reused as directional moonlight
@@ -3020,15 +3024,15 @@ export function setTimeOfDayMode(mode = "noon") {
         if (hemiLight) {
             hemiLight.color.setHex(0x284268);
             hemiLight.groundColor.setHex(0x101820);
-            hemiLight.intensity = 0.75;
+            hemiLight.intensity = 0.70;
         }
         if (ambientLight) {
             ambientLight.color.setHex(0x1e293b);
-            ambientLight.intensity = 0.45;
+            ambientLight.intensity = 0.40;
         }
         if (renderer) {
-            renderer.toneMappingExposure = 0.85;
-            renderer.setClearColor(0x0b192c, 1.0);
+            renderer.toneMappingExposure = 0.90;
+            renderer.setClearColor(0x060d18, 1.0);
         }
         if (sky) {
             sky.visible = false; // Starry canvas takes over
@@ -3038,37 +3042,34 @@ export function setTimeOfDayMode(mode = "noon") {
         iotLedMaterials.forEach(m => { m.emissiveIntensity = 2.8; });
 
     } else {
-        // ☀️ Noon Mode (Bright Overhead Daylight — Default)
-        const skyTexture = createSkyGradientTexture("#6db8f2", "#d4eefc", false);
+        // ☀️ Noon Mode (Deep azure zenith #4fa3e3 -> soft sky blue #9ad1f5 -> warm horizon #dceefb)
+        const skyTexture = createSkyGradientTexture("#4fa3e3", "#9ad1f5", "#dceefb", false);
         scene.background = skyTexture;
         if (scene.fog) {
-            scene.fog.color.setHex(0xd8ecfa);
-            scene.fog.density = 0.006;
+            scene.fog.color.setHex(0xdceefb);
+            scene.fog.density = 0.005;
         }
         if (sunLight) {
             sunLight.position.set(15, 65, 20);
             sunLight.color.setHex(0xfff8e7);
-            sunLight.intensity = 2.8;
+            sunLight.intensity = 2.6;
             sunLight.castShadow = true;
         }
         if (hemiLight) {
-            hemiLight.color.setHex(0xe0f4ff);
+            hemiLight.color.setHex(0x9ad1f5);
             hemiLight.groundColor.setHex(0x4d3822);
-            hemiLight.intensity = 1.45;
+            hemiLight.intensity = 1.35;
         }
         if (ambientLight) {
-            ambientLight.color.setHex(0xdff6ff);
-            ambientLight.intensity = 0.85;
+            ambientLight.color.setHex(0xdceefb);
+            ambientLight.intensity = 0.75;
         }
         if (renderer) {
-            renderer.toneMappingExposure = 1.20;
-            renderer.setClearColor(0xd8ecfa, 1.0);
+            renderer.toneMappingExposure = 1.05;
+            renderer.setClearColor(0xdceefb, 1.0);
         }
         if (sky) {
-            sky.visible = true;
-            sky.material.uniforms["sunPosition"].value.set(15, 65, 20).normalize();
-            sky.material.uniforms["turbidity"].value = 3.0;
-            sky.material.uniforms["rayleigh"].value = 1.4;
+            sky.visible = false;
         }
         // IoT Night Glow OFF
         iotLights.forEach(l => { l.intensity = 0.0; });
@@ -3079,15 +3080,15 @@ export function setTimeOfDayMode(mode = "noon") {
 window.setTimeOfDayMode = setTimeOfDayMode;
 
 function initEnvironmentLighting() {
-    ambientLight = new THREE.AmbientLight(0xdff6ff, 0.85);
+    ambientLight = new THREE.AmbientLight(0xdceefb, 0.75);
     scene.add(ambientLight);
 
-    hemiLight = new THREE.HemisphereLight(0xdff6ff, 0x5c4328, 1.2);
+    hemiLight = new THREE.HemisphereLight(0x9ad1f5, 0x4d3822, 1.35);
     scene.add(hemiLight);
 
     const mobile = isMobileDevice();
-    sunLight = new THREE.DirectionalLight(0xfff8e8, 3.2);
-    sunLight.position.set(6, 14, 6);
+    sunLight = new THREE.DirectionalLight(0xfff8e8, 2.6);
+    sunLight.position.set(15, 65, 20);
     sunLight.castShadow = true;
     sunLight.shadow.mapSize.width = mobile ? 1024 : 2048;
     sunLight.shadow.mapSize.height = mobile ? 1024 : 2048;
@@ -3102,18 +3103,13 @@ function initEnvironmentLighting() {
 
     sky = new Sky();
     sky.scale.setScalar(450000);
+    sky.visible = false; // Disabled so rich gradient canvas texture is never obscured by Rayleigh wash
     scene.add(sky);
 
     sun = new THREE.Vector3();
 
-    const skyUniforms = sky.material.uniforms;
-    skyUniforms["turbidity"].value = 3.0;
-    skyUniforms["rayleigh"].value = 1.4;
-    skyUniforms["mieCoefficient"].value = 0.004;
-    skyUniforms["mieDirectionalG"].value = 0.85;
-
-    // Soft daylight atmospheric fog (replaces dark 0x11271d)
-    scene.fog = new THREE.FogExp2(0xcdebf9, 0.007);
+    // Soft daylight atmospheric fog with subtle horizon mist
+    scene.fog = new THREE.FogExp2(0xdceefb, 0.005);
 
     setTimeOfDayMode("noon");
 }
@@ -3133,26 +3129,54 @@ function updateSpatialArAnchors() {
 
     const width = cachedContainerWidth || containerEl.clientWidth || window.innerWidth;
     const height = cachedContainerHeight || containerEl.clientHeight || 640;
+    const isMobile = width < 768;
 
-    for (let i = 0; i < SPATIAL_ANCHORS.length; i++) {
-        const anchor = SPATIAL_ANCHORS[i];
-        if (!anchor.el) {
-            anchor.el = document.getElementById(anchor.id);
+    if (isMobile) {
+        // On mobile (<768px), badges are docked cleanly in top flex row below HUD dock without overlap
+        for (let i = 0; i < SPATIAL_ANCHORS.length; i++) {
+            const anchor = SPATIAL_ANCHORS[i];
+            if (!anchor.el) {
+                anchor.el = document.getElementById(anchor.id);
+            }
+            if (anchor.el) {
+                anchor.el.style.transform = "none";
+                anchor.el.style.display = "inline-flex";
+            }
         }
-        const el = anchor.el;
-        if (!el) continue;
+    } else {
+        // On desktop, project into 3D world space with viewport boundary clamping and anti-collision separation
+        let lastX = -999, lastY = -999;
+        for (let i = 0; i < SPATIAL_ANCHORS.length; i++) {
+            const anchor = SPATIAL_ANCHORS[i];
+            if (!anchor.el) {
+                anchor.el = document.getElementById(anchor.id);
+            }
+            const el = anchor.el;
+            if (!el) continue;
 
-        _projScratchVec.copy(anchor.worldPos).project(camera);
+            _projScratchVec.copy(anchor.worldPos).project(camera);
 
-        // Check if anchor is in front of camera
-        if (_projScratchVec.z < 1.0 && _projScratchVec.x >= -1.1 && _projScratchVec.x <= 1.1 && _projScratchVec.y >= -1.1 && _projScratchVec.y <= 1.1) {
-            const screenX = (_projScratchVec.x * 0.5 + 0.5) * width;
-            const screenY = (-_projScratchVec.y * 0.5 + 0.5) * height;
+            // Check if anchor is in front of camera
+            if (_projScratchVec.z < 1.0 && _projScratchVec.x >= -1.1 && _projScratchVec.x <= 1.1 && _projScratchVec.y >= -1.1 && _projScratchVec.y <= 1.1) {
+                let screenX = (_projScratchVec.x * 0.5 + 0.5) * width;
+                let screenY = (-_projScratchVec.y * 0.5 + 0.5) * height;
 
-            el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0)`;
-            el.style.display = "flex";
-        } else {
-            el.style.display = "none";
+                // Viewport boundary clamping so pills never bleed off canvas
+                screenX = Math.min(Math.max(70, screenX), width - 180);
+                screenY = Math.min(Math.max(90, screenY), height - 100);
+
+                // Anti-collision separation between adjacent pins
+                if (Math.abs(screenX - lastX) < 140 && Math.abs(screenY - lastY) < 38) {
+                    screenY += 40;
+                }
+                lastX = screenX;
+                lastY = screenY;
+
+                el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0)`;
+                el.style.display = "inline-flex";
+            } else {
+                el.style.display = "none";
+            }
         }
     }
 
@@ -3175,6 +3199,110 @@ function updateSpatialArAnchors() {
         }
     }
 }
+
+/**
+ * Dynamically updates 3D Field Spatial Pins (Row 4 crop icon & label, Zone A moisture)
+ * based on selected crop and active growth stage
+ */
+export function updateFieldSpatialPins(cropId = "tomato", soilMoist = null) {
+    const isBn = (window.currentAppLanguage === "bn");
+    const key = normalizeCropId(cropId);
+    const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === key) : null;
+    const icon = CROP_FALLBACK_ICONS[key] || (dbCrop ? dbCrop.icon : "🌱") || "🌱";
+    const cropName = dbCrop ? (isBn ? dbCrop.name_bn : dbCrop.name_en) : (key.charAt(0).toUpperCase() + key.slice(1));
+
+    // Dynamic Row 4 Crop Callout
+    const cropIconEl = document.getElementById("arPinCropIcon") || document.querySelector("#arPinRow4 .ar-pin-icon");
+    if (cropIconEl) cropIconEl.textContent = icon;
+
+    const cropLabelEl = document.getElementById("arPinCropLabel") || document.querySelector("#arPinRow4 .ar-pin-label");
+    if (cropLabelEl) {
+        if (isBn) {
+            if (currentGrowthStage >= 4) {
+                cropLabelEl.textContent = `সারি ৪: পাকা ${cropName} (ফসল তোলার উপযোগী)`;
+            } else if (currentGrowthStage === 3) {
+                cropLabelEl.textContent = `সারি ৪: ${cropName} ফুল ও ফলন (৬ দিনে পরিপক্ক)`;
+            } else {
+                cropLabelEl.textContent = `সারি ৪: বাড়ন্ত ${cropName} (সুস্থ চারা)`;
+            }
+        } else {
+            if (currentGrowthStage >= 4) {
+                cropLabelEl.textContent = `Row 4: Harvest-Ready ${cropName} (Optimal)`;
+            } else if (currentGrowthStage === 3) {
+                cropLabelEl.textContent = `Row 4: ${cropName} Ripening (Ready in 6 Days)`;
+            } else {
+                cropLabelEl.textContent = `Row 4: Vegetative ${cropName} (Healthy)`;
+            }
+        }
+    }
+
+    // Dynamic Zone A Soil Moisture Callout
+    const moistPct = Math.round(soilMoist !== null ? soilMoist : soilMoisturePercent);
+    const moistLabelEl = document.getElementById("arPinZoneALabel") || document.querySelector("#arPinZoneA .ar-pin-label");
+    if (moistLabelEl) {
+        const bnMoist = isBn ? String(moistPct).replace(/\d/g, d => "০১২৩৪৫৬৭৮৯"[d]) : moistPct;
+        moistLabelEl.textContent = isBn
+            ? `Zone A: ${bnMoist}% আর্দ্রতা (${moistPct >= 60 ? 'অনুকূল' : 'সেচ প্রয়োজন'})`
+            : `Zone A: ${moistPct}% Moisture (${moistPct >= 60 ? 'Optimal' : 'Low'})`;
+    }
+}
+window.updateFieldSpatialPins = updateFieldSpatialPins;
+
+/**
+ * Mobile-responsive dropdown label optimizer (<480px width: concise labels without mid-word cuts)
+ */
+export function formatDropdownLabelsForMobile() {
+    const isMobile = (window.innerWidth <= 480);
+    const isBn = (window.currentAppLanguage === "bn");
+
+    const cropSelect = document.getElementById("cropSelect");
+    if (cropSelect) {
+        Array.from(cropSelect.options).forEach(opt => {
+            const cropKey = opt.value;
+            const icon = CROP_FALLBACK_ICONS[cropKey] || "🌱";
+            const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === cropKey) : null;
+            if (isMobile) {
+                const shortName = dbCrop ? (isBn ? dbCrop.bangla_name : dbCrop.name) : cropKey;
+                opt.textContent = `${icon} ${shortName}`;
+            } else {
+                const fullName = dbCrop
+                    ? (isBn ? `${icon} ${dbCrop.bangla_name} (${dbCrop.name})` : `${icon} ${dbCrop.name} Field`)
+                    : `${icon} ${cropKey}`;
+                opt.textContent = fullName;
+            }
+        });
+    }
+
+    const locSelect = document.getElementById("farmLocationSelect");
+    if (locSelect) {
+        const shortNames = {
+            mymensingh: isBn ? "📍 ময়মনসিংহ" : "📍 Mymensingh",
+            bogura: isBn ? "📍 বগুড়া" : "📍 Bogura",
+            rajshahi: isBn ? "📍 রাজশাহী" : "📍 Rajshahi",
+            dinajpur: isBn ? "📍 দিনাজপুর" : "📍 Dinajpur",
+            barishal: isBn ? "📍 বরিশাল" : "📍 Barishal",
+            sylhet: isBn ? "📍 সিলেট" : "📍 Sylhet",
+            cumilla: isBn ? "📍 কুমিল্লা" : "📍 Cumilla",
+            rangpur: isBn ? "📍 রংপুর" : "📍 Rangpur",
+            gps: isBn ? "📡 GPS খামার" : "📡 GPS Farm"
+        };
+        Array.from(locSelect.options).forEach(opt => {
+            const locKey = opt.value;
+            if (isMobile && shortNames[locKey]) {
+                opt.textContent = shortNames[locKey];
+            } else if (!isMobile) {
+                if (locKey === "gps") {
+                    opt.textContent = isBn ? "📡 আমার খামার GPS (My Farm GPS)" : "📡 My Farm GPS";
+                } else if (shortNames[locKey]) {
+                    opt.textContent = isBn
+                        ? `${shortNames[locKey]} (${locKey.charAt(0).toUpperCase() + locKey.slice(1)})`
+                        : `${shortNames[locKey]}`;
+                }
+            }
+        });
+    }
+}
+window.formatDropdownLabelsForMobile = formatDropdownLabelsForMobile;
 
 /**
  * Updates floating live telemetry badge for the specifically tapped plant
@@ -3397,6 +3525,7 @@ export function executeActionFertilize() {
     }
 
     requestShadowUpdate();
+    updateFieldSpatialPins(activeCropId, percent);
     updateHUDStatusCards();
 }
 window.executeActionFertilize = executeActionFertilize;
@@ -3417,6 +3546,7 @@ export function executeActionSpray() {
     }
 
     requestShadowUpdate();
+    updateFieldSpatialPins(activeCropId, percent);
     updateHUDStatusCards();
 }
 window.executeActionSpray = executeActionSpray;
@@ -4129,8 +4259,13 @@ function bindUIControls() {
     window.addEventListener("languageChanged", (e) => {
         updateHUDStatusCards();
         updateActionCardData(activeCropId);
+        updateFieldSpatialPins(activeCropId);
+        formatDropdownLabelsForMobile();
         updateTimelineUI();
     });
+
+    formatDropdownLabelsForMobile();
+    updateFieldSpatialPins(activeCropId);
 }
 
 // =============================================================================
@@ -4274,22 +4409,8 @@ export function init3DFieldSimulation() {
 
     scene = new THREE.Scene();
 
-    // Daylight sky background gradient (#cdebf9 horizon to #7ec0ee zenith)
-    const skyCanvas = document.createElement("canvas");
-    skyCanvas.width = 16;
-    skyCanvas.height = 256;
-    const skyCtx = skyCanvas.getContext("2d");
-    if (skyCtx) {
-        const skyGrad = skyCtx.createLinearGradient(0, 0, 0, 256);
-        skyGrad.addColorStop(0, "#7ec0ee");
-        skyGrad.addColorStop(0.65, "#aee0f9");
-        skyGrad.addColorStop(1, "#cdebf9");
-        skyCtx.fillStyle = skyGrad;
-        skyCtx.fillRect(0, 0, 16, 256);
-        scene.background = new THREE.CanvasTexture(skyCanvas);
-    } else {
-        scene.background = new THREE.Color(0xcdebf9);
-    }
+    // Daylight atmospheric sky gradient (#4fa3e3 azure -> #9ad1f5 soft blue -> #dceefb warm horizon)
+    scene.background = createSkyGradientTexture("#4fa3e3", "#9ad1f5", "#dceefb", false);
 
     camera = new THREE.PerspectiveCamera(mobile ? 52 : 45, width / height, 0.1, 1000);
     if (mobile) {
@@ -4309,7 +4430,7 @@ export function init3DFieldSimulation() {
         });
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
-        renderer.setClearColor(0xcdebf9, 1.0);
+        renderer.setClearColor(0xdceefb, 1.0);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.15;
         renderer.shadowMap.enabled = true;
@@ -4458,6 +4579,9 @@ export function init3DFieldSimulation() {
         setTimeout(dismissHint, 4000);
     }
 
+    formatDropdownLabelsForMobile();
+    updateFieldSpatialPins(activeCropId || "tomato");
+
     window.addEventListener("resize", onWindowResize, { passive: true });
     window.addEventListener("orientationchange", () => setTimeout(onWindowResize, 150), { passive: true });
 
@@ -4522,6 +4646,7 @@ function onWindowResize() {
 
         renderer.setSize(width, height);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+        formatDropdownLabelsForMobile();
         requestShadowUpdate();
     }, 100);
 }
