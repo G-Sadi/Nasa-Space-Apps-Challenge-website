@@ -318,8 +318,14 @@ export class FarmerAuthEngine {
 
     /**
      * Tier 3 Non-blocking background sync with 2-second timeout
+     * Skips dead localhost calls on live GitHub Pages / production environments
      */
     async syncWithBackend(action, farmer) {
+        // Detect production environment (e.g. g-sadi.github.io) — never wait for localhost:5000 timeouts
+        if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            return;
+        }
+
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 2000);

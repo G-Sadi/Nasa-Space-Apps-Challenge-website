@@ -1950,6 +1950,11 @@ STRICT RULES FOR EVERY RESPONSE:
     }
 
     private async callBackendProxy(message: string, recentHistory: ChatMessageTurn[], farmContext: FarmContext): Promise<string> {
+        // Detect production environment (e.g. g-sadi.github.io) — never wait for localhost:5000 timeouts
+        if (typeof window !== "undefined" && window.location.hostname !== "localhost" && window.location.hostname !== "127.0.0.1") {
+            return null;
+        }
+
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 

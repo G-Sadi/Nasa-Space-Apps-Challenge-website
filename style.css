@@ -7680,9 +7680,10 @@ body.lang-bn strong {
     .fctrl-crop-pill {
         padding: 4px 8px;
     }
-    .fctrl-crop-select {
-        font-size: 12px;
-        max-width: 130px;
+    .fctrl-crop-select,
+    .fctrl-loc-select {
+        font-size: 16px !important;
+        max-width: 140px;
     }
     .fctrl-crop-pill .fctrl-label {
         display: none;
@@ -7738,7 +7739,7 @@ body.lang-bn strong {
         scrollbar-width: none;
         z-index: 20;
         pointer-events: auto;
-        padding: 2px 2px;
+        padding: 4px 2px;
     }
     .farmer-status-dock::-webkit-scrollbar {
         display: none;
@@ -7749,13 +7750,14 @@ body.lang-bn strong {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        padding: 5px 10px;
-        background: rgba(10, 24, 18, 0.82);
+        padding: 5px 12px;
+        background: rgba(10, 24, 18, 0.88);
         backdrop-filter: blur(14px);
         -webkit-backdrop-filter: blur(14px);
-        border: 1px solid rgba(74, 222, 128, 0.25);
+        border: 1px solid rgba(74, 222, 128, 0.35);
         border-radius: 9999px;
         margin: 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
     }
 
     .farmer-status-dock .dock-card-header {
@@ -7763,7 +7765,7 @@ body.lang-bn strong {
         gap: 4px;
     }
     .farmer-status-dock .dock-icon {
-        font-size: 13px;
+        font-size: 14px;
         width: 18px;
         height: 18px;
     }
@@ -7771,9 +7773,13 @@ body.lang-bn strong {
         font-size: 11px;
         margin: 0;
         white-space: nowrap;
+        color: #f8fafc;
     }
-    .farmer-status-dock .dock-title-group small {
-        display: none;
+    .farmer-status-dock .dock-title-group small,
+    .farmer-status-dock .dock-source-tag,
+    .farmer-status-dock .dock-action-badge,
+    .farmer-status-dock .dock-metric-label {
+        display: none !important;
     }
     .farmer-status-dock .dock-card-body {
         margin: 0;
@@ -7781,8 +7787,19 @@ body.lang-bn strong {
         display: inline-flex;
         align-items: center;
     }
+    .farmer-status-dock .dock-metric-row {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
     .farmer-status-dock .dock-val {
-        font-size: 11px;
+        font-size: 11.5px;
+        font-weight: 800;
+        color: #4ade80;
+    }
+    .farmer-status-dock .dock-subval {
+        font-size: 10px;
+        color: #cbd5e1;
     }
     .farmer-status-dock .status-pill {
         font-size: 10px;

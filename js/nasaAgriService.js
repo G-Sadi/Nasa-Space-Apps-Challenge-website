@@ -316,6 +316,8 @@ function formatDateYYYYMMDD(d) {
 /**
  * Fetch live data from NASA POWER Agroclimatology API
  * Handles 3-4 day satellite processing lag, timeouts, missing values (-999), and offline fallback.
+ * Implements Instant Non-Blocking Hydration: hydrates from localStorage/presets in 0ms,
+ * then fetches live updates asynchronously in the background.
  */
 export async function fetchNasaAgriData(zoneKey = "mymensingh", customLat = null, customLon = null) {
     let lat, lon, targetZone;
@@ -343,7 +345,30 @@ export async function fetchNasaAgriData(zoneKey = "mymensingh", customLat = null
 
     currentZoneKey = zoneKey;
 
-    // Calculate dates: NASA daily data usually has a 3-4 day latency
+    // 1. INSTANT NON-BLOCKING HYDRATION (0ms wait)
+    let hydrated = false;
+    try {
+        const raw = localStorage.getItem(`nasa_power_cache_${zoneKey}`);
+        if (raw) {
+            const cached = JSON.parse(raw);
+            if (cached && cached.data) {
+                currentNasaData = cached.data;
+                currentSourceType = "LOCAL_CACHE";
+                hydrated = true;
+            }
+        }
+    } catch (e) { }
+
+    if (!hydrated) {
+        const fallback = PREBUNDLED_NASA_DATA[zoneKey] || PREBUNDLED_NASA_DATA.mymensingh;
+        currentNasaData = { ...fallback };
+        currentSourceType = "PREBUNDLED";
+    }
+
+    // Immediately trigger listeners so HUD status cards render in 0ms
+    notifyListeners();
+
+    // 2. ASYNCHRONOUS BACKGROUND LIVE FETCH (community=AG)
     const now = new Date();
     const endDateObj = new Date(now.getTime() - 4 * 86400000);
     const startDateObj = new Date(endDateObj.getTime() - 7 * 86400000);
@@ -353,110 +378,86 @@ export async function fetchNasaAgriData(zoneKey = "mymensingh", customLat = null
 
     const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=GWETROOT,GWETTOP,ALLSKY_SFC_PAR_TOT,ALLSKY_SFC_SW_DWN,T2M,T2M_MAX,T2M_MIN,PRECTOTCORR,RH2M,WS2M&community=AG&longitude=${lon.toFixed(4)}&latitude=${lat.toFixed(4)}&start=${startDate}&end=${endDate}&format=JSON`;
 
-    console.log(`[NASA POWER API] Querying Agroclimatology (community=AG) for ${targetZone.nameEn}:`, url);
+    (async () => {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 6500); // 6.5s timeout
 
-    try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 6500); // 6.5s timeout
+            const response = await fetch(url, { signal: controller.signal });
+            clearTimeout(timeoutId);
 
-        const response = await fetch(url, { signal: controller.signal });
-        clearTimeout(timeoutId);
-
-        if (!response.ok) {
-            throw new Error(`NASA API returned HTTP ${response.status}`);
-        }
-
-        const json = await response.json();
-        const params = json.properties && json.properties.parameter;
-
-        if (!params || !params.GWETROOT || !params.T2M) {
-            throw new Error("Invalid or incomplete NASA POWER parameter object");
-        }
-
-        // Find the latest valid date that is not -999 (NASA missing fill value)
-        const dateKeys = Object.keys(params.GWETROOT).sort();
-        let validDateKey = null;
-
-        for (let i = dateKeys.length - 1; i >= 0; i--) {
-            const dk = dateKeys[i];
-            if (params.GWETROOT[dk] !== -999 && params.T2M[dk] !== -999) {
-                validDateKey = dk;
-                break;
+            if (!response.ok) {
+                throw new Error(`NASA API returned HTTP ${response.status}`);
             }
-        }
 
-        if (!validDateKey) {
-            throw new Error("No non-fill values found in recent NASA POWER response window");
-        }
+            const json = await response.json();
+            const params = json.properties && json.properties.parameter;
 
-        // Build 7-day trend array
-        const trend7Day = [];
-        dateKeys.slice(-7).forEach((dk, idx) => {
-            const rVal = params.GWETROOT[dk];
-            const pVal = params.PRECTOTCORR ? params.PRECTOTCORR[dk] : 0;
-            const tVal = params.T2M[dk];
-            trend7Day.push({
-                day: idx === 6 ? "Today" : `D-${6 - idx}`,
-                dateKey: dk,
-                gwetroot: (rVal !== -999) ? parseFloat(rVal.toFixed(2)) : 0.65,
-                precip: (pVal !== -999) ? Math.max(0, parseFloat(pVal.toFixed(1))) : 0.0,
-                temp: (tVal !== -999) ? parseFloat(tVal.toFixed(1)) : 26.5
+            if (!params || !params.GWETROOT || !params.T2M) return;
+
+            // Find the latest valid date that is not -999 (NASA missing fill value)
+            const dateKeys = Object.keys(params.GWETROOT).sort();
+            let validDateKey = null;
+
+            for (let i = dateKeys.length - 1; i >= 0; i--) {
+                const dk = dateKeys[i];
+                if (params.GWETROOT[dk] !== -999 && params.T2M[dk] !== -999) {
+                    validDateKey = dk;
+                    break;
+                }
+            }
+
+            if (!validDateKey) return;
+
+            // Build 7-day trend array
+            const trend7Day = [];
+            dateKeys.slice(-7).forEach((dk, idx) => {
+                const rVal = params.GWETROOT[dk];
+                const pVal = params.PRECTOTCORR ? params.PRECTOTCORR[dk] : 0;
+                const tVal = params.T2M[dk];
+                trend7Day.push({
+                    day: idx === 6 ? "Today" : `D-${6 - idx}`,
+                    dateKey: dk,
+                    gwetroot: (rVal !== -999) ? parseFloat(rVal.toFixed(2)) : 0.65,
+                    precip: (pVal !== -999) ? Math.max(0, parseFloat(pVal.toFixed(1))) : 0.0,
+                    temp: (tVal !== -999) ? parseFloat(tVal.toFixed(1)) : 26.5
+                });
             });
-        });
 
-        const liveData = {
-            GWETROOT: Math.max(0.1, Math.min(1.0, params.GWETROOT[validDateKey])),
-            GWETTOP: Math.max(0.1, Math.min(1.0, params.GWETTOP ? params.GWETTOP[validDateKey] : params.GWETROOT[validDateKey] * 0.92)),
-            ALLSKY_SFC_PAR_TOT: Math.max(100, params.ALLSKY_SFC_PAR_TOT ? params.ALLSKY_SFC_PAR_TOT[validDateKey] : 420.0),
-            ALLSKY_SFC_SW_DWN: Math.max(1.0, params.ALLSKY_SFC_SW_DWN ? params.ALLSKY_SFC_SW_DWN[validDateKey] : 5.0),
-            T2M: parseFloat(params.T2M[validDateKey].toFixed(1)),
-            T2M_MAX: params.T2M_MAX ? parseFloat(params.T2M_MAX[validDateKey].toFixed(1)) : parseFloat((params.T2M[validDateKey] + 4.5).toFixed(1)),
-            T2M_MIN: params.T2M_MIN ? parseFloat(params.T2M_MIN[validDateKey].toFixed(1)) : parseFloat((params.T2M[validDateKey] - 5.0).toFixed(1)),
-            PRECTOTCORR: params.PRECTOTCORR ? Math.max(0, parseFloat(params.PRECTOTCORR[validDateKey].toFixed(1))) : 0.0,
-            RH2M: params.RH2M ? Math.max(20, Math.min(100, parseFloat(params.RH2M[validDateKey].toFixed(1)))) : 75.0,
-            WS2M: params.WS2M ? Math.max(0.5, parseFloat(params.WS2M[validDateKey].toFixed(1))) : 2.5,
-            validDateKey: validDateKey,
-            trend7Day: trend7Day,
-            rawParams: params
-        };
+            const liveData = {
+                GWETROOT: Math.max(0.1, Math.min(1.0, params.GWETROOT[validDateKey])),
+                GWETTOP: Math.max(0.1, Math.min(1.0, params.GWETTOP ? params.GWETTOP[validDateKey] : params.GWETROOT[validDateKey] * 0.92)),
+                ALLSKY_SFC_PAR_TOT: Math.max(100, params.ALLSKY_SFC_PAR_TOT ? params.ALLSKY_SFC_PAR_TOT[validDateKey] : 420.0),
+                ALLSKY_SFC_SW_DWN: Math.max(1.0, params.ALLSKY_SFC_SW_DWN ? params.ALLSKY_SFC_SW_DWN[validDateKey] : 5.0),
+                T2M: parseFloat(params.T2M[validDateKey].toFixed(1)),
+                T2M_MAX: params.T2M_MAX ? parseFloat(params.T2M_MAX[validDateKey].toFixed(1)) : parseFloat((params.T2M[validDateKey] + 4.5).toFixed(1)),
+                T2M_MIN: params.T2M_MIN ? parseFloat(params.T2M_MIN[validDateKey].toFixed(1)) : parseFloat((params.T2M[validDateKey] - 5.0).toFixed(1)),
+                PRECTOTCORR: params.PRECTOTCORR ? Math.max(0, parseFloat(params.PRECTOTCORR[validDateKey].toFixed(1))) : 0.0,
+                RH2M: params.RH2M ? Math.max(20, Math.min(100, parseFloat(params.RH2M[validDateKey].toFixed(1)))) : 75.0,
+                WS2M: params.WS2M ? Math.max(0.5, parseFloat(params.WS2M[validDateKey].toFixed(1))) : 2.5,
+                validDateKey: validDateKey,
+                trend7Day: trend7Day,
+                rawParams: params
+            };
 
-        currentNasaData = liveData;
-        currentSourceType = "LIVE_API";
-        lastFetchTimestamp = Date.now();
+            currentNasaData = liveData;
+            currentSourceType = "LIVE_API";
+            lastFetchTimestamp = Date.now();
 
-        // Cache in localStorage
-        try {
-            localStorage.setItem(`nasa_power_cache_${zoneKey}`, JSON.stringify({
-                timestamp: lastFetchTimestamp,
-                data: liveData
-            }));
-        } catch (e) { }
+            try {
+                localStorage.setItem(`nasa_power_cache_${zoneKey}`, JSON.stringify({
+                    timestamp: lastFetchTimestamp,
+                    data: liveData
+                }));
+            } catch (e) { }
 
-        console.log(`[NASA POWER API] ✅ Successfully fetched live satellite agroclimatology for ${targetZone.nameEn}:`, liveData);
-    } catch (err) {
-        console.warn(`[NASA POWER API] Network/Parse issue (${err.message}). Checking offline cache for ${targetZone.nameEn}...`);
-
-        // Check local storage cache
-        let cached = null;
-        try {
-            const raw = localStorage.getItem(`nasa_power_cache_${zoneKey}`);
-            if (raw) cached = JSON.parse(raw);
-        } catch (e) { }
-
-        if (cached && cached.data) {
-            currentNasaData = cached.data;
-            currentSourceType = "LOCAL_CACHE";
-            console.log(`[NASA POWER API] Loaded cached satellite data from ${new Date(cached.timestamp).toLocaleString()}`);
-        } else {
-            // Fall back to calibrated pre-bundled data
-            const fallback = PREBUNDLED_NASA_DATA[zoneKey] || PREBUNDLED_NASA_DATA.mymensingh;
-            currentNasaData = { ...fallback };
-            currentSourceType = "PREBUNDLED";
-            console.log(`[NASA POWER API] Loaded pre-bundled calibrated dataset for ${targetZone.nameEn}`);
+            notifyListeners();
+            console.log(`[NASA POWER API] ✅ Live satellite agroclimatology updated in background for ${targetZone.nameEn}`);
+        } catch (bgErr) {
+            console.log(`[NASA POWER API] Background update notice (${bgErr?.message || "offline"}) — using cached/preset telemetry.`);
         }
-    }
+    })();
 
-    notifyListeners();
     return currentNasaData;
 }
 
@@ -667,11 +668,15 @@ export function translateNasaDataToFarmerActions(data = currentNasaData, lang = 
 }
 
 /**
- * Register a listener function to be called when NASA data updates
+ * Register a listener function to be called when NASA data updates.
+ * Immediately invokes callback with active hydrated telemetry for 0ms initial render.
  */
 export function onNasaDataUpdated(callback) {
     if (typeof callback === "function") {
         listeners.push(callback);
+        try {
+            callback(getCurrentNasaAgriData());
+        } catch (e) { }
     }
 }
 
