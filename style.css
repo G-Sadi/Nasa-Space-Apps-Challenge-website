@@ -8356,11 +8356,15 @@ body.lang-bn strong {
 }
 
 @media (max-width: 768px) {
+    /* Prevent iOS Safari auto-zoom on mobile inputs & selects */
+    input, select, textarea {
+        font-size: 16px !important;
+    }
     .fctrl-loc-pill {
         padding: 4px 8px;
     }
     .fctrl-loc-select {
-        font-size: 12px;
+        font-size: 16px !important;
         max-width: 120px;
         padding: 5px 8px;
     }
