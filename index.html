@@ -1283,15 +1283,15 @@
 
                 <!-- Time-of-Day Segmented Toggle (Morning | Noon | Night) -->
                 <div class="tod-segmented-control time-of-day-toggle" id="todSegmentedControl" role="group" aria-label="Time of Day Control">
-                    <button type="button" class="tod-segment-btn time-btn" data-time="morning" data-time-group="timeOfDay" id="todBtnMorning" title="Morning (সকাল)" onclick="window.setTimeOfDayMode &amp;&amp; window.setTimeOfDayMode('morning')">
+                    <button type="button" class="tod-segment-btn time-btn" data-time="morning" data-time-group="timeOfDay" id="todBtnMorning" title="Morning (সকাল)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('morning');">
                         <span class="tod-btn-icon">🌅</span>
                         <span class="tod-btn-text" data-i18n="tod-morning">সকাল</span>
                     </button>
-                    <button type="button" class="tod-segment-btn time-btn active" data-time="noon" data-time-group="timeOfDay" id="todBtnNoon" title="Noon (দুপুর)" onclick="window.setTimeOfDayMode &amp;&amp; window.setTimeOfDayMode('noon')">
+                    <button type="button" class="tod-segment-btn time-btn active" data-time="noon" data-time-group="timeOfDay" id="todBtnNoon" title="Noon (দুপুর)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('noon');">
                         <span class="tod-btn-icon">☀️</span>
                         <span class="tod-btn-text" data-i18n="tod-noon">দুপুর</span>
                     </button>
-                    <button type="button" class="tod-segment-btn time-btn" data-time="night" data-time-group="timeOfDay" id="todBtnNight" title="Night (রাত)" onclick="window.setTimeOfDayMode &amp;&amp; window.setTimeOfDayMode('night')">
+                    <button type="button" class="tod-segment-btn time-btn" data-time="night" data-time-group="timeOfDay" id="todBtnNight" title="Night (রাত)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('night');">
                         <span class="tod-btn-icon">🌙</span>
                         <span class="tod-btn-text" data-i18n="tod-night">রাত</span>
                     </button>
