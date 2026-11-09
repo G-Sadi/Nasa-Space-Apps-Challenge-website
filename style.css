@@ -6603,11 +6603,19 @@ body.lang-bn strong {
     font-size: 11px;
     font-weight: 700;
     white-space: nowrap;
+    max-width: min(340px, calc(100vw - 32px));
+    box-sizing: border-box;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.55), 0 0 14px rgba(74, 222, 128, 0.25);
     pointer-events: auto;
     cursor: pointer;
     transform: translate(-50%, -100%);
     transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s ease, border-color 0.2s ease;
+}
+
+.ar-spatial-pin .ar-pin-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .ar-spatial-pin:hover {

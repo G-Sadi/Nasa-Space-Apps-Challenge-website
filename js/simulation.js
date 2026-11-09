@@ -82,6 +82,48 @@ export function normalizeCropId(rawId) {
 }
 window.normalizeCropId = normalizeCropId;
 
+// =============================================================================
+// CROP DISPLAY NAMES & LOCALIZATION (BULLETPROOF FALLBACK MAPPING)
+// =============================================================================
+export const CROP_DISPLAY_NAMES = {
+    tomato: { en: "Tomato", bn: "টমেটো", icon: "🍅" },
+    rice: { en: "Rice", bn: "ধান", icon: "🌾" },
+    wheat: { en: "Wheat", bn: "গম", icon: "🌾" },
+    maize: { en: "Maize", bn: "ভুট্টা", icon: "🌽" },
+    jute: { en: "Jute", bn: "পাট", icon: "🌿" },
+    potato: { en: "Potato", bn: "আলু", icon: "🥔" },
+    mustard: { en: "Mustard", bn: "সরিষা", icon: "🌼" },
+    eggplant: { en: "Eggplant", bn: "বেগুন", icon: "🍆" },
+    chili: { en: "Chili", bn: "মরিচ", icon: "🌶️" },
+    lentil: { en: "Lentil", bn: "মসুর ডাল", icon: "🌱" },
+    cucumber: { en: "Cucumber", bn: "শসা", icon: "🥒" },
+    cauliflower: { en: "Cauliflower", bn: "ফুলকপি", icon: "🥦" },
+    onion: { en: "Onion", bn: "পেঁয়াজ", icon: "🧅" },
+    carrot: { en: "Carrot", bn: "গাজর", icon: "🥕" },
+    papaya: { en: "Papaya", bn: "পেঁপে", icon: "🍈" }
+};
+
+export function getCropDisplayName(cropId, isBn = false) {
+    if (!cropId) return isBn ? "ফসল" : "Crop";
+    const key = normalizeCropId(cropId);
+    const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === key) : null;
+    if (dbCrop) {
+        if (isBn && (dbCrop.bangla_name || dbCrop.name_bn)) {
+            return dbCrop.bangla_name || dbCrop.name_bn;
+        }
+        if (!isBn && (dbCrop.name || dbCrop.name_en)) {
+            return dbCrop.name || dbCrop.name_en;
+        }
+    }
+    const fallback = CROP_DISPLAY_NAMES[key];
+    if (fallback) {
+        return isBn ? fallback.bn : fallback.en;
+    }
+    return key.charAt(0).toUpperCase() + key.slice(1);
+}
+window.getCropDisplayName = getCropDisplayName;
+window.CROP_DISPLAY_NAMES = CROP_DISPLAY_NAMES;
+
 /**
  * Returns exact terrain surface height at (x, z)
  */
@@ -153,9 +195,9 @@ let mouse = new THREE.Vector2();
 
 // Crop Lifecycle & Growth State
 let activeCropId = "tomato"; // Default to photorealistic Tomato
-let currentGrowthDay = 48;
+let currentGrowthDay = 68; // Default to mature fruiting & ripening stage so full crops are visible immediately
 let maxCropDays = 105;
-let currentGrowthStage = 3; // 1 to 5
+let currentGrowthStage = 4; // Default to Stage 4 (Fruit Ripening / Maturity)
 let cropHealthState = "healthy"; // 'healthy' | 'deficiency' | 'pest'
 
 // Simulation Playback
@@ -434,6 +476,186 @@ export function getCucumberSkinTexture() {
     cucumberSkinTexture.wrapS = THREE.RepeatWrapping;
     cucumberSkinTexture.wrapT = THREE.ClampToEdgeWrapping;
     return cucumberSkinTexture;
+}
+
+// Procedural High-Resolution Papaya Trunk Bark Texture (Olive-Tan with Diamond Leaf-Scar Markings)
+let papayaBarkTexture = null;
+export function getPapayaBarkTexture() {
+    if (papayaBarkTexture) return papayaBarkTexture;
+    const width = 256;
+    const height = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // 1. Organic vertical gradient: greyish-tan (#525e46) blending to lighter olive-green (#7a8966)
+    const grad = ctx.createLinearGradient(0, height, 0, 0);
+    grad.addColorStop(0.00, "#48533e");
+    grad.addColorStop(0.35, "#5f6f52");
+    grad.addColorStop(0.70, "#748364");
+    grad.addColorStop(1.00, "#839272");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, width, height);
+
+    // 2. Subtle fibrous bark striations
+    for (let i = 0; i < 3200; i++) {
+        const x = Math.random() * width;
+        const y = Math.random() * height;
+        const len = 5 + Math.random() * 14;
+        const isDark = Math.random() > 0.45;
+        ctx.strokeStyle = isDark ? "rgba(35, 42, 28, 0.22)" : "rgba(164, 180, 142, 0.18)";
+        ctx.lineWidth = 0.8 + Math.random() * 0.8;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + (Math.random() - 0.5) * 3, y + len);
+        ctx.stroke();
+    }
+
+    // 3. Realistic horizontal diamond-shaped leaf scar markings along trunk
+    const scarRows = 14;
+    for (let r = 0; r < scarRows; r++) {
+        const sy = (r + 0.5) * (height / scarRows) + (Math.random() - 0.5) * 6;
+        const numScars = 4;
+        for (let s = 0; s < numScars; s++) {
+            const sx = (s + ((r % 2) * 0.5)) * (width / numScars) + (Math.random() - 0.5) * 8;
+            const dw = 16 + Math.random() * 6;
+            const dh = 6 + Math.random() * 3;
+
+            // Outer diamond scar rim
+            ctx.fillStyle = "rgba(38, 44, 30, 0.58)";
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - dh);
+            ctx.lineTo(sx + dw, sy);
+            ctx.lineTo(sx, sy + dh);
+            ctx.lineTo(sx - dw, sy);
+            ctx.closePath();
+            ctx.fill();
+
+            // Inner lighter scar center
+            ctx.fillStyle = "rgba(142, 156, 124, 0.62)";
+            ctx.beginPath();
+            ctx.moveTo(sx, sy - dh * 0.55);
+            ctx.lineTo(sx + dw * 0.65, sy);
+            ctx.lineTo(sx, sy + dh * 0.55);
+            ctx.lineTo(sx - dw * 0.65, sy);
+            ctx.closePath();
+            ctx.fill();
+
+            // 3 tiny vascular bundle trace dots
+            ctx.fillStyle = "rgba(42, 50, 34, 0.82)";
+            ctx.beginPath();
+            ctx.arc(sx - 3, sy, 0.9, 0, Math.PI * 2);
+            ctx.arc(sx, sy - 1, 0.9, 0, Math.PI * 2);
+            ctx.arc(sx + 3, sy, 0.9, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    papayaBarkTexture = new THREE.CanvasTexture(canvas);
+    papayaBarkTexture.wrapS = THREE.RepeatWrapping;
+    papayaBarkTexture.wrapT = THREE.RepeatWrapping;
+    papayaBarkTexture.repeat.set(2, 4);
+    return papayaBarkTexture;
+}
+
+// Procedural High-Resolution 7-Lobed Papaya Leaf Texture (Radiating Yellow-Green Veins #bef264)
+let papayaLeafTexture = null;
+export function getPapayaLeafTexture() {
+    if (papayaLeafTexture) return papayaLeafTexture;
+    const size = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // 1. Tropical emerald green blade base with rich gradient
+    const grad = ctx.createRadialGradient(size * 0.5, size * 0.45, 15, size * 0.5, size * 0.45, size * 0.68);
+    grad.addColorStop(0.00, "#1e8438");
+    grad.addColorStop(0.55, "#15803d");
+    grad.addColorStop(1.00, "#14532d");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    // Subtle intercostal cellular mottling
+    for (let i = 0; i < 2800; i++) {
+        const x = Math.random() * size;
+        const y = Math.random() * size;
+        const r = 0.9 + Math.random() * 2.2;
+        ctx.fillStyle = Math.random() > 0.5 ? "rgba(34, 197, 94, 0.12)" : "rgba(10, 48, 22, 0.18)";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 2. 7 Radiating Main Veins (#bef264) from petiole hub (cx, cy)
+    // Note: With Three.js flipY=true, v=0.07 maps to cy = size * (1 - 0.07) = 475 near canvas bottom
+    const cx = size * 0.5;
+    const cy = 475;
+
+    const lobes = [
+        { name: "central", deg: 0, len: 450, w: 4.2 },
+        { name: "upper_r", deg: 28, len: 380, w: 3.6 },
+        { name: "upper_l", deg: -28, len: 380, w: 3.6 },
+        { name: "mid_r", deg: 56, len: 305, w: 3.0 },
+        { name: "mid_l", deg: -56, len: 305, w: 3.0 },
+        { name: "basal_r", deg: 84, len: 235, w: 2.6 },
+        { name: "basal_l", deg: -84, len: 235, w: 2.6 }
+    ];
+
+    lobes.forEach(l => {
+        const rad = l.deg * Math.PI / 180;
+        const dx = Math.sin(rad);
+        const dy = -Math.cos(rad);
+        const tipX = cx + dx * l.len;
+        const tipY = cy + dy * l.len;
+
+        // Fine lateral pinnate veinlets branching at 42 degrees
+        const numVeinlets = 7;
+        for (let v = 1; v <= numVeinlets; v++) {
+            const vt = v / (numVeinlets + 1);
+            const vx = cx + dx * (l.len * vt);
+            const vy = cy + dy * (l.len * vt);
+            const vLen = (l.len * 0.20) * (1 - vt * 0.45);
+
+            // Right lateral veinlet
+            const rAng = rad + (42 * Math.PI / 180);
+            ctx.strokeStyle = "rgba(190, 242, 100, 0.48)";
+            ctx.lineWidth = 1.0;
+            ctx.beginPath();
+            ctx.moveTo(vx, vy);
+            ctx.lineTo(vx + Math.sin(rAng) * vLen, vy - Math.cos(rAng) * vLen);
+            ctx.stroke();
+
+            // Left lateral veinlet
+            const lAng = rad - (42 * Math.PI / 180);
+            ctx.beginPath();
+            ctx.moveTo(vx, vy);
+            ctx.lineTo(vx + Math.sin(lAng) * vLen, vy - Math.cos(lAng) * vLen);
+            ctx.stroke();
+        }
+
+        // Crisp main yellow-green vein (#bef264)
+        ctx.strokeStyle = "rgba(190, 242, 100, 0.94)";
+        ctx.lineWidth = l.w;
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(tipX, tipY);
+        ctx.stroke();
+    });
+
+    // Central petiole insert circle
+    ctx.fillStyle = "#bef264";
+    ctx.beginPath();
+    ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+    ctx.fill();
+
+    papayaLeafTexture = new THREE.CanvasTexture(canvas);
+    papayaLeafTexture.wrapS = THREE.ClampToEdgeWrapping;
+    papayaLeafTexture.wrapT = THREE.ClampToEdgeWrapping;
+    return papayaLeafTexture;
 }
 
 // =============================================================================
@@ -1583,148 +1805,407 @@ function createJuteMorphologyGeometry() {
 }
 
 /**
- * Deeply Dissected 7-Lobed Palmate Papaya Leaf (পেঁপে পাতা)
- * Glossy dorsal side points UP (+Y) toward the sky with gentle outward droop
+ * Pyriform (Pear-Shaped) 5-Grooved Papaya Fruit Geometry (পেঁপে ফল)
+ * Modeled with narrowed stalk neck, plump belly, blossom tip, and 5 longitudinal ridges
  */
-function createPalmatePapayaLeafGeometry(petioleLen = 0.85) {
-    const parts = [];
+function createPyriformPapayaFruitGeometry(length = 0.25, maxRadius = 0.082) {
+    const points = [];
+    const segmentsY = 24;
+    for (let i = 0; i <= segmentsY; i++) {
+        const t = i / segmentsY;
+        const y = (t - 0.5) * length;
+        let r;
+        if (t < 0.08) {
+            // blossom end pointed tip
+            r = maxRadius * 0.22 * Math.sin((t / 0.08) * (Math.PI * 0.5));
+        } else if (t < 0.45) {
+            // lower plump belly
+            const p = (t - 0.08) / 0.37;
+            r = maxRadius * (0.22 + 0.78 * Math.sin(p * Math.PI * 0.5));
+        } else if (t < 0.82) {
+            // gentle taper toward neck
+            const p = (t - 0.45) / 0.37;
+            r = maxRadius * (1.00 - 0.45 * Math.pow(p, 1.2));
+        } else {
+            // narrowed neck near stem stalk
+            const p = (t - 0.82) / 0.18;
+            r = maxRadius * (0.55 - 0.25 * p);
+        }
+        points.push(new THREE.Vector2(Math.max(0.002, r), y));
+    }
 
-    // Long hollow green petiole (leaf stalk) arching upward and extending outward
-    const petioleCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, 0.10, petioleLen * 0.35),
-        new THREE.Vector3(0, 0.12, petioleLen * 0.70),
-        new THREE.Vector3(0, 0.04, petioleLen)
+    const lathe = new THREE.LatheGeometry(points, 24);
+    const pos = lathe.attributes.position;
+    const count = pos.count;
+
+    for (let i = 0; i < count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const z = pos.getZ(i);
+        const theta = Math.atan2(z, x);
+
+        // 5 subtle longitudinal melon-like ridges (r *= 1 + 0.045 * Math.cos(5 * theta))
+        const ridgeMod = 1.0 + 0.045 * Math.cos(5 * theta);
+        pos.setX(i, x * ridgeMod);
+        pos.setZ(i, z * ridgeMod);
+    }
+    lathe.computeVertexNormals();
+
+    // Short curved peduncle stalk connecting fruit neck to trunk
+    const stalkCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, length * 0.5, 0),
+        new THREE.Vector3(0.012, length * 0.5 + 0.018, 0.006),
+        new THREE.Vector3(0.026, length * 0.5 + 0.038, 0.014)
     ]);
-    const petiole = new THREE.TubeGeometry(petioleCurve, 10, 0.013, 6, false);
-    parts.push(petiole);
+    const stalk = new THREE.TubeGeometry(stalkCurve, 6, Math.max(0.006, maxRadius * 0.14), 6, false);
+    setGeometryColor(stalk, 0x4d6b2c);
 
-    // 7-lobed deeply dissected palmate leaf blade at petiole tip
-    const tipZ = petioleLen;
-    const lobeDefs = [
-        { angle: 0, length: 0.48, width: 0.12, archY: 0.05 },       // Central primary lobe
-        { angle: -0.42, length: 0.40, width: 0.10, archY: 0.04 },  // Left upper lobe
-        { angle: 0.42, length: 0.40, width: 0.10, archY: 0.04 },   // Right upper lobe
-        { angle: -0.88, length: 0.32, width: 0.08, archY: 0.03 },  // Left middle lobe
-        { angle: 0.88, length: 0.32, width: 0.08, archY: 0.03 },   // Right middle lobe
-        { angle: -1.35, length: 0.22, width: 0.06, archY: 0.02 },  // Left basal lobe
-        { angle: 1.35, length: 0.22, width: 0.06, archY: 0.02 }    // Right basal lobe
-    ];
-
-    lobeDefs.forEach(l => {
-        const blade = createBotanicalBladeGeometry({
-            length: l.length,
-            baseWidth: 0.015,
-            midWidth: l.width,
-            tipWidth: 0.003,
-            archX: 0,
-            archY: l.archY,
-            midribFold: 0.008,
-            wavyEdge: 0.005,
-            segments: 10
-        });
-        // Mathematical alignment:
-        // 1. Fan lobes out in XY plane
-        blade.rotateZ(l.angle);
-        // 2. Rotate 180 deg around Y so normal faces -Z
-        blade.rotateY(Math.PI);
-        // 3. Rotate 90 deg around X so length points along +Z (petiole) and dorsal normal faces +Y (skyward!)
-        blade.rotateX(Math.PI * 0.5);
-        // 4. Translate to petiole apex
-        blade.translate(0, 0.04, tipZ);
-        parts.push(blade);
-    });
-
-    return mergeBufferGeometries(parts);
+    return mergeBufferGeometries([lathe, stalk]);
 }
 
 /**
- * Papaya Tree Morphology Generator (পেঁপে গাছ)
- * Unbranched ringed trunk capped at apex with terminal bud (never pokes above canopy),
- * 14 papayas in 3 ripeness rings hugging trunk at y = 1.35-1.85,
- * 16 right-side-up palmate leaves with glossy dorsal faces skyward,
- * and sunk base so roots NEVER float above soil ridge!
+ * Ridge-Aware Longitudinal Vertex Coloration for Papaya Fruits
+ */
+function colorPyriformFruitVertices(geom, baseHex, darkHex, highlightHex) {
+    if (!geom || !geom.attributes || !geom.attributes.position) return geom;
+    const pos = geom.attributes.position;
+    const count = pos.count;
+    const colors = new Float32Array(count * 3);
+
+    const cBase = (baseHex instanceof THREE.Color) ? baseHex : new THREE.Color(baseHex);
+    const cDark = (darkHex instanceof THREE.Color) ? darkHex : new THREE.Color(darkHex);
+    const cHigh = (highlightHex instanceof THREE.Color) ? highlightHex : new THREE.Color(highlightHex);
+
+    const tempCol = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const z = pos.getZ(i);
+        const theta = Math.atan2(z, x);
+
+        // Highlight along longitudinal ridges (5 lobes)
+        const ridgeVal = Math.cos(5 * theta); // -1 to +1
+        const ridgeFactor = 0.5 + 0.5 * ridgeVal; // 0 to 1
+
+        if (ridgeFactor > 0.60) {
+            tempCol.copy(cBase).lerp(cHigh, (ridgeFactor - 0.60) / 0.40);
+        } else {
+            tempCol.copy(cDark).lerp(cBase, ridgeFactor / 0.60);
+        }
+
+        colors[i * 3] = tempCol.r;
+        colors[i * 3 + 1] = tempCol.g;
+        colors[i * 3 + 2] = tempCol.b;
+    }
+
+    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+    return geom;
+}
+
+/**
+ * Deeply 7-Lobed Palmate Papaya Leaf Blade (পেঁপে পাতার ফলক)
+ * Thin single-surface 3D leaf blade with dome curvature (zero thick bevels or white edge shading artifacts)
+ */
+function createPapayaPalmateBladeGeometry(size = 0.58) {
+    const profile = [
+        // Basal Right Lobe
+        { dist: size * 0.08, deg: 105 },
+        { dist: size * 0.32, deg: 92 },
+        { dist: size * 0.28, deg: 88 },
+        { dist: size * 0.52, deg: 84 },
+        { dist: size * 0.35, deg: 80 },
+        { dist: size * 0.30, deg: 76 },
+        // Sinus 1
+        { dist: size * 0.18, deg: 70 },
+        // Mid Right Lobe
+        { dist: size * 0.45, deg: 64 },
+        { dist: size * 0.38, deg: 60 },
+        { dist: size * 0.70, deg: 56 },
+        { dist: size * 0.48, deg: 52 },
+        { dist: size * 0.40, deg: 48 },
+        // Sinus 2
+        { dist: size * 0.22, deg: 42 },
+        // Upper Right Lobe
+        { dist: size * 0.55, deg: 35 },
+        { dist: size * 0.48, deg: 32 },
+        { dist: size * 0.85, deg: 28 },
+        { dist: size * 0.60, deg: 24 },
+        { dist: size * 0.52, deg: 20 },
+        // Sinus 3
+        { dist: size * 0.26, deg: 14 },
+        // Central Lobe
+        { dist: size * 0.65, deg: 8 },
+        { dist: size * 0.58, deg: 5 },
+        { dist: size * 1.00, deg: 0 },
+        { dist: size * 0.58, deg: -5 },
+        { dist: size * 0.65, deg: -8 },
+        // Sinus 4
+        { dist: size * 0.26, deg: -14 },
+        // Upper Left Lobe
+        { dist: size * 0.52, deg: -20 },
+        { dist: size * 0.60, deg: -24 },
+        { dist: size * 0.85, deg: -28 },
+        { dist: size * 0.48, deg: -32 },
+        { dist: size * 0.55, deg: -35 },
+        // Sinus 5
+        { dist: size * 0.22, deg: -42 },
+        // Mid Left Lobe
+        { dist: size * 0.40, deg: -48 },
+        { dist: size * 0.48, deg: -52 },
+        { dist: size * 0.70, deg: -56 },
+        { dist: size * 0.38, deg: -60 },
+        { dist: size * 0.45, deg: -64 },
+        // Sinus 6
+        { dist: size * 0.18, deg: -70 },
+        // Basal Left Lobe
+        { dist: size * 0.30, deg: -76 },
+        { dist: size * 0.35, deg: -80 },
+        { dist: size * 0.52, deg: -84 },
+        { dist: size * 0.28, deg: -88 },
+        { dist: size * 0.32, deg: -92 },
+        { dist: size * 0.08, deg: -105 }
+    ];
+
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0);
+    profile.forEach(p => {
+        const rad = p.deg * Math.PI / 180;
+        const x = p.dist * Math.sin(rad);
+        const y = p.dist * Math.cos(rad);
+        shape.lineTo(x, y);
+    });
+    shape.closePath();
+
+    const geom = new THREE.ShapeGeometry(shape, 12);
+    const pos = geom.attributes.position;
+    const uv = geom.attributes.uv;
+    const count = pos.count;
+
+    const minX = -size * 0.52;
+    const maxX = size * 0.52;
+    const minY = -size * 0.08;
+    const maxY = size * 1.02;
+
+    for (let i = 0; i < count; i++) {
+        const vx = pos.getX(i);
+        const vy = pos.getY(i);
+        const dist = Math.sqrt(vx * vx + vy * vy);
+        const norm = dist / size;
+
+        // Subtle 3D spherical dome curvature (leaves cup gently downward toward tips)
+        pos.setZ(i, -0.045 * (norm * norm));
+
+        // Precision UV coordinates matching getPapayaLeafTexture
+        const u = (vx - minX) / (maxX - minX);
+        const v = (vy - minY) / (maxY - minY);
+        uv.setXY(i, Math.max(0, Math.min(1, u)), Math.max(0, Math.min(1, v)));
+    }
+    geom.computeVertexNormals();
+    return geom;
+}
+
+/**
+ * Botanically Authentic 3D Papaya Tree Morphology Generator (Carica papaya - পেঁপে গাছ)
+ * 1. Organic tapered trunk planted firmly at local y = 0
+ * 2. Capped at apex (y = 2.12m) with 4 emerging young shoot leaves
+ * 3. 24 hollow petioles in 3D Fibonacci spiral (golden angle 2.39996 rad) across 3 tiers (upper upward, middle S-curve, lower drooping)
+ * 4. 24 thin deeply 7-lobed palmate leaf blades with 3D dome curvature and yellow-green veins (#bef264)
+ * 5. Cauliflorous spiral column of 16 pyriform 5-grooved papaya fruits (y = 1.16m to 1.68m) in 3 ripeness tiers + 6 white flowers
+ * 6. Buried root system sunk firmly into the soil ridge
  */
 function createPapayaMorphologyGeometry() {
     const stems = [];
     const leaves = [];
     const fruits = [];
+    const flowers = [];
 
-    const height = 2.05;
-    const baseSink = 0.05; // Sink 0.05m into soil ridge so root collar is buried and roots never float!
+    const height = 2.15;
+    const baseSink = 0.05; // Sink 0.05m into soil ridge so root collar is buried and roots never float
 
-    // 1. Tapered Trunk: Cylinder with base at y = -baseSink, top at y = height - baseSink = 2.00
-    const trunk = new THREE.CylinderGeometry(0.065, 0.11, height, 12);
+    // Part A: Tapered Trunk (CylinderGeometry(0.065, 0.145, 2.15, 20, 12))
+    const trunk = new THREE.CylinderGeometry(0.065, 0.145, height, 20, 12);
     trunk.translate(0, height * 0.5 - baseSink, 0);
     stems.push(trunk);
 
-    // Terminal Growing Bud at Apex (y = 2.01) - so trunk NEVER pokes out above the canopy!
-    const apicalBud = new THREE.SphereGeometry(0.068, 10, 8, 0, Math.PI * 2, 0, Math.PI * 0.55);
-    apicalBud.scale(1.0, 0.7, 1.0);
-    apicalBud.translate(0, height - baseSink, 0);
-    stems.push(apicalBud);
-
-    // Horizontal ring scar markings along trunk
-    for (let r = 2; r < 12; r++) {
-        const ry = -baseSink + (r / 12) * height * 0.88;
-        const currentRadius = THREE.MathUtils.lerp(0.11, 0.065, (ry + baseSink) / height);
-        const ring = new THREE.TorusGeometry(currentRadius * 1.025, 0.004, 4, 12);
-        ring.rotateX(Math.PI * 0.5);
-        ring.translate(0, ry, 0);
-        stems.push(ring);
+    // Trunk Apex shoot cluster: 4 upward-pointing emerging young shoot leaves at y = 2.12m
+    for (let s = 0; s < 4; s++) {
+        const shootAng = s * (Math.PI * 0.5) + 0.35;
+        const shootBlade = createPapayaPalmateBladeGeometry(0.20);
+        // Elevate upward +48 deg
+        shootBlade.rotateX(-Math.PI * 0.5 + (48 * Math.PI / 180));
+        shootBlade.rotateY(Math.PI * 0.5 - shootAng);
+        shootBlade.translate(Math.cos(shootAng) * 0.025, height - baseSink - 0.02, Math.sin(shootAng) * 0.025);
+        leaves.push(shootBlade);
     }
 
-    // 2. Dense Cluster of 14 Papayas in 3 Multi-Ripeness Tiers hugging trunk below crown (y = 1.35 to 1.85)
-    // Tier 1: Lower ripe golden amber/orange (#f59e0b) - 4 fruits
-    // Tier 2: Middle half-ripe breaker yellow-green (#84cc16) - 5 fruits
-    // Tier 3: Upper unripe glossy emerald green (#15803d) - 5 fruits
+    // Part B & C: Multi-Tiered Fibonacci Spiral Petioles & 7-Lobed Palmate Leaf Blades
+    // 24 hollow stalks from y = 1.62m to 2.10m (golden angle = 2.39996 rad)
+    const petioleCount = 24;
+    for (let i = 0; i < petioleCount; i++) {
+        const t = i / (petioleCount - 1); // 0 at crown bottom (y = 1.62), 1 at crown top (y = 2.10)
+        const angle = i * 2.39996;
+        const py = 1.62 + t * 0.48 - baseSink;
+        const trunkR = THREE.MathUtils.lerp(0.145, 0.065, (py + baseSink) / height);
+
+        const dirX = Math.cos(angle);
+        const dirZ = Math.sin(angle);
+        const startX = dirX * (trunkR * 0.95);
+        const startZ = dirZ * (trunkR * 0.95);
+        const startY = py;
+
+        let curvePoints = [];
+        let petioleLen = 0.75;
+        let petioleRad = THREE.MathUtils.lerp(0.014, 0.009, t);
+        let bladePitch = 0;
+        let bladeSize = 0.58;
+
+        if (t > 0.70) {
+            // Tier 1: Upper Young Tier (t > 0.7) - Petiole length 0.38m–0.52m, angling UPWARD (+25° to +48°)
+            const normT = (t - 0.70) / 0.30;
+            petioleLen = THREE.MathUtils.lerp(0.40, 0.52, normT);
+            const elevDeg = THREE.MathUtils.lerp(25, 48, normT);
+            const elevRad = elevDeg * Math.PI / 180;
+            bladePitch = elevRad;
+            bladeSize = THREE.MathUtils.lerp(0.46, 0.52, normT);
+
+            const p0 = new THREE.Vector3(startX, startY, startZ);
+            const p1 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.50),
+                startY + Math.sin(elevRad) * (petioleLen * 0.50),
+                startZ + dirZ * (petioleLen * 0.50)
+            );
+            const p2 = new THREE.Vector3(
+                startX + dirX * Math.cos(elevRad) * petioleLen,
+                startY + Math.sin(elevRad) * petioleLen,
+                startZ + dirZ * Math.cos(elevRad) * petioleLen
+            );
+            curvePoints = [p0, p1, p2];
+        } else if (t >= 0.30) {
+            // Tier 2: Middle Mature Tier (0.3 <= t <= 0.7) - Petiole length 0.65m–0.85m, extending OUTWARD & SLIGHTLY UP with S-curve (+25° to +5°)
+            const normT = (t - 0.30) / 0.40;
+            petioleLen = THREE.MathUtils.lerp(0.65, 0.85, normT);
+            bladePitch = 5 * Math.PI / 180;
+            bladeSize = THREE.MathUtils.lerp(0.60, 0.68, Math.sin(normT * Math.PI));
+
+            const p0 = new THREE.Vector3(startX, startY, startZ);
+            const p1 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.32),
+                startY + petioleLen * 0.16,
+                startZ + dirZ * (petioleLen * 0.32)
+            );
+            const p2 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.68),
+                startY + petioleLen * 0.22,
+                startZ + dirZ * (petioleLen * 0.68)
+            );
+            const p3 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.98),
+                startY + petioleLen * 0.18,
+                startZ + dirZ * (petioleLen * 0.98)
+            );
+            curvePoints = [p0, p1, p2, p3];
+        } else {
+            // Tier 3: Lower Older Tier (t < 0.3) - Petiole length 0.75m–0.90m, arching outward and gently drooping to -12° at tip
+            const normT = t / 0.30;
+            petioleLen = THREE.MathUtils.lerp(0.76, 0.90, 1 - normT);
+            bladePitch = -12 * Math.PI / 180;
+            bladeSize = THREE.MathUtils.lerp(0.56, 0.64, normT);
+
+            const p0 = new THREE.Vector3(startX, startY, startZ);
+            const p1 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.30),
+                startY + petioleLen * 0.10,
+                startZ + dirZ * (petioleLen * 0.30)
+            );
+            const p2 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 0.65),
+                startY + petioleLen * 0.07,
+                startZ + dirZ * (petioleLen * 0.65)
+            );
+            const p3 = new THREE.Vector3(
+                startX + dirX * (petioleLen * 1.00),
+                startY - petioleLen * 0.10,
+                startZ + dirZ * (petioleLen * 1.00)
+            );
+            curvePoints = [p0, p1, p2, p3];
+        }
+
+        const petioleCurve = new THREE.CatmullRomCurve3(curvePoints);
+        const petioleGeom = new THREE.TubeGeometry(petioleCurve, 10, petioleRad, 6, false);
+        setGeometryColor(petioleGeom, 0x65a30d);
+        stems.push(petioleGeom);
+
+        // Attach thin 3D 7-lobed palmate leaf blade at petiole tip with dorsal surface facing skyward
+        const tip = curvePoints[curvePoints.length - 1];
+        const blade = createPapayaPalmateBladeGeometry(bladeSize);
+        blade.rotateX(-Math.PI * 0.5 + bladePitch);
+        blade.rotateY(Math.PI * 0.5 - angle);
+        blade.translate(tip.x, tip.y, tip.z);
+        leaves.push(blade);
+    }
+
+    // Part D: Cauliflorous Column of 16 Pyriform Papaya Fruits (y = 1.15m to 1.68m) in 3 Ripeness Tiers
     const fruitTiers = [
-        { yMin: 1.38, yMax: 1.50, count: 4, colorHex: 0xf59e0b, scale: 0.082 }, // Ripe
-        { yMin: 1.52, yMax: 1.68, count: 5, colorHex: 0x84cc16, scale: 0.078 }, // Half-ripe
-        { yMin: 1.70, yMax: 1.84, count: 5, colorHex: 0x15803d, scale: 0.072 }  // Unripe
+        { yMin: 1.16, yMax: 1.32, count: 5, colorHex: 0xf59e0b, length: 0.26, radius: 0.082, pitch: 0.36, tier: "ripe" },
+        { yMin: 1.34, yMax: 1.50, count: 5, colorHex: 0x84cc16, length: 0.24, radius: 0.076, pitch: 0.30, tier: "turning" },
+        { yMin: 1.52, yMax: 1.68, count: 6, colorHex: 0x15803d, length: 0.21, radius: 0.068, pitch: 0.24, tier: "unripe" }
     ];
 
     fruitTiers.forEach((tier, tIdx) => {
         for (let i = 0; i < tier.count; i++) {
-            const ang = (i / tier.count) * Math.PI * 2 + (tIdx * 0.55);
-            const fy = tier.yMin + ((i / tier.count) * (tier.yMax - tier.yMin));
-            const dist = 0.115;
+            const fy = tier.yMin + ((i + 0.5) / tier.count) * (tier.yMax - tier.yMin) - baseSink;
+            const ang = (tIdx * 2.1) + ((i / tier.count) * Math.PI * 2) + ((i % 2) * 0.22);
+            const trunkR = THREE.MathUtils.lerp(0.145, 0.065, (fy + baseSink) / height);
+            const dist = trunkR + tier.radius * 0.38;
+
             const fx = Math.cos(ang) * dist;
             const fz = Math.sin(ang) * dist;
 
-            const papaya = new THREE.SphereGeometry(tier.scale, 12, 10);
-            papaya.scale(1.05, 1.65, 1.05); // Oblong papaya shape
-            papaya.rotateX(0.35); // Hugging trunk, hanging downwards
-            papaya.rotateY(ang);
-            papaya.translate(fx, fy, fz);
-            setGeometryColor(papaya, tier.colorHex);
-            fruits.push(papaya);
+            const fruit = createPyriformPapayaFruitGeometry(tier.length, tier.radius);
+            // Fruit hangs blossom tip downward and outward
+            fruit.rotateX(Math.PI + tier.pitch);
+            fruit.rotateY(Math.PI * 0.5 - ang);
+            fruit.translate(fx, fy, fz);
+
+            // Realistic vertex coloration based on ripeness tier
+            if (tier.tier === "ripe") {
+                // Golden amber-orange #f59e0b to #ea580c
+                colorPyriformFruitVertices(fruit, 0xf59e0b, 0xea580c, 0xfbbf24);
+            } else if (tier.tier === "turning") {
+                // Olive-green with longitudinal yellow-orange turning streaks #84cc16 / #eab308
+                colorPyriformFruitVertices(fruit, 0x84cc16, 0x4d7c0f, 0xeab308);
+            } else {
+                // Glossy deep papaya green #15803d / #166534
+                colorPyriformFruitVertices(fruit, 0x15803d, 0x166534, 0x14532d);
+            }
+            fruits.push(fruit);
         }
     });
 
-    // 3. Umbrella Canopy of 16 Palmate Leaves radiating from apex (y = 1.95 to 2.05)
-    // with gentle natural outward droop (0.15 to 0.38 rad)
-    const leafCount = 16;
-    for (let i = 0; i < leafCount; i++) {
-        const ang = (i / leafCount) * Math.PI * 2 + ((i % 2) * 0.18);
-        const ly = 1.95 + ((i / leafCount) * 0.10);
-        const droopAngle = THREE.MathUtils.lerp(0.15, 0.38, i / leafCount);
+    // 6 Tiny Cream-White 5-Petal Papaya Flowers at y = 1.70m
+    for (let f = 0; f < 6; f++) {
+        const fAng = (f / 6) * Math.PI * 2 + 0.35;
+        const fy = 1.70 + (f % 2) * 0.025 - baseSink;
+        const trunkR = THREE.MathUtils.lerp(0.145, 0.065, (fy + baseSink) / height);
+        const fDist = trunkR + 0.015;
 
-        const palmateLeaf = createPalmatePapayaLeafGeometry(0.85);
-        palmateLeaf.rotateX(droopAngle);
-        palmateLeaf.rotateY(ang);
-        palmateLeaf.translate(0, ly, 0);
-        leaves.push(palmateLeaf);
+        const flower = createCucumberBlossomGeometry(0.026);
+        flower.rotateX(Math.PI * 0.45);
+        flower.rotateY(Math.PI * 0.5 - fAng);
+        flower.translate(Math.cos(fAng) * fDist, fy, Math.sin(fAng) * fDist);
+        setGeometryColor(flower, 0xfef9c3);
+        flowers.push(flower);
     }
 
     const rootGeom = createBotanicalRootSystem(0.35, 0.22, 12);
-    // Sink roots 0.05m as well
     rootGeom.translate(0, -baseSink, 0);
 
     return {
         stemGeom: mergeBufferGeometries(stems),
         leafGeom: mergeBufferGeometries(leaves),
         fruitGeom: mergeBufferGeometries(fruits),
+        flowerGeom: mergeBufferGeometries(flowers),
         rootGeom
     };
 }
@@ -2483,13 +2964,31 @@ export function createCropMesh(cropType, baseChlorophyll) {
             stemGeom = res.stemGeom;
             leafGeom = res.leafGeom;
             fruitGeom = res.fruitGeom;
+            flowerGeom = res.flowerGeom;
             rootGeom = res.rootGeom;
-            stemMat = new THREE.MeshStandardMaterial({ color: 0x6e7852, roughness: 0.85 }); // Greyish-green ringed bark
+            stemMat = new THREE.MeshStandardMaterial({
+                map: getPapayaBarkTexture(),
+                roughness: 0.82,
+                metalness: 0.04
+            });
+            leafMat = new THREE.MeshPhysicalMaterial({
+                map: getPapayaLeafTexture(),
+                roughness: 0.42,
+                metalness: 0.03,
+                clearcoat: 0.25,
+                clearcoatRoughness: 0.35,
+                side: THREE.DoubleSide
+            });
             fruitMat = new THREE.MeshPhysicalMaterial({
                 vertexColors: true, // Multi-stage ripe amber (#f59e0b), breaker yellow-green (#84cc16), unripe green (#15803d)
-                roughness: 0.22,
-                clearcoat: 0.85,
-                clearcoatRoughness: 0.14
+                roughness: 0.28,
+                clearcoat: 0.55,
+                clearcoatRoughness: 0.18
+            });
+            flowerMat = new THREE.MeshStandardMaterial({
+                color: 0xfef9c3,
+                roughness: 0.40,
+                side: THREE.DoubleSide
             });
             rootMat = new THREE.MeshStandardMaterial({ color: 0xcfc4a8, roughness: 0.88 });
             break;
@@ -2611,20 +3110,22 @@ export function createCropMesh(cropType, baseChlorophyll) {
     }
 
     // Hyper-Realistic PBR Subsurface Scattering Material for Leaves (Sunlit & Vibrant across all 15 crops)
-    const leafColor = (crop === "cucumber") ? 0x228b22 : (baseChlorophyll || 0x489a28);
-    const leafEmissive = (crop === "cucumber") ? 0x0d3b14 : 0x184814;
-    leafMat = new THREE.MeshPhysicalMaterial({
-        map: isMonocot ? monocotTexture : dicotTexture,
-        color: leafColor,
-        roughness: 0.40,
-        metalness: 0.02,
-        clearcoat: 0.20,
-        clearcoatRoughness: 0.35,
-        transmission: 0.16,
-        emissive: new THREE.Color(leafEmissive),
-        emissiveIntensity: 0.22,
-        side: THREE.DoubleSide
-    });
+    if (!leafMat) {
+        const leafColor = (crop === "cucumber") ? 0x228b22 : (baseChlorophyll || 0x489a28);
+        const leafEmissive = (crop === "cucumber") ? 0x0d3b14 : 0x184814;
+        leafMat = new THREE.MeshPhysicalMaterial({
+            map: isMonocot ? monocotTexture : dicotTexture,
+            color: leafColor,
+            roughness: 0.40,
+            metalness: 0.02,
+            clearcoat: 0.20,
+            clearcoatRoughness: 0.35,
+            transmission: 0.16,
+            emissive: new THREE.Color(leafEmissive),
+            emissiveIntensity: 0.22,
+            side: THREE.DoubleSide
+        });
+    }
 
     return {
         stemGeom, stemMat,
@@ -2785,6 +3286,8 @@ export function createCropField(rawCropId = "tomato") {
 
     const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === cropId) : null;
     maxCropDays = dbCrop ? dbCrop.total_duration_days : 105;
+    // Set default simulation lifecycle day to mature fruiting & ripening stage (~72% progress)
+    currentGrowthDay = Math.round(maxCropDays * 0.72);
 
     const baseChlorophyll = getHealthColor(cropHealthState);
 
@@ -2970,7 +3473,11 @@ export function applyGrowthStage(day, totalDays = 105) {
 
             // Fruit & Calyx Growth
             if (fruitInstancedMesh) {
-                if (currentGrowthStage < 3) {
+                if (activeCropId === "papaya") {
+                    // Papaya trees prominently display a cauliflorous column of fruits at all viewing stages
+                    const fruitScale = s * (0.65 + 0.35 * Math.pow(progress, 0.5));
+                    dummy.scale.set(fruitScale, fruitScale, fruitScale);
+                } else if (currentGrowthStage < 3) {
                     dummy.scale.set(0.001, 0.001, 0.001); // Fruit hidden at early stages
                 } else {
                     const fruitScale = currentGrowthStage === 3 ? s * 0.45 : (currentGrowthStage === 4 ? s * 0.85 : s);
@@ -2981,9 +3488,11 @@ export function applyGrowthStage(day, totalDays = 105) {
                 if (calyxInstancedMesh) calyxInstancedMesh.setMatrixAt(i, dummy.matrix);
             }
 
-            // Flower blossoms visible at Stage 3
+            // Flower blossoms visible at Stage 3 (and throughout fruiting for continuous bloomers like Papaya)
             if (flowerInstancedMesh) {
-                if (currentGrowthStage === 3) {
+                if (activeCropId === "papaya") {
+                    dummy.scale.set(s, s, s);
+                } else if (currentGrowthStage === 3) {
                     dummy.scale.set(s, s, s);
                 } else {
                     dummy.scale.set(0.001, 0.001, 0.001);
@@ -3019,8 +3528,7 @@ export function applyGrowthStage(day, totalDays = 105) {
             else currentFruitMat.color.setHex(0x16a34a);
             currentFruitMat.needsUpdate = true;
         } else if (activeCropId === "papaya") {
-            if (currentGrowthStage >= 4) currentFruitMat.color.setHex(0xf59e0b);
-            else currentFruitMat.color.setHex(0x3b7a1e);
+            currentFruitMat.color.setHex(0xffffff); // Full vertex color fidelity for multi-tier ripening
             currentFruitMat.needsUpdate = true;
         }
     }
@@ -3767,16 +4275,19 @@ function updateSpatialArAnchors() {
                 let screenX = (_projScratchVec.x * 0.5 + 0.5) * width;
                 let screenY = (-_projScratchVec.y * 0.5 + 0.5) * height;
 
-                // Viewport boundary clamping so pills never bleed off canvas or collide with Top HUD
-                screenX = Math.min(Math.max(90, screenX), width - 210);
-                screenY = Math.min(Math.max(115, screenY), height - 100);
+                const pillWidth = el.offsetWidth || 230;
+                const pillHeight = el.offsetHeight || 34;
 
-                // Anti-collision separation between adjacent pins (minimum 165px horizontal separation!)
-                if (Math.abs(screenX - lastX) < 165 && Math.abs(screenY - lastY) < 45) {
-                    if (screenY + 45 < height - 100) {
-                        screenY += 45;
-                    } else {
-                        screenX += 165;
+                // Viewport boundary clamping so pills never bleed off canvas or collide with Top HUD
+                screenX = Math.min(Math.max(16 + pillWidth * 0.5, screenX), width - pillWidth * 0.5 - 16);
+                screenY = Math.min(Math.max(115, screenY), height - pillHeight - 20);
+
+                // Anti-collision separation between adjacent pins (minimum horizontal separation!)
+                if (Math.abs(screenX - lastX) < (pillWidth * 0.85) && Math.abs(screenY - lastY) < 42) {
+                    if (screenY + 44 < height - pillHeight - 20) {
+                        screenY += 44;
+                    } else if (screenX - (pillWidth * 0.85) > (16 + pillWidth * 0.5)) {
+                        screenX -= (pillWidth * 0.85);
                     }
                 }
                 lastX = screenX;
@@ -3784,7 +4295,7 @@ function updateSpatialArAnchors() {
 
                 el.style.left = "";
                 el.style.top = "";
-                el.style.transform = `translate3d(${screenX}px, ${screenY}px, 0)`;
+                el.style.transform = `translate3d(${Math.round(screenX - pillWidth * 0.5)}px, ${Math.round(screenY - pillHeight)}px, 0)`;
                 el.style.display = "inline-flex";
             } else {
                 el.style.display = "none";
@@ -3821,7 +4332,7 @@ export function updateFieldSpatialPins(cropId = "tomato", soilMoist = null) {
     const key = normalizeCropId(cropId);
     const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === key) : null;
     const icon = CROP_FALLBACK_ICONS[key] || (dbCrop ? dbCrop.icon : "🌱") || "🌱";
-    const cropName = dbCrop ? (isBn ? dbCrop.name_bn : dbCrop.name_en) : (key.charAt(0).toUpperCase() + key.slice(1));
+    const cropName = getCropDisplayName(key, isBn);
 
     // Dynamic Row 4 Crop Callout
     const cropIconEl = document.getElementById("arPinCropIcon") || document.querySelector("#arPinRow4 .ar-pin-icon");
@@ -3838,6 +4349,20 @@ export function updateFieldSpatialPins(cropId = "tomato", soilMoist = null) {
                 cropLabelEl.textContent = currentGrowthStage >= 4
                     ? "Row 4: Crisp Cucumber (Harvest-Ready)"
                     : "Row 4: Crisp Cucumber (Ready in 6 Days)";
+            }
+        } else if (key === "papaya") {
+            if (isBn) {
+                cropLabelEl.textContent = currentGrowthStage >= 4
+                    ? "সারি ৪: পরিপক্ক পেঁপে (ফসল তোলার উপযোগী)"
+                    : (currentGrowthStage === 3
+                        ? "সারি ৪: পেঁপে গাছে ফলন (৬ দিনে পরিপক্ক)"
+                        : "সারি ৪: বাড়ন্ত পেঁপে গাছ (সুস্থ)");
+            } else {
+                cropLabelEl.textContent = currentGrowthStage >= 4
+                    ? "Row 4: Harvest-Ready Papaya (Optimal)"
+                    : (currentGrowthStage === 3
+                        ? "Row 4: Ripening Papaya (Ready in 6 Days)"
+                        : "Row 4: Vegetative Papaya (Healthy)");
             }
         } else if (isBn) {
             if (currentGrowthStage >= 4) {
@@ -3934,7 +4459,7 @@ let activeInspectedPlantData = null;
 export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
     const isBn = (window.currentAppLanguage === "bn");
     const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === cropId) : null;
-    const cropName = dbCrop ? (isBn ? dbCrop.name_bn : dbCrop.name_en) : cropId;
+    const cropName = getCropDisplayName(cropId, isBn);
 
     const plant = instanceData[instanceId] || { rowIndex: 0, colIndex: 0, scale: 1.0 };
     const rowNum = (plant.rowIndex !== undefined ? plant.rowIndex : 0) + 1;
@@ -4924,7 +5449,7 @@ function bindUIControls() {
         btnAskBuddyAr.addEventListener("click", () => {
             const isBn = (window.currentAppLanguage === "bn");
             const dbCrop = window.CROPS_DATABASE ? window.CROPS_DATABASE.find(c => c.id === activeCropId) : null;
-            const cName = dbCrop ? (isBn ? dbCrop.name_bn : dbCrop.name_en) : activeCropId;
+            const cName = getCropDisplayName(activeCropId, isBn);
             const pData = activeInspectedPlantData;
             const plantCtx = pData ? (isBn ? `গাছ #${pData.plantNum} (সারি ${pData.rowNum})` : `Plant #${pData.plantNum} (Row ${pData.rowNum})`) : "";
             const prompt = isBn
