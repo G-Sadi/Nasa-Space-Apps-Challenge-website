@@ -3138,20 +3138,26 @@ export function initSmartFarmIoTNodes() {
 window.initSmartFarmIoTNodes = initSmartFarmIoTNodes;
 
 export function setTimeOfDayMode(mode = "noon") {
-    currentTimeOfDayMode = mode;
+    const normalizedMode = (mode || "noon").toString().trim().toLowerCase();
+    currentTimeOfDayMode = normalizedMode;
 
-    // 1. Sync Segmented UI Buttons
-    const buttons = document.querySelectorAll(".tod-segment-btn");
+    // 1. Sync Segmented UI Buttons Across All Matching Selectors
+    const buttons = document.querySelectorAll(".tod-segment-btn, .time-btn, [data-time]");
     buttons.forEach((btn) => {
-        if (btn.dataset.time === mode) {
+        const btnTime = (btn.dataset.time || btn.getAttribute("data-time") || "").trim().toLowerCase();
+        if (btnTime === normalizedMode) {
             btn.classList.add("active");
+            btn.setAttribute("aria-pressed", "true");
         } else {
             btn.classList.remove("active");
+            btn.setAttribute("aria-pressed", "false");
         }
     });
 
+    if (!scene) return;
+
     // 2. Configure Dynamic Atmosphere, Lights & Sky (Vibrant, Zero Washout)
-    if (mode === "morning") {
+    if (normalizedMode === "morning") {
         // 🌅 Morning Mode (Warm amber sunrise: deep azure zenith #2c5282 -> rich orange #dd6b20 -> warm golden horizon #fbd38d)
         const skyTexture = createSkyGradientTexture("#2c5282", "#dd6b20", "#fbd38d", false);
         scene.background = skyTexture;
@@ -3185,7 +3191,7 @@ export function setTimeOfDayMode(mode = "noon") {
         iotLights.forEach(l => { l.intensity = 0.0; });
         iotLedMaterials.forEach(m => { m.emissiveIntensity = 0.5; });
 
-    } else if (mode === "night") {
+    } else if (normalizedMode === "night") {
         // 🌙 Night Mode (Deep starry midnight #050b14 -> dark indigo #0f1c30 -> dusk horizon #1a2e4a)
         const skyTexture = createSkyGradientTexture("#050b14", "#0f1c30", "#1a2e4a", true);
         scene.background = skyTexture;
@@ -3255,6 +3261,9 @@ export function setTimeOfDayMode(mode = "noon") {
         iotLedMaterials.forEach(m => { m.emissiveIntensity = 0.5; });
     }
     requestShadowUpdate();
+    if (renderer && scene && camera) {
+        renderer.render(scene, camera);
+    }
 }
 window.setTimeOfDayMode = setTimeOfDayMode;
 
@@ -4304,13 +4313,50 @@ function bindUIControls() {
     if (btnField) btnField.addEventListener("click", () => switchCameraMode("field"));
     if (btnRoot) btnRoot.addEventListener("click", () => switchCameraMode("root"));
 
-    // Segmented Time-of-Day Mode Switcher
-    const todBtns = document.querySelectorAll(".tod-segment-btn");
+    // Segmented Time-of-Day Mode Switcher (Multi-layered direct listeners, container delegation, & document delegation)
+    const todBtns = document.querySelectorAll(".tod-segment-btn, .time-btn, [data-time]");
     todBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-            const timeMode = btn.dataset.time || "noon";
+        const handleTimeSwitch = (e) => {
+            if (e) {
+                e.stopPropagation();
+            }
+            const timeMode = btn.dataset.time || btn.getAttribute("data-time") || "noon";
             setTimeOfDayMode(timeMode);
+        };
+        btn.addEventListener("click", handleTimeSwitch);
+        btn.addEventListener("pointerdown", (e) => {
+            e.stopPropagation();
         });
+        btn.addEventListener("touchend", (e) => {
+            if (e.cancelable) e.preventDefault();
+            handleTimeSwitch(e);
+        }, { passive: false });
+    });
+
+    // Container Delegation on #todSegmentedControl
+    const todContainer = document.getElementById("todSegmentedControl");
+    if (todContainer) {
+        ["click", "touchend"].forEach(evtType => {
+            todContainer.addEventListener(evtType, (e) => {
+                const btn = e.target.closest(".tod-segment-btn, [data-time], .time-btn");
+                if (btn) {
+                    e.stopPropagation();
+                    if (e.cancelable && evtType === "touchend") e.preventDefault();
+                    const timeVal = btn.dataset.time || btn.getAttribute("data-time") || "noon";
+                    setTimeOfDayMode(timeVal);
+                }
+            }, { passive: false });
+        });
+    }
+
+    // Document-level fallback delegation
+    document.addEventListener("click", (e) => {
+        const btn = e.target && e.target.closest && e.target.closest(".tod-segment-btn, [data-time], .time-btn");
+        if (btn) {
+            e.stopPropagation();
+            const timeVal = btn.dataset.time || btn.getAttribute("data-time") || "noon";
+            setTimeOfDayMode(timeVal);
+        }
     });
 
     if (timeSlider) {

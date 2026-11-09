@@ -5187,6 +5187,20 @@ body.lang-bn strong {
 }
 
 /* Glassmorphic 3-Button Time of Day Segmented Control (1-Click Switcher) */
+.time-of-day-toggle,
+.tod-segmented-control,
+.tod-segment-btn,
+[data-time],
+.time-btn {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 110 !important;
+    cursor: pointer !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .tod-segmented-control {
     display: inline-flex;
     align-items: center;
@@ -5198,7 +5212,8 @@ body.lang-bn strong {
     border: 1px solid rgba(74, 222, 128, 0.28);
     gap: 4px;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
-    z-index: 10;
+    z-index: 110 !important;
+    pointer-events: auto !important;
 }
 
 .tod-segment-btn {
@@ -5209,13 +5224,21 @@ body.lang-bn strong {
     border-radius: 999px;
     font-size: 13px;
     font-weight: 600;
-    cursor: pointer;
+    cursor: pointer !important;
     transition: all 0.25s ease;
     white-space: nowrap;
     border: none;
     outline: none;
     background: transparent;
     color: #cbd5e1;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 110 !important;
+    touch-action: manipulation !important;
+}
+
+.tod-segment-btn * {
+    pointer-events: none !important;
 }
 
 .tod-segment-btn:hover {
@@ -6426,18 +6449,20 @@ body.lang-bn strong {
     transform: translateX(-50%);
     width: calc(100% - 32px);
     max-width: 1240px;
-    z-index: 45;
+    z-index: 100 !important;
     display: flex !important;
     flex-direction: column !important;
     gap: 8px;
-    pointer-events: none;
+    pointer-events: none !important;
 }
 
-.sim-top-hud-row {
+.sim-top-hud-row,
+.hud-dock-row {
     width: 100%;
-    pointer-events: none;
+    pointer-events: none !important;
 }
 
+.hud-dock-row-1,
 .sim-hud-row-1 {
     display: flex;
     align-items: center;
@@ -6445,6 +6470,7 @@ body.lang-bn strong {
     gap: 12px;
 }
 
+.hud-dock-row-2,
 .sim-hud-row-2 {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) auto;
@@ -6452,6 +6478,8 @@ body.lang-bn strong {
     align-items: center;
 }
 
+.hud-dock-row-1 .fctrl-cam-pill,
+.hud-dock-row-1 .fctrl-action-pill,
 .sim-hud-row-1 .fctrl-cam-pill,
 .sim-hud-row-1 .fctrl-action-pill {
     display: inline-flex;
@@ -6463,10 +6491,12 @@ body.lang-bn strong {
     border-radius: 999px;
     padding: 3px 6px;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45), 0 0 14px rgba(74, 222, 128, 0.15);
-    pointer-events: auto;
+    pointer-events: auto !important;
     gap: 4px;
 }
 
+.hud-dock-row-2 .fctrl-loc-pill,
+.hud-dock-row-2 .fctrl-crop-pill,
 .sim-hud-row-2 .fctrl-loc-pill,
 .sim-hud-row-2 .fctrl-crop-pill {
     display: flex;
@@ -6477,10 +6507,17 @@ body.lang-bn strong {
     border: 1px solid rgba(74, 222, 128, 0.3);
     border-radius: 999px;
     padding: 2px 8px;
-    pointer-events: auto;
+    pointer-events: auto !important;
     min-width: 0;
     box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
     position: relative;
+}
+
+.hud-dock-row-2 .tod-segmented-control,
+.sim-hud-row-2 .tod-segmented-control {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 110 !important;
 }
 
 .sim-hud-row-2 .fctrl-loc-select,
@@ -7796,15 +7833,17 @@ body.lang-bn strong {
         display: flex !important;
         flex-direction: column !important;
         gap: 6px;
-        z-index: 40;
-        pointer-events: none;
+        z-index: 100 !important;
+        pointer-events: none !important;
     }
 
-    .sim-top-hud-row {
+    .sim-top-hud-row,
+    .hud-dock-row {
         width: 100%;
-        pointer-events: none;
+        pointer-events: none !important;
     }
 
+    .hud-dock-row-1,
     .sim-hud-row-1 {
         display: flex;
         align-items: center;
@@ -7813,6 +7852,7 @@ body.lang-bn strong {
         gap: 6px;
     }
 
+    .hud-dock-row-2,
     .sim-hud-row-2 {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr) auto;
@@ -7821,15 +7861,19 @@ body.lang-bn strong {
         align-items: center;
     }
 
+    .hud-dock-row-1 .fctrl-cam-pill,
+    .hud-dock-row-1 .fctrl-action-pill,
     .sim-hud-row-1 .fctrl-cam-pill,
     .sim-hud-row-1 .fctrl-action-pill {
         padding: 2px 4px;
         gap: 2px;
+        pointer-events: auto !important;
     }
 
     .fctrl-cam-btn {
         padding: 5px 8px;
         font-size: 13px;
+        pointer-events: auto !important;
     }
     .fctrl-cam-btn .btn-text,
     .fctrl-sf-btn .btn-text,
@@ -7840,13 +7884,17 @@ body.lang-bn strong {
     .fctrl-sf-btn, .fctrl-toggle-btn, .fctrl-action-btn {
         padding: 5px 8px;
         font-size: 13px;
+        pointer-events: auto !important;
     }
 
+    .hud-dock-row-2 .fctrl-loc-pill,
+    .hud-dock-row-2 .fctrl-crop-pill,
     .sim-hud-row-2 .fctrl-loc-pill,
     .sim-hud-row-2 .fctrl-crop-pill {
         padding: 0 4px;
         height: 34px;
         min-width: 0;
+        pointer-events: auto !important;
     }
 
     .fctrl-loc-select,
@@ -7856,12 +7904,18 @@ body.lang-bn strong {
         padding: 0 4px !important;
         max-width: 100% !important;
         width: 100% !important;
+        pointer-events: auto !important;
     }
 
+    .hud-dock-row-2 .tod-segmented-control,
+    .sim-hud-row-2 .tod-segmented-control,
     .tod-segmented-control {
         height: 34px;
         padding: 2px;
         gap: 2px;
+        pointer-events: auto !important;
+        z-index: 110 !important;
+        position: relative !important;
     }
 
     .tod-segment-btn {
@@ -7869,6 +7923,15 @@ body.lang-bn strong {
         padding: 0 6px;
         font-size: 11px;
         gap: 3px;
+        pointer-events: auto !important;
+        z-index: 110 !important;
+        position: relative !important;
+        cursor: pointer !important;
+        touch-action: manipulation !important;
+    }
+
+    .tod-segment-btn * {
+        pointer-events: none !important;
     }
 
     @media (max-width: 480px) {
