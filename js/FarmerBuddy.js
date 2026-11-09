@@ -1772,6 +1772,15 @@ STRICT RULES FOR EVERY RESPONSE:
         }
     }
 
+    openWithMessage(text) {
+        this.toggleWindow(true);
+        if (text && typeof text === "string" && text.trim()) {
+            setTimeout(() => {
+                this.handleUserSubmit(text.trim());
+            }, 300);
+        }
+    }
+
     renderHistory() {
         this.messagesContainer.innerHTML = "";
         this.messages.forEach(msg => {
