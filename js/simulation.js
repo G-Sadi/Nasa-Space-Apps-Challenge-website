@@ -658,6 +658,149 @@ export function getPapayaLeafTexture() {
     return papayaLeafTexture;
 }
 
+// Procedural Feathery Tri-Pinnate Fern-like Carrot Foliage Texture (Compound Pinnae & Serrated Lobes)
+let carrotFernTexture = null;
+export function getCarrotFernTexture() {
+    if (carrotFernTexture) return carrotFernTexture;
+    const w = 256;
+    const h = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    ctx.clearRect(0, 0, w, h);
+    const midX = w / 2;
+
+    // 1. Slender central rachis (stalk) tapering from base (y = h in UV space) to apex (y = 0.08h)
+    ctx.strokeStyle = "#4ade80";
+    ctx.lineWidth = 3.5;
+    ctx.lineCap = "round";
+    ctx.beginPath();
+    ctx.moveTo(midX, h);
+    ctx.quadraticCurveTo(midX, h * 0.5, midX, h * 0.08);
+    ctx.stroke();
+
+    // 2. 9 Pairs of opposing compound pinnae branching off at ~45°
+    const pinnaPairs = 9;
+    for (let p = 0; p < pinnaPairs; p++) {
+        const t = (p + 1) / (pinnaPairs + 1); // 0.1 to 0.9 from top to bottom
+        const pinnaY = h * (1.0 - t * 0.88);
+        const pinnaLen = (1.0 - Math.pow(t - 0.55, 2) * 1.8) * (w * 0.42);
+
+        [-1, 1].forEach(dir => {
+            const angle = dir * (0.65 + t * 0.2); // ~40° to 50°
+            const endX = midX + Math.sin(angle) * pinnaLen;
+            const endY = pinnaY - Math.cos(angle) * pinnaLen * 0.55;
+
+            // Pinna rachis
+            ctx.strokeStyle = "#22c55e";
+            ctx.lineWidth = 1.8;
+            ctx.beginPath();
+            ctx.moveTo(midX, pinnaY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+
+            // 5 pairs of tri-pinnate pinnules with feathery serrated lobes
+            const pinnuleCount = 5;
+            for (let k = 1; k <= pinnuleCount; k++) {
+                const pk = k / (pinnuleCount + 0.5);
+                const px = midX + (endX - midX) * pk;
+                const py = pinnaY + (endY - pinnaY) * pk;
+                const pLen = (1.0 - pk * 0.5) * (w * 0.09);
+
+                [-1, 1].forEach(side => {
+                    const leafAngle = angle + side * 0.75;
+                    const lx = px + Math.cos(leafAngle) * pLen;
+                    const ly = py - Math.sin(leafAngle) * pLen * 0.6;
+
+                    ctx.fillStyle = k % 2 === 0 ? "#16a34a" : "#4ade80";
+                    ctx.beginPath();
+                    ctx.ellipse(lx, ly, Math.max(1.5, pLen * 0.45), Math.max(1, pLen * 0.2), leafAngle, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Subtle serration tip highlight
+                    ctx.fillStyle = "#86efac";
+                    ctx.beginPath();
+                    ctx.arc(lx + Math.cos(leafAngle) * pLen * 0.35, ly - Math.sin(leafAngle) * pLen * 0.2, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+        });
+    }
+
+    // Terminal pinnule cluster at apex
+    ctx.fillStyle = "#4ade80";
+    ctx.beginPath();
+    ctx.ellipse(midX, h * 0.06, 5, 11, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    carrotFernTexture = new THREE.CanvasTexture(canvas);
+    carrotFernTexture.wrapS = THREE.ClampToEdgeWrapping;
+    carrotFernTexture.wrapT = THREE.ClampToEdgeWrapping;
+    carrotFernTexture.generateMipmaps = true;
+    carrotFernTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    carrotFernTexture.needsUpdate = true;
+    return carrotFernTexture;
+}
+
+// Procedural High-Resolution Nantes Carrot Taproot Skin Texture (Beta-Carotene Gradient & Lenticel Rings)
+let carrotSkinTexture = null;
+export function getCarrotSkinTexture() {
+    if (carrotSkinTexture) return carrotSkinTexture;
+    const w = 256;
+    const h = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // 1. Beta-carotene orange gradient with chlorophyll green collar at top
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0.00, "#4d7c0f"); // Crown green shoulder
+    grad.addColorStop(0.06, "#65a30d"); // Transition lime
+    grad.addColorStop(0.14, "#c2410c"); // Rich reddish orange collar
+    grad.addColorStop(0.40, "#ea580c"); // Vibrant Nantes carrot orange
+    grad.addColorStop(0.75, "#f97316"); // Warm mid-root orange
+    grad.addColorStop(0.95, "#fb923c"); // Lower taper
+    grad.addColorStop(1.00, "#fdba74"); // Blunt root tip
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+
+    // 2. 48 rows of horizontal lenticel dimples / micro-grooves
+    for (let r = 0; r < 48; r++) {
+        const y = (r / 48) * h;
+        const count = 4 + Math.floor(Math.random() * 5);
+        for (let j = 0; j < count; j++) {
+            const x = Math.random() * w;
+            const len = 6 + Math.random() * 14;
+            // Shadow line
+            ctx.fillStyle = "rgba(154, 52, 18, 0.55)";
+            ctx.fillRect(x, y, len, 1.4);
+            // Light highlight below
+            ctx.fillStyle = "rgba(254, 215, 170, 0.40)";
+            ctx.fillRect(x, y + 1.2, len, 1.0);
+        }
+    }
+
+    // 3. Subtle fine longitudinal striations
+    for (let i = 0; i < 60; i++) {
+        const x = (i / 60) * w;
+        ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.fillRect(x, 0, 1.5, h);
+    }
+
+    carrotSkinTexture = new THREE.CanvasTexture(canvas);
+    carrotSkinTexture.wrapS = THREE.RepeatWrapping;
+    carrotSkinTexture.wrapT = THREE.ClampToEdgeWrapping;
+    carrotSkinTexture.generateMipmaps = true;
+    carrotSkinTexture.minFilter = THREE.LinearMipmapLinearFilter;
+    carrotSkinTexture.needsUpdate = true;
+    return carrotSkinTexture;
+}
+
 // =============================================================================
 // 2. GEOMETRY MERGING UTILITY (WITH VERTEX COLOR ATTRIBUTE PRESERVATION)
 // =============================================================================
@@ -2588,7 +2731,80 @@ function createCucumberMorphologyGeometry() {
 }
 
 /**
- * Carrot Morphology Generator (Crowned Root Shoulder & Lacy Foliage)
+ * Curved Ribbon Geometry for Feathery Carrot Fern Fronds
+ * Creates an outward-arching parabolic compound ribbon with UV mapping for alpha-cutout textures
+ */
+function createCarrotFrondRibbonGeometry(length = 0.46, elevation = 0.55, widthMax = 0.09) {
+    const segments = 12;
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        // Graceful parabolic outward arch: ascends upward, curves outward, then droops near frond tip
+        const y = Math.sin(t * Math.PI * 0.82) * length * Math.sin(elevation);
+        const z = t * length * Math.cos(elevation);
+        const w = (t < 0.20 ? (t / 0.20) : Math.pow(1 - t, 0.65)) * widthMax;
+
+        // Two vertices across ribbon width
+        positions.push(-w * 0.5, y, z);
+        positions.push(w * 0.5, y, z);
+
+        uvs.push(0, t);
+        uvs.push(1, t);
+
+        if (i < segments) {
+            const base = i * 2;
+            indices.push(base, base + 1, base + 2);
+            indices.push(base + 1, base + 3, base + 2);
+        }
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geom.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+    return geom;
+}
+
+/**
+ * Botanically Authentic 24-Segment Lathe Nantes Carrot Taproot Geometry
+ * Extends from rounded crown shoulder (y = +0.035m) down into soil bed (y = -0.25m)
+ * with horizontal sinusoidal growth rings and blunt apex
+ */
+function createCarrotTaprootGeometry() {
+    const points = [
+        new THREE.Vector2(0.002, 0.035),  // Crown center (y = +0.035m peeking above ground)
+        new THREE.Vector2(0.016, 0.033),
+        new THREE.Vector2(0.034, 0.024),  // Rounded shoulder
+        new THREE.Vector2(0.040, 0.008),
+        new THREE.Vector2(0.041, -0.015), // Ground level embed
+        new THREE.Vector2(0.039, -0.050),
+        new THREE.Vector2(0.035, -0.090),
+        new THREE.Vector2(0.030, -0.130),
+        new THREE.Vector2(0.024, -0.170),
+        new THREE.Vector2(0.017, -0.210),
+        new THREE.Vector2(0.009, -0.238),
+        new THREE.Vector2(0.002, -0.250)  // Blunt conical apex at y = -0.25m
+    ];
+
+    // Modulate points with subtle horizontal growth rings
+    for (let i = 2; i < points.length - 1; i++) {
+        const y = points[i].y;
+        points[i].x *= (1.0 + 0.028 * Math.sin(y * 95));
+    }
+
+    const geom = new THREE.LatheGeometry(points, 24);
+    geom.computeVertexNormals();
+    return geom;
+}
+
+/**
+ * Botanically Accurate Carrot Morphology Generator (Daucus carota)
+ * - 14 Radiating Compound Feathery Fern Fronds (5 inner spring green + 9 outer lush emerald)
+ * - 24-Segment Lathe Beta-Carotene Taproot with Rounded Crown Shoulder & 10 Feeder Rootlets
  */
 function createCarrotMorphologyGeometry() {
     const stems = [];
@@ -2596,51 +2812,52 @@ function createCarrotMorphologyGeometry() {
     const fruits = [];
     const roots = [];
 
-    // Bright-orange tapered carrot taproot extending down into the soil bed
-    const taproot = new THREE.CylinderGeometry(0.040, 0.006, 0.28, 10);
-    taproot.translate(0, -0.11, 0); // extends from y = +0.03 down to -0.25 into soil
-    fruits.push(taproot);
+    // 1. Beta-Carotene Taproot (Lathe geometry from +0.035m down to -0.25m)
+    const taprootGeom = createCarrotTaprootGeometry();
+    setGeometryColor(taprootGeom, 0xffffff); // Uses high-res PBR skin texture
+    fruits.push(taprootGeom);
 
-    // Rounded crown shoulder at ground level
-    const shoulder = new THREE.SphereGeometry(0.039, 8, 6);
-    shoulder.scale(1.0, 0.45, 1.0);
-    shoulder.translate(0, 0.025, 0);
-    fruits.push(shoulder);
+    // 2. Crown rim collar (compact core at ground level)
+    const crown = new THREE.CylinderGeometry(0.016, 0.026, 0.025, 8);
+    crown.translate(0, 0.032, 0);
+    setGeometryColor(crown, 0x4d7c0f);
+    stems.push(crown);
 
-    // Fine feeder rootlets branching off the taproot
+    // 3. Fine feeder rootlets branching off the taproot into soil
     for (let r = 0; r < 10; r++) {
         const ry = -0.04 - (r / 10) * 0.18;
-        const rang = (r / 10) * Math.PI * 2;
+        const rang = (r / 10) * Math.PI * 2 + (r % 2) * 0.4;
         const rCurve = new THREE.LineCurve3(
-            new THREE.Vector3(Math.cos(rang) * 0.025, ry, Math.sin(rang) * 0.025),
-            new THREE.Vector3(Math.cos(rang) * 0.08, ry - 0.04, Math.sin(rang) * 0.08)
+            new THREE.Vector3(Math.cos(rang) * 0.024, ry, Math.sin(rang) * 0.024),
+            new THREE.Vector3(Math.cos(rang) * 0.075, ry - 0.035, Math.sin(rang) * 0.075)
         );
-        roots.push(new THREE.TubeGeometry(rCurve, 3, 0.002, 3, false));
+        const rTube = new THREE.TubeGeometry(rCurve, 4, 0.0016, 3, false);
+        setGeometryColor(rTube, 0xfde68a);
+        roots.push(rTube);
     }
 
-    // Feathery fern-like foliage above ground
-    for (let i = 0; i < 9; i++) {
-        const ang = (i / 9) * Math.PI * 2;
-        const leaf = createBotanicalBladeGeometry({
-            length: 0.42,
-            baseWidth: 0.008,
-            midWidth: 0.058,
-            tipWidth: 0.003,
-            archX: 0.015,
-            archY: 0.09,
-            midribFold: 0.006,
-            wavyEdge: 0.008,
-            segments: 14
-        });
-        leaf.rotateX(0.40);
-        leaf.rotateY(ang);
-        leaf.translate(0, 0.03, 0);
-        leaves.push(leaf);
+    // 4. Feathery Fern-like Fronds (14 Compound Radiating Fronds)
+    // 5 Inner Young Fronds (elevated 20°–32°, height 0.32m–0.38m, vibrant spring lime)
+    const innerCount = 5;
+    for (let i = 0; i < innerCount; i++) {
+        const ang = (i / innerCount) * Math.PI * 2 + 0.2;
+        const frondGeom = createCarrotFrondRibbonGeometry(0.36, 0.38, 0.075);
+        frondGeom.rotateY(ang);
+        frondGeom.translate(0, 0.035, 0);
+        setGeometryColor(frondGeom, 0x65a30d); // vibrant spring lime
+        leaves.push(frondGeom);
     }
 
-    const crown = new THREE.CylinderGeometry(0.015, 0.025, 0.035, 6);
-    crown.translate(0, 0.03, 0);
-    stems.push(crown);
+    // 9 Outer Mature Fronds (elevated 38°–65°, spread 0.45m–0.52m, lush emerald green)
+    const outerCount = 9;
+    for (let i = 0; i < outerCount; i++) {
+        const ang = (i / outerCount) * Math.PI * 2 + 0.55;
+        const frondGeom = createCarrotFrondRibbonGeometry(0.48, 0.65, 0.095);
+        frondGeom.rotateY(ang);
+        frondGeom.translate(0, 0.030, 0);
+        setGeometryColor(frondGeom, 0x16a34a); // lush emerald green
+        leaves.push(frondGeom);
+    }
 
     return {
         stemGeom: mergeBufferGeometries(stems),
@@ -3047,9 +3264,25 @@ export function createCropMesh(cropType, baseChlorophyll) {
             leafGeom = res.leafGeom;
             fruitGeom = res.fruitGeom;
             rootGeom = res.rootGeom;
-            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6522, roughness: 0.60 });
-            fruitMat = new THREE.MeshStandardMaterial({ color: 0xf97316, roughness: 0.52, metalness: 0.02 });
-            rootMat = new THREE.MeshStandardMaterial({ color: 0xfde047, roughness: 0.85 });
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x4d7c0f, roughness: 0.55 });
+            leafMat = new THREE.MeshStandardMaterial({
+                map: getCarrotFernTexture(),
+                alphaTest: 0.35,
+                transparent: true,
+                side: THREE.DoubleSide,
+                roughness: 0.38,
+                metalness: 0.04,
+                emissive: 0x14532d,
+                emissiveIntensity: 0.30
+            });
+            fruitMat = new THREE.MeshStandardMaterial({
+                map: getCarrotSkinTexture(),
+                roughness: 0.46,
+                metalness: 0.03,
+                emissive: 0x7c2d12,
+                emissiveIntensity: 0.16
+            });
+            rootMat = new THREE.MeshStandardMaterial({ color: 0xfde68a, roughness: 0.82 });
             break;
         }
 
@@ -3354,7 +3587,8 @@ export function createCropField(rawCropId = "tomato") {
 
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
-            const x = (c - (COLS - 1) * 0.5) * ROW_SPACING;
+            // Integer column offset aligns plants precisely with raised soil ridge crests (where cos^2 = 1.0)
+            const x = (c - Math.floor(COLS * 0.5)) * ROW_SPACING;
             const z = (r - (ROWS - 1) * 0.5) * PLANT_SPACING;
 
             // Exact terrain ridge crest height
@@ -3477,6 +3711,10 @@ export function applyGrowthStage(day, totalDays = 105) {
                     // Papaya trees prominently display a cauliflorous column of fruits at all viewing stages
                     const fruitScale = s * (0.65 + 0.35 * Math.pow(progress, 0.5));
                     dummy.scale.set(fruitScale, fruitScale, fruitScale);
+                } else if (activeCropId === "carrot") {
+                    // Carrot taproot is an underground storage organ developing throughout growth stages
+                    const rootScale = s * (0.55 + 0.45 * Math.pow(progress, 0.65));
+                    dummy.scale.set(rootScale, rootScale, rootScale);
                 } else if (currentGrowthStage < 3) {
                     dummy.scale.set(0.001, 0.001, 0.001); // Fruit hidden at early stages
                 } else {
@@ -3529,6 +3767,9 @@ export function applyGrowthStage(day, totalDays = 105) {
             currentFruitMat.needsUpdate = true;
         } else if (activeCropId === "papaya") {
             currentFruitMat.color.setHex(0xffffff); // Full vertex color fidelity for multi-tier ripening
+            currentFruitMat.needsUpdate = true;
+        } else if (activeCropId === "carrot") {
+            currentFruitMat.color.setHex(0xffffff); // Allow vibrant beta-carotene & green collar texture to show fully
             currentFruitMat.needsUpdate = true;
         }
     }
@@ -4477,7 +4718,9 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
 
     const fruitEl = document.getElementById("arFruitCount");
     if (fruitEl) {
-        if (currentGrowthStage < 3) {
+        if (cropId === "carrot") {
+            fruitEl.textContent = isBn ? "১টি প্রধান কন্দমূল (Taproot) • ১৯.৫ সেমি" : "1 Primary Taproot • 19.5 cm";
+        } else if (currentGrowthStage < 3) {
             fruitEl.textContent = isBn ? "বৃদ্ধি পর্যায় (Pre-Bloom)" : "Vegetative (Pre-Bloom)";
         } else {
             const count = Math.round(8 + ((plant.scale || 1.0) * 6));
@@ -4500,6 +4743,10 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
             ripenessEl.textContent = isBn
                 ? "১০০% ভরাট কুঁড়ি (Fractal Curd Ready)"
                 : "100% Fully Formed Curd";
+        } else if (cropId === "carrot") {
+            ripenessEl.textContent = isBn
+                ? "৯২% পরিপক্ব (মাটি থেকে উত্তোলনের উপযোগী)"
+                : "92% Mature (Ready for Taproot Harvest)";
         } else {
             ripenessEl.textContent = isBn ? `${pct}% (পরিপক্বতা অনুপাত)` : `${pct}% (Ripeness Index)`;
         }
@@ -4566,6 +4813,173 @@ export function toggleMacroView(activate = true) {
 window.toggleMacroView = toggleMacroView;
 
 // =============================================================================
+// 10B. GAMIFIED CARROT PULL-TO-HARVEST & SOIL BURST SYSTEM
+// =============================================================================
+let pulledCarrotInstanceId = null;
+let pulledCarrotAnim = null;
+let soilBurstGroup = null;
+let soilBurstParticles = [];
+
+function initSoilBurstSystem() {
+    if (soilBurstGroup || !scene) return;
+    soilBurstGroup = new THREE.Group();
+    scene.add(soilBurstGroup);
+}
+
+export function spawnSoilBurst(x, y, z) {
+    initSoilBurstSystem();
+    if (!soilBurstGroup) return;
+    const count = 18;
+    const crumbGeom = new THREE.DodecahedronGeometry(0.012, 0);
+    const crumbColors = [0x78350f, 0x92400e, 0x451a03, 0xb45309];
+
+    for (let i = 0; i < count; i++) {
+        const mat = new THREE.MeshLambertMaterial({
+            color: crumbColors[i % crumbColors.length],
+            roughness: 0.95
+        });
+        const crumb = new THREE.Mesh(crumbGeom, mat);
+        crumb.position.set(
+            x + (Math.random() - 0.5) * 0.08,
+            y + (Math.random() - 0.5) * 0.04,
+            z + (Math.random() - 0.5) * 0.08
+        );
+        const s = 0.5 + Math.random() * 0.8;
+        crumb.scale.set(s, s, s);
+
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 0.7 + Math.random() * 1.2;
+        const vx = Math.cos(angle) * speed * 0.35;
+        const vy = 1.1 + Math.random() * 1.4;
+        const vz = Math.sin(angle) * speed * 0.35;
+
+        soilBurstGroup.add(crumb);
+        soilBurstParticles.push({
+            mesh: crumb,
+            vx, vy, vz,
+            life: 1.0,
+            decay: 1.4 + Math.random() * 0.8
+        });
+    }
+}
+
+export function updateSoilBurstParticles(dt = 0.016) {
+    if (!soilBurstParticles.length || !soilBurstGroup) return;
+    for (let i = soilBurstParticles.length - 1; i >= 0; i--) {
+        const p = soilBurstParticles[i];
+        p.vy -= 9.8 * dt;
+        p.mesh.position.x += p.vx * dt;
+        p.mesh.position.y += p.vy * dt;
+        p.mesh.position.z += p.vz * dt;
+        p.mesh.rotation.x += 4 * dt;
+        p.mesh.rotation.y += 6 * dt;
+        p.life -= p.decay * dt;
+
+        const s = Math.max(0.01, p.life);
+        p.mesh.scale.set(s, s, s);
+
+        if (p.life <= 0 || p.mesh.position.y < 0.05) {
+            soilBurstGroup.remove(p.mesh);
+            p.mesh.geometry.dispose();
+            p.mesh.material.dispose();
+            soilBurstParticles.splice(i, 1);
+        }
+    }
+}
+
+export function handleCarrotPullInteraction(instanceId, plantData) {
+    if (activeCropId !== "carrot") return;
+    const now = performance.now();
+    const d = instanceData[instanceId];
+    if (!d) return;
+
+    if (pulledCarrotInstanceId === instanceId) {
+        // Replant carrot smoothly back into the ridge crest
+        pulledCarrotAnim = {
+            instanceId,
+            startTime: now,
+            duration: 380,
+            startY: d.baseY + 0.22,
+            targetY: d.baseY,
+            startRotX: 0.35,
+            targetRotX: 0.0,
+            isPulled: false
+        };
+        pulledCarrotInstanceId = null;
+    } else {
+        // Reset previously pulled carrot if clicking another one
+        if (pulledCarrotInstanceId !== null && pulledCarrotInstanceId !== instanceId) {
+            const prevD = instanceData[pulledCarrotInstanceId];
+            if (prevD) {
+                dummy.position.set(prevD.baseX, prevD.baseY, prevD.baseZ);
+                dummy.rotation.set(0, prevD.baseRotY, 0);
+                dummy.scale.set(prevD.scale, prevD.scale, prevD.scale);
+                dummy.updateMatrix();
+                if (stemInstancedMesh) stemInstancedMesh.setMatrixAt(pulledCarrotInstanceId, dummy.matrix);
+                if (leafInstancedMesh) leafInstancedMesh.setMatrixAt(pulledCarrotInstanceId, dummy.matrix);
+                if (fruitInstancedMesh) fruitInstancedMesh.setMatrixAt(pulledCarrotInstanceId, dummy.matrix);
+            }
+        }
+
+        pulledCarrotInstanceId = instanceId;
+        pulledCarrotAnim = {
+            instanceId,
+            startTime: now,
+            duration: 450,
+            startY: d.baseY,
+            targetY: d.baseY + 0.22,
+            startRotX: 0.0,
+            targetRotX: 0.35,
+            isPulled: true
+        };
+
+        // Trigger dynamic soil burst particles at the carrot crown
+        spawnSoilBurst(d.baseX, d.baseY + 0.18, d.baseZ);
+    }
+}
+
+export function updatePulledCarrotAnimation() {
+    if (!pulledCarrotAnim) return;
+    const now = performance.now();
+    const elapsed = now - pulledCarrotAnim.startTime;
+    const t = Math.min(1.0, elapsed / pulledCarrotAnim.duration);
+    const ease = 1 - Math.pow(1 - t, 2.5);
+
+    const d = instanceData[pulledCarrotAnim.instanceId];
+    if (!d) {
+        pulledCarrotAnim = null;
+        return;
+    }
+
+    const curY = THREE.MathUtils.lerp(pulledCarrotAnim.startY, pulledCarrotAnim.targetY, ease);
+    const curRotX = THREE.MathUtils.lerp(pulledCarrotAnim.startRotX, pulledCarrotAnim.targetRotX, ease);
+
+    dummy.position.set(d.baseX, curY, d.baseZ);
+    dummy.rotation.set(curRotX, d.baseRotY, 0);
+    dummy.scale.set(d.scale, d.scale, d.scale);
+    dummy.updateMatrix();
+
+    if (stemInstancedMesh) {
+        stemInstancedMesh.setMatrixAt(pulledCarrotAnim.instanceId, dummy.matrix);
+        stemInstancedMesh.instanceMatrix.needsUpdate = true;
+    }
+    if (leafInstancedMesh) {
+        leafInstancedMesh.setMatrixAt(pulledCarrotAnim.instanceId, dummy.matrix);
+        leafInstancedMesh.instanceMatrix.needsUpdate = true;
+    }
+    if (fruitInstancedMesh) {
+        fruitInstancedMesh.setMatrixAt(pulledCarrotAnim.instanceId, dummy.matrix);
+        fruitInstancedMesh.instanceMatrix.needsUpdate = true;
+    }
+
+    requestShadowUpdate();
+
+    if (t >= 1.0) {
+        pulledCarrotAnim = null;
+    }
+}
+
+// =============================================================================
 // 11. INTERACTIVE RAYCASTING ON 3D CROPS
 // =============================================================================
 function initRaycasting() {
@@ -4606,6 +5020,10 @@ function initRaycasting() {
             const hitPoint = hit.point;
             const instanceId = (hit.instanceId !== undefined && hit.instanceId >= 0) ? hit.instanceId : 0;
             const plantData = instanceData[instanceId] || { baseX: hitPoint.x, baseY: hitPoint.y, baseZ: hitPoint.z, rowIndex: 0, colIndex: 0, scale: 1.0 };
+
+            if (activeCropId === "carrot") {
+                handleCarrotPullInteraction(instanceId, plantData);
+            }
 
             activeInspectedPlantPos.set(plantData.baseX, plantData.baseY + 0.45, plantData.baseZ);
 
@@ -5444,6 +5862,13 @@ function bindUIControls() {
         btnCloseMacro.addEventListener("click", () => toggleMacroView(false));
     }
 
+    const btnRootXray = document.getElementById("btnArRootXray");
+    if (btnRootXray) {
+        btnRootXray.addEventListener("click", () => {
+            switchCameraMode("root");
+        });
+    }
+
     const btnAskBuddyAr = document.getElementById("btnAskFarmerBuddyFromAr");
     if (btnAskBuddyAr) {
         btnAskBuddyAr.addEventListener("click", () => {
@@ -5663,7 +6088,11 @@ function animate() {
         }
     }
 
-    // F. In-Scene Spatial AR World-to-Screen Projection
+    // F. Carrot Pull Animation & Soil Particle Dynamics
+    updatePulledCarrotAnimation();
+    updateSoilBurstParticles(0.016);
+
+    // G. In-Scene Spatial AR World-to-Screen Projection
     updateSpatialArAnchors();
 
     controls.update();

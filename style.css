@@ -6781,16 +6781,46 @@ body.lang-bn strong {
     transform: translateY(0);
 }
 
+.ar-root-xray-btn {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 14px;
+    margin-top: 6px;
+    margin-bottom: 6px;
+    background: linear-gradient(135deg, rgba(234, 88, 12, 0.88), rgba(194, 65, 12, 0.95));
+    border: 1px solid rgba(253, 186, 116, 0.45);
+    border-radius: 10px;
+    color: #ffffff !important;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ar-root-xray-btn:hover {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.98), rgba(234, 88, 12, 1.0));
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(234, 88, 12, 0.5);
+}
+.ar-root-xray-btn:active {
+    transform: translateY(0);
+}
+
 /* LEFT COMPACT TELEMETRY RAIL (ZERO CLIPPING BELOW NAVBAR) */
 .farmer-status-dock {
     position: absolute;
-    left: 24px;
+    left: 14px !important;
     top: 96px; /* Offset below navbar & control bar */
     z-index: 18;
     display: flex;
     flex-direction: column;
     gap: 10px;
     width: 260px;
+    margin-left: 0 !important;
+    transform: none !important;
     pointer-events: auto;
 }
 
@@ -7117,7 +7147,7 @@ body.lang-bn strong {
     color: #cbd5e1;
 }
 
-/* Tactile AR Action Buttons with Glow Rings */
+/* Tactile AR Action Buttons with Glow Rings & High-Contrast Typography */
 .action-buttons-group.tactile-ar {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
@@ -7134,16 +7164,49 @@ body.lang-bn strong {
     gap: 3px;
     padding: 8px 4px;
     border-radius: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #f8fafc !important;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     min-height: 52px;
 }
 
+.tactile-ar .action-btn .btn-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.tactile-ar .action-btn .btn-label {
+    color: #f8fafc !important;
+    font-size: 11px;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.tactile-ar .action-btn .action-subtext {
+    font-size: 9px;
+    color: #e2e8f0 !important;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+}
+
+.tactile-ar .action-btn.irrigate-btn {
+    background: linear-gradient(135deg, rgba(14, 116, 144, 0.75), rgba(6, 182, 212, 0.45));
+    border-color: rgba(6, 182, 212, 0.55);
+}
+.tactile-ar .action-btn.fertilize-btn {
+    background: linear-gradient(135deg, rgba(22, 101, 52, 0.75), rgba(34, 197, 94, 0.45));
+    border-color: rgba(34, 197, 94, 0.55);
+}
+.tactile-ar .action-btn.spray-btn {
+    background: linear-gradient(135deg, rgba(161, 98, 7, 0.75), rgba(234, 179, 8, 0.45));
+    border-color: rgba(234, 179, 8, 0.55);
+}
+
 .action-subtext {
     font-size: 9px;
-    color: #94a3b8;
+    color: #cbd5e1;
     font-weight: 500;
 }
 

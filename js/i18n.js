@@ -247,6 +247,8 @@ const i18nData = {
     "action-health-lush":    { en: "🟢 Lush & Thriving",           bn: "🟢 তরতাজা ও সুস্থ" },
     "action-health-droop":   { en: "🟡 Nutrient / Water Deficit",  bn: "🟡 অপুষ্টি বা পানিস্বল্পতা" },
     "action-health-pest":    { en: "🔴 Pest / Blight Alert",       bn: "🔴 বালাই বা রোগের লক্ষণ" },
+    "ar-root-xray":          { en: "🔍 Subterranean Root X-Ray",   bn: "🔍 মাটির নিচের এক্স-রে" },
+    "ar-ask-buddy-btn":      { en: "🤖 Consult Farmer Buddy AI",  bn: "🤖 কৃষি বন্ধু AI পরামর্শ নিন" },
 
     // ===== SKETCHFAB ASSET EXPLORER =====
     "sf-explorer-btn":       { en: "Sketchfab 3D Models",          bn: "Sketchfab 3D মডেল" },
