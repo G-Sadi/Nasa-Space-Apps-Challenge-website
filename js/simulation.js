@@ -361,6 +361,81 @@ function initProceduralTextures() {
     }
 }
 
+// Procedural High-Resolution Cucumber Skin Texture (Dark Emerald Base & Pale Blossom-End Stripes)
+let cucumberSkinTexture = null;
+export function getCucumberSkinTexture() {
+    if (cucumberSkinTexture) return cucumberSkinTexture;
+    const size = 512;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // 1. Rich dark cucumber green gradient from stem neck (top) to blossom end (bottom)
+    const grad = ctx.createLinearGradient(0, 0, 0, size);
+    grad.addColorStop(0.00, "#0e3b1c");
+    grad.addColorStop(0.35, "#14532d");
+    grad.addColorStop(0.70, "#166534");
+    grad.addColorStop(1.00, "#1e793d");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, size, size);
+
+    // 2. Subtle dark & light mottled speckles
+    for (let i = 0; i < 2200; i++) {
+        const x = Math.random() * size;
+        const y = Math.random() * size;
+        const r = 0.8 + Math.random() * 2.2;
+        const isLight = Math.random() > 0.45;
+        ctx.fillStyle = isLight ? "rgba(110, 231, 143, 0.16)" : "rgba(6, 32, 14, 0.28)";
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    // 3. 8-10 Longitudinal pale yellow-green stripes tapering from blossom end (bottom) halfway up
+    const stripeCount = 10;
+    for (let s = 0; s < stripeCount; s++) {
+        const cx = (s + 0.5) * (size / stripeCount);
+        const stripeGrad = ctx.createLinearGradient(0, size, 0, size * 0.42);
+        stripeGrad.addColorStop(0.00, "rgba(190, 242, 100, 0.85)"); // #bef264
+        stripeGrad.addColorStop(0.35, "rgba(134, 239, 172, 0.58)"); // #86efac
+        stripeGrad.addColorStop(0.70, "rgba(74, 222, 128, 0.22)");
+        stripeGrad.addColorStop(1.00, "rgba(34, 197, 94, 0.00)");
+
+        ctx.fillStyle = stripeGrad;
+        ctx.beginPath();
+        ctx.moveTo(cx - 15, size);
+        ctx.quadraticCurveTo(cx - 8, size * 0.72, cx - 1.5, size * 0.42);
+        ctx.quadraticCurveTo(cx + 8, size * 0.72, cx + 15, size);
+        ctx.closePath();
+        ctx.fill();
+
+        // Subtle lighter central pinstripe
+        ctx.strokeStyle = "rgba(254, 240, 138, 0.45)";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(cx, size);
+        ctx.lineTo(cx, size * 0.50);
+        ctx.stroke();
+    }
+
+    // 4. Pale spine / prickle dots on warts
+    ctx.fillStyle = "rgba(255, 255, 255, 0.65)";
+    for (let w = 0; w < 280; w++) {
+        const wx = Math.random() * size;
+        const wy = Math.random() * (size * 0.82);
+        ctx.beginPath();
+        ctx.arc(wx, wy, 0.9, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    cucumberSkinTexture = new THREE.CanvasTexture(canvas);
+    cucumberSkinTexture.wrapS = THREE.RepeatWrapping;
+    cucumberSkinTexture.wrapT = THREE.ClampToEdgeWrapping;
+    return cucumberSkinTexture;
+}
+
 // =============================================================================
 // 2. GEOMETRY MERGING UTILITY (WITH VERTEX COLOR ATTRIBUTE PRESERVATION)
 // =============================================================================
@@ -1655,7 +1730,169 @@ function createPapayaMorphologyGeometry() {
 }
 
 /**
- * Cucumber Morphology Generator (Trailing Vine along Ridge)
+ * Organic Tapered & Curved 3D Cucumber Mesh Generator (LatheGeometry with Peduncle Stalk)
+ */
+function createRealisticCucumberGeometry(length = 0.24, radius = 0.032, curveAmount = 0.016) {
+    const points = [];
+    const segmentsY = 22;
+    for (let i = 0; i <= segmentsY; i++) {
+        const t = i / segmentsY; // 0 at blossom tip (y = -length/2), 1 at stem neck (y = +length/2)
+        const y = (t - 0.5) * length;
+        let r;
+        if (t < 0.08) {
+            // Rounded blossom tip
+            r = radius * Math.sin((t / 0.08) * (Math.PI * 0.5));
+        } else if (t < 0.25) {
+            // Lower body widening with blossom-end stripes
+            const p = (t - 0.08) / 0.17;
+            r = radius * (0.85 + 0.15 * Math.sin(p * Math.PI * 0.5));
+        } else if (t < 0.80) {
+            // Plump middle cylindrical body
+            r = radius * (0.96 + 0.04 * Math.sin(((t - 0.25) / 0.55) * Math.PI));
+        } else {
+            // Tapered stem neck
+            const p = (t - 0.80) / 0.20;
+            r = radius * (0.96 - 0.48 * p);
+        }
+        points.push(new THREE.Vector2(Math.max(0.001, r), y));
+    }
+
+    const lathe = new THREE.LatheGeometry(points, 20);
+    const pos = lathe.attributes.position;
+    const count = pos.count;
+
+    // Apply natural banana-like bend arc, longitudinal ribbing & surface warts
+    for (let i = 0; i < count; i++) {
+        const y = pos.getY(i);
+        const ny = (y / length) + 0.5; // 0 to 1
+        const x = pos.getX(i);
+        const z = pos.getZ(i);
+
+        // 1. Natural gentle curvature (slight banana curve)
+        const bend = Math.sin(ny * Math.PI) * curveAmount;
+        const newX = x + bend;
+
+        // 2. Longitudinal 10-rib radial modulation & realistic surface warts
+        const angle = Math.atan2(z, x);
+        const belly = Math.sin(ny * Math.PI);
+        const ribMod = Math.cos(angle * 10) * (0.0025 * belly);
+        const wartMod = (Math.sin(y * 85 + angle * 7) * Math.cos(y * 42 - angle * 5)) * (0.0020 * belly);
+
+        const radialFactor = 1.0 + (ribMod + wartMod);
+        pos.setX(i, newX * radialFactor);
+        pos.setZ(i, z * radialFactor);
+    }
+
+    lathe.computeVertexNormals();
+
+    // Peduncle stalk at stem neck (connecting cucumber to vine)
+    const stalkCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, length * 0.5, 0),
+        new THREE.Vector3(0.006, length * 0.5 + 0.018, 0.008),
+        new THREE.Vector3(0.015, length * 0.5 + 0.038, 0.018)
+    ]);
+    const stalk = new THREE.TubeGeometry(stalkCurve, 6, Math.max(0.004, radius * 0.22), 6, false);
+    setGeometryColor(stalk, 0x3f7c28);
+
+    return mergeBufferGeometries([lathe, stalk]);
+}
+
+/**
+ * 5-Petal Star-Shaped Golden Yellow Cucumber Blossom (শসার হলুদ ফুল)
+ */
+function createCucumberBlossomGeometry(size = 0.034) {
+    const parts = [];
+    for (let i = 0; i < 5; i++) {
+        const angle = (i / 5) * Math.PI * 2;
+        const petal = createBotanicalBladeGeometry({
+            length: size,
+            baseWidth: size * 0.18,
+            midWidth: size * 0.42,
+            tipWidth: size * 0.06,
+            archX: 0.003,
+            archY: size * 0.20,
+            midribFold: size * 0.06,
+            wavyEdge: size * 0.05,
+            segments: 7
+        });
+        petal.rotateX(Math.PI * 0.42); // flared outward
+        petal.rotateZ(angle);
+        parts.push(petal);
+    }
+    const center = new THREE.ConeGeometry(size * 0.18, size * 0.32, 6);
+    center.rotateX(-Math.PI * 0.5);
+    parts.push(center);
+    const blossom = mergeBufferGeometries(parts);
+    setGeometryColor(blossom, 0xfacc15);
+    return blossom;
+}
+
+/**
+ * Spiral Climbing Tendril Generator (লতার আকর্ষী)
+ */
+function createCucumberTendrilGeometry(radius = 0.018, length = 0.14, coils = 3.5) {
+    const pts = [];
+    const steps = 28;
+    for (let i = 0; i <= steps; i++) {
+        const t = i / steps;
+        const y = t * length;
+        const coilT = Math.max(0, (t - 0.25) / 0.75);
+        const ang = coilT * coils * Math.PI * 2;
+        const r = radius * Math.min(1.0, coilT * 1.5);
+        const x = Math.cos(ang) * r;
+        const z = Math.sin(ang) * r;
+        pts.push(new THREE.Vector3(x, y, z));
+    }
+    const curve = new THREE.CatmullRomCurve3(pts);
+    const tendril = new THREE.TubeGeometry(curve, 18, 0.0024, 4, false);
+    setGeometryColor(tendril, 0x84cc16);
+    return tendril;
+}
+
+/**
+ * Broad 5-Lobed Palmate Cordate Leaf with Cupped Curvature & Petiole (শসা পাতা)
+ */
+function createCucumberPalmateLeafGeometry(size = 0.32) {
+    const shape = new THREE.Shape();
+    shape.moveTo(0, 0); // Petiole sinus notch
+    // Left basal lobe
+    shape.bezierCurveTo(-size * 0.18, -size * 0.08, -size * 0.38, size * 0.08, -size * 0.42, size * 0.25);
+    // Left lateral lobe
+    shape.bezierCurveTo(-size * 0.48, size * 0.45, -size * 0.38, size * 0.65, -size * 0.22, size * 0.78);
+    // Notch to central apex
+    shape.bezierCurveTo(-size * 0.16, size * 0.82, -size * 0.10, size * 0.88, -size * 0.05, size * 0.94);
+    // Central terminal lobe apex
+    shape.bezierCurveTo(-size * 0.02, size * 1.05, size * 0.02, size * 1.05, size * 0.05, size * 0.94);
+    // Right side (symmetric)
+    shape.bezierCurveTo(size * 0.10, size * 0.88, size * 0.16, size * 0.82, size * 0.22, size * 0.78);
+    shape.bezierCurveTo(size * 0.38, size * 0.65, size * 0.48, size * 0.45, size * 0.42, size * 0.25);
+    shape.bezierCurveTo(size * 0.38, size * 0.08, size * 0.18, -size * 0.08, 0, 0);
+
+    const geom = new THREE.ShapeGeometry(shape, 12);
+    const pos = geom.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i);
+        const y = pos.getY(i);
+        const dist = Math.sqrt(x * x + y * y);
+        const cup = -Math.sin(Math.min(1.0, dist / size) * Math.PI) * 0.038 - (Math.abs(x) / size) * 0.022;
+        pos.setZ(i, cup);
+    }
+    geom.computeVertexNormals();
+
+    // Curved Petiole holding leaf blade outward
+    const petioleLen = size * 0.50;
+    const petioleCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -petioleLen, -0.015),
+        new THREE.Vector3(0, -petioleLen * 0.45, 0.008),
+        new THREE.Vector3(0, 0, 0)
+    ]);
+    const petiole = new THREE.TubeGeometry(petioleCurve, 6, 0.0055, 5, false);
+
+    return mergeBufferGeometries([geom, petiole]);
+}
+
+/**
+ * Cucumber Morphology Generator (Climbing Vine Trellis, Gravity-Hanging Striped Cucumbers, Tendrils & Blossoms)
  */
 function createCucumberMorphologyGeometry() {
     const stems = [];
@@ -1663,40 +1900,202 @@ function createCucumberMorphologyGeometry() {
     const fruits = [];
     const flowers = [];
 
-    const vineCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, 0.05, 0),
-        new THREE.Vector3(0.15, 0.12, 0.25),
-        new THREE.Vector3(-0.10, 0.08, 0.55),
-        new THREE.Vector3(0.18, 0.06, 0.85)
+    // 1. Natural Bamboo Support Trellis Arch (Upright Stakes & Horizontal Crossbars)
+    // Left Bamboo Stake (x = -0.16m, height = 0.98m)
+    const leftStake = new THREE.CylinderGeometry(0.011, 0.013, 0.98, 8);
+    leftStake.rotateZ(0.035);
+    leftStake.translate(-0.16, 0.47, 0.0);
+    setGeometryColor(leftStake, 0x8d7756);
+    stems.push(leftStake);
+
+    // Left bamboo nodal rings
+    for (const ny of [0.26, 0.56, 0.86]) {
+        const ring = new THREE.TorusGeometry(0.013, 0.0028, 4, 8);
+        ring.rotateX(Math.PI * 0.5);
+        ring.translate(-0.16 + (0.47 - ny) * 0.035, ny, 0.0);
+        setGeometryColor(ring, 0x6e5d42);
+        stems.push(ring);
+    }
+
+    // Right Bamboo Stake (x = +0.16m, height = 0.98m)
+    const rightStake = new THREE.CylinderGeometry(0.011, 0.013, 0.98, 8);
+    rightStake.rotateZ(-0.035);
+    rightStake.translate(0.16, 0.47, 0.0);
+    setGeometryColor(rightStake, 0x8d7756);
+    stems.push(rightStake);
+
+    // Right bamboo nodal rings
+    for (const ny of [0.26, 0.56, 0.86]) {
+        const ring = new THREE.TorusGeometry(0.013, 0.0028, 4, 8);
+        ring.rotateX(Math.PI * 0.5);
+        ring.translate(0.16 - (0.47 - ny) * 0.035, ny, 0.0);
+        setGeometryColor(ring, 0x6e5d42);
+        stems.push(ring);
+    }
+
+    // Lower Horizontal Bamboo Crossbar (y = 0.48m)
+    const lowerBar = new THREE.CylinderGeometry(0.006, 0.006, 0.36, 6);
+    lowerBar.rotateZ(Math.PI * 0.5);
+    lowerBar.translate(0.0, 0.48, 0.0);
+    setGeometryColor(lowerBar, 0x7a6646);
+    stems.push(lowerBar);
+
+    // Upper Horizontal Bamboo Crossbar (y = 0.84m)
+    const upperBar = new THREE.CylinderGeometry(0.006, 0.006, 0.36, 6);
+    upperBar.rotateZ(Math.PI * 0.5);
+    upperBar.translate(0.0, 0.84, 0.0);
+    setGeometryColor(upperBar, 0x7a6646);
+    stems.push(upperBar);
+
+    // 2. Climbing Main Vine Stem & Twining Shoots
+    const mainVineCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.00, 0.00, 0.00),
+        new THREE.Vector3(-0.14, 0.18, 0.02),
+        new THREE.Vector3(-0.16, 0.36, -0.01),
+        new THREE.Vector3(-0.14, 0.48, 0.02),
+        new THREE.Vector3(-0.02, 0.52, -0.02),
+        new THREE.Vector3(0.12, 0.56, 0.02),
+        new THREE.Vector3(0.16, 0.72, -0.01),
+        new THREE.Vector3(0.14, 0.84, 0.02),
+        new THREE.Vector3(0.02, 0.89, -0.02),
+        new THREE.Vector3(-0.12, 0.94, 0.01)
     ]);
-    const vine = new THREE.TubeGeometry(vineCurve, 12, 0.012, 6, false);
-    stems.push(vine);
+    const mainVine = new THREE.TubeGeometry(mainVineCurve, 28, 0.011, 6, false);
+    setGeometryColor(mainVine, 0x2e6b22);
+    stems.push(mainVine);
 
-    for (let i = 0; i < 6; i++) {
-        const t = (i + 1) / 7;
-        const pt = vineCurve.getPoint(t);
-        const leaf = createBroadWavyLeafGeometry(0.28, 0.22, 5);
-        leaf.rotateX(0.3);
-        leaf.rotateY(i * 1.2);
-        leaf.translate(pt.x, pt.y + 0.05, pt.z);
-        leaves.push(leaf);
+    // Lateral climbing shoot 1 (branching at y = 0.48m)
+    const shoot1Curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-0.14, 0.48, 0.02),
+        new THREE.Vector3(-0.06, 0.58, 0.04),
+        new THREE.Vector3(0.02, 0.66, 0.02),
+        new THREE.Vector3(0.10, 0.74, -0.02)
+    ]);
+    const shoot1 = new THREE.TubeGeometry(shoot1Curve, 12, 0.0075, 5, false);
+    setGeometryColor(shoot1, 0x367c26);
+    stems.push(shoot1);
+
+    // Lateral climbing shoot 2 (branching at y = 0.84m)
+    const shoot2Curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0.14, 0.84, 0.02),
+        new THREE.Vector3(0.04, 0.86, 0.05),
+        new THREE.Vector3(-0.06, 0.84, 0.04),
+        new THREE.Vector3(-0.15, 0.80, 0.02)
+    ]);
+    const shoot2 = new THREE.TubeGeometry(shoot2Curve, 12, 0.0070, 5, false);
+    setGeometryColor(shoot2, 0x367c26);
+    stems.push(shoot2);
+
+    // 3. Delicate Spiral Tendrils (লতার আকর্ষী) Curling around Stakes & Crossbars
+    const tendril1 = createCucumberTendrilGeometry(0.016, 0.12, 3.2);
+    tendril1.rotateZ(0.6);
+    tendril1.translate(-0.16, 0.38, 0.01);
+    stems.push(tendril1);
+
+    const tendril2 = createCucumberTendrilGeometry(0.015, 0.13, 3.5);
+    tendril2.rotateX(0.7);
+    tendril2.translate(0.02, 0.52, -0.02);
+    stems.push(tendril2);
+
+    const tendril3 = createCucumberTendrilGeometry(0.016, 0.14, 3.4);
+    tendril3.rotateZ(-0.5);
+    tendril3.translate(0.16, 0.72, 0.01);
+    stems.push(tendril3);
+
+    const tendril4 = createCucumberTendrilGeometry(0.014, 0.12, 3.0);
+    tendril4.rotateY(0.9);
+    tendril4.translate(0.04, 0.89, -0.02);
+    stems.push(tendril4);
+
+    // 4. Broad 5-Lobed Palmate Leaves along Trellis Nodes (Lush, Layered Canopy)
+    const leafNodes = [
+        { x: -0.12, y: 0.22, z: 0.04, rotX: 0.55, rotY: -0.4, rotZ: -0.2, s: 0.30 },
+        { x: -0.16, y: 0.34, z: -0.03, rotX: 0.45, rotY: -1.2, rotZ: 0.1, s: 0.34 },
+        { x: -0.14, y: 0.46, z: 0.05, rotX: 0.60, rotY: 0.3, rotZ: -0.3, s: 0.35 },
+        { x: -0.06, y: 0.52, z: -0.04, rotX: 0.50, rotY: 1.8, rotZ: 0.2, s: 0.32 },
+        { x: 0.04, y: 0.55, z: 0.05, rotX: 0.65, rotY: 0.1, rotZ: -0.1, s: 0.36 },
+        { x: 0.12, y: 0.60, z: -0.03, rotX: 0.45, rotY: -0.6, rotZ: 0.3, s: 0.33 },
+        { x: 0.16, y: 0.72, z: 0.04, rotX: 0.55, rotY: 0.8, rotZ: -0.2, s: 0.35 },
+        { x: 0.14, y: 0.82, z: -0.04, rotX: 0.50, rotY: 2.1, rotZ: 0.1, s: 0.31 },
+        { x: 0.04, y: 0.88, z: 0.05, rotX: 0.60, rotY: 0.2, rotZ: -0.1, s: 0.32 },
+        { x: -0.08, y: 0.92, z: -0.03, rotX: 0.40, rotY: -1.5, rotZ: 0.2, s: 0.28 },
+        { x: 0.00, y: 0.75, z: 0.06, rotX: 0.70, rotY: 0.0, rotZ: 0.0, s: 0.33 }
+    ];
+
+    for (const ln of leafNodes) {
+        const lf = createCucumberPalmateLeafGeometry(ln.s);
+        lf.rotateX(ln.rotX);
+        lf.rotateY(ln.rotY);
+        lf.rotateZ(ln.rotZ);
+        lf.translate(ln.x, ln.y, ln.z);
+        leaves.push(lf);
     }
 
-    for (let c = 0; c < 2; c++) {
-        const ct = 0.35 + c * 0.40;
-        const pt = vineCurve.getPoint(ct);
-        const cuc = new THREE.CylinderGeometry(0.024, 0.022, 0.22, 8);
-        cuc.rotateZ(Math.PI * 0.48);
-        cuc.translate(pt.x + 0.08, pt.y + 0.02, pt.z);
-        fruits.push(cuc);
-    }
+    // 5. Gravity-Aligned Hanging Cucumbers (3 Growth Stages, 100% Vertical Droop)
+    // Stage 1: Mature Harvest-Ready Cucumbers (50%) - Deep emerald with pale stripes
+    // Cucumber 1: Hanging from node at (-0.12, 0.54, 0.04)
+    const cuc1 = createRealisticCucumberGeometry(0.25, 0.032, 0.016);
+    setGeometryColor(cuc1, 0xffffff); // Full rich texture with pale yellow-green stripes
+    cuc1.rotateZ(-0.04);
+    cuc1.rotateX(0.03);
+    cuc1.translate(-0.12 - 0.015, 0.54 - (0.25 * 0.5 + 0.038), 0.04 - 0.018);
+    fruits.push(cuc1);
 
-    for (let f = 0; f < 3; f++) {
-        const ft = 0.25 + f * 0.30;
-        const pt = vineCurve.getPoint(ft);
-        const flower = createTomatoBlossomGeometry();
-        flower.translate(pt.x - 0.05, pt.y + 0.06, pt.z);
-        flowers.push(flower);
+    // Cucumber 2: Hanging from node at (0.13, 0.70, 0.03)
+    const cuc2 = createRealisticCucumberGeometry(0.24, 0.031, -0.015);
+    setGeometryColor(cuc2, 0xffffff);
+    cuc2.rotateZ(0.05);
+    cuc2.rotateX(-0.03);
+    cuc2.translate(0.13 - 0.015, 0.70 - (0.24 * 0.5 + 0.038), 0.03 - 0.018);
+    fruits.push(cuc2);
+
+    // Stage 2: Medium Growing Cucumbers (30%) - Fresh bright green
+    // Cucumber 3: Hanging from node at (0.02, 0.50, -0.04)
+    const cuc3 = createRealisticCucumberGeometry(0.16, 0.024, 0.012);
+    setGeometryColor(cuc3, 0x98f598); // Bright fresh green tint
+    cuc3.rotateZ(0.03);
+    cuc3.rotateX(-0.04);
+    cuc3.translate(0.02 - 0.015, 0.50 - (0.16 * 0.5 + 0.038), -0.04 - 0.018);
+    fruits.push(cuc3);
+
+    // Cucumber 4: Hanging from node at (-0.08, 0.84, 0.03)
+    const cuc4 = createRealisticCucumberGeometry(0.15, 0.023, -0.011);
+    setGeometryColor(cuc4, 0x98f598);
+    cuc4.rotateZ(-0.04);
+    cuc4.rotateX(0.03);
+    cuc4.translate(-0.08 - 0.015, 0.84 - (0.15 * 0.5 + 0.038), 0.03 - 0.018);
+    fruits.push(cuc4);
+
+    // Stage 3: Baby / Pin Cucumber (20%) - Pale lime with Attached Blossom
+    // Cucumber 5: Hanging from node at (0.09, 0.58, -0.03)
+    const cuc5 = createRealisticCucumberGeometry(0.08, 0.014, 0.007);
+    setGeometryColor(cuc5, 0xd4ff88); // Pale lime baby tint
+    cuc5.rotateZ(0.03);
+    const cuc5X = 0.09 - 0.015;
+    const cuc5Y = 0.58 - (0.08 * 0.5 + 0.038);
+    const cuc5Z = -0.03 - 0.018;
+    cuc5.translate(cuc5X, cuc5Y, cuc5Z);
+    fruits.push(cuc5);
+
+    // Baby yellow flower attached to the bottom blossom tip
+    const babyFlower = createCucumberBlossomGeometry(0.022);
+    babyFlower.rotateX(Math.PI); // Blossom facing downward from tip
+    babyFlower.translate(cuc5X, cuc5Y - 0.042, cuc5Z);
+    flowers.push(babyFlower);
+
+    // 6. Vibrant 5-Petal Star-Shaped Yellow Canopy Blossoms
+    const flowerNodes = [
+        { x: -0.15, y: 0.44, z: 0.05, rotX: 0.3, rotY: 0.4 },
+        { x: -0.02, y: 0.62, z: -0.03, rotX: 0.4, rotY: -0.8 },
+        { x: 0.15, y: 0.78, z: 0.04, rotX: 0.2, rotY: 0.6 },
+        { x: 0.02, y: 0.90, z: 0.04, rotX: 0.5, rotY: 0.1 }
+    ];
+    for (const fn of flowerNodes) {
+        const fl = createCucumberBlossomGeometry(0.034);
+        fl.rotateX(fn.rotX);
+        fl.rotateY(fn.rotY);
+        fl.translate(fn.x, fn.y, fn.z);
+        flowers.push(fl);
     }
 
     return {
@@ -2120,10 +2519,25 @@ export function createCropMesh(cropType, baseChlorophyll) {
             leafGeom = res.leafGeom;
             fruitGeom = res.fruitGeom;
             flowerGeom = res.flowerGeom;
-            rootGeom = createBotanicalRootSystem(0.22, 0.14, 8);
-            stemMat = new THREE.MeshStandardMaterial({ color: 0x386d26, roughness: 0.58 });
-            fruitMat = new THREE.MeshStandardMaterial({ color: 0x225828, roughness: 0.50 });
-            flowerMat = new THREE.MeshStandardMaterial({ color: 0xfacc15, roughness: 0.35 });
+            rootGeom = createBotanicalRootSystem(0.24, 0.15, 8);
+            stemMat = new THREE.MeshStandardMaterial({
+                vertexColors: true, // Supports natural bamboo brown stakes & lush green climbing vines
+                roughness: 0.65
+            });
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                map: getCucumberSkinTexture(),
+                vertexColors: true, // Multi-stage ripe emerald (#ffffff on striped texture), breaker green (#98f598), baby lime (#d4ff88)
+                roughness: 0.32,
+                clearcoat: 0.45,
+                clearcoatRoughness: 0.25
+            });
+            flowerMat = new THREE.MeshStandardMaterial({
+                color: 0xfacc15,
+                roughness: 0.35,
+                emissive: 0x422006,
+                emissiveIntensity: 0.25,
+                side: THREE.DoubleSide
+            });
             rootMat = new THREE.MeshStandardMaterial({ color: 0xd4cbb3, roughness: 0.88 });
             break;
         }
@@ -2196,17 +2610,19 @@ export function createCropMesh(cropType, baseChlorophyll) {
         }
     }
 
-    // Hyper-Realistic PBR Subsurface Scattering Material for Leaves (Sunlit & Vibrant)
+    // Hyper-Realistic PBR Subsurface Scattering Material for Leaves (Sunlit & Vibrant across all 15 crops)
+    const leafColor = (crop === "cucumber") ? 0x228b22 : (baseChlorophyll || 0x489a28);
+    const leafEmissive = (crop === "cucumber") ? 0x0d3b14 : 0x184814;
     leafMat = new THREE.MeshPhysicalMaterial({
         map: isMonocot ? monocotTexture : dicotTexture,
-        color: baseChlorophyll || 0x489a28,
+        color: leafColor,
         roughness: 0.40,
         metalness: 0.02,
         clearcoat: 0.20,
         clearcoatRoughness: 0.35,
         transmission: 0.16,
-        emissive: new THREE.Color(0x225514),
-        emissiveIntensity: 0.28,
+        emissive: new THREE.Color(leafEmissive),
+        emissiveIntensity: 0.22,
         side: THREE.DoubleSide
     });
 
@@ -3173,12 +3589,12 @@ export function setTimeOfDayMode(mode = "noon") {
         }
         if (hemiLight) {
             hemiLight.color.setHex(0xffd966);
-            hemiLight.groundColor.setHex(0x4a3520);
-            hemiLight.intensity = 1.1;
+            hemiLight.groundColor.setHex(0x5c4028);
+            hemiLight.intensity = 1.25;
         }
         if (ambientLight) {
             ambientLight.color.setHex(0xffeedd);
-            ambientLight.intensity = 0.65;
+            ambientLight.intensity = 0.70;
         }
         if (renderer) {
             renderer.toneMappingExposure = 1.0;
@@ -3242,12 +3658,12 @@ export function setTimeOfDayMode(mode = "noon") {
         }
         if (hemiLight) {
             hemiLight.color.setHex(0x9ad1f5);
-            hemiLight.groundColor.setHex(0x4d3822);
-            hemiLight.intensity = 1.30;
+            hemiLight.groundColor.setHex(0x5c4028);
+            hemiLight.intensity = 1.50;
         }
         if (ambientLight) {
             ambientLight.color.setHex(0xdceefb);
-            ambientLight.intensity = 0.75;
+            ambientLight.intensity = 0.78;
         }
         if (renderer) {
             renderer.toneMappingExposure = 0.98;
@@ -3268,10 +3684,10 @@ export function setTimeOfDayMode(mode = "noon") {
 window.setTimeOfDayMode = setTimeOfDayMode;
 
 function initEnvironmentLighting() {
-    ambientLight = new THREE.AmbientLight(0xdceefb, 0.75);
+    ambientLight = new THREE.AmbientLight(0xdceefb, 0.78);
     scene.add(ambientLight);
 
-    hemiLight = new THREE.HemisphereLight(0x9ad1f5, 0x4d3822, 1.35);
+    hemiLight = new THREE.HemisphereLight(0x9ad1f5, 0x5c4028, 1.50);
     scene.add(hemiLight);
 
     const mobile = isMobileDevice();
@@ -3351,9 +3767,9 @@ function updateSpatialArAnchors() {
                 let screenX = (_projScratchVec.x * 0.5 + 0.5) * width;
                 let screenY = (-_projScratchVec.y * 0.5 + 0.5) * height;
 
-                // Viewport boundary clamping so pills never bleed off canvas
-                screenX = Math.min(Math.max(80, screenX), width - 200);
-                screenY = Math.min(Math.max(90, screenY), height - 100);
+                // Viewport boundary clamping so pills never bleed off canvas or collide with Top HUD
+                screenX = Math.min(Math.max(90, screenX), width - 210);
+                screenY = Math.min(Math.max(115, screenY), height - 100);
 
                 // Anti-collision separation between adjacent pins (minimum 165px horizontal separation!)
                 if (Math.abs(screenX - lastX) < 165 && Math.abs(screenY - lastY) < 45) {
@@ -3413,7 +3829,17 @@ export function updateFieldSpatialPins(cropId = "tomato", soilMoist = null) {
 
     const cropLabelEl = document.getElementById("arPinCropLabel") || document.querySelector("#arPinRow4 .ar-pin-label");
     if (cropLabelEl) {
-        if (isBn) {
+        if (key === "cucumber") {
+            if (isBn) {
+                cropLabelEl.textContent = currentGrowthStage >= 4
+                    ? "সারি ৪: তোলাযোগ্য শসা (ফসল তোলার উপযোগী)"
+                    : "সারি ৪: পরিপক্ক শসা (৬ দিনে পরিপক্ক)";
+            } else {
+                cropLabelEl.textContent = currentGrowthStage >= 4
+                    ? "Row 4: Crisp Cucumber (Harvest-Ready)"
+                    : "Row 4: Crisp Cucumber (Ready in 6 Days)";
+            }
+        } else if (isBn) {
             if (currentGrowthStage >= 4) {
                 cropLabelEl.textContent = `সারি ৪: পাকা ${cropName} (ফসল তোলার উপযোগী)`;
             } else if (currentGrowthStage === 3) {

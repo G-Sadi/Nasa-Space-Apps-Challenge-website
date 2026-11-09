@@ -7950,7 +7950,7 @@ body.lang-bn strong {
     /* 3D Spatial Pins on Mobile: Docked Centered Row under Top HUD */
     .spatial-ar-pins-wrap {
         position: absolute;
-        top: 92px; /* Positioned directly below the 2-row Top HUD (~84px tall) */
+        top: 108px; /* Positioned safely below the 2-row Top HUD dock without clipping */
         left: 8px;
         right: 8px;
         display: flex;
