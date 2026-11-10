@@ -234,6 +234,8 @@ let transitionScale = 1.0;
 // Camera Transition State (Smooth 600ms Lerp Engine)
 let currentCameraMode = "field"; // 'drone' | 'field' | 'root' | 'macro'
 let isMacroViewActive = false;
+let isXRayActive = false;
+let activeInspectedPlantData = null;
 let targetCameraPos = new THREE.Vector3(0, 0.90, 5.2);
 let targetLookAt = new THREE.Vector3(0, 0.65, 0);
 let startCameraPos = new THREE.Vector3(0, 0.90, 5.2);
@@ -1245,29 +1247,30 @@ function createBroadWavyLeafGeometry(length = 0.35, width = 0.22, lobeCount = 5)
 
 /**
  * Underground Botanical Root System Generator (Fibrous Crown & Branching Lateral Rootlets)
+ * Strictly positioned below soil ridge surface (startY <= -0.045m, depth down to -0.32m)
  */
-function createBotanicalRootSystem(depth = 0.22, spread = 0.12, rootCount = 8) {
+function createBotanicalRootSystem(depth = 0.24, spread = 0.13, rootCount = 10, startY = -0.045) {
     const roots = [];
-    // Primary central taproot
+    // Primary central taproot starting strictly underground
     const tapCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(0, -0.01, 0),
-        new THREE.Vector3(0.008, -depth * 0.45, -0.008),
-        new THREE.Vector3(-0.008, -depth * 0.8, 0.008),
-        new THREE.Vector3(0, -depth, 0)
+        new THREE.Vector3(0, startY, 0),
+        new THREE.Vector3(0.008, startY - depth * 0.45, -0.008),
+        new THREE.Vector3(-0.008, startY - depth * 0.80, 0.008),
+        new THREE.Vector3(0, startY - depth, 0)
     ]);
-    roots.push(new THREE.TubeGeometry(tapCurve, 6, 0.006, 4, false));
+    roots.push(new THREE.TubeGeometry(tapCurve, 8, 0.0055, 4, false));
 
-    // Lateral spreading feeder rootlets
+    // Lateral spreading feeder rootlets strictly below the surface
     for (let r = 0; r < rootCount; r++) {
         const ang = (r / rootCount) * Math.PI * 2 + (r % 2) * 0.35;
         const rad = spread * (0.6 + (r % 3) * 0.22);
         const rDepth = depth * (0.4 + (r % 4) * 0.18);
         const latCurve = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(0, -0.02, 0),
-            new THREE.Vector3(Math.cos(ang) * rad * 0.5, -rDepth * 0.45, Math.sin(ang) * rad * 0.5),
-            new THREE.Vector3(Math.cos(ang) * rad, -rDepth, Math.sin(ang) * rad)
+            new THREE.Vector3(0, startY - 0.008, 0),
+            new THREE.Vector3(Math.cos(ang) * rad * 0.5, startY - rDepth * 0.45, Math.sin(ang) * rad * 0.5),
+            new THREE.Vector3(Math.cos(ang) * rad, startY - rDepth, Math.sin(ang) * rad)
         ]);
-        roots.push(new THREE.TubeGeometry(latCurve, 5, 0.003, 3, false));
+        roots.push(new THREE.TubeGeometry(latCurve, 6, 0.0028, 3, false));
     }
     return mergeBufferGeometries(roots);
 }
@@ -1708,63 +1711,378 @@ function createEggplantMorphologyGeometry() {
 }
 
 /**
- * Chili Morphology Generator (Compact Bush, Lanceolate Leaves & Hanging Chilies)
+ * Curved Organic 3D Chili Fruit Geometry (Capsicum annuum)
+ * Smoothly curves along a natural hanging J-curve (15°–35° bend)
+ * Features an organic shoulder bulge, smooth taper, 5-6 soft longitudinal ribs, and rounded apex
+ */
+function createCurvedChiliFruitGeometry(length = 0.118, maxRadius = 0.0145, jCurveBend = 0.026) {
+    const curve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(jCurveBend * 0.12, -length * 0.20, 0.002),
+        new THREE.Vector3(jCurveBend * 0.44, -length * 0.50, 0.006),
+        new THREE.Vector3(jCurveBend * 0.85, -length * 0.82, 0.012),
+        new THREE.Vector3(jCurveBend * 1.08, -length, 0.016)
+    ]);
+
+    const numRings = 16;
+    const radialSegs = 14;
+    const positions = [];
+    const normals = [];
+    const uvs = [];
+    const indices = [];
+
+    const points = curve.getPoints(numRings);
+    const frenetFrames = curve.computeFrenetFrames(numRings, false);
+
+    function getRadiusAt(t) {
+        if (t < 0.12) {
+            return maxRadius * (0.75 + (t / 0.12) * 0.28);
+        } else if (t < 0.45) {
+            return maxRadius * (1.03 - Math.pow((t - 0.25) / 0.35, 2) * 0.08);
+        } else if (t < 0.85) {
+            const k = (t - 0.45) / 0.40;
+            return maxRadius * (0.95 - k * 0.55);
+        } else {
+            const k = (t - 0.85) / 0.15;
+            return maxRadius * Math.max(0.08, 0.40 * (1.0 - k * 0.85));
+        }
+    }
+
+    positions.push(0, 0.002, 0);
+    normals.push(0, 1, 0);
+    uvs.push(0.5, 0);
+
+    for (let i = 0; i <= numRings; i++) {
+        const t = i / numRings;
+        const pt = points[i];
+        const N = frenetFrames.normals[i];
+        const B = frenetFrames.binormals[i];
+        const baseR = getRadiusAt(t);
+
+        for (let j = 0; j < radialSegs; j++) {
+            const theta = (j / radialSegs) * Math.PI * 2;
+            const rib = 1.0 + 0.065 * Math.sin(5 * theta);
+            const r = baseR * rib;
+
+            const cosT = Math.cos(theta);
+            const sinT = Math.sin(theta);
+
+            const rx = (N.x * cosT + B.x * sinT) * r;
+            const ry = (N.y * cosT + B.y * sinT) * r;
+            const rz = (N.z * cosT + B.z * sinT) * r;
+
+            positions.push(pt.x + rx, pt.y + ry, pt.z + rz);
+            const len = Math.hypot(rx, ry, rz) || 1;
+            normals.push(rx / len, ry / len, rz / len);
+            uvs.push(j / radialSegs, t);
+        }
+    }
+
+    const tipPt = points[numRings];
+    positions.push(tipPt.x, tipPt.y - 0.003, tipPt.z);
+    normals.push(0, -1, 0);
+    uvs.push(0.5, 1);
+
+    const topCenterIdx = 0;
+    const bottomCenterIdx = 1 + (numRings + 1) * radialSegs;
+
+    for (let j = 0; j < radialSegs; j++) {
+        const nextJ = (j + 1) % radialSegs;
+        indices.push(topCenterIdx, 1 + nextJ, 1 + j);
+    }
+
+    for (let i = 0; i < numRings; i++) {
+        const ringStart = 1 + i * radialSegs;
+        const nextRingStart = 1 + (i + 1) * radialSegs;
+        for (let j = 0; j < radialSegs; j++) {
+            const nextJ = (j + 1) % radialSegs;
+            const a = ringStart + j;
+            const b = ringStart + nextJ;
+            const c = nextRingStart + j;
+            const d = nextRingStart + nextJ;
+
+            indices.push(a, b, c);
+            indices.push(b, d, c);
+        }
+    }
+
+    const lastRingStart = 1 + numRings * radialSegs;
+    for (let j = 0; j < radialSegs; j++) {
+        const nextJ = (j + 1) % radialSegs;
+        indices.push(bottomCenterIdx, lastRingStart + j, lastRingStart + nextJ);
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geom.setAttribute("normal", new THREE.Float32BufferAttribute(normals, 3));
+    geom.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+    return geom;
+}
+
+/**
+ * Curved Green Pedicel Stalk & 5-Lobed Calyx Cap (মরিচের বোঁটা)
+ * Connects the branch node (0, 0, 0) snugly to the shoulder of the chili pepper
+ */
+function createChiliPedicelAndCalyxGeometry(pedicelLength = 0.035, calyxRadius = 0.015) {
+    const parts = [];
+
+    // 1. Curved green pedicel stalk starting at branch node (0, 0, 0)
+    const pedCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0.005, -pedicelLength * 0.35, 0.002),
+        new THREE.Vector3(0.008, -pedicelLength * 0.70, 0.004),
+        new THREE.Vector3(0.005, -pedicelLength, 0.003)
+    ]);
+    const pedTube = new THREE.TubeGeometry(pedCurve, 8, 0.0028, 5, false);
+    setGeometryColor(pedTube, 0x2d5a1e);
+    parts.push(pedTube);
+
+    // 2. 5-Lobed green calyx cup cupping the chili top
+    const calyxBase = new THREE.CylinderGeometry(calyxRadius * 0.65, calyxRadius * 1.05, 0.011, 10);
+    calyxBase.translate(0.005, -pedicelLength - 0.004, 0.003);
+    setGeometryColor(calyxBase, 0x244f17);
+    parts.push(calyxBase);
+
+    // 5 pointed sepal tips cupping the shoulder
+    for (let s = 0; s < 5; s++) {
+        const theta = (s / 5) * Math.PI * 2;
+        const sepal = new THREE.ConeGeometry(0.0040, 0.013, 4);
+        sepal.rotateX(Math.PI);
+        sepal.rotateZ(0.35);
+        sepal.rotateY(theta);
+        sepal.translate(
+            0.005 + Math.cos(theta) * calyxRadius * 0.9,
+            -pedicelLength - 0.010,
+            0.003 + Math.sin(theta) * calyxRadius * 0.9
+        );
+        setGeometryColor(sepal, 0x366822);
+        parts.push(sepal);
+    }
+
+    return mergeBufferGeometries(parts);
+}
+
+/**
+ * Realistic Ovate-Lanceolate Chili Leaf with Central Midrib Crease & V-Fold
+ */
+function createChiliLeafGeometry(length = 0.145, baseWidth = 0.006, midWidth = 0.050) {
+    const segments = 10;
+    const positions = [];
+    const uvs = [];
+    const indices = [];
+
+    const petioleLen = 0.022;
+
+    for (let i = 0; i <= segments; i++) {
+        const t = i / segments;
+        const y = Math.sin(t * Math.PI * 0.85) * length * 0.26 - (t > 0.65 ? Math.pow(t - 0.65, 2) * length * 0.60 : 0);
+        const z = petioleLen + t * length;
+
+        let w = (t < 0.38)
+            ? baseWidth + (midWidth - baseWidth) * Math.sin((t / 0.38) * Math.PI * 0.5)
+            : midWidth * Math.pow(1.0 - (t - 0.38) / 0.62, 0.75);
+
+        const vFold = Math.sin(t * Math.PI) * 0.005;
+
+        positions.push(-w * 0.5, y + vFold, z);
+        positions.push(w * 0.5, y + vFold, z);
+
+        uvs.push(0, t);
+        uvs.push(1, t);
+
+        if (i < segments) {
+            const base = i * 2;
+            indices.push(base, base + 1, base + 2);
+            indices.push(base + 1, base + 3, base + 2);
+        }
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geom.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+    return geom;
+}
+
+/**
+ * 5-Petaled White Nodding Star Flower (Chili Blossom with Yellow Anthers)
+ */
+function createChiliBlossomGeometry() {
+    const parts = [];
+    const stalkCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0.003, -0.012, 0.003),
+        new THREE.Vector3(0.004, -0.022, 0.006)
+    ]);
+    const stalk = new THREE.TubeGeometry(stalkCurve, 4, 0.0016, 4, false);
+    setGeometryColor(stalk, 0x2d5a1e);
+    parts.push(stalk);
+
+    for (let p = 0; p < 5; p++) {
+        const theta = (p / 5) * Math.PI * 2;
+        const petal = new THREE.ConeGeometry(0.0045, 0.016, 4);
+        petal.rotateX(1.4);
+        petal.rotateZ(theta);
+        petal.translate(0.004, -0.024, 0.006);
+        setGeometryColor(petal, 0xf8fafc);
+        parts.push(petal);
+    }
+
+    const anthers = new THREE.SphereGeometry(0.0035, 6, 6);
+    anthers.translate(0.004, -0.026, 0.006);
+    setGeometryColor(anthers, 0xfacc15);
+    parts.push(anthers);
+
+    return mergeBufferGeometries(parts);
+}
+
+/**
+ * Botanically Accurate Chili Morphology Generator (Capsicum annuum)
+ * - Sunk Main Stem at y = -0.06m (Zero floating gaps)
+ * - Seamless Dichotomous Y-Forking Branches (Shared node coordinates)
+ * - Pendant Curved Chili Peppers with Green Calyx Caps & Pedicels
+ * - Multi-stage Harvest Crimson, Breaker Orange-Red & Fresh Glossy Green PBR Colors
+ * - Sculpted Ovate-Lanceolate Foliage & White Nodding Blossoms
+ * - Subterranean Root System starting at y = -0.06m
  */
 function createChiliMorphologyGeometry() {
     const stems = [];
     const leaves = [];
     const fruits = [];
+    const calyces = [];
     const flowers = [];
 
-    const baseStem = createOrganicMainStem(0.22, 0.018, 0.012, 0.01, 0.01, 6);
-    stems.push(baseStem);
+    // 1. Continuous Main Stem: Starts at y = -0.06m (sunk into soil) up to primary fork node (0, 0.22, 0)
+    const mainStemCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -0.06, 0),
+        new THREE.Vector3(0.004, 0.04, -0.002),
+        new THREE.Vector3(-0.003, 0.14, 0.003),
+        new THREE.Vector3(0, 0.22, 0)
+    ]);
+    const mainStem = new THREE.TubeGeometry(mainStemCurve, 10, 0.015, 6, false);
+    setGeometryColor(mainStem, 0x2f5e24);
+    stems.push(mainStem);
 
-    const forkCount = 6;
-    for (let i = 0; i < forkCount; i++) {
-        const ang = (i / forkCount) * Math.PI * 2;
-        const fork = createOrganicMainStem(0.34, 0.010, 0.004, 0.04, 0.03, 8);
-        fork.rotateZ(0.45);
-        fork.rotateY(ang);
-        fork.translate(0, 0.22, 0);
-        stems.push(fork);
+    // Primary Y-Fork Node
+    const N0 = new THREE.Vector3(0, 0.22, 0);
 
-        for (let l = 0; l < 4; l++) {
-            const ly = 0.25 + l * 0.08;
-            const leaf = createBotanicalBladeGeometry({
-                length: 0.14,
-                baseWidth: 0.005,
-                midWidth: 0.032,
-                tipWidth: 0.002,
-                archX: 0.01,
-                archY: 0.025,
-                midribFold: 0.004,
-                segments: 10
-            });
-            leaf.rotateX(0.4);
-            leaf.rotateY(ang + (l - 1.5) * 0.4);
-            leaf.translate(Math.cos(ang) * (0.08 + l * 0.04), ly, Math.sin(ang) * (0.08 + l * 0.04));
-            leaves.push(leaf);
-        }
+    // 2. Primary Forking Branches from N0
+    const primaryBranches = [
+        { end: new THREE.Vector3(-0.12, 0.38, 0.05), mid: new THREE.Vector3(-0.06, 0.30, 0.02) },
+        { end: new THREE.Vector3(0.13, 0.39, -0.04), mid: new THREE.Vector3(0.06, 0.31, -0.02) },
+        { end: new THREE.Vector3(0.02, 0.41, 0.12), mid: new THREE.Vector3(0.01, 0.32, 0.06) },
+        { end: new THREE.Vector3(-0.02, 0.43, -0.11), mid: new THREE.Vector3(-0.01, 0.33, -0.05) }
+    ];
 
-        if (i % 2 === 0) {
-            const chili = new THREE.ConeGeometry(0.014, 0.11, 7);
-            chili.rotateX(Math.PI);
-            chili.translate(Math.cos(ang) * 0.18, 0.35, Math.sin(ang) * 0.18);
-            setGeometryColor(chili, (i % 4 === 0) ? 0xdc2626 : 0x16a34a);
-            fruits.push(chili);
-        } else {
-            const flower = createTomatoBlossomGeometry();
-            flower.scale(0.6, 0.6, 0.6);
-            flower.translate(Math.cos(ang) * 0.16, 0.42, Math.sin(ang) * 0.16);
-            flowers.push(flower);
-        }
-    }
+    primaryBranches.forEach(b => {
+        const bCurve = new THREE.CatmullRomCurve3([N0, b.mid, b.end]);
+        const branchTube = new THREE.TubeGeometry(bCurve, 8, 0.009, 5, false);
+        setGeometryColor(branchTube, 0x2f5e24);
+        stems.push(branchTube);
+    });
+
+    // 3. Secondary Branchlets extending to canopy
+    const secondaryBranches = [
+        { start: primaryBranches[0].end, end: new THREE.Vector3(-0.19, 0.52, 0.11), mid: new THREE.Vector3(-0.16, 0.45, 0.08) },
+        { start: primaryBranches[0].end, end: new THREE.Vector3(-0.14, 0.55, -0.05), mid: new THREE.Vector3(-0.13, 0.46, 0.00) },
+        { start: primaryBranches[1].end, end: new THREE.Vector3(0.20, 0.53, -0.09), mid: new THREE.Vector3(0.17, 0.46, -0.06) },
+        { start: primaryBranches[1].end, end: new THREE.Vector3(0.16, 0.56, 0.08), mid: new THREE.Vector3(0.15, 0.47, 0.02) },
+        { start: primaryBranches[2].end, end: new THREE.Vector3(0.04, 0.58, 0.21), mid: new THREE.Vector3(0.03, 0.50, 0.16) },
+        { start: primaryBranches[2].end, end: new THREE.Vector3(-0.05, 0.56, 0.17), mid: new THREE.Vector3(-0.02, 0.48, 0.14) },
+        { start: primaryBranches[3].end, end: new THREE.Vector3(0.00, 0.59, -0.18), mid: new THREE.Vector3(-0.01, 0.51, -0.14) },
+        { start: primaryBranches[3].end, end: new THREE.Vector3(-0.06, 0.57, -0.14), mid: new THREE.Vector3(-0.04, 0.50, -0.12) }
+    ];
+
+    secondaryBranches.forEach(sb => {
+        const sbCurve = new THREE.CatmullRomCurve3([sb.start, sb.mid, sb.end]);
+        const sbTube = new THREE.TubeGeometry(sbCurve, 6, 0.0065, 4, false);
+        setGeometryColor(sbTube, 0x366822);
+        stems.push(sbTube);
+    });
+
+    // 4. Sculpted Ovate-Lanceolate Leaves attached at branch nodes
+    const leafNodes = [
+        { pos: new THREE.Vector3(-0.06, 0.30, 0.02), rotY: -0.6, rotX: 0.35, s: 0.95 },
+        { pos: new THREE.Vector3(0.06, 0.31, -0.02), rotY: 0.7, rotX: 0.38, s: 0.95 },
+        { pos: new THREE.Vector3(0.01, 0.32, 0.06), rotY: 1.8, rotX: 0.40, s: 0.90 },
+        { pos: new THREE.Vector3(-0.01, 0.33, -0.05), rotY: -2.2, rotX: 0.36, s: 0.90 },
+        { pos: primaryBranches[0].end, rotY: -0.8, rotX: 0.45, s: 1.05 },
+        { pos: primaryBranches[1].end, rotY: 0.9, rotX: 0.42, s: 1.05 },
+        { pos: primaryBranches[2].end, rotY: 2.1, rotX: 0.44, s: 1.00 },
+        { pos: primaryBranches[3].end, rotY: -1.9, rotX: 0.40, s: 1.00 },
+        { pos: secondaryBranches[0].mid, rotY: -0.4, rotX: 0.50, s: 0.90 },
+        { pos: secondaryBranches[1].mid, rotY: -1.2, rotX: 0.48, s: 0.90 },
+        { pos: secondaryBranches[2].mid, rotY: 0.5, rotX: 0.52, s: 0.90 },
+        { pos: secondaryBranches[3].mid, rotY: 1.4, rotX: 0.46, s: 0.90 },
+        { pos: secondaryBranches[4].mid, rotY: 2.4, rotX: 0.48, s: 0.85 },
+        { pos: secondaryBranches[5].mid, rotY: -2.6, rotX: 0.50, s: 0.85 },
+        { pos: secondaryBranches[6].mid, rotY: -1.7, rotX: 0.46, s: 0.85 },
+        { pos: secondaryBranches[7].mid, rotY: 3.0, rotX: 0.48, s: 0.85 },
+        { pos: secondaryBranches[0].end, rotY: -0.3, rotX: 0.55, s: 0.80 },
+        { pos: secondaryBranches[2].end, rotY: 0.6, rotX: 0.55, s: 0.80 },
+        { pos: secondaryBranches[4].end, rotY: 2.2, rotX: 0.52, s: 0.78 },
+        { pos: secondaryBranches[6].end, rotY: -2.0, rotX: 0.54, s: 0.78 }
+    ];
+
+    leafNodes.forEach(ln => {
+        const leaf = createChiliLeafGeometry(0.145 * ln.s, 0.006 * ln.s, 0.050 * ln.s);
+        leaf.rotateX(ln.rotX);
+        leaf.rotateY(ln.rotY);
+        leaf.translate(ln.pos.x, ln.pos.y, ln.pos.z);
+        setGeometryColor(leaf, 0x25591c);
+        leaves.push(leaf);
+    });
+
+    // 5. Pendant Curved Chili Fruits + Calyx Caps & Pedicels (6 Fruit Nodes)
+    const fruitNodes = [
+        { pos: primaryBranches[0].end, color: 0xb50e16, len: 0.125, bend: 0.028, rotY: -0.5 },
+        { pos: primaryBranches[1].end, color: 0xe01a22, len: 0.120, bend: 0.026, rotY: 0.6 },
+        { pos: primaryBranches[2].end, color: 0xd94e1f, len: 0.115, bend: 0.024, rotY: 1.9 },
+        { pos: primaryBranches[3].end, color: 0x855b1e, len: 0.110, bend: 0.025, rotY: -2.1 },
+        { pos: secondaryBranches[1].mid, color: 0x387d22, len: 0.098, bend: 0.022, rotY: -1.3 },
+        { pos: secondaryBranches[3].mid, color: 0x1f5c18, len: 0.095, bend: 0.020, rotY: 1.2 }
+    ];
+
+    fruitNodes.forEach(fn => {
+        const pedLen = 0.034;
+        const calyx = createChiliPedicelAndCalyxGeometry(pedLen, 0.015);
+        calyx.rotateY(fn.rotY);
+        calyx.translate(fn.pos.x, fn.pos.y, fn.pos.z);
+        calyces.push(calyx);
+
+        const fruit = createCurvedChiliFruitGeometry(fn.len, 0.0145, fn.bend);
+        fruit.rotateY(fn.rotY);
+        fruit.translate(fn.pos.x + Math.sin(fn.rotY) * 0.005, fn.pos.y - pedLen, fn.pos.z + Math.cos(fn.rotY) * 0.003);
+        setGeometryColor(fruit, fn.color);
+        fruits.push(fruit);
+    });
+
+    // 6. White Nodding Blossoms at Upper Nodes (4 Flower Nodes)
+    const flowerNodes = [
+        secondaryBranches[0].mid,
+        secondaryBranches[2].mid,
+        secondaryBranches[4].mid,
+        secondaryBranches[6].mid
+    ];
+    flowerNodes.forEach(fPos => {
+        const blossom = createChiliBlossomGeometry();
+        blossom.translate(fPos.x, fPos.y, fPos.z);
+        flowers.push(blossom);
+    });
+
+    // 7. Subterranean Root System starting at y = -0.06m (Meeting the sunk stem base)
+    const roots = [createBotanicalRootSystem(0.24, 0.14, 10, -0.06)];
 
     return {
         stemGeom: mergeBufferGeometries(stems),
         leafGeom: mergeBufferGeometries(leaves),
         fruitGeom: mergeBufferGeometries(fruits),
-        flowerGeom: mergeBufferGeometries(flowers)
+        calyxGeom: mergeBufferGeometries(calyces),
+        flowerGeom: mergeBufferGeometries(flowers),
+        rootGeom: mergeBufferGeometries(roots)
     };
 }
 
@@ -3119,13 +3437,26 @@ export function createCropMesh(cropType, baseChlorophyll) {
             fruitGeom = res.fruitGeom;
             calyxGeom = res.calyxGeom;
             flowerGeom = res.flowerGeom;
-            rootGeom = createBotanicalRootSystem(0.22, 0.12, 8);
-            stemMat = new THREE.MeshStandardMaterial({ color: 0x2e6822, roughness: 0.55 });
-            fruitMat = new THREE.MeshPhysicalMaterial({
-                vertexColors: true, // Multi-stage red & emerald green chilies
-                roughness: 0.20,
-                clearcoat: 0.75
+            rootGeom = res.rootGeom;
+            stemMat = new THREE.MeshStandardMaterial({ color: 0x2f5e24, roughness: 0.68 });
+            leafMat = new THREE.MeshStandardMaterial({
+                color: 0x25591c,
+                roughness: 0.42,
+                metalness: 0.05,
+                side: THREE.DoubleSide
             });
+            fruitMat = new THREE.MeshPhysicalMaterial({
+                color: 0xffffff, // Pure white base so vertexColors are NOT multiplied into pitch-black!
+                vertexColors: true, // Multi-stage ripe crimson, breaker amber, and fresh glossy green
+                roughness: 0.22,
+                metalness: 0.02,
+                clearcoat: 0.85,
+                clearcoatRoughness: 0.12,
+                reflectivity: 0.70,
+                emissive: 0x0a0500,
+                emissiveIntensity: 0.08 // Prevents pitch-black shadow silhouettes in dusk/sunset
+            });
+            calyxMat = new THREE.MeshStandardMaterial({ color: 0x2d5a1e, roughness: 0.45, side: THREE.DoubleSide });
             flowerMat = new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.25 });
             rootMat = new THREE.MeshStandardMaterial({ color: 0xd4cbb3, roughness: 0.88 });
             break;
@@ -3507,6 +3838,9 @@ async function streamCropGlbAsync(cropId) {
 export function createCropField(rawCropId = "tomato") {
     const cropId = normalizeCropId(rawCropId);
     activeCropId = cropId;
+    if (isXRayActive || isMacroViewActive) {
+        exitPlantInspection();
+    }
     updateFieldGridDimensions();
     if (currentCropGroup) {
         disposeFieldInstancedMeshes(currentCropGroup);
@@ -3568,6 +3902,7 @@ export function createCropField(rawCropId = "tomato") {
         rootInstancedMesh = new THREE.InstancedMesh(rootGeom, rootMat, TOTAL_PLANTS);
         rootInstancedMesh.castShadow = true;
         rootInstancedMesh.receiveShadow = true;
+        rootInstancedMesh.visible = false; // Strictly hidden by default across ALL crops in normal view
     } else {
         rootInstancedMesh = null;
     }
@@ -3715,6 +4050,18 @@ export function applyGrowthStage(day, totalDays = 105) {
                     // Carrot taproot is an underground storage organ developing throughout growth stages
                     const rootScale = s * (0.55 + 0.45 * Math.pow(progress, 0.65));
                     dummy.scale.set(rootScale, rootScale, rootScale);
+                } else if (activeCropId === "chili") {
+                    if (currentGrowthStage < 3) {
+                        dummy.scale.set(0.001, 0.001, 0.001); // Fruits hidden in early vegetative stages
+                    } else if (currentGrowthStage === 3) {
+                        const fruitScale = s * 0.50; // Young developing chilies
+                        dummy.scale.set(fruitScale, fruitScale, fruitScale);
+                    } else if (currentGrowthStage === 4) {
+                        const fruitScale = s * 0.85; // Breaker stage chilies
+                        dummy.scale.set(fruitScale, fruitScale, fruitScale);
+                    } else {
+                        dummy.scale.set(s, s, s); // Harvest-ready full-size chilies
+                    }
                 } else if (currentGrowthStage < 3) {
                     dummy.scale.set(0.001, 0.001, 0.001); // Fruit hidden at early stages
                 } else {
@@ -3762,8 +4109,7 @@ export function applyGrowthStage(day, totalDays = 105) {
             currentFruitMat.color.copy(getTomatoRipeningColor(currentGrowthDay, maxCropDays));
             currentFruitMat.needsUpdate = true;
         } else if (activeCropId === "chili") {
-            if (currentGrowthStage >= 4) currentFruitMat.color.setHex(0xdc2626);
-            else currentFruitMat.color.setHex(0x16a34a);
+            currentFruitMat.color.setHex(0xffffff); // Pure white base so multi-stage vertex colors shine through with 100% PBR accuracy!
             currentFruitMat.needsUpdate = true;
         } else if (activeCropId === "papaya") {
             currentFruitMat.color.setHex(0xffffff); // Full vertex color fidelity for multi-tier ripening
@@ -4692,8 +5038,6 @@ export function formatDropdownLabelsForMobile() {
 }
 window.formatDropdownLabelsForMobile = formatDropdownLabelsForMobile;
 
-let activeInspectedPlantData = null;
-
 /**
  * Updates floating live telemetry badge for the specifically tapped plant
  */
@@ -4707,7 +5051,7 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
     const colNum = (plant.colIndex !== undefined ? plant.colIndex : 0) + 1;
     const plantNum = instanceId + 1;
 
-    activeInspectedPlantData = { plantNum, rowNum, colNum, cropName, cropId };
+    activeInspectedPlantData = { plantNum, rowNum, colNum, cropName, cropId, instanceId };
 
     const titleEl = document.getElementById("arCalloutCropTitle");
     if (titleEl) {
@@ -4720,6 +5064,8 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
     if (fruitEl) {
         if (cropId === "carrot") {
             fruitEl.textContent = isBn ? "১টি প্রধান কন্দমূল (Taproot) • ১৯.৫ সেমি" : "1 Primary Taproot • 19.5 cm";
+        } else if (cropId === "chili") {
+            fruitEl.textContent = isBn ? "৬টি / গাছ (ঝুলন্ত বাঁকা মরিচ)" : "6 / plant (Pendent curved chilies)";
         } else if (currentGrowthStage < 3) {
             fruitEl.textContent = isBn ? "বৃদ্ধি পর্যায় (Pre-Bloom)" : "Vegetative (Pre-Bloom)";
         } else {
@@ -4735,6 +5081,10 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
             ripenessEl.textContent = isBn
                 ? "৫৫% পাকা (লাল) · ২৫% ব্রেকার · ২০% কাঁচা"
                 : "55% Ripe (Red) · 25% Breaker · 20% Green";
+        } else if (cropId === "chili") {
+            ripenessEl.textContent = isBn
+                ? "৫০% পাকা (গাঢ় লাল) · ৩৩% ব্রেকার (কমলা) · ১৭% কাঁচা (সবুজ)"
+                : "50% Ripe (Crimson) · 33% Breaker (Amber) · 17% Immature (Green)";
         } else if (cropId === "papaya") {
             ripenessEl.textContent = isBn
                 ? "৪টি পাকা · ৫টি আধাপাকা · ৫টি কাঁচা"
@@ -4789,26 +5139,167 @@ export function updatePlantInspectionBadge(instanceId = 0, cropId = "tomato") {
 window.updatePlantInspectionBadge = updatePlantInspectionBadge;
 
 /**
- * Toggle 3D Crop Macro View / AR X-Ray Mode
+ * Subterranean Root X-Ray State Machine (Two-Way Toggle & Strict Subterranean Visibility)
+ */
+export function setXRayMode(enabled, targetPlant = null) {
+    isXRayActive = !!enabled;
+
+    if (rootInstancedMesh) {
+        rootInstancedMesh.visible = isXRayActive;
+        if (isXRayActive && currentRootMat) {
+            // High-contrast bioluminescent cyan glow for root inspection
+            currentRootMat.emissive.setHex(0x06b6d4);
+            currentRootMat.emissiveIntensity = 0.55;
+            currentRootMat.needsUpdate = true;
+        } else if (currentRootMat) {
+            currentRootMat.emissive.setHex(0x000000);
+            currentRootMat.emissiveIntensity = 0.0;
+            currentRootMat.needsUpdate = true;
+        }
+    }
+
+    if (terrainMesh && terrainMesh.material) {
+        if (isXRayActive) {
+            terrainMesh.material.transparent = true;
+            terrainMesh.material.opacity = 0.28;
+            terrainMesh.material.depthWrite = false;
+        } else {
+            terrainMesh.material.transparent = false;
+            terrainMesh.material.opacity = 1.0;
+            terrainMesh.material.depthWrite = true;
+        }
+        terrainMesh.material.needsUpdate = true;
+    }
+
+    if (soilVolumeMesh && soilVolumeMesh.material) {
+        if (isXRayActive) {
+            soilVolumeMesh.material.transparent = true;
+            soilVolumeMesh.material.opacity = 0.22;
+            soilVolumeMesh.material.depthWrite = false;
+        } else {
+            soilVolumeMesh.material.transparent = false;
+            soilVolumeMesh.material.opacity = 1.0;
+            soilVolumeMesh.material.depthWrite = true;
+        }
+        soilVolumeMesh.material.needsUpdate = true;
+    }
+
+    // When inspecting plant and activating X-Ray, lower camera target Y to clearly frame subterranean root architecture
+    if (isXRayActive && (isMacroViewActive || targetPlant)) {
+        const pX = activeInspectedPlantPos.x;
+        const pY = activeInspectedPlantPos.y;
+        const pZ = activeInspectedPlantPos.z;
+        startCameraTransition(
+            new THREE.Vector3(pX + 0.24, Math.max(pY + 0.15, 0.25), pZ + 1.10),
+            new THREE.Vector3(pX, Math.max(pY - 0.20, -0.05), pZ),
+            550
+        );
+    }
+
+    syncXRayUIState();
+    requestShadowUpdate();
+}
+window.setXRayMode = setXRayMode;
+
+/**
+ * Synchronize UI controls and floating indicators with X-Ray and Macro state
+ */
+export function syncXRayUIState() {
+    const isBn = (window.currentAppLanguage === "bn");
+    const btnArRootXray = document.getElementById("btnArRootXray");
+    const pill = document.getElementById("xrayActiveFloatingPill");
+    const btnRootView = document.getElementById("btnRootView");
+    const btnToggleMacro = document.getElementById("btnToggleMacroView");
+
+    if (btnArRootXray) {
+        if (isXRayActive) {
+            btnArRootXray.classList.add("active-xray");
+            btnArRootXray.setAttribute("aria-pressed", "true");
+            const txtEl = btnArRootXray.querySelector(".btn-txt");
+            if (txtEl) {
+                txtEl.textContent = isBn ? "এক্স-রে বন্ধ করুন (Exit Root X-Ray)" : "Exit Root X-Ray";
+            }
+        } else {
+            btnArRootXray.classList.remove("active-xray");
+            btnArRootXray.setAttribute("aria-pressed", "false");
+            const txtEl = btnArRootXray.querySelector(".btn-txt");
+            if (txtEl) {
+                txtEl.textContent = isBn ? "মাটির নিচের এক্স-রে (Root X-Ray)" : "Subterranean Root X-Ray";
+            }
+        }
+    }
+
+    if (pill) {
+        pill.style.display = isXRayActive ? "inline-flex" : "none";
+    }
+
+    if (btnRootView) {
+        if (isXRayActive && currentCameraMode === "root") {
+            btnRootView.classList.add("active");
+        } else if (currentCameraMode !== "root") {
+            btnRootView.classList.remove("active");
+        }
+    }
+
+    if (btnToggleMacro) {
+        if (isMacroViewActive || isXRayActive) {
+            btnToggleMacro.classList.add("active");
+            btnToggleMacro.setAttribute("aria-pressed", "true");
+        } else {
+            btnToggleMacro.classList.remove("active");
+            btnToggleMacro.setAttribute("aria-pressed", "false");
+        }
+    }
+}
+window.syncXRayUIState = syncXRayUIState;
+
+/**
+ * 5-Path Exit Dismissal Lifecycle (Exit Plant Inspection & Subterranean X-Ray)
+ */
+export function exitPlantInspection() {
+    isMacroViewActive = false;
+    setXRayMode(false);
+    currentCameraMode = "field";
+
+    const ringEl = document.getElementById("arMacroInspectionRing");
+    if (ringEl) ringEl.style.display = "none";
+
+    closeFarmerActionCard();
+
+    // Smooth return to default field overview
+    startCameraTransition(new THREE.Vector3(0, 0.90, 5.2), new THREE.Vector3(0, 0.65, 0), 600);
+
+    const btnField = document.getElementById("btnFieldView");
+    const btnDrone = document.getElementById("btnDroneView");
+    const btnRoot = document.getElementById("btnRootView");
+    [btnDrone, btnRoot].forEach(b => b?.classList.remove("active"));
+    btnField?.classList.add("active");
+
+    syncXRayUIState();
+}
+window.exitPlantInspection = exitPlantInspection;
+
+/**
+ * Toggle 3D Crop Macro View / AR Close-Up
  */
 export function toggleMacroView(activate = true) {
-    isMacroViewActive = activate;
+    if (!activate) {
+        exitPlantInspection();
+        return;
+    }
+
+    isMacroViewActive = true;
     const ringEl = document.getElementById("arMacroInspectionRing");
 
-    if (isMacroViewActive) {
-        startCameraTransition(
-            new THREE.Vector3(activeInspectedPlantPos.x + 0.20, Math.max(activeInspectedPlantPos.y + 0.45, 0.55), activeInspectedPlantPos.z + 1.20),
-            new THREE.Vector3(activeInspectedPlantPos.x, activeInspectedPlantPos.y + 0.35, activeInspectedPlantPos.z),
-            600
-        );
-        currentCameraMode = "macro";
-        if (ringEl) ringEl.style.display = "flex";
-        openFarmerActionCard(activeCropId);
-    } else {
-        startCameraTransition(new THREE.Vector3(0, 0.90, 5.2), new THREE.Vector3(0, 0.65, 0), 600);
-        currentCameraMode = "field";
-        if (ringEl) ringEl.style.display = "none";
-    }
+    startCameraTransition(
+        new THREE.Vector3(activeInspectedPlantPos.x + 0.20, Math.max(activeInspectedPlantPos.y + 0.45, 0.55), activeInspectedPlantPos.z + 1.20),
+        new THREE.Vector3(activeInspectedPlantPos.x, activeInspectedPlantPos.y + 0.35, activeInspectedPlantPos.z),
+        600
+    );
+    currentCameraMode = "macro";
+    if (ringEl) ringEl.style.display = "flex";
+    openFarmerActionCard(activeCropId);
+    syncXRayUIState();
 }
 window.toggleMacroView = toggleMacroView;
 
@@ -5040,11 +5531,34 @@ function initRaycasting() {
             if (ringEl) ringEl.style.display = "flex";
 
             openFarmerActionCard(activeCropId);
+            syncXRayUIState();
+        } else {
+            // Path 3: Dismiss inspection & subterranean X-Ray if clicking outside on empty ground or sky
+            if (isMacroViewActive || isXRayActive) {
+                exitPlantInspection();
+            }
         }
+    };
+
+    const onPointerMove = (event) => {
+        if (!renderer || !camera || isTransitioningCamera) return;
+        const rect = renderer.domElement.getBoundingClientRect();
+        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+
+        const hoverTargets = [];
+        if (fruitInstancedMesh) hoverTargets.push(fruitInstancedMesh);
+        if (stemInstancedMesh) hoverTargets.push(stemInstancedMesh);
+        if (leafInstancedMesh) hoverTargets.push(leafInstancedMesh);
+
+        const hits = raycaster.intersectObjects(hoverTargets, false);
+        renderer.domElement.style.cursor = (hits.length > 0) ? "pointer" : "default";
     };
 
     renderer.domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
     renderer.domElement.addEventListener("pointerup", onPointerUp);
+    renderer.domElement.addEventListener("pointermove", onPointerMove, { passive: true });
 }
 
 export function openFarmerActionCard(cropId = "tomato") {
@@ -5518,33 +6032,11 @@ export function switchCameraMode(mode) {
     }
 
     if (mode === "root") {
+        setXRayMode(true);
         startCameraTransition(new THREE.Vector3(0, -0.18, 2.5), new THREE.Vector3(0, -0.10, 0), 600);
         btnRoot?.classList.add("active");
-
-        // Make upper soil ridges & volume block semi-transparent for X-Ray root view
-        if (terrainMesh && terrainMesh.material) {
-            terrainMesh.material.transparent = true;
-            terrainMesh.material.opacity = 0.42;
-            terrainMesh.material.needsUpdate = true;
-        }
-        if (soilVolumeMesh && soilVolumeMesh.material) {
-            soilVolumeMesh.material.transparent = true;
-            soilVolumeMesh.material.opacity = 0.35;
-            soilVolumeMesh.material.needsUpdate = true;
-        }
     } else {
-        // Restore fully opaque soil in Drone and Close-up view
-        if (terrainMesh && terrainMesh.material) {
-            terrainMesh.material.transparent = false;
-            terrainMesh.material.opacity = 1.0;
-            terrainMesh.material.needsUpdate = true;
-        }
-        if (soilVolumeMesh && soilVolumeMesh.material) {
-            soilVolumeMesh.material.transparent = false;
-            soilVolumeMesh.material.opacity = 1.0;
-            soilVolumeMesh.material.needsUpdate = true;
-        }
-
+        setXRayMode(false);
         if (mode === "drone") {
             startCameraTransition(new THREE.Vector3(0, 11.0, 13.0), new THREE.Vector3(0, 0.2, 0), 600);
             btnDrone?.classList.add("active");
@@ -5553,6 +6045,7 @@ export function switchCameraMode(mode) {
             btnField?.classList.add("active");
         }
     }
+    syncXRayUIState();
     requestShadowUpdate();
 }
 window.switchCameraMode = switchCameraMode;
@@ -5851,23 +6344,45 @@ function bindUIControls() {
 
 
 
-    // Macro View Toggle Buttons
+    // Macro View & Subterranean Root X-Ray Toggle Buttons
     const btnToggleMacro = document.getElementById("btnToggleMacroView");
     if (btnToggleMacro) {
-        btnToggleMacro.addEventListener("click", () => toggleMacroView(!isMacroViewActive));
+        btnToggleMacro.addEventListener("click", () => {
+            if (isMacroViewActive || isXRayActive) {
+                exitPlantInspection();
+            } else {
+                toggleMacroView(true);
+            }
+        });
     }
 
     const btnCloseMacro = document.getElementById("btnCloseMacroView");
     if (btnCloseMacro) {
-        btnCloseMacro.addEventListener("click", () => toggleMacroView(false));
+        btnCloseMacro.addEventListener("click", () => exitPlantInspection());
     }
 
     const btnRootXray = document.getElementById("btnArRootXray");
     if (btnRootXray) {
-        btnRootXray.addEventListener("click", () => {
-            switchCameraMode("root");
+        btnRootXray.addEventListener("click", (e) => {
+            e.stopPropagation();
+            setXRayMode(!isXRayActive, activeInspectedPlantData?.instanceId);
         });
     }
+
+    const btnDismissXRayPill = document.getElementById("btnDismissXRayPill");
+    if (btnDismissXRayPill) {
+        btnDismissXRayPill.addEventListener("click", (e) => {
+            e.stopPropagation();
+            setXRayMode(false);
+        });
+    }
+
+    // Keyboard Escape to dismiss inspection / X-Ray (Path 4)
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && (isMacroViewActive || isXRayActive)) {
+            exitPlantInspection();
+        }
+    });
 
     const btnAskBuddyAr = document.getElementById("btnAskFarmerBuddyFromAr");
     if (btnAskBuddyAr) {

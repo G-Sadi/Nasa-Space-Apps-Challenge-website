@@ -1196,17 +1196,24 @@
                             <strong id="arPestStatus" class="text-emerald">০% (ঝুঁকিমুক্ত)</strong>
                         </div>
                     </div>
-                    <button id="btnArRootXray" class="ar-root-xray-btn" title="Inspect subterranean root architecture">
+                    <button type="button" id="btnArRootXray" class="ar-root-xray-btn" title="Inspect subterranean root architecture" aria-pressed="false">
                         <span class="btn-ico">🔍</span>
                         <span class="btn-txt" data-i18n="ar-root-xray">মাটির নিচের এক্স-রে (Root X-Ray)</span>
                     </button>
-                    <button id="btnAskFarmerBuddyFromAr" class="ar-ask-buddy-btn">
+                    <button type="button" id="btnAskFarmerBuddyFromAr" class="ar-ask-buddy-btn">
                         <span class="btn-ico">🤖</span>
                         <span class="btn-txt" data-i18n="ar-ask-buddy-btn">কৃষি বন্ধু AI পরামর্শ নিন</span>
                     </button>
-                    <button id="btnCloseMacroView" class="ar-close-macro-btn">✕ স্বাভাবিক দৃশ্য (Exit AR
-                        Close-up)</button>
+                    <button type="button" id="btnCloseMacroView" class="ar-close-macro-btn">✕ স্বাভাবিক দৃশ্য (Exit AR Close-up)</button>
                 </div>
+            </div>
+
+            <!-- Floating Quick Pill for Active Subterranean Root X-Ray Mode -->
+            <div id="xrayActiveFloatingPill" class="xray-active-floating-pill" style="display: none;" role="status" aria-live="polite">
+                <span class="xray-pill-radar"></span>
+                <span class="xray-pill-icon">🔬</span>
+                <span class="xray-pill-text" data-i18n="xray-pill-active">মাটির নিচের মূল এক্স-রে সক্রিয় (Subterranean Root X-Ray Active)</span>
+                <button type="button" id="btnDismissXRayPill" class="xray-pill-dismiss-btn" aria-label="Exit X-Ray Mode" title="Exit X-Ray (Esc)">✕</button>
             </div>
         </div>
 
@@ -1287,15 +1294,15 @@
 
                 <!-- Time-of-Day Segmented Toggle (Morning | Noon | Night) -->
                 <div class="tod-segmented-control time-of-day-toggle" id="todSegmentedControl" role="group" aria-label="Time of Day Control">
-                    <button type="button" class="tod-segment-btn time-btn" data-time="morning" data-time-group="timeOfDay" id="todBtnMorning" title="Morning (সকাল)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('morning');">
+                    <button type="button" class="tod-segment-btn time-btn" data-time="morning" data-time-group="timeOfDay" id="todBtnMorning" title="Morning (সকাল)">
                         <span class="tod-btn-icon">🌅</span>
                         <span class="tod-btn-text" data-i18n="tod-morning">সকাল</span>
                     </button>
-                    <button type="button" class="tod-segment-btn time-btn active" data-time="noon" data-time-group="timeOfDay" id="todBtnNoon" title="Noon (দুপুর)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('noon');">
+                    <button type="button" class="tod-segment-btn time-btn active" data-time="noon" data-time-group="timeOfDay" id="todBtnNoon" title="Noon (দুপুর)">
                         <span class="tod-btn-icon">☀️</span>
                         <span class="tod-btn-text" data-i18n="tod-noon">দুপুর</span>
                     </button>
-                    <button type="button" class="tod-segment-btn time-btn" data-time="night" data-time-group="timeOfDay" id="todBtnNight" title="Night (রাত)" onclick="if (window.setTimeOfDayMode) window.setTimeOfDayMode('night');">
+                    <button type="button" class="tod-segment-btn time-btn" data-time="night" data-time-group="timeOfDay" id="todBtnNight" title="Night (রাত)">
                         <span class="tod-btn-icon">🌙</span>
                         <span class="tod-btn-text" data-i18n="tod-night">রাত</span>
                     </button>
