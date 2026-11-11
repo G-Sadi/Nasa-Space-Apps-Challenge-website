@@ -40,10 +40,42 @@
     <!-- NAVBAR -->
     <header class="navbar">
 
-        <div class="logo">
-            <span>FS</span>
-            <strong>Field Shift</strong>
-        </div>
+        <a href="#" class="logo" aria-label="Field Shift Home">
+            <div class="logo-emblem">
+                <svg width="26" height="26" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="fsSproutGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+                            <stop offset="0%" stop-color="#10b981"/>
+                            <stop offset="100%" stop-color="#43ef8c"/>
+                        </linearGradient>
+                        <linearGradient id="fsOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#46dfff"/>
+                            <stop offset="50%" stop-color="#43ef8c"/>
+                            <stop offset="100%" stop-color="#10b981"/>
+                        </linearGradient>
+                        <filter id="fsGlow" x="-30%" y="-30%" width="160%" height="160%">
+                            <feGaussianBlur stdDeviation="1.2" result="blur"/>
+                            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+                        </filter>
+                    </defs>
+                    <!-- Orbital Satellite Ring (tilted -28 deg) -->
+                    <ellipse cx="18" cy="18" rx="14" ry="5.5" transform="rotate(-28 18 18)" fill="none" stroke="url(#fsOrbitGrad)" stroke-width="1.6" stroke-linecap="round" opacity="0.95"/>
+                    <!-- Sprout stem -->
+                    <path d="M18 29 C18 22 17.5 17 18 13" stroke="url(#fsSproutGrad)" stroke-width="1.8" stroke-linecap="round"/>
+                    <!-- Primary Leaf (Right) -->
+                    <path d="M18 21 C18.5 15 25 12 25.5 8 C20.5 8.5 17.5 13.5 18 21 Z" fill="url(#fsSproutGrad)"/>
+                    <!-- Secondary Leaf (Left) -->
+                    <path d="M17.8 23 C16.5 18.5 10.5 17 10 13.5 C14.5 13 17 17.5 17.8 23 Z" fill="url(#fsSproutGrad)" opacity="0.85"/>
+                    <!-- Glowing Telemetry Dot on Orbit -->
+                    <circle cx="28.6" cy="12.2" r="2.2" fill="#46dfff" filter="url(#fsGlow)" class="telemetry-dot-pulse"/>
+                    <circle cx="28.6" cy="12.2" r="4.2" fill="none" stroke="#46dfff" stroke-width="0.8" opacity="0.6"/>
+                </svg>
+            </div>
+            <div class="logo-text">
+                <span class="logo-title">Field Shift</span>
+                <span class="logo-subtitle" data-i18n="logo-subtitle">NASA EARTH OBSERVATION</span>
+            </div>
+        </a>
 
         <nav>
             <a href="#farmSimulation" data-i18n="nav-3d">3D Live Field</a>
@@ -116,21 +148,150 @@
         </div>
 
 
-        <!-- HERO VISUAL -->
-        <div class="hero-visual">
+        <!-- HERO VISUAL / INTERACTIVE NASA SATELLITE FIELD SCANNER -->
+        <div class="hero-visual" id="heroVisualScanner">
 
-            <div class="field-grid">
+            <!-- 3 Floating Glassmorphic Telemetry Badges Around Edges -->
+            <div class="floating-telemetry-pill pill-top-left" aria-hidden="true">
+                <span class="pill-icon">🛰️</span>
+                <span class="pill-text" data-i18n="pill-smap">NASA SMAP Live Sync</span>
+            </div>
 
-                <div class="field-dot"></div>
+            <div class="floating-telemetry-pill pill-top-right" aria-hidden="true">
+                <span class="pill-icon">🌾</span>
+                <span class="pill-text" data-i18n="pill-ndvi">NDVI 0.68</span>
+            </div>
 
-                <div class="analysis-card">
+            <div class="floating-telemetry-pill pill-bottom-right" aria-hidden="true">
+                <span class="pill-icon">💧</span>
+                <span class="pill-text" data-i18n="pill-moisture">Moisture 52%</span>
+            </div>
 
-                    <small data-i18n="field-analysis">FIELD ANALYSIS</small>
+            <!-- Field Grid Scanner Frame -->
+            <div class="field-grid scanner-field-grid" id="scannerFieldGrid" role="region" aria-label="NASA Satellite Field Scanner">
 
-                    <strong data-i18n="field-name">
-                        Field Shift • Mymensingh - Field 02
-                    </strong>
+                <!-- Animated Radar Scanline -->
+                <div class="scanner-laser-line" aria-hidden="true"></div>
 
+                <!-- Top Scanner Header HUD -->
+                <div class="scanner-header-hud">
+                    <div class="scanner-status-indicator">
+                        <span class="scanner-live-dot"></span>
+                        <span class="scanner-status-text" data-i18n="scanner-live-status">LIVE SATELLITE SCAN</span>
+                    </div>
+                    <div class="scanner-coords-badge">
+                        <span class="scanner-coords-icon">🛰️</span>
+                        <span class="scanner-coords-text">24.7471° N, 90.4203° E</span>
+                    </div>
+                </div>
+
+                <!-- 4 Interactive Clickable/Hoverable Plot Zones -->
+                <div class="scanner-zones-container" id="scannerZonesContainer">
+
+                    <!-- Zone A: North Plot -->
+                    <div class="scanner-zone active" data-zone="A" tabindex="0" role="button" aria-pressed="true" aria-label="Zone A: North Plot">
+                        <div class="zone-top-bar">
+                            <span class="zone-badge-pill">A</span>
+                            <span class="zone-name-text" data-i18n="zone-a-name">Zone A: North Plot</span>
+                            <span class="zone-ndvi-badge">0.74 NDVI</span>
+                        </div>
+                        <div class="zone-beacon">
+                            <span class="beacon-core"></span>
+                            <span class="beacon-wave"></span>
+                        </div>
+                        <div class="zone-crop-hint" data-i18n="zone-a-crop">Rice (আমন ধান)</div>
+                    </div>
+
+                    <!-- Zone B: Canal Side -->
+                    <div class="scanner-zone" data-zone="B" tabindex="0" role="button" aria-pressed="false" aria-label="Zone B: Canal Side">
+                        <div class="zone-top-bar">
+                            <span class="zone-badge-pill">B</span>
+                            <span class="zone-name-text" data-i18n="zone-b-name">Zone B: Canal Side</span>
+                            <span class="zone-ndvi-badge">0.68 NDVI</span>
+                        </div>
+                        <div class="zone-beacon">
+                            <span class="beacon-core"></span>
+                            <span class="beacon-wave"></span>
+                        </div>
+                        <div class="zone-crop-hint" data-i18n="zone-b-crop">Boro Rice (বোরো)</div>
+                    </div>
+
+                    <!-- Zone C: Lowland Basin -->
+                    <div class="scanner-zone" data-zone="C" tabindex="0" role="button" aria-pressed="false" aria-label="Zone C: Lowland Basin">
+                        <div class="zone-top-bar">
+                            <span class="zone-badge-pill">C</span>
+                            <span class="zone-name-text" data-i18n="zone-c-name">Zone C: Lowland Basin</span>
+                            <span class="zone-ndvi-badge">0.61 NDVI</span>
+                        </div>
+                        <div class="zone-beacon">
+                            <span class="beacon-core"></span>
+                            <span class="beacon-wave"></span>
+                        </div>
+                        <div class="zone-crop-hint" data-i18n="zone-c-crop">Deepwater Rice (গভীর আমন)</div>
+                    </div>
+
+                    <!-- Zone D: High Terrace -->
+                    <div class="scanner-zone" data-zone="D" tabindex="0" role="button" aria-pressed="false" aria-label="Zone D: High Terrace">
+                        <div class="zone-top-bar">
+                            <span class="zone-badge-pill">D</span>
+                            <span class="zone-name-text" data-i18n="zone-d-name">Zone D: High Terrace</span>
+                            <span class="zone-ndvi-badge">0.52 NDVI</span>
+                        </div>
+                        <div class="zone-beacon">
+                            <span class="beacon-core"></span>
+                            <span class="beacon-wave"></span>
+                        </div>
+                        <div class="zone-crop-hint" data-i18n="zone-d-crop">Mustard / Pulses (সরিষা/ডাল)</div>
+                    </div>
+
+                </div>
+
+                <!-- Overlaid Glassmorphic Live Telemetry HUD -->
+                <div class="scanner-telemetry-hud" id="scannerTelemetryHud">
+                    <div class="hud-top-bar">
+                        <div class="hud-zone-meta">
+                            <span class="hud-eyebrow" data-i18n="scanner-hud-eyebrow">NASA TELEMETRY HUD • FIELD 02</span>
+                            <h4 class="hud-zone-title" id="hudZoneTitle">Zone A: North Plot</h4>
+                        </div>
+                        <div class="hud-action-badge status-optimal" id="hudActionBadge">
+                            <span class="action-dot"></span>
+                            <span class="action-text" id="hudActionText">No Irrigation Needed</span>
+                        </div>
+                    </div>
+
+                    <div class="hud-metrics-row">
+                        <div class="hud-metric-card">
+                            <span class="metric-label" data-i18n="scanner-lbl-smap">SMAP SOIL MOISTURE</span>
+                            <div class="metric-value-wrap">
+                                <strong class="metric-number" id="hudValMoisture">58%</strong>
+                                <span class="metric-sub" id="hudSubMoisture">Optimal</span>
+                            </div>
+                        </div>
+
+                        <div class="hud-metric-card">
+                            <span class="metric-label" data-i18n="scanner-lbl-modis">MODIS NDVI</span>
+                            <div class="metric-value-wrap">
+                                <strong class="metric-number" id="hudValNdvi">0.74</strong>
+                                <span class="metric-sub" id="hudSubNdvi">Healthy Dense</span>
+                            </div>
+                        </div>
+
+                        <div class="hud-metric-card">
+                            <span class="metric-label" data-i18n="scanner-lbl-eco">ECOSTRESS CANOPY</span>
+                            <div class="metric-value-wrap">
+                                <strong class="metric-number" id="hudValTemp">25.4°C</strong>
+                                <span class="metric-sub" id="hudSubTemp">Normal</span>
+                            </div>
+                        </div>
+
+                        <div class="hud-metric-card">
+                            <span class="metric-label" data-i18n="scanner-lbl-advisory">RECOMMENDED ACTION</span>
+                            <div class="metric-value-wrap">
+                                <strong class="metric-number text-optimal" id="hudValAction">Conserve Water</strong>
+                                <span class="metric-sub" id="hudSubAction">Good Retention</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -1968,6 +2129,7 @@
     <script src="js/data.js"></script>
     <script src="js/crops_db.js"></script>
     <script src="js/weather.js"></script>
+    <script src="js/scanner.js"></script>
     <script src="js/map.js"></script>
     <script src="js/rotation.js"></script>
     <script src="script.js"></script>
