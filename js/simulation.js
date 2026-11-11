@@ -4982,6 +4982,196 @@ export function updateFieldSpatialPins(cropId = "tomato", soilMoist = null) {
 }
 window.updateFieldSpatialPins = updateFieldSpatialPins;
 
+let isSprinklerActiveState = true;
+
+export function initSpatialMarkerInteractions() {
+    const pinZoneA = document.getElementById("arPinZoneA");
+    const pinRow4 = document.getElementById("arPinRow4");
+    const pinSprinkler = document.getElementById("arPinSprinkler");
+    const popover = document.getElementById("spatialMarkerPopover");
+    const closeBtn = document.getElementById("btnMarkerPopoverClose");
+    const iconEl = document.getElementById("markerPopoverIcon");
+    const titleEl = document.getElementById("markerPopoverTitle");
+    const subEl = document.getElementById("markerPopoverSub");
+    const bodyEl = document.getElementById("markerPopoverBody");
+    const footerEl = document.getElementById("markerPopoverFooter");
+
+    if (!popover) return;
+
+    function hidePopover() {
+        popover.style.display = "none";
+        [pinZoneA, pinRow4, pinSprinkler].forEach(p => p?.classList.remove("active-spatial-pin"));
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener("click", hidePopover);
+    }
+
+    function showPopover(markerType) {
+        const isBn = (window.currentAppLanguage === "bn");
+        [pinZoneA, pinRow4, pinSprinkler].forEach(p => p?.classList.remove("active-spatial-pin"));
+
+        if (markerType === "zoneA") {
+            pinZoneA?.classList.add("active-spatial-pin");
+            if (iconEl) iconEl.textContent = "💧";
+            if (titleEl) titleEl.textContent = isBn ? "জোন এ: মাটির আর্দ্রতা টেলিমেট্রি" : "Zone A: Soil Moisture Telemetry";
+            if (subEl) subEl.textContent = isBn ? "ময়মনসিংহ ফিল্ড ০২ · নাসা SMAP লাইভ" : "Mymensingh Field 02 · NASA SMAP Live";
+            if (bodyEl) {
+                const moist = Math.round(soilMoisturePercent || 58);
+                const moistStatus = moist >= 60 ? (isBn ? "অনুকূল (Optimal)" : "Optimal") : (isBn ? "কম (Low)" : "Low");
+                bodyEl.innerHTML = `
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "মাটির আর্দ্রতা:" : "Soil Moisture:"}</span>
+                        <strong style="color: ${moist >= 60 ? '#43ef8c' : '#fbbf24'};">${moist}% (${moistStatus})</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "শিকড় অঞ্চল গভীরতা:" : "Root Zone Depth:"}</span>
+                        <strong>15–30 cm (GWETROOT)</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "পানি প্রবেশ হার:" : "Infiltration Rate:"}</span>
+                        <strong>14 mm/hr (${isBn ? "উত্তম নিষ্কাশন" : "Good"})</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "সেচ পরামর্শ:" : "Irrigation Advisory:"}</span>
+                        <strong style="color: #43ef8c;">${isBn ? "বর্তমানে সেচের প্রয়োজন নেই" : "No Irrigation Needed"}</strong>
+                    </div>
+                `;
+            }
+            if (footerEl) {
+                footerEl.innerHTML = `
+                    <button type="button" class="popover-btn popover-btn-primary" id="btnTestMoistureBoost">
+                        ${isBn ? "💧 +১০% আর্দ্রতা যোগ করুন" : "💧 +10% Test Water"}
+                    </button>
+                    <button type="button" class="popover-btn popover-btn-secondary" id="btnPopCloseInner">
+                        ${isBn ? "বন্ধ করুন" : "Close"}
+                    </button>
+                `;
+                document.getElementById("btnTestMoistureBoost")?.addEventListener("click", () => {
+                    updateSoilMoisture(Math.min(100, (soilMoisturePercent || 58) + 10));
+                    updateFieldSpatialPins(activeCropId);
+                    showPopover("zoneA");
+                });
+                document.getElementById("btnPopCloseInner")?.addEventListener("click", hidePopover);
+            }
+        } else if (markerType === "row4") {
+            pinRow4?.classList.add("active-spatial-pin");
+            if (iconEl) iconEl.textContent = "🌾";
+            const cropName = getCropDisplayName(activeCropId, isBn);
+            if (titleEl) titleEl.textContent = isBn ? `সারি ৪: ${cropName} পরিপক্কতা` : `Row 4: ${cropName} Ripening Cluster`;
+            if (subEl) subEl.textContent = isBn ? "ডিজিটাল টুইন ক্রপ সেন্সর ক্লাস্টার" : "Digital Twin Crop Sensor Cluster";
+            if (bodyEl) {
+                bodyEl.innerHTML = `
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "বর্তমান ফসল:" : "Active Crop:"}</span>
+                        <strong style="color: #43ef8c;">${cropName}</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "বৃদ্ধির পর্যায়:" : "Growth Stage:"}</span>
+                        <strong>${isBn ? "পরিপক্কতা (Maturity)" : "Maturity (92%)"}</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "উদ্ভিদ স্বাস্থ্য সূচক:" : "Canopy NDVI:"}</span>
+                        <strong style="color: #43ef8c;">0.68 NDVI (${isBn ? "সবুজ ও পুষ্ট" : "Optimal"})</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "সম্ভাব্য কর্তন:" : "Harvest Est.:"}</span>
+                        <strong>${isBn ? "৬–৮ দিনের মধ্যে প্রস্তুত" : "Ready in 6–8 Days"}</strong>
+                    </div>
+                `;
+            }
+            if (footerEl) {
+                footerEl.innerHTML = `
+                    <button type="button" class="popover-btn popover-btn-primary" id="btnMacroInspect">
+                        ${isBn ? "🔍 ক্লোজ-আপ দেখুন" : "🔍 Crop Close-Up"}
+                    </button>
+                    <button type="button" class="popover-btn popover-btn-secondary" id="btnPopCloseInner">
+                        ${isBn ? "বন্ধ করুন" : "Close"}
+                    </button>
+                `;
+                document.getElementById("btnMacroInspect")?.addEventListener("click", () => {
+                    const btnMacro = document.getElementById("btnViewCloseup");
+                    if (btnMacro) btnMacro.click();
+                    hidePopover();
+                });
+                document.getElementById("btnPopCloseInner")?.addEventListener("click", hidePopover);
+            }
+        } else if (markerType === "sprinkler") {
+            pinSprinkler?.classList.add("active-spatial-pin");
+            if (iconEl) iconEl.textContent = "💦";
+            if (titleEl) titleEl.textContent = isBn ? "নোড #২: স্মার্ট সেচ পাম্প" : "Node #2: IoT Irrigation Pump";
+            if (subEl) subEl.textContent = isBn ? "স্বয়ংক্রিয় সৌরচালিত ড্রিপ/স্প্রিংকলার" : "Solar Automated Drip & Sprinkler Node";
+            if (bodyEl) {
+                const statusTxt = isSprinklerActiveState
+                    ? (isBn ? "সক্রিয় (Active)" : "Active")
+                    : (isBn ? "বিশ্রাম (Standby)" : "Standby");
+                const statusCol = isSprinklerActiveState ? "#43ef8c" : "#94a99f";
+                bodyEl.innerHTML = `
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "পাম্পের অবস্থা:" : "Pump Status:"}</span>
+                        <strong style="color: ${statusCol};">${statusTxt}</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "পানি প্রবাহ হার:" : "Flow Rate:"}</span>
+                        <strong>18.5 L/min · 2.4 Bar</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "সৌর ব্যাটারি:" : "Solar Battery:"}</span>
+                        <strong>94% · LoRaWAN Connected</strong>
+                    </div>
+                    <div class="popover-metric-row">
+                        <span>${isBn ? "সেচ কাভারেজ:" : "Coverage:"}</span>
+                        <strong>Zone A & Row 4 (Field 02)</strong>
+                    </div>
+                `;
+            }
+            if (footerEl) {
+                const toggleBtnText = isSprinklerActiveState
+                    ? (isBn ? "⏸️ পাম্প স্ট্যান্ডবাই করুন" : "⏸️ Switch to Standby")
+                    : (isBn ? "▶️ পাম্প চালু করুন" : "▶️ Activate Pump");
+                footerEl.innerHTML = `
+                    <button type="button" class="popover-btn popover-btn-primary" id="btnToggleSprinkler">
+                        ${toggleBtnText}
+                    </button>
+                    <button type="button" class="popover-btn popover-btn-secondary" id="btnPopCloseInner">
+                        ${isBn ? "বন্ধ করুন" : "Close"}
+                    </button>
+                `;
+                document.getElementById("btnToggleSprinkler")?.addEventListener("click", () => {
+                    isSprinklerActiveState = !isSprinklerActiveState;
+                    const spLabel = document.getElementById("arPinSprinklerLabel");
+                    if (isSprinklerActiveState) {
+                        executeActionIrrigate();
+                        if (spLabel) spLabel.textContent = isBn ? "Node #2: সেচ পাম্প (Active)" : "Node #2: Irrigation Pump (Active)";
+                    } else {
+                        if (sprinklerWaterParticles) sprinklerWaterParticles.visible = false;
+                        if (spLabel) spLabel.textContent = isBn ? "Node #2: সেচ পাম্প (Standby)" : "Node #2: Irrigation Pump (Standby)";
+                    }
+                    showPopover("sprinkler");
+                });
+                document.getElementById("btnPopCloseInner")?.addEventListener("click", hidePopover);
+            }
+        }
+
+        popover.style.display = "block";
+    }
+
+    pinZoneA?.addEventListener("click", () => showPopover("zoneA"));
+    pinRow4?.addEventListener("click", () => showPopover("row4"));
+    pinSprinkler?.addEventListener("click", () => showPopover("sprinkler"));
+
+    // Keyboard support
+    [pinZoneA, pinRow4, pinSprinkler].forEach(pin => {
+        pin?.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                pin.click();
+            }
+        });
+    });
+}
+window.initSpatialMarkerInteractions = initSpatialMarkerInteractions;
+
 /**
  * Mobile-responsive dropdown label optimizer (<480px width: concise labels without mid-word cuts)
  */
@@ -6807,6 +6997,7 @@ export function init3DFieldSimulation() {
 
     // Viewport-aware rendering to eliminate 100% idle GPU/CPU battery drain when scrolled away or tab hidden
     setupViewportAwareRendering(containerEl);
+    initSpatialMarkerInteractions();
     isRenderLoopRunning = true;
     requestShadowUpdate();
     requestAnimationFrame(animate);

@@ -333,23 +333,41 @@
         </div>
 
         <!-- In-Scene 3D Spatial AR HUD Overlay (World-to-Screen Projected Pins & Holographic Rings) -->
-        <div id="spatialArContainer" class="spatial-ar-container" aria-hidden="true">
+        <div id="spatialArContainer" class="spatial-ar-container" role="region" aria-label="3D Live Field Telemetry Markers">
             <!-- 3D World-Space Zone Pins Wrapper -->
             <div class="spatial-ar-pins-wrap" id="spatialArPinsWrap">
-                <div id="arPinZoneA" class="ar-spatial-pin pin-zone" title="Zone A Moisture Status">
+                <div id="arPinZoneA" class="ar-spatial-pin pin-zone" title="Zone A Moisture Status" tabindex="0" role="button" aria-haspopup="dialog">
                     <span class="ar-pin-pulse"></span>
                     <span class="ar-pin-icon">💧</span>
-                    <span class="ar-pin-label" id="arPinZoneALabel">Zone A: ৭৪% আর্দ্রতা (Optimal)</span>
+                    <span class="ar-pin-label" id="arPinZoneALabel">Zone A: 58% Moisture (Optimal)</span>
                 </div>
-                <div id="arPinRow4" class="ar-spatial-pin pin-crop" title="Row 4 Ripening Cluster">
+                <div id="arPinRow4" class="ar-spatial-pin pin-crop" title="Row 4 Ripening Cluster" tabindex="0" role="button" aria-haspopup="dialog">
                     <span class="ar-pin-pulse"></span>
                     <span class="ar-pin-icon" id="arPinCropIcon">🌱</span>
-                    <span class="ar-pin-label" id="arPinCropLabel">Row 4: পাকা ফলন (Ready in 6 Days)</span>
+                    <span class="ar-pin-label" id="arPinCropLabel">Row 4: Harvest-Ready Rice (Optimal)</span>
                 </div>
-                <div id="arPinSprinkler" class="ar-spatial-pin pin-device" title="Sprinkler Node #2">
+                <div id="arPinSprinkler" class="ar-spatial-pin pin-device" title="Sprinkler Node #2" tabindex="0" role="button" aria-haspopup="dialog">
                     <span class="ar-pin-pulse"></span>
                     <span class="ar-pin-icon">💦</span>
-                    <span class="ar-pin-label">Node #2: সেচ নোজল (Active)</span>
+                    <span class="ar-pin-label" id="arPinSprinklerLabel">Node #2: সেচ পাম্প (Active)</span>
+                </div>
+            </div>
+
+            <!-- Interactive Telemetry Popover / Toast for 3D Markers -->
+            <div id="spatialMarkerPopover" class="spatial-marker-popover" style="display: none;" role="dialog" aria-modal="true">
+                <div class="marker-popover-card">
+                    <div class="popover-header">
+                        <div class="popover-title-row">
+                            <span class="popover-icon" id="markerPopoverIcon">💧</span>
+                            <div>
+                                <h4 class="popover-title" id="markerPopoverTitle">Zone A Moisture Telemetry</h4>
+                                <span class="popover-sub" id="markerPopoverSub">Mymensingh Field 02 · NASA SMAP</span>
+                            </div>
+                        </div>
+                        <button type="button" class="popover-close-btn" id="btnMarkerPopoverClose" aria-label="Close">✕</button>
+                    </div>
+                    <div class="popover-body" id="markerPopoverBody"></div>
+                    <div class="popover-footer" id="markerPopoverFooter"></div>
                 </div>
             </div>
 
@@ -952,6 +970,17 @@
 
             <!-- MAP -->
             <div class="land-map">
+                <!-- Satellite Coordinate HUD Overlay -->
+                <div class="map-satellite-hud">
+                    <span class="hud-sat-pill">🛰️ SATELLITE EO</span>
+                    <span class="hud-coords">24.7471° N, 90.4203° E</span>
+                    <span class="hud-aez" data-i18n="map-aez">AEZ-9 Old Brahmaputra</span>
+                </div>
+                <!-- Satellite Scanning Radar Animation Overlay -->
+                <div id="mapScanningOverlay" class="map-scanning-overlay" style="display: none;">
+                    <div class="map-scan-laser"></div>
+                    <div class="map-scan-text" data-i18n="map-scanning-text">🛰️ NASA SATELLITE SCANNING LAND...</div>
+                </div>
                 <div id="farmMap"></div>
             </div>
 

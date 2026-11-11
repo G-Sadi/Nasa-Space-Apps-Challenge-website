@@ -97,6 +97,16 @@ function calculateScenario() {
                 : "The scenario remains manageable. Your adaptive crop rotation remains competitive.";
         }
     }
+
+    // Dynamic Real-time Binding to Dual-Line Chart
+    if (window.farmChartInstance) {
+        const newRain = BASELINE_RAINFALL.map(r => Math.round(Math.max(10, r * (1 + rain / 100))));
+        const newWater = BASELINE_WATER.map(w => Math.round(Math.max(15, Math.min(100, w + (water * 0.75) - (temp * 2.2)))));
+
+        window.farmChartInstance.data.datasets[0].data = newRain;
+        window.farmChartInstance.data.datasets[1].data = newWater;
+        window.farmChartInstance.update("none");
+    }
 }
 
 if (rainSlider) rainSlider.addEventListener("input", calculateScenario);
@@ -108,6 +118,11 @@ function resetSimulation() {
     if (tempSlider) tempSlider.value = 0;
     if (waterSlider) waterSlider.value = 0;
     calculateScenario();
+    if (window.farmChartInstance) {
+        window.farmChartInstance.data.datasets[0].data = [...BASELINE_RAINFALL];
+        window.farmChartInstance.data.datasets[1].data = [...BASELINE_WATER];
+        window.farmChartInstance.update();
+    }
 }
 
 /*
@@ -138,58 +153,172 @@ window.resetSimulation = resetSimulation;
 
 /*
 |--------------------------------------------------------------------------
-| Chart.js Initialization
+| Dual-Line Chart.js Initialization & Real-Time Slider Binding
 |--------------------------------------------------------------------------
 */
 
-const ctx = document.getElementById("farmChart");
-if (ctx) {
-    new Chart(ctx, {
+const CHART_MONTHS_EN = ["Jan", "Mar", "May", "Jul", "Sep", "Nov"];
+const CHART_MONTHS_BN = ["জানু", "মার্চ", "মে", "জুলাই", "সেপ্টে", "নভে"];
+const BASELINE_RAINFALL = [45, 140, 290, 375, 230, 55]; // realistic monsoon rainfall curve (mm)
+const BASELINE_WATER = [68, 62, 79, 94, 86, 71]; // realistic water availability curve (%)
+
+let farmChartInstance = null;
+
+function initFarmChart() {
+    const ctx = document.getElementById("farmChart");
+    if (!ctx) return;
+
+    const isBn = (window.currentAppLanguage === "bn");
+
+    if (farmChartInstance) {
+        farmChartInstance.destroy();
+    }
+
+    farmChartInstance = new Chart(ctx, {
         type: "line",
         data: {
-            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            labels: isBn ? CHART_MONTHS_BN : CHART_MONTHS_EN,
             datasets: [
                 {
-                    label: "Rainfall (mm)",
-                    data: [120, 180, 240, 210, 300, 260],
+                    label: isBn ? "বৃষ্টিপাত (মিমি)" : "Rainfall (mm)",
+                    data: [...BASELINE_RAINFALL],
                     borderColor: "#43ef8c",
-                    backgroundColor: "rgba(67, 239, 140, 0.15)",
-                    borderWidth: 2.5,
+                    backgroundColor: "rgba(67, 239, 140, 0.16)",
+                    borderWidth: 2.8,
+                    pointBackgroundColor: "#43ef8c",
+                    pointBorderColor: "#06150f",
+                    pointBorderWidth: 2,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 7,
                     fill: true,
-                    tension: 0.4
+                    tension: 0.38,
+                    yAxisID: "y"
                 },
                 {
-                    label: "Water Availability (%)",
-                    data: [80, 76, 72, 68, 74, 79],
+                    label: isBn ? "পানির প্রাপ্যতা (%)" : "Water Availability (%)",
+                    data: [...BASELINE_WATER],
                     borderColor: "#38bdf8",
                     backgroundColor: "transparent",
-                    borderWidth: 2,
-                    borderDash: [5, 5],
-                    tension: 0.4
+                    borderWidth: 2.5,
+                    borderDash: [6, 4],
+                    pointBackgroundColor: "#38bdf8",
+                    pointBorderColor: "#06150f",
+                    pointBorderWidth: 2,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 7,
+                    tension: 0.38,
+                    yAxisID: "y1"
                 }
             ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: "index",
+                intersect: false
+            },
             plugins: {
                 legend: {
-                    labels: { color: "#e2e8f0" }
+                    position: "top",
+                    labels: {
+                        color: "#e2e8f0",
+                        font: { size: 12, weight: "600" },
+                        usePointStyle: true,
+                        pointStyle: "circle",
+                        padding: 16
+                    }
+                },
+                tooltip: {
+                    backgroundColor: "rgba(6, 21, 15, 0.94)",
+                    titleColor: "#43ef8c",
+                    bodyColor: "#f8fafc",
+                    borderColor: "rgba(67, 239, 140, 0.4)",
+                    borderWidth: 1,
+                    padding: 10,
+                    boxPadding: 4,
+                    callbacks: {
+                        label: function (context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) {
+                                label += context.datasetIndex === 0
+                                    ? `${context.parsed.y} mm`
+                                    : `${context.parsed.y}%`;
+                            }
+                            return label;
+                        }
+                    }
                 }
             },
             scales: {
                 x: {
-                    ticks: { color: "#8ca097" },
-                    grid: { color: "rgba(255, 255, 255, 0.05)" }
+                    ticks: {
+                        color: "#9bb0a5",
+                        font: { size: 12, weight: "600" }
+                    },
+                    grid: {
+                        color: "rgba(255, 255, 255, 0.05)"
+                    }
                 },
                 y: {
-                    ticks: { color: "#8ca097" },
-                    grid: { color: "rgba(255, 255, 255, 0.05)" }
+                    type: "linear",
+                    display: true,
+                    position: "left",
+                    min: 0,
+                    max: 480,
+                    title: {
+                        display: true,
+                        text: isBn ? "বৃষ্টিপাত (মিমি)" : "Rainfall (mm)",
+                        color: "#43ef8c",
+                        font: { size: 11, weight: "700" }
+                    },
+                    ticks: {
+                        color: "#43ef8c",
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        color: "rgba(67, 239, 140, 0.08)"
+                    }
+                },
+                y1: {
+                    type: "linear",
+                    display: true,
+                    position: "right",
+                    min: 0,
+                    max: 100,
+                    title: {
+                        display: true,
+                        text: isBn ? "পানির প্রাপ্যতা (%)" : "Water Availability (%)",
+                        color: "#38bdf8",
+                        font: { size: 11, weight: "700" }
+                    },
+                    ticks: {
+                        color: "#38bdf8",
+                        font: { size: 11 }
+                    },
+                    grid: {
+                        drawOnChartArea: false
+                    }
                 }
             }
         }
     });
+
+    window.farmChartInstance = farmChartInstance;
 }
+
+// Initialize on load and sync with language changes
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initFarmChart);
+} else {
+    initFarmChart();
+}
+
+window.addEventListener("languageChanged", () => {
+    initFarmChart();
+    calculateScenario();
+});
 
 /*
 |--------------------------------------------------------------------------

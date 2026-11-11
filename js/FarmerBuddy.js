@@ -1409,28 +1409,17 @@ STRICT RULES FOR EVERY RESPONSE:
         this.minimizeBtnEl = this.closeBtnEl;
         this.liveSyncBadgeEl = header.querySelector("#fbLiveSyncBadge");
 
-        // Model Selector Toolbar (Compact & Sleek AI Segment)
+        // Clean Live NASA Telemetry Status Bar (Replaces model dropdown)
         this.modelToolbar = document.createElement("div");
         this.modelToolbar.id = "fbModelToolbar";
-        this.modelToolbar.className = "fb-model-toolbar";
+        this.modelToolbar.className = "fb-telemetry-status-bar";
         this.modelToolbar.innerHTML = `
-            <div class="fb-model-selector-group">
-                <span class="fb-model-icon">✨</span>
-                <select id="fbModelSelect" class="fb-model-select" aria-label="Select AI Model">
-                    <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "⚡ Gemini 3.5 Flash (দ্রুত)" : "⚡ Gemini 3.5 Flash"}
-                    </option>
-                    <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                        ${isBn ? "🎯 Gemini 3.5 Pro (প্ল্যানার)" : "🎯 Gemini 3.5 Pro"}
-                    </option>
-                    <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                        ${isBn ? "🌱 Gemini 3.5 Lite (সাশ্রয়ী)" : "🌱 Gemini 3.5 Lite"}
-                    </option>
-                </select>
+            <div class="fb-telemetry-indicator">
+                <span class="fb-telemetry-pulse-dot"></span>
+                <span class="fb-telemetry-status-text">🛰️ Synced with NASA SMAP &amp; MODIS</span>
             </div>
-            <div id="fbModelPill" class="fb-model-pill ${this.getModelPillClass()}" title="${isBn ? 'বর্তমান AI মোড' : 'Active AI Mode'}">
-                <span class="fb-pulse-dot"></span>
-                <span id="fbModelPillText">${this.getModelPillLabel(isBn)}</span>
+            <div class="fb-telemetry-field-tag">
+                <span>Field 02 • Mymensingh</span>
             </div>
         `;
 
@@ -1531,13 +1520,7 @@ STRICT RULES FOR EVERY RESPONSE:
             pillText.textContent = this.getModelPillLabel(isBn);
         }
         if (badge) {
-            if (this.selectedModel === "gemini-2.5-pro") {
-                badge.textContent = isBn ? "AI প্রফিট প্ল্যানার" : "AI Profit Planner";
-            } else if (this.selectedModel === "gemini-2.5-flash") {
-                badge.textContent = isBn ? "AI লাইট মোড" : "AI Low-Bandwidth";
-            } else {
-                badge.textContent = isBn ? "AI দ্রুততম 3.5" : "AI Ultra-Fast 3.5";
-            }
+            badge.textContent = isBn ? "কৃষি AI" : "NASA AI";
         }
     }
 
@@ -1568,22 +1551,6 @@ STRICT RULES FOR EVERY RESPONSE:
         if (this.micBtn) this.micBtn.title = isBn ? "ভয়েস টাইপিং (Speech-to-Text)" : "Voice Input (Speech-to-Text)";
         if (this.previewInfo) {
             this.previewInfo.textContent = isBn ? "🌿 পাতার ছবি যুক্ত হয়েছে" : "🌿 Leaf image attached";
-        }
-
-        // Update Model Dropdown labels
-        const modelSelect = this.chatWindow ? this.chatWindow.querySelector("#fbModelSelect") : null;
-        if (modelSelect) {
-            modelSelect.innerHTML = `
-                <option value="gemini-3.5-flash" ${this.selectedModel === 'gemini-3.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "⚡ Gemini 3.5 Flash (দ্রুত)" : "⚡ Gemini 3.5 Flash"}
-                </option>
-                <option value="gemini-2.5-pro" ${this.selectedModel === 'gemini-2.5-pro' ? 'selected' : ''}>
-                    ${isBn ? "🎯 Gemini 3.5 Pro (প্ল্যানার)" : "🎯 Gemini 3.5 Pro"}
-                </option>
-                <option value="gemini-2.5-flash" ${this.selectedModel === 'gemini-2.5-flash' ? 'selected' : ''}>
-                    ${isBn ? "🌱 Gemini 3.5 Lite (সাশ্রয়ী)" : "🌱 Gemini 3.5 Lite"}
-                </option>
-            `;
         }
 
         this.renderQuickChips();
@@ -1875,12 +1842,8 @@ STRICT RULES FOR EVERY RESPONSE:
         let thinkingLabel;
         if (attachedImage) {
             thinkingLabel = isBn ? "📷 পাতার ছবির লক্ষণ ও রোগ বিশ্লেষণ করছি..." : "📷 Analyzing Leaf Symptoms & Pathology Vision...";
-        } else if (this.selectedModel === "gemini-2.5-pro") {
-            thinkingLabel = isBn ? "শস্য পরিক্রমা ও লাভ পরিকল্পনা হিসাব করছি..." : "Calculating Crop Rotation & Profit Plan...";
-        } else if (this.selectedModel === "gemini-2.5-flash") {
-            thinkingLabel = isBn ? "হালকা ব্যান্ডউইথে কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing in Low-Bandwidth Mode...";
         } else {
-            thinkingLabel = isBn ? "Gemini 3.5 দিয়ে কৃষি পরামর্শ বিশ্লেষণ করছি..." : "Analyzing Advisory with Gemini 3.5...";
+            thinkingLabel = isBn ? "🛰️ নাসা টেলিমেট্রি ও কৃষি পরামর্শ বিশ্লেষণ করছি..." : "🛰️ Analyzing NASA Telemetry & Agronomy Advisory...";
         }
 
         textTarget.innerHTML = `<span class="fb-typing-indicator"><span class="fb-typing-dots"><span></span><span></span><span></span></span> <span class="fb-thinking-text">${thinkingLabel}</span></span>`;
@@ -1940,19 +1903,29 @@ STRICT RULES FOR EVERY RESPONSE:
         let replyText = null;
 
         try {
-            // LAYER 1: DIRECT GEMINI REST API (Multimodal with inlineData if attachedImage)
+            // LAYER 1: DIRECT GEMINI REST API with 2-second timeout race for instant fallback
             if (this.geminiApiKey && navigator.onLine) {
                 try {
-                    replyText = await this.callDirectGemini(promptForAi, attachedImage || null, recentHistory, farmContext);
+                    const timeoutPromise = new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error("Gemini 2000ms timeout fallback")), 2000)
+                    );
+                    replyText = await Promise.race([
+                        this.callDirectGemini(promptForAi, attachedImage || null, recentHistory, farmContext),
+                        timeoutPromise
+                    ]);
                 } catch (directErr) {
-                    console.warn("[FarmerBuddy] Direct Gemini API call failed:", directErr.message);
+                    console.warn("[FarmerBuddy] Direct Gemini API call failed or timed out:", directErr.message);
                 }
             }
 
-            // LAYER 1 (Secondary): LOCAL BACKEND PROXY (e.g. localhost:5000 with auto-injected secure .env key)
-            if (!replyText && navigator.onLine) {
+            // LAYER 1 (Secondary): LOCAL BACKEND PROXY (quick check)
+            if (!replyText && navigator.onLine && window.location.hostname === "localhost") {
                 try {
-                    replyText = await this.callBackendProxy(promptForAi, recentHistory, farmContext);
+                    const proxyTimeout = new Promise((_, reject) => setTimeout(() => reject(new Error("Proxy timeout")), 1000));
+                    replyText = await Promise.race([
+                        this.callBackendProxy(promptForAi, recentHistory, farmContext),
+                        proxyTimeout
+                    ]);
                 } catch (proxyErr) {
                     console.warn("[FarmerBuddy] Backend proxy unreachable:", proxyErr.message);
                 }
@@ -1961,10 +1934,10 @@ STRICT RULES FOR EVERY RESPONSE:
             // LAYER 2: STATEFUL LOCAL AGRICULTURAL EXPERT & ROTATION ENGINE
             if (!replyText) {
                 if (attachedImage) {
-                    const activeCrop = this.context.crop || this.localEngine.extractCrop(farmContext.crop) || "tomato";
+                    const activeCrop = this.context.crop || this.localEngine.extractCrop(farmContext.crop) || "rice";
                     replyText = this.localEngine.generateImageDiagnosisChecklist(activeCrop, isBn);
                 } else {
-                    console.log(`[FarmerBuddy] Generating response via Layer 2 Stateful Agricultural Engine [${this.selectedModel}]...`);
+                    console.log(`[FarmerBuddy] Generating instant response via Layer 2 Agronomy Engine...`);
                     replyText = this.localEngine.processQuery(cleanText, this.context, farmContext, this.currentLang);
                 }
             }
