@@ -81,7 +81,7 @@ export const DEMO_FARMER: FarmerProfile = {
     district: "Mymensingh",
     lat: 24.7471,
     lon: 90.4203,
-    landSizeDecimals: 35,
+    landSizeDecimals: 2500, // 25 Acres (75 Bigha)
     primaryCrop: "rice",
     soilType: "loamy",
     createdAt: "2026-01-01T00:00:00.000Z"
@@ -241,11 +241,18 @@ export class FarmerAuthEngine {
             }
         } catch (e) { }
 
-        // 3. Pre-seed Demo Farmer if empty
+        // 3. Pre-seed Demo Farmer if empty or update if cached with old metadata
         if (this.memoryMap.size === 0) {
             this.memoryMap.set(DEMO_FARMER.phone, DEMO_FARMER);
             this.persistToLocalStorage();
             this.idb.put(DEMO_FARMER).catch(() => { });
+        } else if (this.memoryMap.has(DEMO_FARMER.phone)) {
+            const currentDemo = this.memoryMap.get(DEMO_FARMER.phone);
+            if (currentDemo && currentDemo.landSizeDecimals !== 2500) {
+                this.memoryMap.set(DEMO_FARMER.phone, { ...currentDemo, ...DEMO_FARMER });
+                this.persistToLocalStorage();
+                this.idb.put(DEMO_FARMER).catch(() => { });
+            }
         }
 
         // 4. Ensure demo farmer is always in autofill if no previous autofill
@@ -259,7 +266,10 @@ export class FarmerAuthEngine {
             const storedSession = localStorage.getItem(STORAGE_SESSION_KEY);
             if (storedSession) {
                 const parsed = JSON.parse(storedSession);
-                if (parsed && parsed.phone && this.memoryMap.has(parsed.phone)) {
+                if (parsed && (parsed.id === "demo-rahim-01" || parsed.phone === DEMO_FARMER.phone)) {
+                    this.activeSession = { ...DEMO_FARMER };
+                    localStorage.setItem(STORAGE_SESSION_KEY, JSON.stringify(this.activeSession));
+                } else if (parsed && parsed.phone && this.memoryMap.has(parsed.phone)) {
                     this.activeSession = this.memoryMap.get(parsed.phone)!;
                 } else if (parsed && parsed.phone) {
                     this.activeSession = parsed;
@@ -591,13 +601,16 @@ export class FarmerAuthEngine {
             const distName = isBn ? distBn : farmer.district;
             const cropInfo = CROP_LABELS[farmer.primaryCrop];
             const cropName = cropInfo ? (isBn ? cropInfo.bn : cropInfo.en) : farmer.primaryCrop;
+            const landSizeDisplay = (farmer.id === "demo-rahim-01" || farmer.landSizeDecimals === 2500)
+                ? (isBn ? '২৫ একর (৭৫ বিঘা)' : '25 Acres (75 Bigha)')
+                : `${farmer.landSizeDecimals} ${isBn ? 'শতক' : 'dec'}`;
 
             container.innerHTML = `
                 <button class="nav-farmer-badge" id="btnNavFarmerProfile" title="${isBn ? 'কৃষক প্রোফাইল দেখুন ও পরিবর্তন করুন' : 'View & Switch Farmer Profile'}">
                     <span class="farmer-avatar">👨‍🌾</span>
                     <span class="farmer-info">
                         <strong class="farmer-name">${farmer.name}</strong>
-                        <small class="farmer-meta">📍 ${distName} • ${farmer.landSizeDecimals} ${isBn ? 'শতক' : 'dec'} (${cropName})</small>
+                        <small class="farmer-meta">📍 ${distName} • ${landSizeDisplay} (${cropName})</small>
                     </span>
                     <span class="farmer-chevron">▾</span>
                 </button>
@@ -649,6 +662,9 @@ export class FarmerAuthEngine {
         const distBn = BANGLADESH_DISTRICTS[farmer.district.toLowerCase()]?.nameBn || farmer.district;
         const cropInfo = CROP_LABELS[farmer.primaryCrop];
         const soilInfo = SOIL_LABELS[farmer.soilType];
+        const landSizeDisplay = (farmer.id === "demo-rahim-01" || farmer.landSizeDecimals === 2500)
+            ? (isBn ? '২৫ একর (৭৫ বিঘা)' : '25 Acres (75 Bigha)')
+            : `${farmer.landSizeDecimals} ${isBn ? 'শতাংশ' : 'Decimals'}`;
 
         popover.innerHTML = `
             <div class="popover-header">
@@ -669,7 +685,7 @@ export class FarmerAuthEngine {
                 </div>
                 <div class="popover-detail-item">
                     <span>📐 ${isBn ? 'জমির পরিমাণ' : 'Land Size'}</span>
-                    <strong>${farmer.landSizeDecimals} ${isBn ? 'শতাংশ' : 'Decimals'}</strong>
+                    <strong>${landSizeDisplay}</strong>
                 </div>
                 <div class="popover-detail-item">
                     <span>🌾 ${isBn ? 'মাটির ধরন' : 'Soil Type'}</span>

@@ -1,5 +1,5 @@
 @echo off
-title AgriVision - Gemini AI Backend Proxy
+title Field Shift - Gemini AI Backend Proxy
 echo ========================================================
 echo   Starting Farmer Buddy (কৃষি বন্ধু) Gemini Backend Proxy
 echo   Listening on: http://localhost:5000/api/ask

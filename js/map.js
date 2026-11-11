@@ -62,10 +62,10 @@ function initializeFarmMap() {
     farmMarker.bindPopup(
         `
         <strong>
-            ${farmData.field.name}
+            Field Shift • Mymensingh - Field 02
         </strong>
         <br>
-        ${farmData.farm.name}
+        Farmer: মোঃ রহিম উদ্দিন (Rahim Uddin)
         `
     );
 
@@ -91,14 +91,14 @@ function initializeFarmMap() {
     fieldPolygon.bindPopup(
         `
         <strong>
-            ${farmData.field.name}
+            Field Shift • Mymensingh - Field 02
         </strong>
 
         <br>
 
-        Area:
-        ${farmData.field.area}
-        ${farmData.field.unit}
+        Area: 25 Acres (75 Bigha)
+        <br>
+        Active Crop: Rice (ধান)
         `
     );
 
@@ -133,6 +133,8 @@ function initializeFarmMap() {
 
 function updateLocationUI() {
 
+    const isBn = (window.currentAppLanguage === "bn");
+
     const locationName =
         document.getElementById(
             "locationName"
@@ -152,7 +154,9 @@ function updateLocationUI() {
     if (locationName) {
 
         locationName.textContent =
-            `${farmData.farm.name} · ${farmData.field.name}`;
+            isBn
+                ? (window.GLOBAL_FARM_CONFIG?.fieldNameBn || "ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২")
+                : (window.GLOBAL_FARM_CONFIG?.fieldName || "Field Shift • Mymensingh - Field 02");
 
     }
 
@@ -160,8 +164,9 @@ function updateLocationUI() {
     if (coordinates) {
 
         coordinates.textContent =
-            `${farmData.location.latitude.toFixed(4)}° N, ` +
-            `${farmData.location.longitude.toFixed(4)}° E`;
+            isBn
+                ? (window.GLOBAL_FARM_CONFIG?.coordinatesBn || "২৪.৭৪৭১° উ, ৯০.৪২০৩° পূ")
+                : (window.GLOBAL_FARM_CONFIG?.coordinates || "24.7471° N, 90.4203° E");
 
     }
 
@@ -169,7 +174,9 @@ function updateLocationUI() {
     if (fieldArea) {
 
         fieldArea.textContent =
-            `${farmData.field.area} ${farmData.field.unit}`;
+            isBn
+                ? (window.GLOBAL_FARM_CONFIG?.areaBn || "২৫ একর (৭৫ বিঘা)")
+                : (window.GLOBAL_FARM_CONFIG?.area || "25 Acres (75 Bigha)");
 
     }
 
@@ -881,6 +888,9 @@ document.addEventListener(
 
         initializeFarmMap();
 
+        setTimeout(() => {
+            if (farmMap) farmMap.invalidateSize();
+        }, 300);
 
         const analyzeButton =
             document.getElementById(
@@ -896,6 +906,10 @@ document.addEventListener(
             );
 
         }
+
+        window.addEventListener("languageChanged", () => {
+            updateLocationUI();
+        });
 
     }
 );

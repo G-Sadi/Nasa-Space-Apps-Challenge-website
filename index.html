@@ -46,9 +46,10 @@
         </div>
 
         <nav>
-            <a href="#how" data-i18n="nav-how">How it works</a>
-            <a href="#analysis" data-i18n="nav-analyze">Analyze</a>
-            <a href="#simulation" data-i18n="nav-simulation">Simulation</a>
+            <a href="#farmSimulation" data-i18n="nav-3d">3D Live Field</a>
+            <a href="#landLocation" data-i18n="nav-land-weather">Land & Weather</a>
+            <a href="#simulation" data-i18n="nav-simulator">Scenario Simulator</a>
+            <a href="#rotation" data-i18n="nav-rotation">Crop Rotation</a>
             <a href="#lifecycle" data-i18n="nav-lifecycle">Crop Lifecycle</a>
         </nav>
 
@@ -106,8 +107,8 @@
                     Analyze my field →
                 </button>
 
-                <button class="secondary-btn" onclick="scrollToHow()" data-i18n="hero-btn-secondary">
-                    See how it works
+                <button class="secondary-btn" onclick="scrollToSimulation()" data-i18n="hero-btn-secondary">
+                    Explore 3D Field ↓
                 </button>
 
             </div>
@@ -127,1014 +128,40 @@
                     <small data-i18n="field-analysis">FIELD ANALYSIS</small>
 
                     <strong data-i18n="field-name">
-                        Mymensingh · Field 02
+                        Field Shift • Mymensingh - Field 02
                     </strong>
 
                 </div>
 
             </div>
 
+        </div>
+
+        <!-- COMPACT 3-PILL STEP BAR -->
+        <div class="hero-steps-bar">
+            <div class="step-pill">
+                <span class="step-num">01</span>
+                <span class="step-txt" data-i18n="hero-step-1">Select Field</span>
+            </div>
+            <span class="step-arrow" aria-hidden="true">→</span>
+            <div class="step-pill">
+                <span class="step-num">02</span>
+                <span class="step-txt" data-i18n="hero-step-2">NASA Sync</span>
+            </div>
+            <span class="step-arrow" aria-hidden="true">→</span>
+            <div class="step-pill">
+                <span class="step-num">03</span>
+                <span class="step-txt" data-i18n="hero-step-3">Adaptive Plan</span>
+            </div>
         </div>
 
     </section>
 
 
-    <!-- HOW IT WORKS -->
-    <section id="how" class="section">
-
-        <div class="section-heading">
-
-            <p class="eyebrow" data-i18n="how-eyebrow">
-                HOW IT WORKS
-            </p>
-
-            <h2>
-                <span data-i18n="how-h2-1">Turn field data into</span>
-                <span class="highlight" data-i18n="how-h2-span">better decisions.</span>
-            </h2>
-
-        </div>
-
-
-        <div class="steps">
-
-            <div class="step-card">
-                <span>01</span>
-
-                <h3 data-i18n="step1-title">
-                    Select your field
-                </h3>
-
-                <p data-i18n="step1-desc">
-                    Enter your location and field conditions.
-                </p>
-            </div>
-
-
-            <div class="step-card">
-                <span>02</span>
-
-                <h3 data-i18n="step2-title">
-                    Analyze conditions
-                </h3>
-
-                <p data-i18n="step2-desc">
-                    Combine climate, water and crop information.
-                </p>
-            </div>
-
-
-            <div class="step-card">
-                <span>03</span>
-
-                <h3 data-i18n="step3-title">
-                    Get your plan
-                </h3>
-
-                <p data-i18n="step3-desc">
-                    Generate an adaptive crop recommendation.
-                </p>
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- ANALYSIS -->
-    <section id="analysis" class="section analysis-section">
-
-        <div class="section-heading">
-
-            <p class="eyebrow" data-i18n="analysis-eyebrow">
-                FIELD ANALYSIS
-            </p>
-
-            <h2>
-                <span data-i18n="analysis-h2-1">Your field,</span>
-                <span class="highlight" data-i18n="analysis-h2-span">in real time.</span>
-            </h2>
-
-        </div>
-
-
-        <!-- 7-DAY HYPER-LOCAL WEATHER FORECAST MODULE -->
-        <div class="weather-forecast-container" id="weatherForecastContainer">
-            <div class="weather-header-row">
-                <div class="weather-header-left">
-                    <div class="weather-pulse-badge">
-                        <span class="weather-pulse-dot"></span>
-                        <span class="weather-badge-text" data-i18n="weather-title">7-Day Hyper-Local Forecast</span>
-                    </div>
-                    <div class="weather-location-pill" id="weatherLocationPill">
-                        <span class="loc-icon">📍</span>
-                        <span id="weatherLocationText">Mymensingh · Field 02</span>
-                    </div>
-                </div>
-
-                <div class="weather-header-right">
-                    <span class="weather-cache-indicator" id="weatherCacheIndicator">⚡ Cached (3h)</span>
-                    <button id="refreshWeatherBtn" class="weather-refresh-btn" title="Refresh Forecast">
-                        <span class="refresh-icon">↻</span>
-                        <span data-i18n="weather-refresh-btn">Refresh</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- HORIZONTAL WEATHER CARDS STRIP -->
-            <div class="weather-cards-scroll">
-                <div class="weather-cards-strip" id="weatherCardsStrip">
-                    <div class="weather-loading-skeleton">
-                        <span class="loading-spinner">↻</span>
-                        <span>Connecting to Open-Meteo satellite feed...</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AUTOMATED KRISHI ALERT BANNER -->
-            <div class="krishi-alert-banner alert-favorable" id="krishiAlertBanner">
-                <div class="krishi-alert-icon-box">
-                    <span class="krishi-alert-icon" id="krishiAlertIcon">🌱</span>
-                </div>
-                <div class="krishi-alert-content">
-                    <div class="krishi-alert-header">
-                        <strong class="krishi-alert-title" data-i18n="krishi-alert-title">KRISHI WEATHER
-                            ADVISORY</strong>
-                        <span class="krishi-alert-tag" id="krishiAlertTag">Next 48 Hours</span>
-                    </div>
-                    <p class="krishi-alert-message" id="krishiAlertMessage">
-                        আগামী ৪৮ ঘণ্টায় আবহাওয়া অনুকূলে রয়েছে—পরিকল্পিত সেচ ও মাঠ পরিচর্যা পরিচালনা করতে পারেন।
-                    </p>
-                </div>
-            </div>
-        </div>
-
-
-        <div class="dashboard">
-
-            <!-- FIELD MAP -->
-            <div class="field-panel">
-
-                <div class="panel-header">
-
-                    <div>
-
-                        <small data-i18n="nasa-obs">NASA OBSERVATION ZONE</small>
-
-                        <h3 data-i18n="field-name">
-                            Mymensingh · Field 02
-                        </h3>
-
-                    </div>
-
-                    <span class="live" data-i18n="live-data">
-                        ● LIVE DATA
-                    </span>
-
-                </div>
-
-
-                <div class="field-map">
-
-                    <div class="map-point"></div>
-
-                </div>
-
-            </div>
-
-
-            <!-- METRICS -->
-            <div class="metrics">
-
-                <div class="metric-card">
-
-                    <small data-i18n="rainfall-label">RAINFALL</small>
-
-                    <strong id="rainfall">
-                        1842 mm
-                    </strong>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <small data-i18n="temp-label">AVG TEMPERATURE</small>
-
-                    <strong id="temperature">
-                        27.4°C
-                    </strong>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <small data-i18n="water-label">WATER AVAILABILITY</small>
-
-                    <strong id="water">
-                        72%
-                    </strong>
-
-                </div>
-
-
-                <div class="metric-card">
-
-                    <small data-i18n="veg-label">VEGETATION INDEX</small>
-
-                    <strong>
-                        0.68 NDVI
-                    </strong>
-
-                </div>
-
-
-                <div class="condition-card">
-
-                    <small data-i18n="field-cond-label">FIELD CONDITION</small>
-
-                    <p id="fieldCondition" data-i18n="field-cond-text">
-                        Moderate water pressure with good soil compatibility.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- SIMULATOR -->
-    <section id="simulation" class="section">
-
-        <div class="section-heading">
-
-            <p class="eyebrow" data-i18n="sim-eyebrow">
-                SCENARIO SIMULATOR
-            </p>
-
-            <h2>
-                <span data-i18n="sim-h2-1">Stress-test your</span>
-                <span class="highlight" data-i18n="sim-h2-span">next season.</span>
-            </h2>
-
-        </div>
-
-
-        <div class="simulator">
-
-            <!-- CONTROLS -->
-            <div class="controls">
-
-                <h3 data-i18n="climate-ctrl">
-                    Climate controls
-                </h3>
-
-
-                <label>
-                    <span data-i18n="rain-change">Rainfall change</span>
-                    <span id="rainValue">0%</span>
-                </label>
-
-                <input type="range" id="rainSlider" min="-30" max="30" value="0">
-
-
-                <label>
-                    <span data-i18n="temp-change">Temperature change</span>
-                    <span id="tempValue">0°C</span>
-                </label>
-
-                <input type="range" id="tempSlider" min="-3" max="5" step="0.1" value="0">
-
-
-                <label>
-                    <span data-i18n="water-avail">Water availability</span>
-                    <span id="waterValue">0%</span>
-                </label>
-
-                <input type="range" id="waterSlider" min="-30" max="20" value="0">
-
-
-                <button class="secondary-btn" onclick="resetSimulation()" data-i18n="reset-scenario">
-                    Reset scenario
-                </button>
-
-            </div>
-
-
-            <!-- RESULT -->
-            <div class="result">
-
-                <small data-i18n="sim-outcome">
-                    SIMULATED OUTCOME
-                </small>
-
-                <h3 data-i18n="rec-crop">
-                    Recommended crop
-                </h3>
-
-                <h2 id="crop">
-                    Maize
-                </h2>
-
-                <div class="score">
-
-                    <span id="score">
-                        81
-                    </span>
-
-                    /100
-
-                </div>
-
-
-                <div class="result-grid">
-
-                    <div>
-                        <small data-i18n="water-pressure">
-                            WATER PRESSURE
-                        </small>
-
-                        <strong id="waterScore">
-                            79%
-                        </strong>
-                    </div>
-
-
-                    <div>
-                        <small data-i18n="climate-fit">
-                            CLIMATE FIT
-                        </small>
-
-                        <strong id="climateScore">
-                            79%
-                        </strong>
-                    </div>
-
-
-                    <div>
-                        <small data-i18n="expected-return">
-                            EXPECTED RETURN
-                        </small>
-
-                        <strong id="returnScore">
-                            ৳1.58L
-                        </strong>
-                    </div>
-
-                </div>
-
-
-                <div class="recommendation">
-
-                    <p id="recommendationText">
-                        The scenario remains within a manageable range. Your adaptive rotation remains competitive.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- CHART -->
-    <section class="section">
-
-        <div class="section-heading">
-
-            <p class="eyebrow" data-i18n="chart-eyebrow">
-                DATA VISUALIZATION
-            </p>
-
-            <h2>
-                <span data-i18n="chart-h2-1">See how conditions</span>
-                <span class="highlight" data-i18n="chart-h2-span">change.</span>
-            </h2>
-
-        </div>
-
-
-        <div class="chart-container">
-
-            <canvas id="farmChart"></canvas>
-
-        </div>
-
-    </section>
-
-
-    <!-- FIELD ROTATION SECTION -->
-    <section id="rotation" class="section rotation-section">
-
-        <div class="section-heading">
-
-            <p class="eyebrow" data-i18n="rot-eyebrow">
-                FIELD ROTATION
-            </p>
-
-            <h2>
-                <span data-i18n="rot-h2-1">Plan your field</span>
-                <span class="highlight" data-i18n="rot-h2-span">across seasons.</span>
-            </h2>
-
-            <p class="section-description" data-i18n="rot-desc">
-                Rotate crops strategically to protect soil health,
-                manage water pressure and improve long-term productivity.
-            </p>
-
-        </div>
-
-
-        <!-- ROTATION HEADER -->
-        <div class="rotation-header">
-
-            <div>
-
-                <small data-i18n="selected-field">SELECTED FIELD</small>
-
-                <h3 data-i18n="field-name">
-                    Mymensingh · Field 02
-                </h3>
-
-            </div>
-
-            <div class="rotation-status">
-
-                <span class="status-dot"></span>
-
-                <span data-i18n="rot-optimized">Rotation optimized</span>
-
-            </div>
-
-        </div>
-
-
-        <!-- ROTATION TIMELINE -->
-        <div class="rotation-timeline">
-
-            <!-- YEAR 1 -->
-            <div class="rotation-card active" data-year="2026" onclick="selectRotation(2026)">
-
-                <div class="rotation-year">
-                    2026
-                </div>
-
-                <div class="crop-icon">
-                    🌽
-                </div>
-
-                <h3 data-i18n="crop-maize">
-                    Maize
-                </h3>
-
-                <p data-i18n="high-yield">
-                    High yield crop
-                </p>
-
-                <div class="rotation-score">
-
-                    <span data-i18n="soil-impact">
-                        Soil impact
-                    </span>
-
-                    <strong data-i18n="impact-medium">
-                        Medium
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- YEAR 2 -->
-            <div class="rotation-card" data-year="2027" onclick="selectRotation(2027)">
-
-                <div class="rotation-year">
-                    2027
-                </div>
-
-                <div class="crop-icon">
-                    🌾
-                </div>
-
-                <h3 data-i18n="crop-rice">
-                    Rice
-                </h3>
-
-                <p data-i18n="water-intensive">
-                    Water intensive
-                </p>
-
-                <div class="rotation-score">
-
-                    <span data-i18n="soil-impact">
-                        Soil impact
-                    </span>
-
-                    <strong data-i18n="impact-high">
-                        High
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- YEAR 3 -->
-            <div class="rotation-card" data-year="2028" onclick="selectRotation(2028)">
-
-                <div class="rotation-year">
-                    2028
-                </div>
-
-                <div class="crop-icon">
-                    🌱
-                </div>
-
-                <h3 data-i18n="crop-wheat">
-                    Wheat
-                </h3>
-
-                <p data-i18n="moderate-demand">
-                    Moderate demand
-                </p>
-
-                <div class="rotation-score">
-
-                    <span data-i18n="soil-impact">
-                        Soil impact
-                    </span>
-
-                    <strong data-i18n="impact-low">
-                        Low
-                    </strong>
-
-                </div>
-
-            </div>
-
-
-            <!-- YEAR 4 -->
-            <div class="rotation-card" data-year="2029" onclick="selectRotation(2029)">
-
-                <div class="rotation-year">
-                    2029
-                </div>
-
-                <div class="crop-icon">
-                    🫘
-                </div>
-
-                <h3 data-i18n="crop-legume">
-                    Legume
-                </h3>
-
-                <p data-i18n="soil-restoration">
-                    Soil restoration
-                </p>
-
-                <div class="rotation-score">
-
-                    <span data-i18n="soil-impact">
-                        Soil impact
-                    </span>
-
-                    <strong data-i18n="impact-very-low">
-                        Very Low
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ROTATION INTERACTIVE DETAILS -->
-        <div class="rotation-details">
-
-            <div class="rotation-detail-main">
-
-                <span class="detail-label" data-i18n="selected-year-lbl">
-                    SELECTED YEAR
-                </span>
-
-                <h2 id="selectedYear">
-                    2026
-                </h2>
-
-                <div class="selected-crop">
-
-                    <span id="selectedCropIcon">🌽</span>
-
-                    <span id="selectedCrop">
-                        Maize
-                    </span>
-
-                </div>
-
-                <p id="cropDescription">
-                    Maize provides strong yield potential but requires careful nutrient management.
-                </p>
-
-            </div>
-
-
-            <div class="rotation-metrics">
-
-                <div class="metric">
-
-                    <span data-i18n="soil-health-lbl">
-                        Soil Health
-                    </span>
-
-                    <strong id="detailSoilHealth">
-                        72%
-                    </strong>
-
-                </div>
-
-
-                <div class="metric">
-
-                    <span data-i18n="water-demand-lbl">
-                        Water Demand
-                    </span>
-
-                    <strong id="waterDemand">
-                        68%
-                    </strong>
-
-                </div>
-
-
-                <div class="metric">
-
-                    <span data-i18n="yield-pot-lbl">
-                        Yield Potential
-                    </span>
-
-                    <strong id="detailYieldPotential">
-                        91%
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- ROTATION ACTIONS -->
-        <div class="rotation-actions">
-
-            <button type="button" id="simulateRotation" data-i18n="sim-rotation-btn">
-                ▶ Simulate Rotation
-            </button>
-
-            <button type="button" id="resetRotation" data-i18n="reset-rotation-btn">
-                Reset
-            </button>
-
-        </div>
-
-
-        <!-- SIMULATION RESULT -->
-        <div id="rotationResult" class="rotation-result">
-
-            <span class="result-icon">
-                ✓
-            </span>
-
-            <div>
-
-                <strong data-i18n="rot-complete-title">
-                    Rotation analysis complete
-                </strong>
-
-                <p id="rotationResultText">
-                    The 4-year rotation shows a positive long-term trajectory. Soil health improves during the legume
-                    phase while water pressure decreases.
-                </p>
-
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- CROP LIFECYCLE TRACKER -->
-    <section id="lifecycle" class="section lifecycle-section">
-
-        <div class="section-heading">
-            <p class="eyebrow" data-i18n="lifecycle-eyebrow">
-                PRECISION CROP INTELLIGENCE
-            </p>
-            <h2>
-                <span data-i18n="lifecycle-h2-1">Interactive</span>
-                <span class="highlight" data-i18n="lifecycle-h2-span">Crop Lifecycle Tracker.</span>
-            </h2>
-            <p class="section-subtitle" data-i18n="lifecycle-desc">
-                Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K
-                fertilizer schedules, critical pest/disease alerts, and actionable management tips.
-            </p>
-        </div>
-
-        <div class="lifecycle-container">
-
-            <!-- CROP SELECTOR CARD -->
-            <div class="crop-selector-card">
-                <div class="crop-selector-header">
-                    <label for="cropLifecycleSelect" class="selector-label">
-                        <span class="label-icon">🌱</span>
-                        <span data-i18n="lifecycle-crop-label">Select Target Crop:</span>
-                    </label>
-
-                    <div class="category-filters" id="categoryFilters" role="tablist">
-                        <button class="cat-pill active" data-category="all" data-i18n="lifecycle-category-all">All
-                            Crops</button>
-                        <button class="cat-pill" data-category="cereal"
-                            data-i18n="lifecycle-category-cereal">Cereals</button>
-                        <button class="cat-pill" data-category="vegetable"
-                            data-i18n="lifecycle-category-veg">Vegetables</button>
-                        <button class="cat-pill" data-category="cash" data-i18n="lifecycle-category-cash">Cash
-                            Crops</button>
-                        <button class="cat-pill" data-category="pulse"
-                            data-i18n="lifecycle-category-pulse">Pulses</button>
-                        <button class="cat-pill" data-category="oil-spice" data-i18n="lifecycle-category-oil">Oilseeds &
-                            Spices</button>
-                        <button class="cat-pill" data-category="fruit"
-                            data-i18n="lifecycle-category-fruit">Fruits</button>
-                    </div>
-                </div>
-
-                <div class="selector-row">
-                    <div class="custom-select-wrapper">
-                        <select id="cropLifecycleSelect" class="styled-crop-select" aria-label="Select Crop">
-                            <!-- Populated dynamically by app.js -->
-                        </select>
-                        <span class="select-chevron">▼</span>
-                    </div>
-
-                    <div class="tour-controls">
-                        <button id="lifecycleTourBtn" class="tour-btn" title="Automated Stage Walkthrough">
-                            <span class="tour-icon">▶</span>
-                            <span id="tourBtnText" data-i18n="lifecycle-btn-play">Auto Tour</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- CROP PROFILE QUICK METRICS STRIP -->
-                <div class="crop-profile-strip" id="cropProfileStrip">
-                    <div class="profile-item">
-                        <span class="profile-icon">⏳</span>
-                        <div class="profile-text">
-                            <span class="profile-label" data-i18n="lifecycle-stat-duration">Total Duration</span>
-                            <strong id="profileDuration">125 Days</strong>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <span class="profile-icon">🌡️</span>
-                        <div class="profile-text">
-                            <span class="profile-label" data-i18n="lifecycle-stat-temp">Optimal Temp</span>
-                            <strong id="profileTemp">22°C - 34°C</strong>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <span class="profile-icon">💧</span>
-                        <div class="profile-text">
-                            <span class="profile-label" data-i18n="lifecycle-stat-water">Water Demand</span>
-                            <strong id="profileWater">High (1100-1350 mm)</strong>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <span class="profile-icon">🌍</span>
-                        <div class="profile-text">
-                            <span class="profile-label" data-i18n="lifecycle-stat-soil">Soil Suitability</span>
-                            <strong id="profileSoil">Clay loam to silty clay</strong>
-                        </div>
-                    </div>
-                    <div class="profile-item">
-                        <span class="profile-icon">🗓️</span>
-                        <div class="profile-text">
-                            <span class="profile-label" data-i18n="lifecycle-stat-season">Ideal Season</span>
-                            <strong id="profileSeason">Aman / Boro / Aus</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DYNAMIC 5-STEP VISUAL PROGRESS BAR -->
-            <div class="stepper-wrapper">
-                <div class="stepper-header">
-                    <div class="stepper-status">
-                        <span class="status-indicator"></span>
-                        <span class="stage-counter-text" id="stageCounterText">Stage 1 of 5</span>
-                    </div>
-                    <div class="stepper-actions">
-                        <button id="prevStageBtn" class="step-nav-btn" disabled>
-                            <span data-i18n="lifecycle-btn-prev">← Previous</span>
-                        </button>
-                        <button id="nextStageBtn" class="step-nav-btn">
-                            <span data-i18n="lifecycle-btn-next">Next →</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="progress-track-container">
-                    <div class="progress-line-bg"></div>
-                    <div class="progress-line-fill" id="progressLineFill" style="width: 0%;"></div>
-
-                    <div class="stepper-nodes" id="stepperNodes" role="tablist">
-                        <!-- 5 Dynamic Step Nodes -->
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACTIVE STAGE DETAILS SHOWCASE -->
-            <div class="stage-detail-panel" id="stageDetailPanel">
-                <!-- Rendered dynamically by app.js -->
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- LAND LOCATION -->
-    <section id="landLocation">
-
-        <div class="section-label" data-i18n="land-eyebrow">
-            LAND INTELLIGENCE
-        </div>
-
-        <h2>
-            <span data-i18n="land-h2-1">Understand your</span>
-            <span class="highlight" data-i18n="land-h2-span">land.</span>
-        </h2>
-
-        <p data-i18n="land-desc">
-            Analyze the geographic conditions around your agricultural field.
-        </p>
-
-
-        <div class="location-layout">
-
-            <!-- MAP -->
-            <div class="land-map">
-
-                <div id="farmMap"></div>
-
-            </div>
-
-
-            <!-- DATA -->
-            <div class="land-data">
-
-                <div class="land-data-header">
-
-                    <span data-i18n="selected-land">
-                        SELECTED LAND
-                    </span>
-
-                    <strong id="locationName">
-                        Mymensingh Field 02
-                    </strong>
-
-                </div>
-
-
-                <div class="geo-card">
-
-                    <span data-i18n="location-label">
-                        📍 LOCATION
-                    </span>
-
-                    <strong id="coordinates">
-                        24.7471° N, 90.4203° E
-                    </strong>
-
-                </div>
-
-
-                <div class="geo-card">
-
-                    <span data-i18n="river-label">
-                        🌊 NEAREST RIVER
-                    </span>
-
-                    <strong id="riverStatus">
-                        Detecting...
-                    </strong>
-
-                    <small id="riverDistance">
-                        --
-                    </small>
-
-                </div>
-
-
-                <div class="geo-card">
-
-                    <span data-i18n="pond-label">
-                        💧 NEAREST POND
-                    </span>
-
-                    <strong id="pondStatus">
-                        Detecting...
-                    </strong>
-
-                    <small id="pondDistance">
-                        --
-                    </small>
-
-                </div>
-
-
-                <div class="geo-card">
-
-                    <span data-i18n="area-label">
-                        📐 FIELD AREA
-                    </span>
-
-                    <strong id="fieldArea">
-                        2.4 acres
-                    </strong>
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="coordinate-inputs">
-
-            <div class="input-group">
-
-                <label data-i18n="lat-label">LATITUDE</label>
-
-                <input type="number" id="latitudeInput" value="24.7471" step="0.000001">
-
-            </div>
-
-
-            <div class="input-group">
-
-                <label data-i18n="lon-label">LONGITUDE</label>
-
-                <input type="number" id="longitudeInput" value="90.4203" step="0.000001">
-
-            </div>
-
-        </div>
-
-
-        <div class="search-radius">
-
-            <label data-i18n="search-rad-label">
-                SEARCH RADIUS
-            </label>
-
-            <select id="searchRadius">
-
-                <option value="500" data-i18n="opt-500m">
-                    500 meters
-                </option>
-
-                <option value="1000" selected data-i18n="opt-1km">
-                    1 kilometer
-                </option>
-
-                <option value="2000" data-i18n="opt-2km">
-                    2 kilometers
-                </option>
-
-                <option value="5000" data-i18n="opt-5km">
-                    5 kilometers
-                </option>
-
-            </select>
-
-        </div>
-
-
-        <button id="analyzeLand" class="analyze-btn" data-i18n="analyze-land-btn">
-            Analyze this land
-        </button>
-
-    </section>
-
-
-    <!-- 3D FARM SIMULATION -->
-    <section id="farmSimulation" class="cinema-mode">
+    <!-- =====================================================================
+         03. INTERACTIVE 3D FIELD DIGITAL TWIN & NASA LIVE TELEMETRY HUB
+         ===================================================================== -->
+<section id="farmSimulation" class="cinema-mode">
 
         <!-- 3D Viewport Canvas -->
         <div id="farm3D" class="canvas-container"></div>
@@ -1689,7 +716,825 @@
     </section>
 
 
-    <!-- FINAL CTA -->
+<!-- =====================================================================
+         04. UNIFIED LAND & WEATHER INTELLIGENCE
+         ===================================================================== -->
+    <section id="landLocation" class="section analysis-section">
+        <a id="analysis" aria-hidden="true" style="position: absolute; top: -80px;"></a>
+
+        <div class="section-heading">
+            <p class="eyebrow" data-i18n="land-eyebrow">
+                LAND & WEATHER INTELLIGENCE
+            </p>
+            <h2>
+                <span data-i18n="land-h2-1">Understand your</span>
+                <span class="highlight" data-i18n="land-h2-span">land & weather.</span>
+            </h2>
+            <p class="section-desc" data-i18n="land-desc">
+                Hyper-local 7-day weather forecasts integrated with real-time NASA satellite land telemetry and hydrological analysis.
+            </p>
+        </div>
+
+        <!-- 7-DAY HYPER-LOCAL WEATHER FORECAST MODULE -->
+        <div class="weather-forecast-container" id="weatherForecastContainer">
+            <div class="weather-header-row">
+                <div class="weather-header-left">
+                    <div class="weather-pulse-badge">
+                        <span class="weather-pulse-dot"></span>
+                        <span class="weather-badge-text" data-i18n="weather-title">7-Day Hyper-Local Forecast</span>
+                    </div>
+                    <div class="weather-location-pill" id="weatherLocationPill">
+                        <span class="loc-icon">📍</span>
+                        <span id="weatherLocationText">Field Shift • Mymensingh - Field 02</span>
+                    </div>
+                </div>
+
+                <div class="weather-header-right">
+                    <span class="weather-cache-indicator" id="weatherCacheIndicator">⚡ Cached (3h)</span>
+                    <button id="refreshWeatherBtn" class="weather-refresh-btn" title="Refresh Forecast">
+                        <span class="refresh-icon">↻</span>
+                        <span data-i18n="weather-refresh-btn">Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- HORIZONTAL WEATHER CARDS STRIP -->
+            <div class="weather-cards-scroll">
+                <div class="weather-cards-strip" id="weatherCardsStrip">
+                    <div class="weather-loading-skeleton">
+                        <span class="loading-spinner">↻</span>
+                        <span>Connecting to Open-Meteo satellite feed...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AUTOMATED KRISHI ALERT BANNER -->
+            <div class="krishi-alert-banner alert-favorable" id="krishiAlertBanner">
+                <div class="krishi-alert-icon-box">
+                    <span class="krishi-alert-icon" id="krishiAlertIcon">🌱</span>
+                </div>
+                <div class="krishi-alert-content">
+                    <div class="krishi-alert-header">
+                        <strong class="krishi-alert-title" data-i18n="krishi-alert-title">KRISHI WEATHER
+                            ADVISORY</strong>
+                        <span class="krishi-alert-tag" id="krishiAlertTag">Next 48 Hours</span>
+                    </div>
+                    <p class="krishi-alert-message" id="krishiAlertMessage">
+                        আগামী ৪৮ ঘণ্টায় আবহাওয়া অনুকূলে রয়েছে—পরিকল্পিত সেচ ও মাঠ পরিচর্যা পরিচালনা করতে পারেন।
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- UNDERSTAND YOUR LAND MAP & TELEMETRY DASHBOARD -->
+        <div class="location-layout">
+
+            <!-- MAP -->
+            <div class="land-map">
+                <div id="farmMap"></div>
+            </div>
+
+            <!-- DATA -->
+            <div class="land-data">
+
+                <div class="land-data-header">
+                    <span data-i18n="selected-land">
+                        SELECTED LAND
+                    </span>
+                    <strong id="locationName" data-i18n="field-name">
+                        Field Shift • Mymensingh - Field 02
+                    </strong>
+                </div>
+
+                <!-- Geographic Attributes Grid -->
+                <div class="geo-cards-grid">
+                    <div class="geo-card">
+                        <span data-i18n="location-label">
+                            📍 LOCATION
+                        </span>
+                        <strong id="coordinates">
+                            24.7471° N, 90.4203° E
+                        </strong>
+                    </div>
+
+                    <div class="geo-card">
+                        <span data-i18n="area-label">
+                            📐 FIELD AREA
+                        </span>
+                        <strong id="fieldArea">
+                            25 Acres (75 Bigha)
+                        </strong>
+                    </div>
+
+                    <div class="geo-card">
+                        <span data-i18n="river-label">
+                            🌊 NEAREST RIVER
+                        </span>
+                        <strong id="riverStatus">
+                            Detecting...
+                        </strong>
+                        <small id="riverDistance">
+                            --
+                        </small>
+                    </div>
+
+                    <div class="geo-card">
+                        <span data-i18n="pond-label">
+                            💧 NEAREST POND
+                        </span>
+                        <strong id="pondStatus">
+                            Detecting...
+                        </strong>
+                        <small id="pondDistance">
+                            --
+                        </small>
+                    </div>
+                </div>
+
+                <!-- 4 NASA Observation Telemetry Metric Cards -->
+                <div class="telemetry-cards-header">
+                    <span class="telemetry-tag" data-i18n="nasa-obs">🛰️ NASA OBSERVATION TELEMETRY</span>
+                    <span class="live" data-i18n="live-data">● LIVE DATA</span>
+                </div>
+
+                <div class="telemetry-cards-grid">
+                    <div class="metric-card">
+                        <small data-i18n="rainfall-label">RAINFALL</small>
+                        <strong id="rainfall">
+                            1842 mm
+                        </strong>
+                    </div>
+
+                    <div class="metric-card">
+                        <small data-i18n="temp-label">AVG TEMPERATURE</small>
+                        <strong id="temperature">
+                            27.4°C
+                        </strong>
+                    </div>
+
+                    <div class="metric-card">
+                        <small data-i18n="water-label">WATER AVAILABILITY</small>
+                        <strong id="water">
+                            72%
+                        </strong>
+                    </div>
+
+                    <div class="metric-card">
+                        <small data-i18n="veg-label">VEGETATION INDEX</small>
+                        <strong id="vegIndex">
+                            0.68 NDVI
+                        </strong>
+                    </div>
+                </div>
+
+                <div class="condition-card">
+                    <small data-i18n="field-cond-label">FIELD CONDITION</small>
+                    <p id="fieldCondition" data-i18n="field-cond-text">
+                        Moderate water pressure with good soil compatibility.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="land-controls-row">
+            <div class="coordinate-inputs">
+                <div class="input-group">
+                    <label data-i18n="lat-label">LATITUDE</label>
+                    <input type="number" id="latitudeInput" value="24.7471" step="0.000001">
+                </div>
+
+                <div class="input-group">
+                    <label data-i18n="lon-label">LONGITUDE</label>
+                    <input type="number" id="longitudeInput" value="90.4203" step="0.000001">
+                </div>
+            </div>
+
+            <div class="search-radius">
+                <label data-i18n="search-rad-label">
+                    SEARCH RADIUS
+                </label>
+                <select id="searchRadius">
+                    <option value="500" data-i18n="opt-500m">500 meters</option>
+                    <option value="1000" selected data-i18n="opt-1km">1 kilometer</option>
+                    <option value="2000" data-i18n="opt-2km">2 kilometers</option>
+                    <option value="5000" data-i18n="opt-5km">5 kilometers</option>
+                </select>
+            </div>
+
+            <button id="analyzeLand" class="analyze-btn" data-i18n="analyze-land-btn">
+                Analyze this land
+            </button>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================================
+         05. SCENARIO SIMULATOR & DYNAMIC CHART
+         ===================================================================== -->
+<section id="simulation" class="section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow" data-i18n="sim-eyebrow">
+                SCENARIO SIMULATOR
+            </p>
+
+            <h2>
+                <span data-i18n="sim-h2-1">Stress-test your</span>
+                <span class="highlight" data-i18n="sim-h2-span">next season.</span>
+            </h2>
+
+        </div>
+
+
+        <div class="simulator">
+
+            <!-- CONTROLS -->
+            <div class="controls">
+
+                <h3 data-i18n="climate-ctrl">
+                    Climate controls
+                </h3>
+
+
+                <label>
+                    <span data-i18n="rain-change">Rainfall change</span>
+                    <span id="rainValue">0%</span>
+                </label>
+
+                <input type="range" id="rainSlider" min="-30" max="30" value="0">
+
+
+                <label>
+                    <span data-i18n="temp-change">Temperature change</span>
+                    <span id="tempValue">0°C</span>
+                </label>
+
+                <input type="range" id="tempSlider" min="-3" max="5" step="0.1" value="0">
+
+
+                <label>
+                    <span data-i18n="water-avail">Water availability</span>
+                    <span id="waterValue">0%</span>
+                </label>
+
+                <input type="range" id="waterSlider" min="-30" max="20" value="0">
+
+
+                <button class="secondary-btn" onclick="resetSimulation()" data-i18n="reset-scenario">
+                    Reset scenario
+                </button>
+
+            </div>
+
+
+            <!-- RESULT -->
+            <div class="result">
+
+                <small data-i18n="sim-outcome">
+                    SIMULATED OUTCOME
+                </small>
+
+                <h3 data-i18n="rec-crop">
+                    Recommended crop
+                </h3>
+
+                <h2 id="crop">
+                    Maize
+                </h2>
+
+                <div class="score">
+
+                    <span id="score">
+                        81
+                    </span>
+
+                    /100
+
+                </div>
+
+
+                <div class="result-grid">
+
+                    <div>
+                        <small data-i18n="water-pressure">
+                            WATER PRESSURE
+                        </small>
+
+                        <strong id="waterScore">
+                            79%
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <small data-i18n="climate-fit">
+                            CLIMATE FIT
+                        </small>
+
+                        <strong id="climateScore">
+                            79%
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <small data-i18n="expected-return">
+                            EXPECTED RETURN
+                        </small>
+
+                        <strong id="returnScore">
+                            ৳1.58L
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                <div class="recommendation">
+
+                    <p id="recommendationText">
+                        The scenario remains within a manageable range. Your adaptive rotation remains competitive.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    
+        <!-- DYNAMIC CONDITIONS CHART (INTEGRATED INTO SCENARIO SIMULATOR) -->
+        <div class="simulation-chart-wrapper">
+
+            <div class="section-heading chart-subheading">
+                <p class="eyebrow" data-i18n="chart-eyebrow">
+                    DATA VISUALIZATION
+                </p>
+                <h2>
+                    <span data-i18n="chart-h2-1">See how conditions</span>
+                    <span class="highlight" data-i18n="chart-h2-span">change.</span>
+                </h2>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="farmChart"></canvas>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================================
+         06. MULTI-YEAR FIELD ROTATION PLANNER
+         ===================================================================== -->
+<section id="rotation" class="section rotation-section">
+
+        <div class="section-heading">
+
+            <p class="eyebrow" data-i18n="rot-eyebrow">
+                FIELD ROTATION
+            </p>
+
+            <h2>
+                <span data-i18n="rot-h2-1">Plan your field</span>
+                <span class="highlight" data-i18n="rot-h2-span">across seasons.</span>
+            </h2>
+
+            <p class="section-description" data-i18n="rot-desc">
+                Rotate crops strategically to protect soil health,
+                manage water pressure and improve long-term productivity.
+            </p>
+
+        </div>
+
+
+        <!-- ROTATION HEADER -->
+        <div class="rotation-header">
+
+            <div>
+
+                <small data-i18n="selected-field">SELECTED FIELD</small>
+
+                <h3 data-i18n="field-name">
+                    Field Shift • Mymensingh - Field 02
+                </h3>
+
+            </div>
+
+            <div class="rotation-status">
+
+                <span class="status-dot"></span>
+
+                <span data-i18n="rot-optimized">Rotation optimized</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROTATION TIMELINE -->
+        <div class="rotation-timeline">
+
+            <!-- YEAR 1 -->
+            <div class="rotation-card active" data-year="2026" onclick="selectRotation(2026)">
+
+                <div class="rotation-year">
+                    2026
+                </div>
+
+                <div class="crop-icon">
+                    🌽
+                </div>
+
+                <h3 data-i18n="crop-maize">
+                    Maize
+                </h3>
+
+                <p data-i18n="high-yield">
+                    High yield crop
+                </p>
+
+                <div class="rotation-score">
+
+                    <span data-i18n="soil-impact">
+                        Soil impact
+                    </span>
+
+                    <strong data-i18n="impact-medium">
+                        Medium
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 2 -->
+            <div class="rotation-card" data-year="2027" onclick="selectRotation(2027)">
+
+                <div class="rotation-year">
+                    2027
+                </div>
+
+                <div class="crop-icon">
+                    🌾
+                </div>
+
+                <h3 data-i18n="crop-rice">
+                    Rice
+                </h3>
+
+                <p data-i18n="water-intensive">
+                    Water intensive
+                </p>
+
+                <div class="rotation-score">
+
+                    <span data-i18n="soil-impact">
+                        Soil impact
+                    </span>
+
+                    <strong data-i18n="impact-high">
+                        High
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 3 -->
+            <div class="rotation-card" data-year="2028" onclick="selectRotation(2028)">
+
+                <div class="rotation-year">
+                    2028
+                </div>
+
+                <div class="crop-icon">
+                    🌱
+                </div>
+
+                <h3 data-i18n="crop-wheat">
+                    Wheat
+                </h3>
+
+                <p data-i18n="moderate-demand">
+                    Moderate demand
+                </p>
+
+                <div class="rotation-score">
+
+                    <span data-i18n="soil-impact">
+                        Soil impact
+                    </span>
+
+                    <strong data-i18n="impact-low">
+                        Low
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <!-- YEAR 4 -->
+            <div class="rotation-card" data-year="2029" onclick="selectRotation(2029)">
+
+                <div class="rotation-year">
+                    2029
+                </div>
+
+                <div class="crop-icon">
+                    🫘
+                </div>
+
+                <h3 data-i18n="crop-legume">
+                    Legume
+                </h3>
+
+                <p data-i18n="soil-restoration">
+                    Soil restoration
+                </p>
+
+                <div class="rotation-score">
+
+                    <span data-i18n="soil-impact">
+                        Soil impact
+                    </span>
+
+                    <strong data-i18n="impact-very-low">
+                        Very Low
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROTATION INTERACTIVE DETAILS -->
+        <div class="rotation-details">
+
+            <div class="rotation-detail-main">
+
+                <span class="detail-label" data-i18n="selected-year-lbl">
+                    SELECTED YEAR
+                </span>
+
+                <h2 id="selectedYear">
+                    2026
+                </h2>
+
+                <div class="selected-crop">
+
+                    <span id="selectedCropIcon">🌽</span>
+
+                    <span id="selectedCrop">
+                        Maize
+                    </span>
+
+                </div>
+
+                <p id="cropDescription">
+                    Maize provides strong yield potential but requires careful nutrient management.
+                </p>
+
+            </div>
+
+
+            <div class="rotation-metrics">
+
+                <div class="metric">
+
+                    <span data-i18n="soil-health-lbl">
+                        Soil Health
+                    </span>
+
+                    <strong id="detailSoilHealth">
+                        72%
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span data-i18n="water-demand-lbl">
+                        Water Demand
+                    </span>
+
+                    <strong id="waterDemand">
+                        68%
+                    </strong>
+
+                </div>
+
+
+                <div class="metric">
+
+                    <span data-i18n="yield-pot-lbl">
+                        Yield Potential
+                    </span>
+
+                    <strong id="detailYieldPotential">
+                        91%
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ROTATION ACTIONS -->
+        <div class="rotation-actions">
+
+            <button type="button" id="simulateRotation" data-i18n="sim-rotation-btn">
+                ▶ Simulate Rotation
+            </button>
+
+            <button type="button" id="resetRotation" data-i18n="reset-rotation-btn">
+                Reset
+            </button>
+
+        </div>
+
+
+        <!-- SIMULATION RESULT -->
+        <div id="rotationResult" class="rotation-result">
+
+            <span class="result-icon">
+                ✓
+            </span>
+
+            <div>
+
+                <strong data-i18n="rot-complete-title">
+                    Rotation analysis complete
+                </strong>
+
+                <p id="rotationResultText">
+                    The 4-year rotation shows a positive long-term trajectory. Soil health improves during the legume
+                    phase while water pressure decreases.
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================================
+         07. INTERACTIVE CROP LIFECYCLE TRACKER
+         ===================================================================== -->
+<section id="lifecycle" class="section lifecycle-section">
+
+        <div class="section-heading">
+            <p class="eyebrow" data-i18n="lifecycle-eyebrow">
+                PRECISION CROP INTELLIGENCE
+            </p>
+            <h2>
+                <span data-i18n="lifecycle-h2-1">Interactive</span>
+                <span class="highlight" data-i18n="lifecycle-h2-span">Crop Lifecycle Tracker.</span>
+            </h2>
+            <p class="section-subtitle" data-i18n="lifecycle-desc">
+                Comprehensive 5-stage agronomic roadmaps for 15 essential crops: track timeline days, precision N-P-K
+                fertilizer schedules, critical pest/disease alerts, and actionable management tips.
+            </p>
+        </div>
+
+        <div class="lifecycle-container">
+
+            <!-- CROP SELECTOR CARD -->
+            <div class="crop-selector-card">
+                <div class="crop-selector-header">
+                    <label for="cropLifecycleSelect" class="selector-label">
+                        <span class="label-icon">🌱</span>
+                        <span data-i18n="lifecycle-crop-label">Select Target Crop:</span>
+                    </label>
+
+                    <div class="category-filters" id="categoryFilters" role="tablist">
+                        <button class="cat-pill active" data-category="all" data-i18n="lifecycle-category-all">All
+                            Crops</button>
+                        <button class="cat-pill" data-category="cereal"
+                            data-i18n="lifecycle-category-cereal">Cereals</button>
+                        <button class="cat-pill" data-category="vegetable"
+                            data-i18n="lifecycle-category-veg">Vegetables</button>
+                        <button class="cat-pill" data-category="cash" data-i18n="lifecycle-category-cash">Cash
+                            Crops</button>
+                        <button class="cat-pill" data-category="pulse"
+                            data-i18n="lifecycle-category-pulse">Pulses</button>
+                        <button class="cat-pill" data-category="oil-spice" data-i18n="lifecycle-category-oil">Oilseeds &
+                            Spices</button>
+                        <button class="cat-pill" data-category="fruit"
+                            data-i18n="lifecycle-category-fruit">Fruits</button>
+                    </div>
+                </div>
+
+                <div class="selector-row">
+                    <div class="custom-select-wrapper">
+                        <select id="cropLifecycleSelect" class="styled-crop-select" aria-label="Select Crop">
+                            <!-- Populated dynamically by app.js -->
+                        </select>
+                        <span class="select-chevron">▼</span>
+                    </div>
+
+                    <div class="tour-controls">
+                        <button id="lifecycleTourBtn" class="tour-btn" title="Automated Stage Walkthrough">
+                            <span class="tour-icon">▶</span>
+                            <span id="tourBtnText" data-i18n="lifecycle-btn-play">Auto Tour</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CROP PROFILE QUICK METRICS STRIP -->
+                <div class="crop-profile-strip" id="cropProfileStrip">
+                    <div class="profile-item">
+                        <span class="profile-icon">⏳</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-duration">Total Duration</span>
+                            <strong id="profileDuration">125 Days</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🌡️</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-temp">Optimal Temp</span>
+                            <strong id="profileTemp">22°C - 34°C</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">💧</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-water">Water Demand</span>
+                            <strong id="profileWater">High (1100-1350 mm)</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🌍</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-soil">Soil Suitability</span>
+                            <strong id="profileSoil">Clay loam to silty clay</strong>
+                        </div>
+                    </div>
+                    <div class="profile-item">
+                        <span class="profile-icon">🗓️</span>
+                        <div class="profile-text">
+                            <span class="profile-label" data-i18n="lifecycle-stat-season">Ideal Season</span>
+                            <strong id="profileSeason">Aman / Boro / Aus</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DYNAMIC 5-STEP VISUAL PROGRESS BAR -->
+            <div class="stepper-wrapper">
+                <div class="stepper-header">
+                    <div class="stepper-status">
+                        <span class="status-indicator"></span>
+                        <span class="stage-counter-text" id="stageCounterText">Stage 1 of 5</span>
+                    </div>
+                    <div class="stepper-actions">
+                        <button id="prevStageBtn" class="step-nav-btn" disabled>
+                            <span data-i18n="lifecycle-btn-prev">← Previous</span>
+                        </button>
+                        <button id="nextStageBtn" class="step-nav-btn">
+                            <span data-i18n="lifecycle-btn-next">Next →</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="progress-track-container">
+                    <div class="progress-line-bg"></div>
+                    <div class="progress-line-fill" id="progressLineFill" style="width: 0%;"></div>
+
+                    <div class="stepper-nodes" id="stepperNodes" role="tablist">
+                        <!-- 5 Dynamic Step Nodes -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVE STAGE DETAILS SHOWCASE -->
+            <div class="stage-detail-panel" id="stageDetailPanel">
+                <!-- Rendered dynamically by app.js -->
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================================================
+         08. CTA & FOOTER
+         ===================================================================== -->
     <section class="final-cta">
 
         <p class="eyebrow" data-i18n="cta-eyebrow">
@@ -1712,17 +1557,51 @@
     <footer>
 
         <strong data-i18n="footer-brand">
-            AgriVision
+            Field Shift
         </strong>
 
         <p data-i18n="footer-tagline">
-            Smart farming intelligence platform.
+            Smart agricultural intelligence platform for sustainable farming.
         </p>
+
+        <!-- NASA Telemetry Badges -->
+        <div class="nasa-data-badges-container">
+            <div class="nasa-data-badges-title" data-i18n="nasa-sources-title">
+                NASA Earth Observation Telemetry Sources
+            </div>
+            <div class="nasa-badges-grid">
+                <div class="nasa-source-badge" title="NASA Soil Moisture Active Passive">
+                    <span class="badge-icon">🛰️</span>
+                    <strong>NASA SMAP</strong>
+                    <span class="badge-desc" data-i18n="smap-desc">Root & Topsoil Moisture</span>
+                </div>
+                <div class="nasa-source-badge" title="Moderate Resolution Imaging Spectroradiometer">
+                    <span class="badge-icon">🌿</span>
+                    <strong>MODIS</strong>
+                    <span class="badge-desc" data-i18n="modis-desc">NDVI & Solar PAR</span>
+                </div>
+                <div class="nasa-source-badge" title="ECOsystem Spaceborne Thermal Radiometer Experiment">
+                    <span class="badge-icon">🌡️</span>
+                    <strong>ECOSTRESS</strong>
+                    <span class="badge-desc" data-i18n="ecostress-desc">Evapotranspiration & Stress</span>
+                </div>
+                <div class="nasa-source-badge" title="Modern-Era Retrospective analysis for Research and Applications">
+                    <span class="badge-icon">💨</span>
+                    <strong>MERRA-2</strong>
+                    <span class="badge-desc" data-i18n="merra-desc">Atmospheric & Temp</span>
+                </div>
+                <div class="nasa-source-badge" title="Global Precipitation Measurement">
+                    <span class="badge-icon">🌧️</span>
+                    <strong>GPM</strong>
+                    <span class="badge-desc" data-i18n="gpm-desc">Precipitation IMERG</span>
+                </div>
+            </div>
+        </div>
 
     </footer>
 
 
-    <!-- =====================================================================
+<!-- =====================================================================
          🛰️ NASA FARMING DATA HUB MODAL (FOR FARMERS & SPACE APPS JUDGES)
          ===================================================================== -->
     <div id="nasaAgriHubModal" class="nasa-hub-modal-overlay" style="display: none;" aria-hidden="true" role="dialog">

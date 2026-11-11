@@ -34,7 +34,7 @@ registeredFarmers.set("01711223344", {
     district: "Mymensingh",
     lat: 24.7471,
     lon: 90.4203,
-    landSizeDecimals: 35,
+    landSizeDecimals: 2500, // 25 Acres (75 Bigha)
     primaryCrop: "rice",
     soilType: "loamy",
     createdAt: "2026-01-01T00:00:00.000Z"
@@ -162,7 +162,7 @@ function enforceGreetingRules(reply, isBn) {
 app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
-        service: 'AgriVision Farmer Buddy Gemini Proxy',
+        service: 'Field Shift Farmer Buddy Gemini Proxy',
         supportedModels: ['gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-3.8-flash'],
         timestamp: new Date().toISOString()
     });
@@ -331,6 +331,6 @@ Always address this farmer warmly and personally by name ("আসসালাম
 
 // Start Express Server
 app.listen(PORT, () => {
-    console.log(`🌾 AgriVision Farmer Buddy Gemini Proxy listening on http://localhost:${PORT}`);
+    console.log(`🌾 Field Shift Farmer Buddy Gemini Proxy listening on http://localhost:${PORT}`);
     console.log(`🚀 Route ready: POST http://localhost:${PORT}/api/ask`);
 });

@@ -20,8 +20,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 
 // Storage keys
-const SKETCHFAB_TOKEN_KEY = "agrivision_sketchfab_api_token";
-const SKETCHFAB_CACHE_KEY = "agrivision_sketchfab_cache_v1";
+const SKETCHFAB_TOKEN_KEY = "fieldshift_sketchfab_api_token";
+const SKETCHFAB_CACHE_KEY = "fieldshift_sketchfab_cache_v1";
 
 /**
  * Curated high-resolution Sketchfab models with verified CC-BY licenses,

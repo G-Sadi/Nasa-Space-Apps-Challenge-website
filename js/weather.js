@@ -1,6 +1,6 @@
 /*
 |--------------------------------------------------------------------------
-| FIELD SHIFT / AGRIVISION — 7-DAY HYPER-LOCAL WEATHER FORECAST MODULE
+| FIELD SHIFT — 7-DAY HYPER-LOCAL WEATHER FORECAST MODULE
 |--------------------------------------------------------------------------
 | - Geolocation API with Mymensingh, BD fallback
 | - Open-Meteo 7-day daily forecast API
@@ -15,13 +15,13 @@
     'use strict';
 
     // Constants
-    const CACHE_KEY = 'agrivision_weather_v1';
+    const CACHE_KEY = 'fieldshift_weather_v1';
     const CACHE_DURATION_MS = 3 * 60 * 60 * 1000; // 3 Hours
     const DEFAULT_COORDS = {
         lat: 24.7471,
         lon: 90.4203,
-        nameEn: 'Mymensingh · Field 02',
-        nameBn: 'ময়মনসিংহ · ফিল্ড ০২'
+        nameEn: 'Field Shift • Mymensingh - Field 02',
+        nameBn: 'ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২'
     };
 
     // WMO Weather Code Map (Descriptions & Icons)

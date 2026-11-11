@@ -9,10 +9,14 @@
 
 const i18nData = {
     // ===== NAVBAR =====
+    "nav-3d":           { en: "3D Live Field",     bn: "৩ডি লাইভ ফিল্ড" },
+    "nav-land-weather": { en: "Land & Weather",    bn: "জমি ও আবহাওয়া" },
+    "nav-simulator":    { en: "Scenario Simulator",bn: "পরিস্থিতি সিমুলেটর" },
+    "nav-rotation":     { en: "Crop Rotation",     bn: "শস্য আবর্তন" },
+    "nav-lifecycle":    { en: "Crop Lifecycle",    bn: "ফসল জীবনচক্র" },
     "nav-how":          { en: "How it works",      bn: "কিভাবে কাজ করে" },
     "nav-analyze":      { en: "Analyze",            bn: "বিশ্লেষণ" },
     "nav-simulation":   { en: "Simulation",         bn: "সিমুলেশন" },
-    "nav-lifecycle":    { en: "Crop Lifecycle",     bn: "ফসল জীবনচক্র" },
     "nav-btn":          { en: "Start analysis",     bn: "বিশ্লেষণ শুরু করুন" },
 
     // ===== HERO =====
@@ -23,11 +27,14 @@ const i18nData = {
     "hero-desc":        { en: "Analyze climate, water, soil and crop conditions to build smarter and more resilient farming plans.",
                           bn: "জলবায়ু, পানি, মাটি এবং ফসলের অবস্থা বিশ্লেষণ করে আরও স্মার্ট ও টেকসই কৃষি পরিকল্পনা তৈরি করুন।" },
     "hero-btn-primary": { en: "Analyze my field →",        bn: "আমার জমি বিশ্লেষণ করুন →" },
-    "hero-btn-secondary":{ en: "See how it works",         bn: "কিভাবে কাজ করে দেখুন" },
+    "hero-btn-secondary":{ en: "Explore 3D Field ↓",       bn: "৩ডি ফিল্ড দেখুন ↓" },
+    "hero-step-1":      { en: "Select Field",              bn: "জমি নির্বাচন" },
+    "hero-step-2":      { en: "NASA Sync",                 bn: "নাসা সিঙ্ক" },
+    "hero-step-3":      { en: "Adaptive Plan",             bn: "অভিযোজিত পরিকল্পনা" },
 
     // ===== HERO VISUAL =====
     "field-analysis":   { en: "FIELD ANALYSIS",            bn: "জমি বিশ্লেষণ" },
-    "field-name":       { en: "Mymensingh · Field 02",     bn: "ময়মনসিংহ · ফিল্ড ০২" },
+    "field-name":       { en: "Field Shift • Mymensingh - Field 02", bn: "ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২" },
 
     // ===== HOW IT WORKS =====
     "how-eyebrow":      { en: "HOW IT WORKS",              bn: "কিভাবে কাজ করে" },
@@ -290,9 +297,15 @@ const i18nData = {
     "cta-h2-1":         { en: "Build a smarter",               bn: "আরও আধুনিক ও টেকসই" },
     "cta-h2-span":      { en: "farm plan.",                     bn: "খামার পরিকল্পনা সাজান।" },
     "cta-btn":          { en: "Start analysis →",              bn: "বিশ্লেষণ শুরু করুন →" },
-    "footer-brand":     { en: "AgriVision",                    bn: "এগ্রিভিশন" },
+    "footer-brand":     { en: "Field Shift",                   bn: "ফিল্ড শিফট" },
     "footer-tagline":   { en: "Smart agricultural intelligence platform for sustainable farming.",
-                          bn: "টেকসই কৃষির জন্য স্মার্ট কৃষি বুদ্ধিমত্তা প্ল্যাটফর্ম।" }
+                          bn: "টেকসই কৃষির জন্য স্মার্ট কৃষি বুদ্ধিমত্তা প্ল্যাটফর্ম।" },
+    "nasa-sources-title":{ en: "NASA Earth Observation Telemetry Sources", bn: "নাসা আর্থ অবজারভেশন টেলিমেট্রি উৎসসমূহ" },
+    "smap-desc":        { en: "Soil Moisture Active Passive · Root/Topsoil Moisture", bn: "মাটির মূল ও উপরিভাগের আর্দ্রতা" },
+    "modis-desc":       { en: "Terra/Aqua · 250m NDVI Vegetation Index & Solar PAR", bn: "উদ্ভিদ স্বাস্থ্য সূচক ও সৌর বিকিরণ" },
+    "ecostress-desc":   { en: "Thermal Radiometer · Evapotranspiration & Drought Stress", bn: "বাষ্পীভবন ও খরা চাপ সূচক" },
+    "merra-desc":       { en: "GMAO Reanalysis · Temperature, Humidity & Wind Vectors", bn: "বায়ুমণ্ডলীয় তাপমাত্রা ও আর্দ্রতা" },
+    "gpm-desc":         { en: "IMERG Satellite Constellation · Precipitation Rates", bn: "বৃষ্টিপাত ও বর্ষণ পরিমাপ" }
 };
 
 // Global active language ('en' | 'bn')

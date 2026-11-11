@@ -1,6 +1,6 @@
 /*
 |--------------------------------------------------------------------------
-| FIELD SHIFT / AGRIVISION — CROP LIFECYCLE TRACKER (app.js)
+| FIELD SHIFT — CROP LIFECYCLE TRACKER (app.js)
 |--------------------------------------------------------------------------
 | Ultra-lightweight, responsive, dark-mode (#0f172a) interactive 5-stage
 | crop tracker with dynamic progress bar, precision N-P-K fertilizer advice,

@@ -1,21 +1,28 @@
 /*
 |--------------------------------------------------------------------------
-| AGRI SIMULATOR - FARM DATA (js/data.js)
+| FIELD SHIFT — FARM DATA CONFIGURATION (js/data.js)
+|--------------------------------------------------------------------------
+| Single Source of Truth for Global Farm Metadata across Field Shift.
 |--------------------------------------------------------------------------
 */
 
 const farmData = {
 
-    // ✅ map.js এর জন্য farm info
+    // Single source farm info
     farm: {
-        name: "AgriVision Farm"
+        name: "Field Shift"
     },
 
-    // ✅ map.js এর জন্য field info
+    // Field info
     field: {
-        name: "Field 02",
-        area: 2.4,
-        unit: "acres",
+        name: "Field Shift • Mymensingh - Field 02",
+        shortName: "Field 02",
+        area: 25,
+        bigha: 75,
+        decimals: 2500,
+        unit: "Acres (75 Bigha)",
+        displayArea: "25 Acres (75 Bigha)",
+        displayAreaBn: "২৫ একর (৭৫ বিঘা)",
         boundary: [
             [24.7480, 90.4195],
             [24.7482, 90.4210],
@@ -25,11 +32,23 @@ const farmData = {
     },
 
     location: {
-        name: "Mymensingh Field 02",
+        name: "Field Shift • Mymensingh - Field 02",
+        nameBn: "ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২",
         latitude: 24.7471,
         longitude: 90.4203,
-        area: 2.4,
-        unit: "acres"
+        coordinates: "24.7471° N, 90.4203° E",
+        coordinatesBn: "২৪.৭৪৭১° উ, ৯০.৪২০৩° পূ",
+        area: "25 Acres (75 Bigha)",
+        areaBn: "২৫ একর (৭৫ বিঘা)",
+        unit: "Acres (75 Bigha)"
+    },
+
+    farmer: {
+        name: "মোঃ রহিম উদ্দিন (Rahim Uddin)",
+        phone: "01711223344",
+        district: "Mymensingh",
+        landSizeDecimals: 2500,
+        primaryCrop: "rice"
     },
 
     soil: {
@@ -42,13 +61,12 @@ const farmData = {
     },
 
     weather: {
-        temperature: 29,
+        temperature: 27.4,
         humidity: 74,
-        rainfall: 1200,
+        rainfall: 1842,
         windSpeed: 12
     },
 
-    // ✅ map.js এবং simulation.js উভয়ের জন্য geography
     geography: {
         river: {
             nearby: true,
@@ -62,7 +80,6 @@ const farmData = {
         }
     },
 
-    // simulation.js এর জন্য ব্যাকওয়ার্ড সাপোর্ট
     river: {
         nearby: true,
         distance: 420
@@ -73,10 +90,33 @@ const farmData = {
     },
 
     crop: {
-        current: "Maize",
+        current: "Rice",
+        nameBn: "ধান",
         year: 2026,
         growth: 68,
         yieldPotential: 91
     }
 
+};
+
+// Global Farm Configuration — Single Source of Truth
+window.GLOBAL_FARM_CONFIG = {
+    farmerName: "মোঃ রহিম উদ্দিন (Rahim Uddin)",
+    farmerNameBn: "মোঃ রহিম উদ্দিন",
+    farmerNameEn: "Rahim Uddin",
+    fieldName: "Field Shift • Mymensingh - Field 02",
+    fieldNameBn: "ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২",
+    coordinates: "24.7471° N, 90.4203° E",
+    coordinatesBn: "২৪.৭৪৭১° উ, ৯০.৪২০৩° পূ",
+    latitude: 24.7471,
+    longitude: 90.4203,
+    area: "25 Acres (75 Bigha)",
+    areaBn: "২৫ একর (৭৫ বিঘা)",
+    acres: 25,
+    bigha: 75,
+    decimals: 2500,
+    activeCrop: "Rice (ধান)",
+    activeCropKey: "rice",
+    activeCropBn: "ধান",
+    activeCropEn: "Rice"
 };

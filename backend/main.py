@@ -380,7 +380,7 @@ FARMERS_STORE = {
         "district": "Mymensingh",
         "lat": 24.7471,
         "lon": 90.4203,
-        "landSizeDecimals": 35.0,
+        "landSizeDecimals": 2500.0,  # 25 Acres (75 Bigha)
         "primaryCrop": "rice",
         "soilType": "loamy",
         "createdAt": "2026-01-01T00:00:00Z"

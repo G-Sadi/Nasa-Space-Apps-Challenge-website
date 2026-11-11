@@ -117,16 +117,22 @@ function resetSimulation() {
 */
 
 function scrollToAnalysis() {
-    const el = document.getElementById("analysis");
+    const el = document.getElementById("landLocation") || document.getElementById("analysis");
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+}
+
+function scrollToSimulation() {
+    const el = document.getElementById("farmSimulation");
     if (el) el.scrollIntoView({ behavior: "smooth" });
 }
 
 function scrollToHow() {
-    const el = document.getElementById("how");
+    const el = document.getElementById("farmSimulation") || document.getElementById("how");
     if (el) el.scrollIntoView({ behavior: "smooth" });
 }
 
 window.scrollToAnalysis = scrollToAnalysis;
+window.scrollToSimulation = scrollToSimulation;
 window.scrollToHow = scrollToHow;
 window.resetSimulation = resetSimulation;
 

@@ -687,7 +687,7 @@ Are there specific stress symptoms or visible changes on your **${label}** crop 
  */
 export class FarmerBuddy {
     private proxyUrl: string = "http://localhost:5000/api/ask";
-    private storageKeyPrefix: string = "agrivision_farmer_buddy_chat_v4_";
+    private storageKeyPrefix: string = "fieldshift_farmer_buddy_chat_v4_";
     private currentLang: AppLanguage = "en";
     private messages: ChatMessage[] = [];
     private chatHistory: ChatMessageTurn[] = [];
@@ -753,7 +753,7 @@ export class FarmerBuddy {
             minimizeTitle: "Minimize Chat",
             inputPlaceholder: "Ask about crop rotation, profit, fertilizers, or age...",
             sendAria: "Send Message",
-            footerNote: "⚡ Powered by Google Gemini AI & Stateful Crop Rotation Planner",
+            footerNote: "⚡ Powered by Google Gemini AI & Field Shift Crop Rotation Planner",
             senderTag: "👨‍🌾 Farmer Buddy",
             welcomeMsg: "Hello Friend! I am your **Farmer Buddy (কৃষি বন্ধু)**, your agricultural economist and trusted farming partner.\n\nFrom high-profit 3-season crop rotation plans, 20-30% input cost reduction, to balanced fertilizer schedules—I am right by your side. How can I assist your farm today?"
         },
@@ -767,7 +767,7 @@ export class FarmerBuddy {
             minimizeTitle: "মিনিমাইজ করুন",
             inputPlaceholder: "শস্য আবর্তন, লাভ, সার বা ফসলের বয়স লিখুন...",
             sendAria: "বার্তা পাঠান",
-            footerNote: "⚡ Google Gemini AI ও স্মার্ট শস্য পরিক্রমা প্ল্যানার দ্বারা চালিত",
+            footerNote: "⚡ Google Gemini AI ও Field Shift শস্য পরিক্রমা প্ল্যানার দ্বারা চালিত",
             senderTag: "👨‍🌾 কৃষি বন্ধু",
             welcomeMsg: "আসসালামু আলাইকুম ভাই! আমি আপনার **কৃষি বন্ধু**—আপনার কৃষি অর্থনীতিবিদ ও বিশ্বস্ত মাঠ সহচর।\n\nসর্বোচ্চ লাভ ও খরচ কমানোর ৩ মৌসুমের শস্য পরিক্রমা, সুষম সারের হিসাব, কিংবা রোগবালাই দমন—যেকোনো প্রয়োজনে আমি আপনার পাশে আছি। আজ আপনার জমির জন্য কী পরিকল্পনা করতে চান?"
         }
@@ -798,7 +798,7 @@ export class FarmerBuddy {
         }
 
         if (typeof window !== "undefined") {
-            const savedModel = localStorage.getItem("agrivision_selected_model") as GeminiModelTier | null;
+            const savedModel = (localStorage.getItem("fieldshift_selected_model") || localStorage.getItem("agrivision_selected_model")) as GeminiModelTier | null;
             if (savedModel === "gemini-3.5-flash" || savedModel === "gemini-2.5-pro" || savedModel === "gemini-2.5-flash") {
                 this.selectedModel = savedModel;
             }
@@ -955,7 +955,7 @@ export class FarmerBuddy {
                 selectedCrop = cropSelect.options[cropSelect.selectedIndex]?.text?.trim() || cropSelect.value;
             }
         }
-        if (!selectedCrop) selectedCrop = isBn ? "টমেটো (Tomato)" : "Tomato";
+        if (!selectedCrop) selectedCrop = isBn ? "ধান (Rice)" : "Rice";
 
         if (!growthStage && typeof document !== "undefined") {
             growthStage = document.getElementById("timelineStageBadge")?.textContent?.trim() ||
@@ -1104,9 +1104,13 @@ export class FarmerBuddy {
         };
         const soilLabel = soilMap[farmer.soilType] ? (isBn ? soilMap[farmer.soilType].bn : soilMap[farmer.soilType].en) : farmer.soilType;
 
+        const areaStr = (farmer.landSizeDecimals === 2500 || farmer.id === "demo-rahim-01")
+            ? (isBn ? "২৫ একর (৭৫ বিঘা)" : "25 Acres (75 Bigha)")
+            : (isBn ? `${farmer.landSizeDecimals} শতাংশ` : `${farmer.landSizeDecimals} decimal`);
+
         const personalizedMsg = isBn
-            ? `আসসালামু আলাইকুম ${farmer.name} ভাই! আপনার ${farmer.district}-এর ${farmer.landSizeDecimals} শতাংশ ${soilLabel} মাটির ${cropLabel} ক্ষেতের লাইভ NASA স্যাটেলাইট তথ্য এখন চালু আছে। আজ আপনাকে কীভাবে সাহায্য করতে পারি?`
-            : `Hello ${farmer.name}! Your ${farmer.landSizeDecimals} decimal ${cropLabelEn} field in ${farmer.district} (${soilLabel} soil) is synced with live NASA satellite telemetry. How can I help you today?`;
+            ? `আসসালামু আলাইকুম ${farmer.name} ভাই! আপনার ${farmer.district}-এর ${areaStr} ${soilLabel} মাটির ${cropLabel} ক্ষেতের লাইভ NASA স্যাটেলাইট তথ্য এখন চালু আছে। আজ আপনাকে কীভাবে সাহায্য করতে পারি?`
+            : `Hello ${farmer.name}! Your ${areaStr} ${cropLabelEn} field in ${farmer.district} (${soilLabel} soil) is synced with live NASA satellite telemetry. How can I help you today?`;
 
         const welcomeIdx = this.messages.findIndex(m => m.id && m.id.startsWith("welcome-"));
         if (welcomeIdx !== -1) {
@@ -1138,11 +1142,16 @@ export class FarmerBuddy {
 
         let farmerProfileBlock = "";
         if (farmContext.farmer) {
+            const landDisplay = (farmContext.farmer.landSizeDecimals === 2500 || farmContext.farmer.id === "demo-rahim-01")
+                ? "25 Acres (75 Bigha) / 2500 decimals (শতাংশ)"
+                : `${farmContext.farmer.landSizeDecimals} decimals (শতাংশ)`;
+
             farmerProfileBlock = `[LOGGED-IN FARMER PROFILE:
+• Field Name: Field Shift • Mymensingh - Field 02
 • Farmer Name: ${farmContext.farmer.name}
 • Registered Phone: ${farmContext.farmer.phone}
 • District: ${farmContext.farmer.district}
-• Land Size: ${farmContext.farmer.landSizeDecimals} decimals (শতাংশ)
+• Land Size: ${landDisplay}
 • Primary Crop: ${farmContext.farmer.primaryCrop}
 • Soil Type: ${farmContext.farmer.soilType}
 MANDATORY GREETING & PERSONALIZATION:
@@ -1150,8 +1159,9 @@ Address this farmer directly by name. In Bangla, start with: "আসসালা
         }
 
         let instruction = `${farmerProfileBlock}[LIVE NASA EARTH OBSERVATION & 3D FIELD TELEMETRY:
+• Field Name: Field Shift • Mymensingh - Field 02
 • Agroclimatology Zone: ${farmContext.nasaZone || 'Mymensingh (AEZ-9)'}
-• Active 3D Crop: ${farmContext.crop || 'Tomato'} (${farmContext.growthStage || 'Vegetative'}, ${farmContext.growthDay || '40 Days'})
+• Active 3D Crop: ${farmContext.crop || 'Rice'} (${farmContext.growthStage || 'Vegetative'}, ${farmContext.growthDay || '40 Days'})
 • NASA SMAP Root Zone Soil Moisture (GWETROOT): ${farmContext.nasaRootMoist || farmContext.soilMoisture || '68%'} (Topsoil GWETTOP: ${farmContext.nasaTopMoist || '62%'})
 • NASA Solar PAR Flux (ALLSKY_SFC_PAR_TOT): ${farmContext.nasaPAR || '425 W/m²'}
 • NASA GPM IMERG Precipitation (PRECTOTCORR): ${farmContext.nasaPrecip || '0.8 mm/day'}
@@ -1517,7 +1527,10 @@ STRICT RULES FOR EVERY RESPONSE:
         if (modelSelect) {
             modelSelect.addEventListener("change", (e: any) => {
                 this.selectedModel = e.target.value as GeminiModelTier;
-                try { localStorage.setItem("agrivision_selected_model", this.selectedModel); } catch (err) { }
+                try {
+                    localStorage.setItem("fieldshift_selected_model", this.selectedModel);
+                    localStorage.setItem("agrivision_selected_model", this.selectedModel);
+                } catch (err) { }
                 this.updateModelUI();
                 console.log(`[FarmerBuddy] Selected model switched to: ${this.selectedModel}`);
             });

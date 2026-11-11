@@ -1,6 +1,6 @@
 /*
 |--------------------------------------------------------------------------
-| AGRIVISION / FIELD SHIFT — PHOTOREALISTIC 3D & SPATIAL AR CROP ENGINE
+| FIELD SHIFT — PHOTOREALISTIC 3D & SPATIAL AR CROP ENGINE
 |--------------------------------------------------------------------------
 | - Hyper-Detailed PBR Botanical Morphology (Distinct Leaf Shapes, Organic
 |   Tapered Stems, Zero Wooden Stakes, Calyx Stars, PBR Subsurface Translucency)
@@ -194,7 +194,7 @@ let raycaster = null;
 let mouse = new THREE.Vector2();
 
 // Crop Lifecycle & Growth State
-let activeCropId = "tomato"; // Default to photorealistic Tomato
+let activeCropId = "rice"; // Default to photorealistic Rice field
 let currentGrowthDay = 68; // Default to mature fruiting & ripening stage so full crops are visible immediately
 let maxCropDays = 105;
 let currentGrowthStage = 4; // Default to Stage 4 (Fruit Ripening / Maturity)
@@ -6086,7 +6086,7 @@ export function show2DFarmFallback() {
         containerEl.appendChild(fallbackEl);
     }
 
-    const currentCrop = activeCropId || "tomato";
+    const currentCrop = activeCropId || "rice";
     const icon = CROP_FALLBACK_ICONS[currentCrop] || "🌱";
     const cropName = currentCrop.charAt(0).toUpperCase() + currentCrop.slice(1);
 
@@ -6733,12 +6733,12 @@ export function init3DFieldSimulation() {
     // Initialize Live NASA Agroclimatology Engine & Sync 3D Environment with Active Farmer
     try {
         const initialFarmer = (typeof window !== "undefined" && window.authService) ? window.authService.getCurrentFarmer() : null;
-        const initialCrop = (initialFarmer && initialFarmer.primaryCrop) ? initialFarmer.primaryCrop : "tomato";
+        const initialCrop = (initialFarmer && initialFarmer.primaryCrop) ? initialFarmer.primaryCrop : "rice";
         const initialZone = (initialFarmer && initialFarmer.district) ? initialFarmer.district.toLowerCase() : "mymensingh";
         const initialLat = initialFarmer ? initialFarmer.lat : null;
         const initialLon = initialFarmer ? initialFarmer.lon : null;
 
-        if (initialCrop !== "tomato") {
+        if (initialCrop) {
             updateCropSimulation(initialCrop);
         }
 

@@ -1,5 +1,5 @@
 {
-  "name": "agrivision-gemini-backend",
+  "name": "fieldshift-gemini-backend",
   "version": "1.0.0",
   "description": "Secure Node.js/Express Google Gemini API Proxy",
   "type": "module",
