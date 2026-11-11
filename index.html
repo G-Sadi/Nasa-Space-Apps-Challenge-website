@@ -7,6 +7,12 @@
 
     <title>Field Shift — Smart Farm Intelligence</title>
 
+    <!-- Chrome Browser Tab Favicon (Crisp "FS" Emerald Square + Live Satellite Dot) -->
+    <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+    <link rel="alternate icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9InNhdEdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgaW49IlNvdXJjZUdyYXBoaWMiIHN0ZERldmlhdGlvbj0iMS41IiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+CiAgICAgIDwvZmVNZXJnZT4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8IS0tIEVtZXJhbGQgR3JlZW4gUm91bmRlZCBTcXVhcmUgLS0+CiAgPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTYiIHJ5PSIxNiIgZmlsbD0iIzRhZGU4MCIvPgogIDwhLS0gQm9sZCBEYXJrIEZTIFRleHQgLS0+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCAnUGx1cyBKYWthcnRhIFNhbnMnLCBJbnRlciwgJ1NlZ29lIFVJJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzA0MTYwYiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii0xLjUiPkZTPC90ZXh0PgogIDwhLS0gU2F0ZWxsaXRlIE9yYml0IFJpbmcgLS0+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDQxNjBiIiBzdHJva2Utd2lkdGg9IjEuMiIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBHbG93aW5nIFdoaXRlIFNhdGVsbGl0ZSBEb3QgLS0+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iMy41IiBmaWxsPSIjZmZmZmZmIiBmaWx0ZXI9InVybCgjc2F0R2xvdykiLz4KPC9zdmc+Cg==">
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCIgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0Ij4KICA8ZGVmcz4KICAgIDxmaWx0ZXIgaWQ9InNhdEdsb3ciIHg9Ii01MCUiIHk9Ii01MCUiIHdpZHRoPSIyMDAlIiBoZWlnaHQ9IjIwMCUiPgogICAgICA8ZmVHYXVzc2lhbkJsdXIgaW49IlNvdXJjZUdyYXBoaWMiIHN0ZERldmlhdGlvbj0iMS41IiByZXN1bHQ9ImJsdXIiLz4KICAgICAgPGZlTWVyZ2U+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJibHVyIi8+CiAgICAgICAgPGZlTWVyZ2VOb2RlIGluPSJTb3VyY2VHcmFwaGljIi8+CiAgICAgIDwvZmVNZXJnZT4KICAgIDwvZmlsdGVyPgogIDwvZGVmcz4KICA8IS0tIEVtZXJhbGQgR3JlZW4gUm91bmRlZCBTcXVhcmUgLS0+CiAgPHJlY3QgeD0iMiIgeT0iMiIgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iMTYiIHJ5PSIxNiIgZmlsbD0iIzRhZGU4MCIvPgogIDwhLS0gQm9sZCBEYXJrIEZTIFRleHQgLS0+CiAgPHRleHQgeD0iMzIiIHk9IjQzIiBmb250LWZhbWlseT0ic3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCAnUGx1cyBKYWthcnRhIFNhbnMnLCBJbnRlciwgJ1NlZ29lIFVJJywgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIzMCIgZm9udC13ZWlnaHQ9IjkwMCIgZmlsbD0iIzA0MTYwYiIgdGV4dC1hbmNob3I9Im1pZGRsZSIgbGV0dGVyLXNwYWNpbmc9Ii0xLjUiPkZTPC90ZXh0PgogIDwhLS0gU2F0ZWxsaXRlIE9yYml0IFJpbmcgLS0+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDQxNjBiIiBzdHJva2Utd2lkdGg9IjEuMiIgb3BhY2l0eT0iMC4zIi8+CiAgPCEtLSBHbG93aW5nIFdoaXRlIFNhdGVsbGl0ZSBEb3QgLS0+CiAgPGNpcmNsZSBjeD0iNTAiIGN5PSIxNCIgcj0iMy41IiBmaWxsPSIjZmZmZmZmIiBmaWx0ZXI9InVybCgjc2F0R2xvdykiLz4KPC9zdmc+Cg==">
+    <meta name="theme-color" content="#04160b">
+
     <!-- Importmap for Three.js and Addons -->
     <script type="importmap">
     {
@@ -40,41 +46,13 @@
     <!-- NAVBAR -->
     <header class="navbar">
 
-        <a href="#" class="logo" aria-label="Field Shift Home">
-            <div class="logo-emblem">
-                <svg width="26" height="26" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <defs>
-                        <linearGradient id="fsSproutGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-                            <stop offset="0%" stop-color="#10b981"/>
-                            <stop offset="100%" stop-color="#43ef8c"/>
-                        </linearGradient>
-                        <linearGradient id="fsOrbitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stop-color="#46dfff"/>
-                            <stop offset="50%" stop-color="#43ef8c"/>
-                            <stop offset="100%" stop-color="#10b981"/>
-                        </linearGradient>
-                        <filter id="fsGlow" x="-30%" y="-30%" width="160%" height="160%">
-                            <feGaussianBlur stdDeviation="1.2" result="blur"/>
-                            <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-                        </filter>
-                    </defs>
-                    <!-- Orbital Satellite Ring (tilted -28 deg) -->
-                    <ellipse cx="18" cy="18" rx="14" ry="5.5" transform="rotate(-28 18 18)" fill="none" stroke="url(#fsOrbitGrad)" stroke-width="1.6" stroke-linecap="round" opacity="0.95"/>
-                    <!-- Sprout stem -->
-                    <path d="M18 29 C18 22 17.5 17 18 13" stroke="url(#fsSproutGrad)" stroke-width="1.8" stroke-linecap="round"/>
-                    <!-- Primary Leaf (Right) -->
-                    <path d="M18 21 C18.5 15 25 12 25.5 8 C20.5 8.5 17.5 13.5 18 21 Z" fill="url(#fsSproutGrad)"/>
-                    <!-- Secondary Leaf (Left) -->
-                    <path d="M17.8 23 C16.5 18.5 10.5 17 10 13.5 C14.5 13 17 17.5 17.8 23 Z" fill="url(#fsSproutGrad)" opacity="0.85"/>
-                    <!-- Glowing Telemetry Dot on Orbit -->
-                    <circle cx="28.6" cy="12.2" r="2.2" fill="#46dfff" filter="url(#fsGlow)" class="telemetry-dot-pulse"/>
-                    <circle cx="28.6" cy="12.2" r="4.2" fill="none" stroke="#46dfff" stroke-width="0.8" opacity="0.6"/>
-                </svg>
+        <a href="#" class="logo" id="brandLogo" aria-label="Field Shift Home" onclick="scrollToTop(event)">
+            <div class="logo-badge">
+                <span class="logo-fs">FS</span>
+                <span class="logo-satellite-dot" aria-hidden="true"></span>
+                <span class="logo-sheen" aria-hidden="true"></span>
             </div>
-            <div class="logo-text">
-                <span class="logo-title">Field Shift</span>
-                <span class="logo-subtitle" data-i18n="logo-subtitle">NASA EARTH OBSERVATION</span>
-            </div>
+            <span class="logo-text">Field Shift</span>
         </a>
 
         <nav>

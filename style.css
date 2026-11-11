@@ -41,121 +41,181 @@ input, select, textarea {
     top: 0;
     z-index: 1000;
 
-    height: 80px;
+    height: 74px;
 
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: nowrap;
 
-    padding: 0 6%;
+    padding: 0 clamp(16px, 3.5vw, 48px);
+    gap: 16px;
 
-    background: rgba(6, 21, 15, 0.88);
-    backdrop-filter: blur(15px);
+    background: rgba(6, 21, 15, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
 
-    border-bottom: 1px solid rgba(255,255,255,.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* 1. RESTORED & INTERACTIVE "FS Field Shift" BRAND LOGO */
 .logo {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 12px;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
     user-select: none;
+    white-space: nowrap;
+    flex-shrink: 0;
     transition: opacity 0.2s ease;
 }
 
 .logo:hover {
-    opacity: 0.95;
+    opacity: 1;
 }
 
-.logo-emblem {
+.logo-badge {
+    position: relative;
     width: 38px;
     height: 38px;
-    display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, rgba(67, 239, 140, 0.22), rgba(16, 185, 129, 0.08));
-    border: 1px solid rgba(67, 239, 140, 0.45);
-    border-radius: 11px;
-    box-shadow: 0 0 16px rgba(67, 239, 140, 0.22);
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+    min-width: 38px;
+    min-height: 38px;
+    background: #4ade80;
+    color: #04160b;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 16px rgba(74, 222, 128, 0.35);
+    animation: logoBadgeAura 3s ease-in-out infinite;
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, filter 0.28s ease;
+    overflow: hidden;
     flex-shrink: 0;
 }
 
-.logo:hover .logo-emblem {
-    transform: scale(1.06);
-    box-shadow: 0 0 24px rgba(67, 239, 140, 0.45);
-    border-color: #43ef8c;
+.logo-fs {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    color: #04160b;
+    line-height: 1;
+    z-index: 1;
+    background: transparent !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+}
+
+.logo-satellite-dot {
+    position: absolute;
+    top: 3px;
+    right: 3px;
+    width: 6px;
+    height: 6px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 6px 1px #4ade80, 0 0 10px 2px rgba(255, 255, 255, 0.9);
+    animation: satellitePulse 1.8s ease-in-out infinite;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.logo-sheen {
+    position: absolute;
+    top: 0;
+    left: -120%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+    transform: skewX(-20deg);
+    transition: left 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+    pointer-events: none;
+    z-index: 3;
 }
 
 .logo-text {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.15;
-}
-
-.logo-title {
-    font-size: 17px;
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    font-size: 18px;
     font-weight: 800;
     color: #ffffff;
     letter-spacing: -0.02em;
+    white-space: nowrap;
+    background: transparent !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 0 !important;
+    transition: color 0.25s ease;
 }
 
-.logo-subtitle {
-    font-size: 8px;
-    font-weight: 700;
-    color: #43ef8c;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    margin-top: 2px;
-    opacity: 0.92;
+/* Hover & Active Effects */
+.logo:hover .logo-badge {
+    transform: translateY(-2px) scale(1.06);
+    box-shadow: 0 6px 20px rgba(74, 222, 128, 0.65), 0 0 30px rgba(74, 222, 128, 0.4);
 }
 
-.telemetry-dot-pulse {
-    animation: logoDotPulse 2s ease-in-out infinite;
+.logo:hover .logo-sheen {
+    left: 140%;
 }
 
-@keyframes logoDotPulse {
+.logo:hover .logo-text {
+    color: #4ade80;
+}
+
+.logo:active .logo-badge {
+    transform: translateY(0) scale(0.96);
+    box-shadow: 0 2px 10px rgba(74, 222, 128, 0.4);
+}
+
+@keyframes logoBadgeAura {
     0%, 100% {
-        opacity: 1;
-        filter: drop-shadow(0 0 3px #46dfff);
+        box-shadow: 0 0 14px rgba(74, 222, 128, 0.35);
     }
     50% {
-        opacity: 0.65;
-        filter: drop-shadow(0 0 8px #46dfff);
+        box-shadow: 0 0 24px rgba(74, 222, 128, 0.65), 0 0 32px rgba(74, 222, 128, 0.25);
     }
 }
 
-.logo span {
-    width: 36px;
-    height: 36px;
-    display: grid;
-    place-items: center;
-    background: #43ef8c;
-    color: #06150f;
-    border-radius: 10px;
-    font-weight: 800;
+@keyframes satellitePulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+        box-shadow: 0 0 6px 1px #4ade80, 0 0 8px 1px rgba(255, 255, 255, 0.9);
+    }
+    50% {
+        transform: scale(1.25);
+        opacity: 0.75;
+        box-shadow: 0 0 10px 2px #4ade80, 0 0 14px 3px rgba(255, 255, 255, 0.95);
+    }
 }
 
-.logo strong {
-    font-size: 17px;
-}
-
+/* 2. NAVBAR NAVIGATION LINKS (SINGLE-LINE ALIGNMENT) */
 nav {
     display: flex;
-    gap: 35px;
+    align-items: center;
+    gap: clamp(14px, 1.5vw, 20px);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 nav a {
     color: #94a99f;
     text-decoration: none;
-    transition: .3s;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 2px;
+    transition: color 0.2s ease, transform 0.2s ease;
 }
 
 nav a:hover {
-    color: #43ef8c;
+    color: #4ade80;
+    transform: translateY(-1px);
 }
 
 
@@ -168,22 +228,40 @@ button {
     font-weight: 700;
 }
 
-.primary-btn,
-.nav-btn {
+.primary-btn {
     background: #43ef8c;
     color: #06150f;
-
     padding: 16px 25px;
-
     border-radius: 12px;
-
     transition: .3s;
 }
 
-.primary-btn:hover,
-.nav-btn:hover {
+.primary-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 15px 35px rgba(67,239,140,.2);
+}
+
+.nav-btn {
+    background: #4ade80;
+    color: #06150f;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 700;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    transition: all 0.25s ease;
+    box-shadow: 0 4px 14px rgba(74, 222, 128, 0.25);
+    flex-shrink: 0;
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 222, 128, 0.45);
+    background: #5eead4;
 }
 
 .secondary-btn {
@@ -3532,7 +3610,9 @@ footer {
 .nav-right {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: clamp(10px, 1.2vw, 14px);
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .lang-switch-container {
@@ -3638,8 +3718,33 @@ body.lang-bn strong {
    MOBILE & DESKTOP RESPONSIVE OPTIMIZATION
    ========================================================================== */
 
-@media (max-width: 900px) {
+@media (min-width: 901px) and (max-width: 1180px) {
     .navbar {
+        padding: 0 16px;
+        gap: 10px;
+    }
+    nav {
+        gap: 12px;
+    }
+    nav a {
+        font-size: 13px;
+        padding: 4px 1px;
+    }
+    .nav-right {
+        gap: 10px;
+    }
+    .nav-farmer-login-btn,
+    .nav-farmer-badge {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    .nav-btn {
+        padding: 8px 14px;
+        font-size: 12.5px;
+    }
+}
+
+@media (max-width: 900px) {
         height: auto;
         padding: 14px 5%;
         flex-wrap: wrap;
@@ -3709,28 +3814,20 @@ body.lang-bn strong {
         padding: 10px 4%;
     }
 
-    .logo strong {
-        font-size: 15px;
-    }
-
-    .logo span {
+    .logo-badge {
         width: 32px;
         height: 32px;
-        font-size: 13px;
+        min-width: 32px;
+        min-height: 32px;
+        border-radius: 8px;
     }
 
-    .logo-emblem {
-        width: 34px;
-        height: 34px;
+    .logo-fs {
+        font-size: 13.5px;
     }
 
-    .logo-title {
-        font-size: 15px;
-    }
-
-    .logo-subtitle {
-        font-size: 7.5px;
-        letter-spacing: 0.12em;
+    .logo-text {
+        font-size: 16px;
     }
 
     .lang-switch-container {
@@ -5156,7 +5253,6 @@ body.lang-bn strong {
 }
 
 @media (max-width: 900px) {
-    .weather-cards-strip {
         min-width: 640px;
     }
 

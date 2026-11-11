@@ -131,6 +131,11 @@ function resetSimulation() {
 |--------------------------------------------------------------------------
 */
 
+function scrollToTop(e) {
+    if (e && typeof e.preventDefault === "function") e.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
 function scrollToAnalysis() {
     const el = document.getElementById("landLocation") || document.getElementById("analysis");
     if (el) el.scrollIntoView({ behavior: "smooth" });
@@ -146,6 +151,7 @@ function scrollToHow() {
     if (el) el.scrollIntoView({ behavior: "smooth" });
 }
 
+window.scrollToTop = scrollToTop;
 window.scrollToAnalysis = scrollToAnalysis;
 window.scrollToSimulation = scrollToSimulation;
 window.scrollToHow = scrollToHow;
@@ -308,11 +314,22 @@ function initFarmChart() {
     window.farmChartInstance = farmChartInstance;
 }
 
+function setupLogoInteractions() {
+    const brandLogo = document.getElementById("brandLogo") || document.querySelector(".logo");
+    if (brandLogo) {
+        brandLogo.addEventListener("click", scrollToTop);
+    }
+}
+
 // Initialize on load and sync with language changes
 if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initFarmChart);
+    document.addEventListener("DOMContentLoaded", () => {
+        initFarmChart();
+        setupLogoInteractions();
+    });
 } else {
     initFarmChart();
+    setupLogoInteractions();
 }
 
 window.addEventListener("languageChanged", () => {
