@@ -5655,9 +5655,6 @@ body.lang-bn strong {
 }
 
 @media (max-width: 900px) {
-        min-width: 640px;
-    }
-
     .krishi-alert-banner {
         flex-direction: column;
         align-items: flex-start;
