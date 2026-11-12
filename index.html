@@ -46,24 +46,17 @@
     <!-- NAVBAR -->
     <header class="navbar">
 
-        <a href="#" class="logo" id="brandLogo" aria-label="Field Shift Home" onclick="scrollToTop(event)">
-            <div class="logo-badge">
-                <span class="logo-fs">FS</span>
-                <span class="logo-satellite-dot" aria-hidden="true"></span>
-                <span class="logo-sheen" aria-hidden="true"></span>
-            </div>
-            <span class="logo-text">Field Shift</span>
-        </a>
+        <!-- Compact Left Control Group (Logo + Farmer Profile Pill + Language Toggle + Start Analysis CTA) -->
+        <div class="nav-left">
+            <a href="#" class="logo" id="brandLogo" aria-label="Field Shift Home" onclick="scrollToTop(event)">
+                <div class="logo-badge">
+                    <span class="logo-fs">FS</span>
+                    <span class="logo-satellite-dot" aria-hidden="true"></span>
+                    <span class="logo-sheen" aria-hidden="true"></span>
+                </div>
+                <span class="logo-text">Field Shift</span>
+            </a>
 
-        <nav>
-            <a href="#farmSimulation" data-i18n="nav-3d">3D Live Field</a>
-            <a href="#landLocation" data-i18n="nav-land-weather">Land & Weather</a>
-            <a href="#simulation" data-i18n="nav-simulator">Scenario Simulator</a>
-            <a href="#rotation" data-i18n="nav-rotation">Crop Rotation</a>
-            <a href="#lifecycle" data-i18n="nav-lifecycle">Crop Lifecycle</a>
-        </nav>
-
-        <div class="nav-right">
             <!-- Farmer Profile Badge / Instant Login Button -->
             <div id="navFarmerAuthContainer" class="nav-farmer-auth">
                 <button class="nav-farmer-login-btn" id="btnNavFarmerLogin" title="Farmer Login / কৃষক প্রবেশ">
@@ -86,6 +79,17 @@
                 Start analysis
             </button>
         </div>
+
+        <!-- Well-Furnished Right Navigation Links -->
+        <nav class="nav-links">
+            <a href="#farmSimulation" class="nav-item" data-i18n="nav-3d">3D Live Field</a>
+            <a href="#landLocation" class="nav-item" data-i18n="nav-land-weather">Land & Weather</a>
+            <a href="#simulation" class="nav-item" data-i18n="nav-simulator">Simulator</a>
+            <a href="#rotation" class="nav-item" data-i18n="nav-rotation">Rotation</a>
+            <a href="#lifecycle" class="nav-item" data-i18n="nav-lifecycle">Crop Lifecycle</a>
+            <a href="#aiAdvisor" class="nav-item" id="navLinkAiAdvisor" data-i18n="nav-ai-advisor">AI Advisor</a>
+            <a href="#nasaHub" class="nav-item" id="navLinkNasaHub" data-i18n="nav-nasa-hub">NASA Hub</a>
+        </nav>
 
     </header>
 
@@ -311,6 +315,7 @@
         </div>
 
         <!-- In-Scene 3D Spatial AR HUD Overlay (World-to-Screen Projected Pins & Holographic Rings) -->
+        <div id="aiAdvisor" class="ai-advisor-anchor" aria-hidden="true"></div>
         <div id="spatialArContainer" class="spatial-ar-container" role="region" aria-label="3D Live Field Telemetry Markers">
             <!-- 3D World-Space Zone Pins Wrapper -->
             <div class="spatial-ar-pins-wrap" id="spatialArPinsWrap">
@@ -1733,7 +1738,7 @@
         </p>
 
         <!-- NASA Telemetry Badges -->
-        <div class="nasa-data-badges-container">
+        <div class="nasa-data-badges-container" id="nasaHub">
             <div class="nasa-data-badges-title" data-i18n="nasa-sources-title">
                 NASA Earth Observation Telemetry Sources
             </div>

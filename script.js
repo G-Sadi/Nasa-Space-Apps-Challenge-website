@@ -458,8 +458,122 @@ window.addEventListener("languageChanged", () => {
     updateRotation(currentSelectedRotationYear);
 });
 
+/*
+|--------------------------------------------------------------------------
+| Navbar Smooth Scroll & Active Section Tracker (IntersectionObserver)
+|--------------------------------------------------------------------------
+*/
+
+function initNavbarActiveTracker() {
+    const navLinks = document.querySelectorAll(".nav-links a, nav a");
+    if (!navLinks || navLinks.length === 0) return;
+
+    // Trackable section IDs mapped to nav links
+    const targetSectionIds = [
+        "farmSimulation",
+        "landLocation",
+        "simulation",
+        "rotation",
+        "lifecycle",
+        "nasaHub"
+    ];
+
+    const observedSections = targetSectionIds
+        .map(id => document.getElementById(id))
+        .filter(el => el !== null);
+
+    if (observedSections.length === 0) return;
+
+    const visibleMap = new Map();
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            visibleMap.set(entry.target.id, entry.isIntersecting);
+        });
+
+        // Determine which section is currently active (top-to-bottom priority)
+        let activeId = null;
+        for (const sec of observedSections) {
+            if (visibleMap.get(sec.id)) {
+                activeId = sec.id;
+                break;
+            }
+        }
+
+        if (activeId) {
+            navLinks.forEach(link => {
+                const href = link.getAttribute("href");
+                if (href === `#${activeId}`) {
+                    link.classList.add("active");
+                } else if (href !== "#aiAdvisor") {
+                    link.classList.remove("active");
+                }
+            });
+        }
+    }, {
+        root: null,
+        rootMargin: "-15% 0px -55% 0px",
+        threshold: [0, 0.1, 0.25]
+    });
+
+    observedSections.forEach(sec => observer.observe(sec));
+
+    // Handle AI Advisor nav link click (smooth scroll + instant Chatbot open)
+    const aiAdvisorLink = document.getElementById("navLinkAiAdvisor");
+    if (aiAdvisorLink) {
+        aiAdvisorLink.addEventListener("click", (e) => {
+            e.preventDefault();
+            navLinks.forEach(l => l.classList.remove("active"));
+            aiAdvisorLink.classList.add("active");
+
+            // Scroll to the 3D Live Field / AR advisor container smoothly
+            const targetEl = document.getElementById("spatialArContainer") || document.getElementById("farmSimulation");
+            if (targetEl) {
+                targetEl.scrollIntoView({ behavior: "smooth" });
+            }
+
+            // Open the Farmer Buddy AI chat widget
+            setTimeout(() => {
+                if (window.farmerBuddyInstance && typeof window.farmerBuddyInstance.toggleWindow === "function") {
+                    window.farmerBuddyInstance.toggleWindow(true);
+                } else {
+                    const fab = document.getElementById("farmerBuddyFAB");
+                    if (fab) fab.click();
+                }
+            }, 300);
+        });
+    }
+
+    // Direct click handler for all nav links for instant feedback
+    navLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            const href = link.getAttribute("href");
+            if (!href || !href.startsWith("#") || href === "#") return;
+            if (href === "#aiAdvisor") return; // Handled separately above
+
+            const target = document.querySelector(href);
+            if (target) {
+                e.preventDefault();
+                navLinks.forEach(l => l.classList.remove("active"));
+                link.classList.add("active");
+                target.scrollIntoView({ behavior: "smooth" });
+                if (history.pushState) {
+                    history.pushState(null, null, href);
+                }
+            }
+        });
+    });
+}
+
 // Initial trigger
-document.addEventListener("DOMContentLoaded", () => {
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+        calculateScenario();
+        updateRotation(2026);
+        initNavbarActiveTracker();
+    });
+} else {
     calculateScenario();
     updateRotation(2026);
-});
+    initNavbarActiveTracker();
+}
