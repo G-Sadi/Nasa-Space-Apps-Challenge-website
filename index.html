@@ -948,18 +948,107 @@
 
         <!-- INTERACTIVE LAND LOCATION SWITCHER & SEARCH BAR -->
         <div class="map-location-bar">
-            <div class="map-search-wrapper">
-                <div class="map-search-input-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="mapSearchInput" class="map-search-input"
-                           placeholder="Search any land, area, or road (e.g., Bakshibazar Dhaka, Savar, Trishal, Bogura, Rajshahi)..."
-                           data-i18n-placeholder="search-placeholder"
-                           autocomplete="off">
-                    <button id="mapSearchClearBtn" class="map-search-clear" style="display: none;" title="Clear search">✕</button>
-                    <div id="mapSearchSpinner" class="map-search-spinner" style="display: none;">↻</div>
+            <div class="map-search-row">
+                <div class="map-search-wrapper">
+                    <div class="map-search-input-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="mapSearchInput" class="map-search-input"
+                               placeholder="Search any land, area, or road (e.g., Bakshibazar Dhaka, Savar, Trishal, Bogura, Rajshahi)..."
+                               data-i18n-placeholder="search-placeholder"
+                               autocomplete="off">
+                        <button id="mapSearchClearBtn" class="map-search-clear" style="display: none;" title="Clear search">✕</button>
+                        <div id="mapSearchSpinner" class="map-search-spinner" style="display: none;">↻</div>
+                    </div>
+                    <!-- Autocomplete Dropdown List -->
+                    <div id="mapSearchResults" class="map-search-dropdown" style="display: none;"></div>
                 </div>
-                <!-- Autocomplete Dropdown List -->
-                <div id="mapSearchResults" class="map-search-dropdown" style="display: none;"></div>
+
+                <!-- Sleek 64-Zillas Dropdown Selector -->
+                <div class="zillas-dropdown-wrapper">
+                    <select id="zillasDropdown" class="zillas-select" aria-label="Select Bangladesh District">
+                        <option value="" disabled selected data-i18n="zillas-select-placeholder">🇧🇩 All 64 Districts (Zillas) ▾</option>
+                        <optgroup label="Dhaka Division (ঢাকা বিভাগ)">
+                            <option value="dhaka" data-lat="23.8103" data-lng="90.4125" data-name-en="Dhaka" data-name-bn="ঢাকা">Dhaka (ঢাকা)</option>
+                            <option value="gazipur" data-lat="24.0023" data-lng="90.4264" data-name-en="Gazipur" data-name-bn="গাজীপুর">Gazipur (গাজীপুর)</option>
+                            <option value="narayanganj" data-lat="23.6238" data-lng="90.5" data-name-en="Narayanganj" data-name-bn="নারায়ণগঞ্জ">Narayanganj (নারায়ণগঞ্জ)</option>
+                            <option value="narsingdi" data-lat="23.9229" data-lng="90.7177" data-name-en="Narsingdi" data-name-bn="নরসিংদী">Narsingdi (নরসিংদী)</option>
+                            <option value="manikganj" data-lat="23.8617" data-lng="90.0003" data-name-en="Manikganj" data-name-bn="মানিকগঞ্জ">Manikganj (মানিকগঞ্জ)</option>
+                            <option value="munshiganj" data-lat="23.5422" data-lng="90.5305" data-name-en="Munshiganj" data-name-bn="মুন্সিগঞ্জ">Munshiganj (মুন্সিগঞ্জ)</option>
+                            <option value="tangail" data-lat="24.2513" data-lng="89.9167" data-name-en="Tangail" data-name-bn="টাঙ্গাইল">Tangail (টাঙ্গাইল)</option>
+                            <option value="kishoreganj" data-lat="24.4449" data-lng="90.7766" data-name-en="Kishoreganj" data-name-bn="কিশোরগঞ্জ">Kishoreganj (কিশোরগঞ্জ)</option>
+                            <option value="faridpur" data-lat="23.607" data-lng="89.8429" data-name-en="Faridpur" data-name-bn="ফরিদপুর">Faridpur (ফরিদপুর)</option>
+                            <option value="gopalganj" data-lat="23.0051" data-lng="89.8266" data-name-en="Gopalganj" data-name-bn="গোপালগঞ্জ">Gopalganj (গোপালগঞ্জ)</option>
+                            <option value="madaripur" data-lat="23.1641" data-lng="90.1897" data-name-en="Madaripur" data-name-bn="মাদারীপুর">Madaripur (মাদারীপুর)</option>
+                            <option value="rajbari" data-lat="23.7574" data-lng="89.6445" data-name-en="Rajbari" data-name-bn="রাজবাড়ী">Rajbari (রাজবাড়ী)</option>
+                            <option value="shariatpur" data-lat="23.2423" data-lng="90.4348" data-name-en="Shariatpur" data-name-bn="শরীয়তপুর">Shariatpur (শরীয়তপুর)</option>
+                        </optgroup>
+                        <optgroup label="Mymensingh Division (ময়মনসিংহ বিভাগ)">
+                            <option value="mymensingh" data-lat="24.7471" data-lng="90.4203" data-name-en="Mymensingh" data-name-bn="ময়মনসিংহ">Mymensingh (ময়মনসিংহ)</option>
+                            <option value="jamalpur" data-lat="24.9375" data-lng="89.9378" data-name-en="Jamalpur" data-name-bn="জামালপুর">Jamalpur (জামালপুর)</option>
+                            <option value="sherpur" data-lat="25.0205" data-lng="90.0153" data-name-en="Sherpur" data-name-bn="শেরপুর">Sherpur (শেরপুর)</option>
+                            <option value="netrokona" data-lat="24.871" data-lng="90.7279" data-name-en="Netrokona" data-name-bn="নেত্রকোনা">Netrokona (নেত্রকোনা)</option>
+                        </optgroup>
+                        <optgroup label="Chattogram Division (চট্টগ্রাম বিভাগ)">
+                            <option value="chattogram" data-lat="22.3569" data-lng="91.7832" data-name-en="Chattogram" data-name-bn="চট্টগ্রাম">Chattogram (চট্টগ্রাম)</option>
+                            <option value="coxs_bazar" data-lat="21.4272" data-lng="92.0058" data-name-en="Cox's Bazar" data-name-bn="কক্সবাজার">Cox's Bazar (কক্সবাজার)</option>
+                            <option value="cumilla" data-lat="23.4607" data-lng="91.1809" data-name-en="Cumilla" data-name-bn="কুমিল্লা">Cumilla (কুমিল্লা)</option>
+                            <option value="brahmanbaria" data-lat="23.9571" data-lng="91.1119" data-name-en="Brahmanbaria" data-name-bn="ব্রাহ্মণবাড়িয়া">Brahmanbaria (ব্রাহ্মণবাড়িয়া)</option>
+                            <option value="chandpur" data-lat="23.2333" data-lng="90.6713" data-name-en="Chandpur" data-name-bn="চাঁদপুর">Chandpur (চাঁদপুর)</option>
+                            <option value="noakhali" data-lat="22.8696" data-lng="91.0994" data-name-en="Noakhali" data-name-bn="নোয়াখালী">Noakhali (নোয়াখালী)</option>
+                            <option value="lakshmipur" data-lat="22.9447" data-lng="90.8282" data-name-en="Lakshmipur" data-name-bn="লক্ষ্মীপুর">Lakshmipur (লক্ষ্মীপুর)</option>
+                            <option value="feni" data-lat="23.0159" data-lng="91.3976" data-name-en="Feni" data-name-bn="ফেনী">Feni (ফেনী)</option>
+                            <option value="khagrachhari" data-lat="23.1193" data-lng="91.9847" data-name-en="Khagrachhari" data-name-bn="খাগড়াছড়ি">Khagrachhari (খাগড়াছড়ি)</option>
+                            <option value="rangamati" data-lat="22.6533" data-lng="92.1789" data-name-en="Rangamati" data-name-bn="রাঙ্গামাটি">Rangamati (রাঙ্গামাটি)</option>
+                            <option value="bandarban" data-lat="22.1953" data-lng="92.2184" data-name-en="Bandarban" data-name-bn="বান্দরবান">Bandarban (বান্দরবান)</option>
+                        </optgroup>
+                        <optgroup label="Rajshahi Division (রাজশাহী বিভাগ)">
+                            <option value="rajshahi" data-lat="24.3745" data-lng="88.6042" data-name-en="Rajshahi" data-name-bn="রাজশাহী">Rajshahi (রাজশাহী)</option>
+                            <option value="bogura" data-lat="24.8481" data-lng="89.373" data-name-en="Bogura" data-name-bn="বগুড়া">Bogura (বগুড়া)</option>
+                            <option value="pabna" data-lat="24.0063" data-lng="89.2372" data-name-en="Pabna" data-name-bn="পাবনা">Pabna (পাবনা)</option>
+                            <option value="sirajganj" data-lat="24.4534" data-lng="89.7007" data-name-en="Sirajganj" data-name-bn="সিরাজগঞ্জ">Sirajganj (সিরাজগঞ্জ)</option>
+                            <option value="natore" data-lat="24.4206" data-lng="89.0006" data-name-en="Natore" data-name-bn="নাটোর">Natore (নাটোর)</option>
+                            <option value="naogaon" data-lat="24.7936" data-lng="88.9318" data-name-en="Naogaon" data-name-bn="নওগাঁ">Naogaon (নওগাঁ)</option>
+                            <option value="chapainawabganj" data-lat="24.5965" data-lng="88.2775" data-name-en="Chapainawabganj" data-name-bn="চাঁপাইনবাবগঞ্জ">Chapainawabganj (চাঁপাইনবাবগঞ্জ)</option>
+                            <option value="joypurhat" data-lat="25.0968" data-lng="89.0227" data-name-en="Joypurhat" data-name-bn="জয়পুরহাট">Joypurhat (জয়পুরহাট)</option>
+                        </optgroup>
+                        <optgroup label="Rangpur Division (রংপুর বিভাগ)">
+                            <option value="rangpur" data-lat="25.7439" data-lng="89.2752" data-name-en="Rangpur" data-name-bn="রংপুর">Rangpur (রংপুর)</option>
+                            <option value="dinajpur" data-lat="25.6217" data-lng="88.6354" data-name-en="Dinajpur" data-name-bn="দিনাজপুর">Dinajpur (দিনাজপুর)</option>
+                            <option value="kurigram" data-lat="25.8054" data-lng="89.6362" data-name-en="Kurigram" data-name-bn="কুড়িগ্রাম">Kurigram (কুড়িগ্রাম)</option>
+                            <option value="gaibandha" data-lat="25.3297" data-lng="89.543" data-name-en="Gaibandha" data-name-bn="গাইবান্ধা">Gaibandha (গাইবান্ধা)</option>
+                            <option value="nilphamari" data-lat="25.9318" data-lng="88.856" data-name-en="Nilphamari" data-name-bn="নীলফামারী">Nilphamari (নীলফামারী)</option>
+                            <option value="lalmonirhat" data-lat="25.9923" data-lng="89.2847" data-name-en="Lalmonirhat" data-name-bn="লালমনিরহাট">Lalmonirhat (লালমনিরহাট)</option>
+                            <option value="thakurgaon" data-lat="26.0337" data-lng="88.4617" data-name-en="Thakurgaon" data-name-bn="ঠাকুরগাঁও">Thakurgaon (ঠাকুরগাঁও)</option>
+                            <option value="panchagarh" data-lat="26.3411" data-lng="88.5542" data-name-en="Panchagarh" data-name-bn="পঞ্চগড়">Panchagarh (পঞ্চগড়)</option>
+                        </optgroup>
+                        <optgroup label="Khulna Division (খুলনা বিভাগ)">
+                            <option value="khulna" data-lat="22.8456" data-lng="89.5403" data-name-en="Khulna" data-name-bn="খুলনা">Khulna (খুলনা)</option>
+                            <option value="jashore" data-lat="23.1664" data-lng="89.2081" data-name-en="Jashore" data-name-bn="যশোর">Jashore (যশোর)</option>
+                            <option value="satkhira" data-lat="22.7185" data-lng="89.0705" data-name-en="Satkhira" data-name-bn="সাতক্ষীরা">Satkhira (সাতক্ষীরা)</option>
+                            <option value="bagerhat" data-lat="22.6516" data-lng="89.7859" data-name-en="Bagerhat" data-name-bn="বাগেরহাট">Bagerhat (বাগেরহাট)</option>
+                            <option value="kushtia" data-lat="23.9013" data-lng="89.1204" data-name-en="Kushtia" data-name-bn="কুষ্টিয়া">Kushtia (কুষ্টিয়া)</option>
+                            <option value="jhenaidah" data-lat="23.545" data-lng="89.1726" data-name-en="Jhenaidah" data-name-bn="ঝিনাইদহ">Jhenaidah (ঝিনাইদহ)</option>
+                            <option value="magura" data-lat="23.4873" data-lng="89.4199" data-name-en="Magura" data-name-bn="মাগুরা">Magura (মাগুরা)</option>
+                            <option value="narail" data-lat="23.1725" data-lng="89.5127" data-name-en="Narail" data-name-bn="নড়াইল">Narail (নড়াইল)</option>
+                            <option value="chuadanga" data-lat="23.6402" data-lng="88.8418" data-name-en="Chuadanga" data-name-bn="চুয়াডাঙ্গা">Chuadanga (চুয়াডাঙ্গা)</option>
+                            <option value="meherpur" data-lat="23.7622" data-lng="88.6318" data-name-en="Meherpur" data-name-bn="মেহেরপুর">Meherpur (মেহেরপুর)</option>
+                        </optgroup>
+                        <optgroup label="Barishal Division (বরিশাল বিভাগ)">
+                            <option value="barishal" data-lat="22.701" data-lng="90.3535" data-name-en="Barishal" data-name-bn="বরিশাল">Barishal (বরিশাল)</option>
+                            <option value="patuakhali" data-lat="22.3596" data-lng="90.3299" data-name-en="Patuakhali" data-name-bn="পটুয়াখালী">Patuakhali (পটুয়াখালী)</option>
+                            <option value="bhola" data-lat="22.6859" data-lng="90.6482" data-name-en="Bhola" data-name-bn="ভোলা">Bhola (ভোলা)</option>
+                            <option value="pirojpur" data-lat="22.5791" data-lng="89.9759" data-name-en="Pirojpur" data-name-bn="পিরোজপুর">Pirojpur (পিরোজপুর)</option>
+                            <option value="barguna" data-lat="22.1592" data-lng="90.1256" data-name-en="Barguna" data-name-bn="বরগুনা">Barguna (বরগুনা)</option>
+                            <option value="jhalokati" data-lat="22.6406" data-lng="90.1987" data-name-en="Jhalokati" data-name-bn="ঝালকাঠি">Jhalokati (ঝালকাঠি)</option>
+                        </optgroup>
+                        <optgroup label="Sylhet Division (সিলেট বিভাগ)">
+                            <option value="sylhet" data-lat="24.8949" data-lng="91.8687" data-name-en="Sylhet" data-name-bn="সিলেট">Sylhet (সিলেট)</option>
+                            <option value="moulvibazar" data-lat="24.4829" data-lng="91.7774" data-name-en="Moulvibazar" data-name-bn="মৌলভীবাজার">Moulvibazar (মৌলভীবাজার)</option>
+                            <option value="habiganj" data-lat="24.3749" data-lng="91.4155" data-name-en="Habiganj" data-name-bn="হবিগঞ্জ">Habiganj (হবিগঞ্জ)</option>
+                            <option value="sunamganj" data-lat="25.0658" data-lng="91.395" data-name-en="Sunamganj" data-name-bn="সুনামগঞ্জ">Sunamganj (সুনামগঞ্জ)</option>
+                        </optgroup>
+                    </select>
+                </div>
             </div>
 
             <!-- Quick-Switch Location Pills & GPS Button -->

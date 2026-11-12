@@ -100,8 +100,10 @@ function calculateScenario() {
 
     // Dynamic Real-time Binding to Dual-Line Chart
     if (window.farmChartInstance) {
-        const newRain = BASELINE_RAINFALL.map(r => Math.round(Math.max(10, r * (1 + rain / 100))));
-        const newWater = BASELINE_WATER.map(w => Math.round(Math.max(15, Math.min(100, w + (water * 0.75) - (temp * 2.2)))));
+        const baseRain = window.activeBaselineRainfall || BASELINE_RAINFALL;
+        const baseWater = window.activeBaselineWater || BASELINE_WATER;
+        const newRain = baseRain.map(r => Math.round(Math.max(10, r * (1 + rain / 100))));
+        const newWater = baseWater.map(w => Math.round(Math.max(15, Math.min(100, w + (water * 0.75) - (temp * 2.2)))));
 
         window.farmChartInstance.data.datasets[0].data = newRain;
         window.farmChartInstance.data.datasets[1].data = newWater;
@@ -119,11 +121,33 @@ function resetSimulation() {
     if (waterSlider) waterSlider.value = 0;
     calculateScenario();
     if (window.farmChartInstance) {
-        window.farmChartInstance.data.datasets[0].data = [...BASELINE_RAINFALL];
-        window.farmChartInstance.data.datasets[1].data = [...BASELINE_WATER];
+        const baseRain = window.activeBaselineRainfall || BASELINE_RAINFALL;
+        const baseWater = window.activeBaselineWater || BASELINE_WATER;
+        window.farmChartInstance.data.datasets[0].data = [...baseRain];
+        window.farmChartInstance.data.datasets[1].data = [...baseWater];
         window.farmChartInstance.update();
     }
 }
+
+function syncSimulatorToDistrict(rainfallMm, tempC, waterPct, conditionText) {
+    const rainFactor = rainfallMm ? (rainfallMm / 2240) : 1;
+    window.activeBaselineRainfall = BASELINE_RAINFALL.map(r => Math.round(Math.max(10, r * rainFactor)));
+    const waterDelta = waterPct ? (waterPct - 78) * 0.4 : 0;
+    window.activeBaselineWater = BASELINE_WATER.map(w => Math.round(Math.max(20, Math.min(98, w + waterDelta))));
+
+    if (rainSlider) rainSlider.value = 0;
+    if (tempSlider) tempSlider.value = 0;
+    if (waterSlider) waterSlider.value = 0;
+
+    calculateScenario();
+
+    if (window.farmChartInstance) {
+        window.farmChartInstance.data.datasets[0].data = [...window.activeBaselineRainfall];
+        window.farmChartInstance.data.datasets[1].data = [...window.activeBaselineWater];
+        window.farmChartInstance.update();
+    }
+}
+window.syncSimulatorToDistrict = syncSimulatorToDistrict;
 
 /*
 |--------------------------------------------------------------------------
