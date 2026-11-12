@@ -3789,10 +3789,15 @@ window.disposeFieldInstancedMeshes = disposeFieldInstancedMeshes;
 /**
  * Progressive GLB Streaming Engine with In-Memory Caching (0ms switch-back)
  */
+const AVAILABLE_LOCAL_GLBS = new Set(); // Registry of pre-packaged local GLB assets
+
 async function streamCropGlbAsync(cropId) {
     const key = normalizeCropId(cropId);
+    if (!AVAILABLE_LOCAL_GLBS.has(key)) {
+        // High-performance procedural photorealistic meshes are active; skip unneeded 404 network probes
+        return;
+    }
     if (geometryAndMaterialPool.getGlb(key)) {
-        console.log(`[3D FieldShift] 🌿 Instant 0ms retrieval of cached GLB asset for ${key}`);
         return;
     }
 

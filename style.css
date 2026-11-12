@@ -154,13 +154,13 @@ header,
     }
 }
 
-/* [ZONE 2: CENTER] -> All 7 Navigation Section Links */
+/* [ZONE 2: CENTER] -> 6 Core Navigation Section Links */
 .nav-links,
 nav {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    gap: 4px;
+    gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
@@ -175,14 +175,14 @@ nav {
 nav a {
     display: inline-flex;
     align-items: center;
-    padding: 6px 9px;
-    font-size: 12.5px;
+    padding: 6px 12px;
+    font-size: 13px;
     font-weight: 500;
     color: rgba(230, 245, 236, 0.85);
     text-decoration: none;
     border-radius: 8px;
     white-space: nowrap;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-links a:hover,
@@ -915,13 +915,14 @@ button {
 
 /* SECTIONS */
 
-.section {
-    padding: 110px 6%;
+.section,
+section {
+    padding: 56px 6%;
 }
 
 .section-heading {
     max-width: 750px;
-    margin-bottom: 50px;
+    margin-bottom: 32px;
 }
 
 .section-heading h2 {
@@ -1171,7 +1172,7 @@ input[type="range"] {
 .final-cta {
     text-align: center;
 
-    padding: 130px 20px;
+    padding: 56px 20px;
 
     background:
         radial-gradient(
@@ -1920,13 +1921,9 @@ footer {
 /* LAND LOCATION */
 
 #landLocation {
-
-    padding: 100px 5%;
-
+    padding: 56px 5%;
     max-width: 1450px;
-
     margin: auto;
-
 }
 
 
@@ -2498,8 +2495,8 @@ footer {
 }
 
 #farmSimulation {
-    padding: 100px 5%;
-    max-width: 1450px;
+    padding: 56px 5%;
+    max-width: 1600px;
     margin: auto;
 }
 
@@ -2532,16 +2529,6 @@ footer {
 /* =========================================================
    SMART FARM 3D SIMULATION
 ========================================================= */
-
-#farmSimulation {
-
-    padding: 100px 5%;
-
-    max-width: 1600px;
-
-    margin: auto;
-
-}
 
 
 .simulation-header {
@@ -4381,7 +4368,7 @@ body.lang-bn strong {
 .lifecycle-section {
     background: radial-gradient(circle at 50% 15%, rgba(67, 239, 140, 0.08), transparent 60%), #06150f;
     position: relative;
-    padding: 100px 6%;
+    padding: 56px 6%;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }

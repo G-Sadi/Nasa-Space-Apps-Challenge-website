@@ -16,7 +16,6 @@ const i18nData = {
     "nav-rotation": { en: "Crop Rotation", bn: "শস্য আবর্তন" },
     "nav-lifecycle": { en: "Crop Lifecycle", bn: "ফসল জীবনচক্র" },
     "nav-ai-advisor": { en: "AI Advisor", bn: "কৃষি এআই" },
-    "nav-nasa-hub": { en: "NASA Hub", bn: "নাসা হাব" },
     "nav-how": { en: "How it works", bn: "কিভাবে কাজ করে" },
     "nav-analyze": { en: "Analyze", bn: "বিশ্লেষণ" },
     "nav-simulation": { en: "Simulation", bn: "সিমুলেশন" },

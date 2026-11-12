@@ -498,8 +498,7 @@ function initNavbarActiveTracker() {
         "landLocation",
         "simulation",
         "rotation",
-        "lifecycle",
-        "nasaHub"
+        "lifecycle"
     ];
 
     const observedSections = targetSectionIds
