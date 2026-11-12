@@ -384,9 +384,25 @@
         }
     }
 
-    // Global Exposed Method
+    // Global Exposed Methods
     window.refreshWeather = function (force = true) {
         detectLocationAndFetch(force);
+    };
+
+    window.setWeatherLocation = function (lat, lon, nameEn, nameBn, force = true) {
+        currentLocation = {
+            lat: parseFloat(lat),
+            lon: parseFloat(lon),
+            nameEn: nameEn || `Location (${lat}°N, ${lon}°E)`,
+            nameBn: nameBn || `অবস্থান (${lat}°উ, ${lon}°পূ)`
+        };
+        isLiveCoord = true;
+        const locTextEl = document.getElementById('weatherLocationText');
+        if (locTextEl) {
+            const isBn = (window.currentAppLanguage === 'bn');
+            locTextEl.textContent = isBn ? currentLocation.nameBn : currentLocation.nameEn;
+        }
+        fetchOpenMeteoForecast(lat, lon, force);
     };
 
     // Auto-init on DOM Ready

@@ -946,16 +946,69 @@
             </div>
         </div>
 
+        <!-- INTERACTIVE LAND LOCATION SWITCHER & SEARCH BAR -->
+        <div class="map-location-bar">
+            <div class="map-search-wrapper">
+                <div class="map-search-input-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="mapSearchInput" class="map-search-input"
+                           placeholder="Search any land, area, or road (e.g., Bakshibazar Dhaka, Savar, Trishal, Bogura, Rajshahi)..."
+                           data-i18n-placeholder="search-placeholder"
+                           autocomplete="off">
+                    <button id="mapSearchClearBtn" class="map-search-clear" style="display: none;" title="Clear search">✕</button>
+                    <div id="mapSearchSpinner" class="map-search-spinner" style="display: none;">↻</div>
+                </div>
+                <!-- Autocomplete Dropdown List -->
+                <div id="mapSearchResults" class="map-search-dropdown" style="display: none;"></div>
+            </div>
+
+            <!-- Quick-Switch Location Pills & GPS Button -->
+            <div class="location-preset-pills" id="locationPresetPills">
+                <button type="button" class="preset-pill gps-pill" id="btnLiveGps" title="Detect & fly to your physical GPS location">
+                    <span class="pill-icon">📍</span>
+                    <span class="pill-label" data-i18n="pill-gps">My Live GPS</span>
+                </button>
+                <button type="button" class="preset-pill active" data-lat="24.7471" data-lng="90.4203" data-name="Field Shift • Mymensingh - Field 02" data-name-bn="ফিল্ড শিফট • ময়মনসিংহ - ফিল্ড ০২" data-aez="AEZ-9 Old Brahmaputra">
+                    <span class="pill-icon">🌾</span>
+                    <span class="pill-label">Mymensingh</span>
+                </button>
+                <button type="button" class="preset-pill" data-lat="23.7231" data-lng="90.3956" data-name="Field Shift • Bakshibazar, Dhaka" data-name-bn="ফিল্ড শিফট • বকশীবাজার, ঢাকা" data-aez="AEZ-28 Madhupur Tract (Urban)">
+                    <span class="pill-icon">🏙️</span>
+                    <span class="pill-label">Bakshibazar, Dhaka</span>
+                </button>
+                <button type="button" class="preset-pill" data-lat="24.8481" data-lng="89.3730" data-name="Field Shift • Bogura Spice & Crop Hub" data-name-bn="ফিল্ড শিফট • বগুড়া মসলা ও শস্য হাব" data-aez="AEZ-4 Karatoya-Bangali Plain">
+                    <span class="pill-icon">🌱</span>
+                    <span class="pill-label">Bogura</span>
+                </button>
+                <button type="button" class="preset-pill" data-lat="24.3745" data-lng="88.6042" data-name="Field Shift • Rajshahi Barind Tract" data-name-bn="ফিল্ড শিফট • রাজশাহী বরেন্দ্র ট্র্যাক্ট" data-aez="AEZ-25 Level Barind Tract">
+                    <span class="pill-icon">☀️</span>
+                    <span class="pill-label">Rajshahi</span>
+                </button>
+                <button type="button" class="preset-pill" data-lat="24.8949" data-lng="91.8687" data-name="Field Shift • Sylhet Haor Basin" data-name-bn="ফিল্ড শিফট • সিলেট হাওর বেসিন" data-aez="AEZ-21 Sylhet Haor Basin">
+                    <span class="pill-icon">🌊</span>
+                    <span class="pill-label">Sylhet</span>
+                </button>
+                <button type="button" class="preset-pill" data-lat="22.8456" data-lng="89.5403" data-name="Field Shift • Khulna Coastal Belt" data-name-bn="ফিল্ড শিফট • খুলনা উপকূলীয় বেল্ট" data-aez="AEZ-13 Ganges Tidal Floodplain">
+                    <span class="pill-icon">🌴</span>
+                    <span class="pill-label">Khulna</span>
+                </button>
+            </div>
+        </div>
+
         <!-- UNDERSTAND YOUR LAND MAP & TELEMETRY DASHBOARD -->
         <div class="location-layout">
 
             <!-- MAP -->
             <div class="land-map">
                 <!-- Satellite Coordinate HUD Overlay -->
-                <div class="map-satellite-hud">
+                <div class="map-satellite-hud" id="mapSatelliteHud">
                     <span class="hud-sat-pill">🛰️ SATELLITE EO</span>
-                    <span class="hud-coords">24.7471° N, 90.4203° E</span>
-                    <span class="hud-aez" data-i18n="map-aez">AEZ-9 Old Brahmaputra</span>
+                    <span class="hud-coords" id="hudCoords">24.7471° N, 90.4203° E</span>
+                    <span class="hud-aez" id="hudAez" data-i18n="map-aez">AEZ-9 Old Brahmaputra</span>
+                </div>
+                <!-- Interactive Map Hint Badge -->
+                <div class="map-hint-pill" id="mapHintPill">
+                    <span>🖱️ Click map or drag pin to select exact plot</span>
                 </div>
                 <!-- Satellite Scanning Radar Animation Overlay -->
                 <div id="mapScanningOverlay" class="map-scanning-overlay" style="display: none;">
@@ -966,7 +1019,7 @@
             </div>
 
             <!-- DATA -->
-            <div class="land-data">
+            <div class="land-data" id="landDataPanel">
 
                 <div class="land-data-header">
                     <span data-i18n="selected-land">
@@ -979,7 +1032,7 @@
 
                 <!-- Geographic Attributes Grid -->
                 <div class="geo-cards-grid">
-                    <div class="geo-card">
+                    <div class="geo-card" id="geoCardLocation">
                         <span data-i18n="location-label">
                             📍 LOCATION
                         </span>
@@ -988,7 +1041,7 @@
                         </strong>
                     </div>
 
-                    <div class="geo-card">
+                    <div class="geo-card" id="geoCardArea">
                         <span data-i18n="area-label">
                             📐 FIELD AREA
                         </span>
@@ -997,27 +1050,27 @@
                         </strong>
                     </div>
 
-                    <div class="geo-card">
+                    <div class="geo-card" id="geoCardRiver">
                         <span data-i18n="river-label">
                             🌊 NEAREST RIVER
                         </span>
                         <strong id="riverStatus">
-                            Detecting...
+                            Old Brahmaputra River
                         </strong>
                         <small id="riverDistance">
-                            --
+                            412 m away
                         </small>
                     </div>
 
-                    <div class="geo-card">
+                    <div class="geo-card" id="geoCardPond">
                         <span data-i18n="pond-label">
                             💧 NEAREST POND
                         </span>
                         <strong id="pondStatus">
-                            Detecting...
+                            Irrigation Canal & Basin
                         </strong>
                         <small id="pondDistance">
-                            --
+                            135 m away
                         </small>
                     </div>
                 </div>
@@ -1029,28 +1082,28 @@
                 </div>
 
                 <div class="telemetry-cards-grid">
-                    <div class="metric-card">
+                    <div class="metric-card" id="telemetryCardRain">
                         <small data-i18n="rainfall-label">RAINFALL</small>
                         <strong id="rainfall">
                             1842 mm
                         </strong>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="telemetryCardTemp">
                         <small data-i18n="temp-label">AVG TEMPERATURE</small>
                         <strong id="temperature">
                             27.4°C
                         </strong>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="telemetryCardWater">
                         <small data-i18n="water-label">WATER AVAILABILITY</small>
                         <strong id="water">
                             72%
                         </strong>
                     </div>
 
-                    <div class="metric-card">
+                    <div class="metric-card" id="telemetryCardVeg">
                         <small data-i18n="veg-label">VEGETATION INDEX</small>
                         <strong id="vegIndex">
                             0.68 NDVI
@@ -1058,7 +1111,7 @@
                     </div>
                 </div>
 
-                <div class="condition-card">
+                <div class="condition-card" id="telemetryCardCondition">
                     <small data-i18n="field-cond-label">FIELD CONDITION</small>
                     <p id="fieldCondition" data-i18n="field-cond-text">
                         Moderate water pressure with good soil compatibility.
@@ -1069,23 +1122,33 @@
 
         </div>
 
+        <!-- SLEEK SINGLE-ROW LAND & PLOT CONTROLS -->
         <div class="land-controls-row">
-            <div class="coordinate-inputs">
-                <div class="input-group">
-                    <label data-i18n="lat-label">LATITUDE</label>
-                    <input type="number" id="latitudeInput" value="24.7471" step="0.000001">
-                </div>
+            <div class="input-group">
+                <label data-i18n="lat-label">LATITUDE</label>
+                <input type="number" id="latitudeInput" value="24.7471" step="0.0001">
+            </div>
 
-                <div class="input-group">
-                    <label data-i18n="lon-label">LONGITUDE</label>
-                    <input type="number" id="longitudeInput" value="90.4203" step="0.000001">
+            <div class="input-group">
+                <label data-i18n="lon-label">LONGITUDE</label>
+                <input type="number" id="longitudeInput" value="90.4203" step="0.0001">
+            </div>
+
+            <div class="input-group land-size-group">
+                <label data-i18n="land-size-label">LAND SIZE</label>
+                <div class="land-size-inputs">
+                    <input type="number" id="landSizeValue" value="25" min="0.1" max="10000" step="0.5">
+                    <select id="landSizeUnit" title="Land unit">
+                        <option value="acre" selected data-i18n="unit-acre">Acres</option>
+                        <option value="bigha" data-i18n="unit-bigha">Bigha</option>
+                        <option value="katha" data-i18n="unit-katha">Katha</option>
+                        <option value="decimal" data-i18n="unit-dec">Dec</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="search-radius">
-                <label data-i18n="search-rad-label">
-                    SEARCH RADIUS
-                </label>
+            <div class="input-group search-radius">
+                <label data-i18n="search-rad-label">SEARCH RADIUS</label>
                 <select id="searchRadius">
                     <option value="500" data-i18n="opt-500m">500 meters</option>
                     <option value="1000" selected data-i18n="opt-1km">1 kilometer</option>
