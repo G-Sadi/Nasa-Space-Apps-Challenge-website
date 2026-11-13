@@ -1,162 +1,179 @@
+# 🛰️🌾 Field Shift — Smart Farm Intelligence & 3D Agricultural Digital Twin
+### Translating NASA Earth Observation Telemetry into Proactive Farm Decisions for Smallholder Farmers
+
 <div align="center">
 
-# 🌾 FieldShift
-### Adaptive Smart Farming & Low-Bandwidth AI Assistant
-**Official Submission for the NASA International Space Apps Challenge 2026**  
-*Engineered by **Team ASL Spectra** (Bangladesh)*
-
-<br/>
-
 [![NASA Space Apps 2026](https://img.shields.io/badge/NASA%20Space%20Apps-2026%20Global%20Challenge-0B3D91?style=for-the-badge&logo=nasa&logoColor=white)](https://www.spaceappschallenge.org/)
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-GitHub%20Pages-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/)
-[![NASA Earth Observations](https://img.shields.io/badge/NASA%20Data-SMAP%20%7C%20POWER%20%7C%20MODIS-0284c7?style=for-the-badge&logo=nasa&logoColor=white)](https://power.larc.nasa.gov/)
-[![3D Simulation](https://img.shields.io/badge/3D%20Engine-Three.js%20%2F%20WebGL-000000?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
+[![Team ASL Spectra](https://img.shields.io/badge/Team-ASL__Spectra%20(Mymensingh%2C%20BD)-10b981?style=for-the-badge&logo=target&logoColor=white)](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/)
+[![Live Prototype](https://img.shields.io/badge/Live%20Prototype-GitHub%20Pages-22c55e?style=for-the-badge&logo=github&logoColor=white)](https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/)
+[![NASA Telemetry](https://img.shields.io/badge/NASA%20Data-SMAP%20%7C%20MODIS%20%7C%20POWER%20%7C%20MERRA--2%20%7C%20ECOSTRESS-0284c7?style=for-the-badge&logo=nasa&logoColor=white)](https://earthdata.nasa.gov/)
+[![3D Engine](https://img.shields.io/badge/3D%20Engine-Three.js%20WebGL%20(60FPS)-000000?style=for-the-badge&logo=three.js&logoColor=white)](https://threejs.org/)
+[![GIS Engine](https://img.shields.io/badge/GIS-64--Zilla%20Esri%20Satellite-16a34a?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![AI Engine](https://img.shields.io/badge/AI-Farmer%20Buddy%20(EN%2F%E0%A6%AC%E0%A6%BE%E0%A6%82%E0%A6%B2%E0%A6%BE)-8b5cf6?style=for-the-badge&logo=google-gemini&logoColor=white)](https://ai.google.dev/)
-[![YouTube Pitch](https://img.shields.io/badge/YouTube-240s%20Official%20Pitch-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=fh6zsdTMMQ8)
 
 <br/>
 
-### 🌐 Official Judge Showcase Links
-[🚀 **Launch Live Web Application**](https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/) • [🎥 **Watch 240s Official Pitch Video**](https://www.youtube.com/watch?v=fh6zsdTMMQ8) • [⚡ **Watch 30s Feature Shorts**](https://www.youtube.com/shorts/jdqRpXBAS44) • [📂 **GitHub Repository**](https://github.com/g-sadi/Nasa-Space-Apps-Challenge-website)
+> **Official Submission by Team ASL Spectra for the 2026 NASA International Space Apps Challenge**  
+> *Track: Climate Resilience, Sustainable Agriculture & Earth Observation Data Democratization*
+
+| 🌐 Live Interactive Web Prototype | 🚀 Official NASA Space Apps Team Page | 🎬 Official Video Demonstration |
+| :---: | :---: | :---: |
+| [**Launch Field Shift Live**](https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/) | [**View Team ASL Spectra Profile**](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) | [**Watch Official Pitch on YouTube**](https://www.youtube.com/@team-spectra_2026) |
 
 </div>
 
 ---
 
-## 📌 Executive Summary & Challenge Solution
+## 🎯 Executive Summary & The Challenge (Impact & Relevance)
 
-Across Bangladesh's **30 Agro-Ecological Zones (AEZ)**, smallholder farmers face severe climate challenges: unpredictable monsoon delays, flash floods in northeastern haor basins, and acute soil moisture depletion in the northwestern Barind Tract. 
+### The Real-World Agricultural Crisis in Bangladesh
+Bangladesh is one of the most climate-vulnerable deltas on Earth. Over 65% of the rural population depends directly on agricultural livelihoods. In fertile agricultural belts like **Mymensingh** (Agro-Ecological Zone AEZ-9, Old Brahmaputra Floodplain), smallholder farmers—such as our representative persona **Sheikh Siraj**—operate on razor-thin margins across fragmented 1–3 bigha family plots.
 
-**FieldShift** bridges the gap between petabytes of NASA Earth Observations and smallholder farmers in low-bandwidth rural environments. It translates raw multi-spectral satellite telemetry into actionable, field-level agronomic advisories through:
-1. **Interactive 3D Digital Twin Crop Simulation** (Three.js WebGL)
-2. **Instant 64-Zilla GIS Satellite Mapping & Land Selector** (Leaflet + Esri World Imagery)
-3. **Multilingual Farmer Buddy AI Assistant** (Bengali/English agronomic advisor powered by Google Gemini API with native offline agronomy rule fallback)
+Every agricultural cycle, smallholder farmers lose up to **30% of their potential harvest value** due to:
+1. **Unpredictable Monsoon Shifts:** Late-arriving rains delay paddy transplanting, exposing emerging crops to flash floods or severe terminal heat.
+2. **Subterranean Root Moisture Depletion:** Topsoil may appear moist while the vital root-zone (10–100 cm) is suffering from critical water depletion, or conversely, over-irrigation wastes diesel-pump fuel and leaches fertilizers.
+3. **Heatwave Canopy Thermal Stress:** High humidity paired with sudden temperature spikes causes rapid flower abortion in vegetables and grain chalkiness in rice.
+4. **Information Asymmetry & Untargeted Inputs:** Farmers purchase expensive synthetic fertilizers (Urea, TSP, MoP) without knowing whether current solar radiation (PAR Flux) and soil moisture allow crops to absorb nutrients.
+
+```
+       [ Rural Farming Reality ]                           [ The Field Shift Solution ]
++------------------------------------+             +-----------------------------------------+
+| Smallholder Farmer (Sheikh Siraj)  |             |          FIELD SHIFT PLATFORM           |
+| • Loses 30% yield to climate shock |  ===>>>     | • Translates raw NASA satellite bytes   |
+| • Cannot read NetCDF / HDF5 files  |             | • Real-time 4-Zone Live Radar HUD       |
+| • 2G/3G low-bandwidth smartphone  |             | • Photorealistic 3D Field Digital Twin  |
+| • Needs immediate, tactile guidance|             | • 0ms 64-Zilla GIS Agro-Telemetry Engine|
++------------------------------------+             | • Bilingual AI Voice/Text Guidance      |
+                                                   +-----------------------------------------+
+```
+
+### Why Existing NASA Portals Are Inaccessible to Smallholders
+NASA, NOAA, and ESA maintain world-class Earth Observation missions generating petabytes of open telemetry daily (NASA SMAP, MODIS, ECOSTRESS, POWER, GPM). However, these data streams exist behind scientific portals (Earthdata, AppEEARS, Giovanni) in dense multidimensional formats with complex coordinate reference systems. 
+
+**Field Shift** eliminates this barrier. It acts as an **intelligent, bidirectional translation bridge** that ingests orbital satellite telemetry and instantly converts it into tactile, actionable farm decisions: *When to irrigate, when to apply fertilizer, how to rotate crops across 4-year horizons, and how to maximize seasonal net profit in Bangladeshi Taka (৳).*
 
 ---
 
-## 🛰️ NASA Earth Observation Datasets & APIs Attribution
+## ⚡ 30-Second Judge Quick-Test Guide (Live Evaluation)
 
-FieldShift relies on verified NASA Earth science missions and open data APIs:
+Judges can evaluate the full application in under two minutes by following this 5-point walkthrough on our live website: [**https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/**](https://g-sadi.github.io/Nasa-Space-Apps-Challenge-website/):
 
-| NASA Mission / Dataset | Sensor / Platform | Parameters Utilized | Application in FieldShift | Primary Reference / API Endpoint |
-|:---|:---|:---|:---|:---|
-| **NASA SMAP** *(Soil Moisture Active Passive)* | L-Band Radar / Radiometer (680 km SSO) | Surface Soil Moisture ($0-5\text{ cm}$), Root-Zone Moisture, Freeze/Thaw state | Drives 4-Zone Radar HUD, irrigation urgency alerts, and soil moisture stratum in 3D field twin | [NASA SMAP Mission](https://smap.jpl.nasa.gov/) / NSIDC DAAC (`SPL3SMP`) |
-| **NASA POWER** *(Prediction of Worldwide Energy Resources)* | MERRA-2 Assimilation & GEOS-5 FP-IT | Solar Radiation (ALLSKY_SFC_SW_DWN), Daily Temp Max/Min, Dew/Frost Point, RH2M | Hyper-local 7-day Krishi weather forecast, solar pump feasibility, and growing degree-day models | [NASA POWER API](https://power.larc.nasa.gov/) (`community=AG`) |
-| **NASA MODIS / VIIRS** | Terra & Aqua Satellites | NDVI (Normalized Difference Vegetation Index), EVI, Surface Reflectance | Real-time crop canopy vigor assessment across 4 plot zones and historical biomass health | [NASA Earthdata](https://earthdata.nasa.gov/) / LP DAAC (`MOD13Q1` / `VNP13A1`) |
-| **NASA ECOSTRESS** | Thermal Radiometer on ISS | Evapotranspiration (ET), Evaporative Stress Index (ESI), Land Surface Temp (LST) | Identifies micro-scale canopy water stress before visible wilting occurs | [ECOSTRESS JPL](https://ecostress.jpl.nasa.gov/) |
-| **GPM IMERG** | Global Precipitation Measurement Constellation | Multi-satellite precipitation accumulation rates (mm/hr) | Calibrates Scenario Simulator rainfall sliders and monsoon flood models | [NASA GPM IMERG](https://gpm.nasa.gov/data/imerg) |
+```
++--------------------------------------------------------------------------------------------------+
+|                                5-POINT JUDGE EVALUATION WALKTHROUGH                              |
++--------------------------------------------------------------------------------------------------+
+| 1. HERO 4-ZONE RADAR HUD  --> Tap Zone A, B, C, D to inspect SMAP moisture & ECOSTRESS thermal  |
+| 2. 3D DIGITAL TWIN FIELD   --> Toggle Drone/Field/Root views, scrub growth days, click AR plant   |
+| 3. 64-ZILLA SATELLITE GIS --> Search any Bangladesh district, drag pin to compute river proximity|
+| 4. SCENARIO & ROTATION    --> Drag Rain/Temp/Water sliders, see crop & BDT (৳) profit adaptation |
+| 5. BILINGUAL AI ADVISOR   --> Toggle EN/বাং in navbar, open Farmer Buddy AI for instant advice   |
++--------------------------------------------------------------------------------------------------+
+```
+
+1. **4-Zone NASA SMAP Live Radar HUD (Hero Section):**
+   * Inspect real-time root-zone soil moisture (58%), MODIS NDVI (0.68–0.74), and ECOSTRESS canopy thermal data.
+   * Tap any of the 4 plot cards (`Zone A: North Plot`, `Zone B: Canal Side`, `Zone C: High Ridge`, `Zone D: Clay Basin`) to observe instantaneous telemetry synchronization and agronomic action directives.
+2. **Interactive 3D Digital Twin & Subterranean Root X-Ray (3D Live Field):**
+   * Experience our locked 60 FPS Three.js WebGL simulation featuring realistic PBR crops, soft shadow mapping, and dynamic daytime lighting (`Morning 🌅` | `Noon ☀️` | `Night 🌙`).
+   * Switch between camera presets: `🚁 Drone View`, `🌾 Field View`, and `🌱 Root & Soil View`.
+   * Drag the **5-Stage Growth Scrubber (Day 1 to Day 130)** to watch crops dynamically germinate, vegetate, flower, and ripen.
+   * Tap any crop plant (Tomato, Rice, Chili, Onion, Carrot) to open **AR Precision Scan**, reveal fruit count and chlorophyll indices, or enter **Subterranean Root X-Ray mode**.
+3. **All 64 Bangladesh Zillas Satellite GIS Map (Land & Weather):**
+   * Select from the quick-switch pills (`[📍 My Live GPS]`, `[🌾 Mymensingh]`, `[🏙️ Bakshibazar, Dhaka]`, `[🌱 Bogura]`, `[☀️ Rajshahi]`, `[🌊 Sylhet]`, `[🌴 Khulna]`) or search any upazila or district.
+   * Click or drag the marker anywhere on the high-resolution Esri World Imagery satellite map to dynamically calculate nearest river/canal distance and 30-AEZ agro-meteorological metrics.
+4. **Climate Scenario Simulator & 4-Year Crop Rotation Planner (2026–2029):**
+   * Move the interactive sliders: **Rainfall change (-30% to +30%)**, **Temperature change (-3°C to +5°C)**, and **Water availability (-30% to +20%)**.
+   * Watch the AI decision engine recompute crop survivability in real time, shifting recommendations (`Maize` ↔ `Sorghum` ↔ `Boro Rice`) and forecasting financial yield in **BDT (৳)**.
+   * Explore the 4-Year Rotation Planner to analyze soil nitrogen regeneration and disease cycle interruption.
+5. **Bilingual Farmer Buddy AI (English & বাংলা):**
+   * Switch language using the `EN / বাং` toggle in the top navbar. Every heading, telemetry pill, badge, and label immediately updates into natural Bengali or English.
+   * Click the floating **Farmer Buddy AI** launcher at the bottom-right to open the responsive assistant, featuring context-aware agronomic answers tailored to the active field coordinates.
 
 ---
 
-## 🌟 Key Features & Architectural Innovations
+## 🛰️ NASA Earth Observation Datasets & Scientific Validity
 
-### 1. Photorealistic 3D Crop Digital Twin Simulation (Three.js & WebGL)
-- **Physics-Based Rendering (PBR):** Dynamically simulates vegetative growth stages for 15 indigenous crops across multiple soil strata (topsoil, root absorption layer, subsoil).
-- **Multi-Angle Camera Modes:**
-  - 🛸 **Drone Top View:** Orthographic canopy overview for spatial yield assessment.
-  - 🌾 **Crop Close-Up:** Detailed botanical leaf transpiration and stem vigor inspection.
-  - 🧪 **Subsoil Strata View:** NPK nutrient penetration and root moisture uptake depth.
-- **Dynamic Lighting & Diurnal Cycle:** Seamlessly switches between Dawn, Noon, and Night celestial lighting with real-time shadow projection.
-- **Smart Solar IoT Pump Sync:** Visualizes automated solar irrigation pump actuation when SMAP root-zone moisture drops below critical thresholds.
+Field Shift integrates data products from five premier NASA and partner Earth Observation missions:
 
-### 2. All 64 Bangladesh Zillas + Custom Plot GIS Satellite Map
-- **High-Resolution Satellite Basemap:** Leaflet.js engine integrated with Esri World Imagery satellite layer (`24.7471° N, 90.4203° E`).
-- **0ms Instant Fuzzy Multi-Engine Search:**
-  - Instant district search across all **64 Zillas in 8 divisions** supporting English, Bangla, and alternative transliterations (*Chattogram/Chittagong*, *Cumilla/Comilla*, *Jashore/Jessore*, *Bogura/Bogra*, *Barishal/Barisal*).
-  - Sub-district & Agricultural Hub resolution (*Bakshibazar Dhaka, Trishal Mymensingh, Srimangal Tea Belt, Gadkhali Flower Zone, Bhimruli Floating Market*).
-  - 8-Division Quick Selector dropdown right in the map HUD.
-- **Spatial Telemetry Interconnection:** Clicking any point on the Bangladesh landmass automatically measures proximity to the nearest river (e.g., *Old Brahmaputra, Buriganga, Gumti, Surma*), nearest water reservoir, soil condition, and agro-ecological zone (AEZ).
-
-### 3. Multilingual "Farmer Buddy" AI Agronomist (কৃষি বন্ধু)
-- **Bilingual Interface:** Converses naturally in native Bangla and English via speech and text.
-- **Tier-3 Architecture:**
-  - **Tier 1:** Native client-side agroclimatology rule engine with 0ms response time for low-bandwidth environments.
-  - **Tier 2:** Enriched NASA SMAP, MODIS, and weather telemetry context injection.
-  - **Tier 3:** High-speed Gemini API integration providing contextual pest control, fertilizer NPK ratio calculations, and climate adaptation strategies.
-
-### 4. Climate Scenario Simulator & Dual-Axis Yield Model
-- **Real-Time Dual-Line Visualization:** Interactive Chart.js canvas graphing **Monthly Rainfall (mm)** against **Water Availability (%)**.
-- **Interactive Stress Sliders:**
-  - 🌧️ *Rainfall Variance:* $-50\%$ drought to $+50\%$ flood conditions.
-  - 🌡️ *Temperature Anomaly:* $-3^\circ\text{C}$ cooling to $+5^\circ\text{C}$ heatwave.
-  - 💧 *Canal & Reservoir Capacity:* Real-time water table adjustment.
-- **Predictive Crop Recommendation:** Automatically calculates shifting economic yield and advises switching to climate-resilient alternative crops.
-
-### 5. 4-Year Multi-Season Field Rotation & 15-Crop Lifecycle Tracker
-- **Soil Health Preservation (2026–2029):** Rotates nitrogen-fixing legumes, high-biomass cereals, and cash crops to rebuild soil nitrogen and interrupt pest life cycles.
-- **15 Cultivars Supported:** *Rice (Aman, Boro, Aus), Wheat, Jute, Potato, Tomato, Mustard, Lentils, Maize, Eggplant, Onion, Chili, Carrot, Cauliflower, Cucumber, Papaya*.
+| NASA Mission / Dataset | Physical Parameter Ingested | Spatial / Temporal Resolution | Official Source Portal | How Field Shift Uses It in Production |
+| :--- | :--- | :---: | :--- | :--- |
+| **NASA SMAP**<br/>*(Soil Moisture Active Passive)* | Surface (0–5 cm) & Root-Zone (0–100 cm) Soil Moisture (`GWETROOT`, `GWETTOP`) | 9 km grid<br/>Updated 2–3 days | [NASA Earthdata](https://earthdata.nasa.gov/) / [SMAP JPL](https://smap.jpl.nasa.gov/) | Powers the 4-Zone Live Radar HUD, triggers precision irrigation alerts (Deficit vs. Optimal vs. Waterlogged), and drives 3D subterranean root moisture physics. |
+| **NASA MODIS & VIIRS**<br/>*(Terra & Aqua Satellites)* | Normalized Difference Vegetation Index (NDVI) & Photosynthetically Active Radiation (`PAR Flux`) | 250 m – 1 km<br/>Daily / 8-day composite | [NASA Worldview](https://worldview.earthdata.nasa.gov/) / [Eyes on the Earth](https://eyes.nasa.gov/apps/earth/) | Evaluates vegetative vigor (0.52–0.76 NDVI), drives chlorophyll health indicators in the AR inspector, and calculates fertilizer uptake timing. |
+| **NASA POWER & MERRA-2**<br/>*(GMAO Agroclimatology)* | Surface Solar Irradiance (`ALLSKY_SFC_SW_DWN`), 2m Air Temp (`T2M`), Wind Speed (`WS2M`), Relative Humidity (`RH2M`) | 0.5° × 0.625°<br/>Hourly / Daily API | [NASA POWER Portal](https://power.larc.nasa.gov/) / [GMAO Reanalysis](https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/) | Ingested by the 7-Day Hyper-Local Krishi Weather Forecast, safe spraying window calculator, and Climate Scenario Simulator. |
+| **NASA ECOSTRESS**<br/>*(ISS Thermal Radiometer)* | Land Surface Temperature (LST), Evapotranspiration (ET) & Evaporative Stress Index (ESI) | 70 m pixel<br/>Variable ISS orbit | [NASA AppEEARS](https://appeears.earthdatacloud.nasa.gov/) / [ECOSTRESS JPL](https://ecostress.jpl.nasa.gov/) | Detects microclimate heatwave canopy stress days before visible crop wilting, warning farmers before irreversible yield damage occurs. |
+| **NASA GPM IMERG**<br/>*(Global Precipitation Measurement)* | Multi-satellite High-Resolution Precipitation Rates (`PRECTOTCORR`, mm/day) | 0.1° (~10 km)<br/>Half-hourly / Daily | [NASA GPM Mission](https://gpm.nasa.gov/) / [GES DISC](https://disc.gsfc.nasa.gov/) | Calibrates localized rainfall baselines across all 64 Bangladesh districts, powering monsoon anomaly detection and haor flash-flood warnings. |
 
 ---
 
-## 🛠️ Technology Stack Breakdown
+## 🏗️ System Architecture & Technology Stack
 
-```text
-Frontend Layer:       HTML5 (Semantic), Modern CSS3 (Dark Glassmorphism, CSS Grid/Flexbox), ES6+ Vanilla JS
-3D Graphics:          Three.js (r160), WebGL Shader Materials, Procedural Botanical Geometry
-GIS & Mapping:        Leaflet.js (v1.9.4), Esri World Imagery Satellite Tiles, Photon Geocoding API
-Data Visualization:   Chart.js (v4.4), Custom Agro-Ecological Zone (AEZ) Telemetry Matrix
-Backend (Optional):   Python 3.10+, FastAPI, Uvicorn, Pydantic, python-dotenv
-AI & Machine Learning:Google Gemini Multimodal API (gemini-2.5-flash) + Native Agronomic Expert Rules
-Deployment & CI/CD:   GitHub Pages, GitHub Actions (Decoupled Multi-Job Pipeline: Build & Deploy)
+```
++----------------------------------------------------------------------------------------------------+
+|                                    FIELD SHIFT ARCHITECTURE                                        |
++----------------------------------------------------------------------------------------------------+
+|                                                                                                    |
+|   [ ORBITAL TELEMETRY LAYER ]                                                                      |
+|   • NASA SMAP (Soil Moisture)    • NASA MODIS (NDVI & PAR)       • NASA ECOSTRESS (Canopy Temp)    |
+|   • NASA POWER (Solar & Temp)    • NASA MERRA-2 (Agroclimate)    • NASA GPM IMERG (Precipitation)  |
+|                                         |                                                          |
+|                                         v                                                          |
+|   [ BACKEND & AGRO-METEOROLOGICAL ENGINE ]                                                         |
+|   • 64-Zilla Agro-Ecological Zone (AEZ) Database (0ms Latency Built-in Telemetry)                   |
+|   • Dual Reverse Geocoding Engine (Photon API + OpenStreetMap Nominatim Fallback)                  |
+|   • Node.js / Express Gemini API Proxy (`/api/gemini/chat` with Local Offline Fallback)            |
+|                                         |                                                          |
+|                                         v                                                          |
+|   [ PRESENTATION & CLIENT-SIDE RUNTIME ]                                                           |
+|   +------------------------------------+  +----------------------------------------------------+   |
+|   | 3D Digital Twin Engine (Three.js)  |  | Interactive GIS & Satellite Mapping (Leaflet.js)   |   |
+|   | • 60 FPS Locked Adaptive WebGL     |  | • Esri World Imagery Satellite Tiles               |   |
+|   | • Viewport-Aware Observer (0% GPU) |  | • Real-Time Hydrological Distance Calculations     |   |
+|   | • PBR Lighting, Wind Shader, AR    |  | • 64 District Coordinates & Dynamic Pins           |   |
+|   +------------------------------------+  +----------------------------------------------------+   |
+|   +------------------------------------+  +----------------------------------------------------+   |
+|   | Decision Support & Simulation UI   |  | Bilingual AI Farmer Buddy Engine                   |   |
+|   | • Climate Scenario Sliders (৳ BDT) |  | • Gemini Multimodal Agriculture System Prompt      |   |
+|   | • 4-Year Crop Rotation Matrices    |  | • English ↔ বাংলা Instant UI Localization Engine   |   |
+|   | • Responsive Glassmorphism         |  | • Mobile Bottom-Sheet Modal (82dvh, Touch Ergonomic|   |
+|   +------------------------------------+  +----------------------------------------------------+   |
++----------------------------------------------------------------------------------------------------+
 ```
 
----
-
-## 🚀 Quick Start & Local Execution Guide
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/g-sadi/Nasa-Space-Apps-Challenge-website.git
-cd Nasa-Space-Apps-Challenge-website
-```
-
-### 2. Run Frontend Web Application (Zero Installation Required)
-FieldShift is a zero-build client-side application. Run with any local static HTTP server:
-
-```bash
-# Using Python built-in server
-python -m http.server 8080
-
-# Or using Node.js
-npx serve -l 8080 .
-```
-
-Open your browser and visit: `http://localhost:8080`
-
-### 3. (Optional) Run the Local FastAPI AI Backend
-To enable the optional backend proxy for Gemini streaming:
-```bash
-cd backend
-python -m venv venv
-venv\Scripts\activate       # On Windows
-source venv/bin/activate    # On Linux/macOS
-pip install -r requirements.txt
-python main.py
-```
+### Key Engineering Highlights:
+* **Zero-Lag 60 FPS Three.js WebGL Engine:** Equipped with smart adaptive pixel ratio (`1.5x` on mobile, `2.0x` on desktop), throttled pointermove raycasting (50ms gate), and an `IntersectionObserver` that completely pauses rendering when off-screen or tab-hidden to prevent mobile device overheating.
+* **Ergonomic Responsive UI:** Zero horizontal overflow (`document.documentElement.scrollWidth <= document.documentElement.clientWidth`) across all screens (iPhone 375px, Android 412px, iPad 768px, Tablet 1024px, Desktop 1366px, 1920px+).
+* **High-Contrast Glassmorphic Aesthetics:** Emerald and dark-forest palettes engineered for outdoor readability under direct sunlight in agricultural fields.
+* **Bilingual English & Bengali Localization:** Instant client-side state synchronization across all 15 crops, 64 districts, and simulated climate scenarios.
 
 ---
 
 ## 👥 Team ASL Spectra (Credits & Roles)
 
-*Proudly developed for the **2026 NASA International Space Apps Challenge** by **Team ASL Spectra** from Bangladesh:*
+Proudly engineered for the **2026 NASA International Space Apps Challenge** by **Team ASL Spectra** from Mymensingh, Bangladesh:
 
-- **Monjir Bin Morshed Sadi**  
-  *Team Lead, Principal Full-Stack Architect & 3D WebGL Visualization Engineer*  
-  GitHub: [@g-sadi](https://github.com/g-sadi)
+| Team Member | Official Role & Core Technical Contribution | Profile / Attribution |
+| :--- | :--- | :---: |
+| **Monjir Bin Morshed Sadi** | **Frontend & AI/ML Developer**<br/>• 3D WebGL Digital Twin & Shader Architecture (Three.js)<br/>• System Architecture, Performance Engineering & Lead Maintainer | [![GitHub](https://img.shields.io/badge/GitHub-@g--sadi-181717?style=flat&logo=github)](https://github.com/g-sadi) |
+| **Fahmida Ahmed** | **Full Stack & AI/ML Developer**<br/>• Agronomic Data Modeling & Climate Resilience Formulations<br/>• AI Assistant Integration & NASA Satellite Telemetry Pipelines | [Team ASL Spectra Profile](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) |
+| **Fatima Tuzzohora** | **UI/UX Designer & Data Visualization Lead**<br/>• Agri-Tech Glassmorphic Interface Design & Accessibility<br/>• 4-Zone Telemetry Radar HUD & Visual Assets Architecture | [Team ASL Spectra Profile](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) |
+| **Abdullah Bin Rakib** | **Media, Research & Documentation Lead**<br/>• Agro-Ecological Field Research & Farmer Persona Studies<br/>• Pitch Video Production, Voiceover & Scientific Storyboarding | [Team ASL Spectra Profile](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) |
+| **Tachin Mahabub Tonoy** | **Researcher & Backend Developer**<br/>• NASA Earth Observation API Pipeline Architecture<br/>• Environmental Data Cleansing & Satellite Telemetry Processing | [Team ASL Spectra Profile](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) |
+| **Md. Mahbub Alam** | **Frontend Developer**<br/>• Interactive 64-Zilla GIS Satellite Mapping (Leaflet / Esri)<br/>• Mobile Responsive Layouts & Climate Scenario Simulator Controls | [Team ASL Spectra Profile](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/) |
 
-- **Fahmida Ahmed**  
-  *Co-Lead, Agricultural Data Modeling, Agronomy Research & Space Telemetry Lead*  
-  GitHub: [@FahmidaAhmed](https://github.com/FahmidaAhmed)
+> **Repository Maintainer Note:** Code commits, technical deployment pipelines, and GitHub repository administration are managed by Monjir Bin Morshed Sadi ([@g-sadi](https://github.com/g-sadi)). All six team members are officially registered and verifiable on the [NASA Space Apps Challenge Team Page](https://www.spaceappschallenge.org/2026/find-a-team/asl_spectra/).
 
 ---
 
-## 📄 License & Open-Source Attribution
-This project is licensed under the **MIT License** — open-sourced for the global agricultural and space science community. All NASA satellite data and APIs are utilized under the [NASA Open Data Policy](https://www.nasa.gov/open/data.html).
+## 📜 License & Open-Source Attribution
+
+This project is licensed under the **MIT License** — open-sourced for the benefit of smallholder farmers, researchers, and agronomists worldwide.
+
+All NASA satellite data, products, and APIs utilized in Field Shift comply with the [NASA Open Data Policy](https://www.nasa.gov/open/data.html) and US Federal Open Science guidelines. Satellite basemaps are provided by Esri World Imagery under open GIS evaluation terms.
 
 <div align="center">
 <br/>
 
 **Transforming NASA Earth Observations into Harvests of Hope.**  
-*NASA Space Apps Challenge 2026 • Team ASL Spectra*
+*NASA International Space Apps Challenge 2026 • Team ASL Spectra*
 
 </div>
