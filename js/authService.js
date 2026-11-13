@@ -540,7 +540,8 @@ export class FarmerAuthEngine {
 
     updateNavbarBadge() {
         const container = document.getElementById("navFarmerAuthContainer");
-        if (!container) return;
+        const mobileContainer = document.getElementById("navMobileFarmerAuthContainer");
+        if (!container && !mobileContainer) return;
 
         const isBn = (window.currentAppLanguage === "bn");
         const farmer = this.activeSession;
@@ -554,8 +555,8 @@ export class FarmerAuthEngine {
                 ? (isBn ? '২৫ একর (৭৫ বিঘা)' : '25 Acres (75 Bigha)')
                 : `${farmer.landSizeDecimals} ${isBn ? 'শতক' : 'dec'}`;
 
-            container.innerHTML = `
-                <button class="nav-farmer-badge" id="btnNavFarmerProfile" title="${isBn ? 'কৃষক প্রোফাইল দেখুন ও পরিবর্তন করুন' : 'View & Switch Farmer Profile'}">
+            const badgeHtml = (btnId) => `
+                <button class="nav-farmer-badge" id="${btnId}" title="${isBn ? 'কৃষক প্রোফাইল দেখুন ও পরিবর্তন করুন' : 'View & Switch Farmer Profile'}">
                     <span class="farmer-avatar">👨‍🌾</span>
                     <span class="farmer-info">
                         <strong class="farmer-name">${farmer.name}</strong>
@@ -565,26 +566,53 @@ export class FarmerAuthEngine {
                 </button>
             `;
 
-            const btn = document.getElementById("btnNavFarmerProfile");
-            if (btn) {
-                btn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    this.toggleProfilePopover();
-                });
+            if (container) {
+                container.innerHTML = badgeHtml("btnNavFarmerProfile");
+                const btn = document.getElementById("btnNavFarmerProfile");
+                if (btn) {
+                    btn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        this.toggleProfilePopover();
+                    });
+                }
+            }
+
+            if (mobileContainer) {
+                mobileContainer.innerHTML = badgeHtml("btnNavMobileFarmerProfile");
+                const mBtn = document.getElementById("btnNavMobileFarmerProfile");
+                if (mBtn) {
+                    mBtn.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        this.toggleProfilePopover();
+                    });
+                }
             }
         } else {
-            container.innerHTML = `
-                <button class="nav-farmer-login-btn" id="btnNavFarmerLogin">
+            const loginHtml = (btnId, extraCls = '') => `
+                <button class="nav-farmer-login-btn ${extraCls}" id="${btnId}">
                     <span class="btn-icon">👨‍🌾</span>
                     <span class="btn-text">${isBn ? 'কৃষক প্রবেশ (Login)' : 'Farmer Login'}</span>
                 </button>
             `;
 
-            const btn = document.getElementById("btnNavFarmerLogin");
-            if (btn) {
-                btn.addEventListener("click", () => {
-                    this.openAuthModal("login");
-                });
+            if (container) {
+                container.innerHTML = loginHtml("btnNavFarmerLogin");
+                const btn = document.getElementById("btnNavFarmerLogin");
+                if (btn) {
+                    btn.addEventListener("click", () => {
+                        this.openAuthModal("login");
+                    });
+                }
+            }
+
+            if (mobileContainer) {
+                mobileContainer.innerHTML = loginHtml("btnNavMobileFarmerLogin", "mobile-login-btn");
+                const mBtn = document.getElementById("btnNavMobileFarmerLogin");
+                if (mBtn) {
+                    mBtn.addEventListener("click", () => {
+                        this.openAuthModal("login");
+                    });
+                }
             }
         }
     }

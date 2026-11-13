@@ -2912,7 +2912,12 @@
         }, 800);
         window.addEventListener('resize', () => {
             if (farmMap) farmMap.invalidateSize();
-        });
+        }, { passive: true });
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                if (farmMap) farmMap.invalidateSize();
+            }, 200);
+        }, { passive: true });
     }
 
     /*

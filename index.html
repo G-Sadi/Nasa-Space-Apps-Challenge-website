@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 
     <title>Field Shift — Smart Farm Intelligence & 3D Agricultural Digital Twin</title>
 
@@ -110,9 +110,41 @@
             <button class="nav-btn" onclick="scrollToAnalysis()" data-i18n="nav-btn">
                 Start analysis
             </button>
+
+            <!-- Sleek Animated Mobile Hamburger Toggle Button (<= 1024px) -->
+            <button class="nav-menu-toggle" id="navMenuToggle" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="navMobileDrawer">
+                <span class="menu-bar bar-1"></span>
+                <span class="menu-bar bar-2"></span>
+                <span class="menu-bar bar-3"></span>
+            </button>
         </div>
 
     </header>
+
+    <!-- MOBILE GLASSMORPHIC NAVIGATION DRAWER (<= 1024px) -->
+    <div class="nav-mobile-drawer" id="navMobileDrawer" aria-hidden="true">
+        <div class="mobile-drawer-inner">
+            <nav class="mobile-nav-links">
+                <a href="#farmSimulation" class="mobile-nav-item" data-i18n="nav-3d">3D Live Field</a>
+                <a href="#landLocation" class="mobile-nav-item" data-i18n="nav-land-weather">Land & Weather</a>
+                <a href="#simulation" class="mobile-nav-item" data-i18n="nav-simulator">Scenario Simulator</a>
+                <a href="#rotation" class="mobile-nav-item" data-i18n="nav-rotation">Crop Rotation</a>
+                <a href="#lifecycle" class="mobile-nav-item" data-i18n="nav-lifecycle">Crop Lifecycle</a>
+                <a href="#aiAdvisor" class="mobile-nav-item" id="mobileNavLinkAiAdvisor" data-i18n="nav-ai-advisor">AI Advisor</a>
+            </nav>
+            <div class="mobile-drawer-actions">
+                <div id="navMobileFarmerAuthContainer" class="mobile-farmer-auth">
+                    <button class="nav-farmer-login-btn mobile-login-btn" id="btnNavMobileFarmerLogin" title="Farmer Login / কৃষক প্রবেশ">
+                        <span class="btn-icon">👨‍🌾</span>
+                        <span class="btn-text">কৃষক প্রবেশ (Login)</span>
+                    </button>
+                </div>
+                <button class="mobile-nav-cta-btn" onclick="scrollToAnalysis()" data-i18n="nav-btn">
+                    Start analysis
+                </button>
+            </div>
+        </div>
+    </div>
 
 
     <!-- HERO -->

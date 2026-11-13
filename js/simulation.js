@@ -5735,20 +5735,30 @@ function initRaycasting() {
         }
     };
 
+    let lastMoveTime = 0;
+    let moveRafId = null;
     const onPointerMove = (event) => {
         if (!renderer || !camera || isTransitioningCamera) return;
-        const rect = renderer.domElement.getBoundingClientRect();
-        mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-        mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-        raycaster.setFromCamera(mouse, camera);
+        const now = performance.now();
+        if (now - lastMoveTime < 50) return; // 50ms throttle gate for zero-lag 60fps
+        lastMoveTime = now;
 
-        const hoverTargets = [];
-        if (fruitInstancedMesh) hoverTargets.push(fruitInstancedMesh);
-        if (stemInstancedMesh) hoverTargets.push(stemInstancedMesh);
-        if (leafInstancedMesh) hoverTargets.push(leafInstancedMesh);
+        if (moveRafId) cancelAnimationFrame(moveRafId);
+        moveRafId = requestAnimationFrame(() => {
+            if (!renderer || !camera) return;
+            const rect = renderer.domElement.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
 
-        const hits = raycaster.intersectObjects(hoverTargets, false);
-        renderer.domElement.style.cursor = (hits.length > 0) ? "pointer" : "default";
+            const hoverTargets = [];
+            if (fruitInstancedMesh) hoverTargets.push(fruitInstancedMesh);
+            if (stemInstancedMesh) hoverTargets.push(stemInstancedMesh);
+            if (leafInstancedMesh) hoverTargets.push(leafInstancedMesh);
+
+            const hits = raycaster.intersectObjects(hoverTargets, false);
+            renderer.domElement.style.cursor = (hits.length > 0) ? "pointer" : "default";
+        });
     };
 
     renderer.domElement.addEventListener("pointerdown", onPointerDown, { passive: true });
@@ -6837,14 +6847,16 @@ export function init3DFieldSimulation() {
 
     try {
         renderer = new THREE.WebGLRenderer({
-            antialias: window.devicePixelRatio < 2,
+            antialias: true,
             powerPreference: "high-performance",
+            precision: "highp",
             alpha: false,
             stencil: false,
             depth: true
         });
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+        const isMobileDpi = window.matchMedia("(max-width: 768px)").matches;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileDpi ? 1.5 : 2.0));
         renderer.setClearColor(0xdceefb, 1.0);
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.15;
@@ -6888,12 +6900,12 @@ export function init3DFieldSimulation() {
 
     controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.03;
+    controls.dampingFactor = 0.06;
+    controls.maxPolarAngle = Math.PI / 2 - 0.04;
     controls.minDistance = 0.8;
     controls.maxDistance = 24.0;
-    controls.rotateSpeed = 0.6;
-    controls.zoomSpeed = 0.8;
+    controls.rotateSpeed = 0.7;
+    controls.zoomSpeed = 0.9;
     controls.enablePan = true;
     controls.panSpeed = 0.6;
     controls.target.set(0, 0.65, 0);
@@ -7015,20 +7027,21 @@ window.init3DFieldSimulation = init3DFieldSimulation;
 // 19. VIEWPORT-AWARE RENDERING (PAUSE OFF-SCREEN & ON INACTIVE TABS)
 // =============================================================================
 function setupViewportAwareRendering(container) {
-    if (!container) return;
+    const target = document.getElementById("farmSimulation") || container;
+    if (!target) return;
     if ("IntersectionObserver" in window) {
         const observer = new IntersectionObserver((entries) => {
             for (const entry of entries) {
                 isSceneVisible = entry.isIntersecting;
                 handleVisibilityChange();
             }
-        }, { threshold: 0.05 });
-        observer.observe(container);
+        }, { threshold: 0.05, rootMargin: "100px 0px" });
+        observer.observe(target);
     }
     document.addEventListener("visibilitychange", () => {
-        isDocumentVisible = (document.visibilityState === "visible");
+        isDocumentVisible = (document.visibilityState === "visible" && !document.hidden);
         handleVisibilityChange();
-    });
+    }, { passive: true });
 }
 
 function handleVisibilityChange() {
@@ -7061,7 +7074,8 @@ function onWindowResize() {
         camera.updateProjectionMatrix();
 
         renderer.setSize(width, height);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2.0));
+        const isMobileResize = window.matchMedia("(max-width: 768px)").matches;
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, isMobileResize ? 1.5 : 2.0));
         formatDropdownLabelsForMobile();
         requestShadowUpdate();
     }, 100);

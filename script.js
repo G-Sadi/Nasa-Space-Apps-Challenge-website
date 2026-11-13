@@ -588,15 +588,109 @@ function initNavbarActiveTracker() {
     });
 }
 
+
+// =============================================================================
+// MOBILE NAVIGATION DRAWER & SMOOTH TOUCH ERGONOMICS (<= 1024px)
+// =============================================================================
+function initMobileNavDrawer() {
+    const menuToggle = document.getElementById("navMenuToggle");
+    const mobileDrawer = document.getElementById("navMobileDrawer");
+    if (!menuToggle || !mobileDrawer) return;
+
+    function toggleDrawer(forceState) {
+        const shouldOpen = (typeof forceState === "boolean")
+            ? forceState
+            : !mobileDrawer.classList.contains("open");
+
+        if (shouldOpen) {
+            mobileDrawer.classList.add("open");
+            mobileDrawer.setAttribute("aria-hidden", "false");
+            menuToggle.classList.add("active");
+            menuToggle.setAttribute("aria-expanded", "true");
+        } else {
+            mobileDrawer.classList.remove("open");
+            mobileDrawer.setAttribute("aria-hidden", "true");
+            menuToggle.classList.remove("active");
+            menuToggle.setAttribute("aria-expanded", "false");
+        }
+    }
+
+    menuToggle.addEventListener("click", (e) => {
+        e.stopPropagation();
+        toggleDrawer();
+    });
+
+    // Handle clicks on mobile nav links
+    const mobileLinks = mobileDrawer.querySelectorAll(".mobile-nav-item");
+    mobileLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            const href = link.getAttribute("href");
+            toggleDrawer(false);
+
+            if (href === "#aiAdvisor") {
+                e.preventDefault();
+                const targetEl = document.getElementById("spatialArContainer") || document.getElementById("farmSimulation");
+                if (targetEl) targetEl.scrollIntoView({ behavior: "smooth" });
+                setTimeout(() => {
+                    if (window.farmerBuddyInstance && typeof window.farmerBuddyInstance.toggleWindow === "function") {
+                        window.farmerBuddyInstance.toggleWindow(true);
+                    } else {
+                        const fab = document.getElementById("farmerBuddyFAB");
+                        if (fab) fab.click();
+                    }
+                }, 350);
+            } else if (href && href.startsWith("#") && href !== "#") {
+                const target = document.querySelector(href);
+                if (target) {
+                    e.preventDefault();
+                    target.scrollIntoView({ behavior: "smooth" });
+                    if (history.pushState) history.pushState(null, null, href);
+                }
+            }
+        });
+    });
+
+    // Auto-close on clicking mobile action buttons (e.g. login or start analysis)
+    const mobileActionBtns = mobileDrawer.querySelectorAll(".mobile-nav-cta-btn, .mobile-login-btn");
+    mobileActionBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            toggleDrawer(false);
+        });
+    });
+
+    // Close on clicking outside the drawer
+    document.addEventListener("click", (e) => {
+        if (mobileDrawer.classList.contains("open") && !mobileDrawer.contains(e.target) && !menuToggle.contains(e.target)) {
+            toggleDrawer(false);
+        }
+    }, { passive: true });
+
+    // Close on Escape key
+    window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && mobileDrawer.classList.contains("open")) {
+            toggleDrawer(false);
+        }
+    }, { passive: true });
+
+    // Close drawer if screen resizes to desktop (> 1024px)
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 1024 && mobileDrawer.classList.contains("open")) {
+            toggleDrawer(false);
+        }
+    }, { passive: true });
+}
+
 // Initial trigger
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", () => {
         calculateScenario();
         updateRotation(2026);
         initNavbarActiveTracker();
+        initMobileNavDrawer();
     });
 } else {
     calculateScenario();
     updateRotation(2026);
     initNavbarActiveTracker();
+    initMobileNavDrawer();
 }

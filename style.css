@@ -7,8 +7,8 @@
 html {
     scroll-behavior: smooth;
     scroll-padding-top: 76px;
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     box-sizing: border-box;
     -webkit-text-size-adjust: 100%;
@@ -19,8 +19,8 @@ body {
     background: #06150f;
     color: #f1f7f3;
     line-height: 1.6;
-    width: 100vw;
-    max-width: 100vw;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
@@ -44,7 +44,7 @@ header,
     z-index: 1000;
 
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
     box-sizing: border-box;
     height: 68px;
 
@@ -247,6 +247,174 @@ button {
     box-sizing: border-box;
     transition: all 0.2s ease;
 }
+
+/* HAMBURGER TOGGLE BUTTON & MOBILE NAVIGATION DRAWER */
+.nav-menu-toggle {
+    display: none;
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+    min-height: 42px;
+    padding: 0;
+    background: rgba(46, 213, 115, 0.1);
+    border: 1px solid rgba(46, 213, 115, 0.28);
+    border-radius: 10px;
+    cursor: pointer;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
+
+.nav-menu-toggle:hover,
+.nav-menu-toggle:active {
+    background: rgba(46, 213, 115, 0.2);
+    border-color: rgba(46, 213, 115, 0.5);
+}
+
+.nav-menu-toggle .menu-bar {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #2ed573;
+    border-radius: 2px;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease;
+}
+
+.nav-menu-toggle.active .bar-1 {
+    transform: translateY(7px) rotate(45deg);
+}
+
+.nav-menu-toggle.active .bar-2 {
+    opacity: 0;
+}
+
+.nav-menu-toggle.active .bar-3 {
+    transform: translateY(-7px) rotate(-45deg);
+}
+
+.nav-mobile-drawer {
+    display: none;
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 0;
+    opacity: 0;
+    visibility: hidden;
+    overflow: hidden;
+    pointer-events: none;
+    background: rgba(6, 20, 14, 0.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(46, 213, 115, 0.25);
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, visibility 0.25s ease;
+    transform: translateZ(0);
+    box-sizing: border-box;
+}
+
+.nav-mobile-drawer.open {
+    max-height: 85vh;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.mobile-drawer-inner {
+    padding: 16px 18px 24px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    box-sizing: border-box;
+}
+
+.mobile-nav-links {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mobile-nav-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(240, 253, 244, 0.9);
+    text-decoration: none;
+    border-radius: 10px;
+    border-left: 3px solid transparent;
+    background: rgba(255, 255, 255, 0.02);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-item:hover,
+.mobile-nav-item:active {
+    color: #2ed573;
+    background: rgba(46, 213, 115, 0.12);
+    border-left-color: #2ed573;
+    padding-left: 18px;
+}
+
+.mobile-drawer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mobile-farmer-auth {
+    width: 100%;
+}
+
+.mobile-farmer-auth .nav-farmer-badge {
+    width: 100%;
+    max-width: 100%;
+    justify-content: flex-start;
+    height: 44px;
+    padding: 0 12px;
+}
+
+.mobile-farmer-auth .nav-farmer-login-btn {
+    width: 100%;
+    height: 44px;
+    justify-content: center;
+    display: flex;
+}
+
+.mobile-nav-cta-btn {
+    width: 100%;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #2ed573, #1eae5f);
+    color: #04160e;
+    font-weight: 700;
+    font-size: 14.5px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(46, 213, 115, 0.35);
+    transition: all 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mobile-nav-cta-btn:active {
+    transform: scale(0.98);
+}
+
 
 .nav-btn:hover {
     transform: translateY(-1px);
@@ -4134,42 +4302,67 @@ body.lang-bn strong {
     }
 }
 
-@media (max-width: 960px) {
+@media (max-width: 1024px) {
     header,
     .navbar {
-        height: auto;
-        min-height: 60px;
-        padding: 8px 12px;
-        flex-wrap: wrap !important;
-        gap: 8px;
+        height: 60px !important;
+        min-height: 60px !important;
+        max-height: 60px !important;
+        padding: 0 16px !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        gap: 12px !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
     }
+
     .brand-logo,
     .logo {
-        order: 1;
+        display: inline-flex !important;
+        align-items: center !important;
+        flex-shrink: 0 !important;
+        order: 1 !important;
     }
-    .nav-right-actions {
-        order: 2;
-    }
+
+    /* Hide desktop links from horizontal top bar */
     .nav-links,
     nav {
-        order: 3;
-        width: 100%;
-        overflow-x: auto;
-        justify-content: flex-start;
-        padding: 4px 2px;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        display: none !important;
     }
-    .nav-links::-webkit-scrollbar,
-    nav::-webkit-scrollbar {
-        display: none;
+
+    /* Right Group: Lang toggle + Hamburger button */
+    .nav-right-actions {
+        display: inline-flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 10px !important;
+        flex-shrink: 0 !important;
+        order: 2 !important;
     }
-    .nav-links a,
-    .nav-links .nav-item,
-    nav a {
-        padding: 4px 8px;
-        font-size: 11.5px;
+
+    .nav-farmer-auth,
+    .nav-farmer-badge,
+    .nav-btn {
+        display: none !important;
+    }
+
+    .lang-switch-container {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+
+    .nav-menu-toggle {
+        display: inline-flex !important;
+    }
+
+    .nav-mobile-drawer {
+        display: block;
     }
 
     .hero {
@@ -6321,7 +6514,7 @@ body.lang-bn strong {
 
     .farm-data-drawer {
         width: 100%;
-        max-width: 100vw;
+        max-width: 100%;
     }
 }
 
@@ -7404,7 +7597,7 @@ body.lang-bn strong {
         right: 14px !important;
         left: auto !important;
         width: auto !important;
-        max-width: 100vw !important;
+        max-width: 100% !important;
         pointer-events: none !important;
         position: fixed !important;
         z-index: 99999 !important;
@@ -11493,4 +11686,257 @@ body.lang-bn strong {
 .nasa-source-badge span.badge-desc {
     color: #8ca097;
     font-size: 11px;
+}
+
+
+/* =============================================================================
+   60 FPS THREE.JS, ERGONOMIC TOUCH TARGETS & MOBILE PERFORMANCE SUITE
+   ============================================================================= */
+
+/* Touch-Friendly Range Sliders (24x24px Target Hit Area) */
+input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    outline: none;
+    margin-top: 15px;
+    accent-color: #43ef8c;
+    cursor: pointer;
+    touch-action: pan-y;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #43ef8c;
+    border: 3px solid #062316;
+    box-shadow: 0 0 10px rgba(67, 239, 140, 0.7);
+    cursor: pointer;
+    transition: transform 0.12s ease;
+}
+
+input[type="range"]::-webkit-slider-thumb:active {
+    transform: scale(1.2);
+}
+
+input[type="range"]::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #43ef8c;
+    border: 3px solid #062316;
+    box-shadow: 0 0 10px rgba(67, 239, 140, 0.7);
+    cursor: pointer;
+}
+
+/* Fluid Hero Typography & 4-Zone Radar HUD (<= 992px) */
+@media (max-width: 992px) {
+    .hero {
+        grid-template-columns: 1fr !important;
+        gap: 24px !important;
+        padding: 40px 5% !important;
+        min-height: auto !important;
+    }
+
+    .hero h1 {
+        font-size: clamp(2.1rem, 5.5vw, 4.2rem) !important;
+        line-height: 1.08 !important;
+        letter-spacing: -2px !important;
+        margin: 14px 0 !important;
+    }
+
+    .scanner-zones-container {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+        height: auto !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        margin-top: 10px !important;
+    }
+
+    /* 64-Zilla Satellite Map & Location Switcher */
+    .location-layout {
+        grid-template-columns: 1fr !important;
+        gap: 20px !important;
+    }
+
+    .location-preset-pills {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        padding-bottom: 6px !important;
+        gap: 8px !important;
+    }
+
+    .location-preset-pills::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .map-search-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 10px !important;
+    }
+
+    .map-search-wrapper,
+    .zillas-dropdown-wrapper {
+        width: 100% !important;
+        min-width: 100% !important;
+        flex: 1 1 100% !important;
+    }
+
+    .map-search-dropdown {
+        z-index: 1200 !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+}
+
+@media (max-width: 400px) {
+    .scanner-zones-container {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* 3D Farm Digital Twin Mobile Height & Telemetry Swipeable Dock (<= 768px) */
+@media (max-width: 768px) {
+    #farmSimulation {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        padding: 0 !important;
+        margin: 1.5rem 0 !important;
+        border-radius: 18px !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+
+    #farm3D {
+        position: relative !important;
+        width: 100% !important;
+        height: 460px !important;
+        min-height: 460px !important;
+        max-height: 460px !important;
+        order: 1 !important;
+        border-radius: 0 !important;
+        margin-top: 0 !important;
+    }
+
+    #farm3D canvas {
+        width: 100% !important;
+        height: 100% !important;
+        display: block !important;
+    }
+
+    /* Dock the 4 telemetry cards into a sleek horizontally swipeable glassmorphic strip */
+    .farmer-status-dock {
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        order: 2 !important;
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        overflow-x: auto !important;
+        scroll-snap-type: x mandatory !important;
+        gap: 10px !important;
+        padding: 10px 14px !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        background: rgba(6, 20, 14, 0.7) !important;
+        border-top: 1px solid rgba(46, 213, 115, 0.15) !important;
+        z-index: 20 !important;
+    }
+
+    .farmer-status-dock::-webkit-scrollbar {
+        display: none !important;
+    }
+
+    .farmer-status-dock .dock-card {
+        scroll-snap-align: start !important;
+        flex: 0 0 auto !important;
+        min-width: 220px !important;
+        max-width: 260px !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Tap Targets for View Pills, Scrubbers & Weather (min-height: 38px) */
+    .fctrl-cam-btn,
+    .fctrl-nasa-btn,
+    .fctrl-toggle-btn,
+    .fctrl-action-btn,
+    .tod-segment-btn,
+    .timeline-play-btn,
+    .speed-btn,
+    .weather-toggle-btn {
+        min-height: 38px !important;
+    }
+
+    .growth-timeline-slider {
+        min-height: 38px !important;
+    }
+
+    /* Responsive Grid for 4-Year Rotation & 7-Day Forecast */
+    .rotation-timeline {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) !important;
+        gap: 12px !important;
+    }
+
+    .weather-cards-strip {
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)) !important;
+        min-width: 0 !important;
+    }
+
+    /* Farmer Buddy AI Mobile Bottom-Sheet (82dvh) */
+    .farmer-buddy-widget {
+        bottom: 16px !important;
+        right: 16px !important;
+    }
+
+    .farmer-buddy-window {
+        position: fixed !important;
+        bottom: 10px !important;
+        right: 10px !important;
+        left: 10px !important;
+        width: calc(100vw - 20px) !important;
+        max-width: calc(100vw - 20px) !important;
+        height: 82dvh !important;
+        max-height: 82dvh !important;
+        border-radius: 20px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* Hardware Accelerated Layers & Blur Optimization for Locked 60 FPS */
+    .glass,
+    .dock-card,
+    .action-card,
+    .weather-day-card,
+    .radar-card,
+    .hud-dock,
+    .map-search-input-box,
+    .map-search-dropdown,
+    .farmer-buddy-window,
+    .nav-mobile-drawer {
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
+        transform: translateZ(0);
+    }
 }
